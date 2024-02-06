@@ -1,0 +1,33 @@
+# Python script providing public variables
+#   for dependent scripts.
+
+import pandas
+
+## shared attributes
+sUtis = ['ele', 'coo', 'hea', 'dhw']
+    # utility types:
+    #   electricity, cooling, heating, domestic hot water
+#fn_exchange = 'exchange_baseline.csv'
+delimiter = ','
+
+## exchange csv files
+dirExch = 'exchange'
+
+## eQuest output csv files
+dirRead = 'eQuest'
+#sBuis = ['1045','1349','1380','1539','1560','1569']
+dfBldg = pandas.read_csv('buildings.csv',
+                     header = 0,
+                     thousands = ',',
+                     dtype = {'bldg_no' : str,
+                              'name' : str,
+                              'area_sf' : float,
+                              'area_m2' : float})
+sBuis = dfBldg['bldg_no'].tolist()
+iCols = [16, 30, 31, 32]
+    # column numbers of the respective utilities
+    #   from the input file (base 0)
+
+## Sympheny input xlsx files
+dirWritSymp = 'Sympheny'
+
