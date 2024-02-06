@@ -23,8 +23,10 @@ def main(sUti: str, sBuis):
         fni = os.path.join(dirExch, MID + '.csv')
         if os.path.isfile(fni):
             dfr = pd.read_csv(os.path.join(dirExch, MID + '.csv'),
-                              header = None)
-            df['value'] = df['value'] + dfr
+                              header = None,
+                              dtype = float,
+                              names = ['value'])
+            df['value'] = df['value'] + dfr['value']
             fno = fno + '_' + sBui
             flag = True
         else:
