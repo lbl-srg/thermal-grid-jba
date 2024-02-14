@@ -1,13 +1,14 @@
 # Python script providing public variables
 #   for dependent scripts.
 
+import os
+
 import pandas as pd
 
 ## shared attributes
 sUtis = ['ele', 'coo', 'hea', 'dhw']
     # utility types:
     #   electricity, cooling, heating, domestic hot water
-#fn_exchange = 'exchange_baseline.csv'
 delimiter = ','
 
 ## exchange csv files
@@ -31,3 +32,13 @@ iCols = [16, 30, 31, 32]
 ## Sympheny input xlsx files
 dirWritSymp = 'Sympheny'
 
+## Figure outputs
+dirFigu = 'Figures'
+
+## functions
+def readMID(MID : str):
+    df = pd.read_csv(os.path.join(dirExch, MID + '.csv'),
+                     header = None,
+                     dtype = float,
+                     names = ['value'])
+    return df['value'].tolist()
