@@ -15,11 +15,12 @@ from _config_estcp import *
 
 # Deletes the folder of the previous written exchange files
 #   and remake the directory
-os.system('rm -rf '+dirExch)
+os.system('rm -rf ' + dirExch)
 os.makedirs(dirExch)
 
 for sBui in sBuis:
-    with open(glob.glob(os.path.join(dirRead, sBui + '*.csv'))[0], newline='') as fr:
+    with open(glob.glob(os.path.join(dirRead, sBui + '*.csv'))[0],
+              newline='') as fr:
         reader = csv.reader(fr, delimiter=',')
         rows = list(reader)
 
@@ -36,7 +37,9 @@ for sBui in sBuis:
             # if column is empty
             continue
 
-        with open(os.path.join(dirExch, sBui + '_' + sUti + '.csv'), 'w', newline='') as fw:
+        with open(os.path.join(dirExch, sBui + '_' + sUti + '.csv'),
+                  'w',
+                  newline='') as fw:
             writer = csv.DictWriter(fw,
                                     fieldnames = ['value'],
                                     delimiter = delimiter)

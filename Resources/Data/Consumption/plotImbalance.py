@@ -19,42 +19,97 @@ from _config_estcp import *
 
 def setXAxisMonths():
     # Set x-axis to display months
+    #   The texts only show in the lowest subplot.
+    #   All other subplots only show the tick marks but not the texts.
     X = plt.gca().xaxis
     X.set_major_locator(mdates.MonthLocator())
     X.set_major_formatter(mdates.DateFormatter('%b'))
     
 def makePlot(tit: str):
+    linewidth = 0.8
+    
     fig = plt.figure()
+    plt.rcParams['figure.figsize'] = [6, 6]
 
     ax = fig.add_subplot(311)
-    h1, = ax.plot(t_hoy, hea, 'r')
-    h1, = ax.plot(t_hoy, dhw, 'm')
-    h1, = ax.plot(t_hoy, - coo, 'b')
-    #plt.title(sBui + ' ' + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0])
-    #plt.title('Combined (six buildings)')
-    plt.title(tit)
+    ax.set_title('Hourly Consumption (kWh/h)',
+                 loc = 'left',
+                 fontsize = 12)
+    h1, = ax.plot(t_hoy, hea,
+                  'r', linewidth = linewidth)
+    h1, = ax.plot(t_hoy, dhw, 'm',
+                  linewidth = linewidth)
+    h1, = ax.plot(t_hoy, - coo,
+                  'b', linewidth = linewidth)
     setXAxisMonths()
     ax.xaxis.set_major_formatter(plt.NullFormatter())
     
     ax = fig.add_subplot(312)
-    h1, = ax.plot(t_ms, heaPea, 'r')
-    h1, = ax.plot(t_ms, dhwPea, 'm')
-    h1, = ax.plot(t_ms, - cooPea, 'b')
-    h1, = ax.plot(t_ms, netPea, 'k')
-    plt.axhline(0, color = 'k')
+    ax.set_title('Monthly Peak (kW)',
+                 loc = 'left',
+                 fontsize = 12)
+    h1, = ax.plot(t_ms, heaPea,
+                  'r', linewidth = linewidth)
+    h1, = ax.plot(t_ms, dhwPea,
+                  'm', linewidth = linewidth)
+    h1, = ax.plot(t_ms, - cooPea,
+                  'b', linewidth = linewidth)
+    h1, = ax.plot(t_ms, netPea,
+                  'k', linewidth = linewidth)
+    plt.axhline(0, color = 'k', linewidth = linewidth/2)
     setXAxisMonths()
     ax.xaxis.set_major_formatter(plt.NullFormatter())
 
     ax = fig.add_subplot(313)
-    h1, = ax.plot(t_hoy, np.cumsum(hea), 'r')
-    h1, = ax.plot(t_hoy, np.cumsum(dhw), 'm')
-    h1, = ax.plot(t_hoy, - np.cumsum(coo), 'b')
-    h1, = ax.plot(t_hoy, np.cumsum(net), 'k')
-    plt.axhline(0, color = 'k')
+    ax.set_title('Cumulative Consumption (thousand kWh)',
+                 loc = 'left',
+                 fontsize = 12)
+    h1, = ax.plot(t_hoy, np.cumsum(hea)/1000,
+                  'r', linewidth = linewidth, label = 'sp. heating')
+    h1, = ax.plot(t_hoy, np.cumsum(dhw)/1000,
+                  'm', linewidth = linewidth, label = 'dom. hot water')
+    h1, = ax.plot(t_hoy, - np.cumsum(coo)/1000,
+                  'b', linewidth = linewidth, label = 'cooling')
+    h1, = ax.plot(t_hoy, np.cumsum(net)/1000,
+                  'k', linewidth = linewidth, label = 'net energy')
+    plt.axhline(0, color = 'k', linewidth = linewidth/2)
     setXAxisMonths()
+    xlabels = [item.get_text() for item in ax.get_xticklabels()]
+    xlabels[-1] = ''
+    ax.set_xticklabels(xlabels)
+    ax.legend(loc = 'upper center',
+              bbox_to_anchor = (0.5, -0.2, - 0.1, 0.),
+              fancybox = True,
+              shadow = True,
+              ncol = 4)
     
-    plt.savefig(os.path.join(dirFigu,tit + '.png'))
-    plt.close()
+    plt.suptitle(tit,
+                 x = 0.05,
+                 y = 0.96,
+                 horizontalalignment = 'left',
+                 fontsize = 14)
+    fig.tight_layout()
+    
+    if not flag_debug:    
+        plt.savefig(os.path.join(dirFigu,tit + '.png'))
+        plt.close()
+
+###########################################################################
+## Start of main process ##
+
+flag_debug = False
+sBui_debug = '1539'
+# debug for plotting a single building
+#   will not delete existing plot files
+#   will not save the plot
+#   will not close the plot (so that it displays in spyder)
+#   will not plot the combined energy
+
+if not flag_debug:
+    # Deletes the folder of the previous written exchange files
+    #   and remake the directory'
+    os.system('rm -rf ' + dirFigu)
+    os.makedirs(dirFigu)
 
 t_dt = pd.date_range(start='2005-01-01',
                      end='2006-01-01',
@@ -78,9 +133,9 @@ cooSum = np.zeros(8760) # cooling, sum of all buildings
 netSum = np.zeros(8760) # net energy, sum of all buildings
 
 #sBui = '1569'
-sBuis = ['1045', '1380']
+if flag_debug:
+    sBuis = [sBui_debug]
 for sBui in sBuis:
-#for sBui in ['1045']:
     ## Read MIDs
     hea = np.array(readMID(sBui + '_hea'))
     heaSum += hea
@@ -107,23 +162,22 @@ for sBui in sBuis:
     
     makePlot(sBui + ' ' + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0])
 
-hea = heaSum
-dhw = dhwSum
-coo = cooSum
-net = netSum
-
-heaPea = np.zeros(12)
-dhwPea = np.zeros(12)
-cooPea = np.zeros(12)
-for m in mons:
-    heaPea[m-1] = np.max(hea[t_moy == m])
-    dhwPea[m-1] = np.max(dhw[t_moy == m])
-    cooPea[m-1] = np.max(coo[t_moy == m])
-netPea = heaPea + dhwPea - cooPea
-
-makePlot('Combined (six buildings)')
-
-#t = np.linspace(1,8760,8760,dtype = int)
+if not flag_debug:
+    hea = heaSum
+    dhw = dhwSum
+    coo = cooSum
+    net = netSum
+    
+    heaPea = np.zeros(12)
+    dhwPea = np.zeros(12)
+    cooPea = np.zeros(12)
+    for m in mons:
+        heaPea[m-1] = np.max(hea[t_moy == m])
+        dhwPea[m-1] = np.max(dhw[t_moy == m])
+        cooPea[m-1] = np.max(coo[t_moy == m])
+    netPea = heaPea + dhwPea - cooPea
+    
+    makePlot('Combined ({} buildings)'.format(len(sBuis)))
 
 """
 ax = fig.add_subplot(512)
