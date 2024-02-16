@@ -111,7 +111,7 @@ def makePlot(tit: str):
     fig.tight_layout()
     
     if not flag_debug:    
-        plt.savefig(os.path.join(dirFigu,tit + '.png'))
+        plt.savefig(os.path.join(dirFigu,tit + '.pdf'))
         plt.close()
 
 ###########################################################################
