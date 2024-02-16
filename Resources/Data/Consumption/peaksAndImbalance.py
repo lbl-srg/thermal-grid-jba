@@ -5,10 +5,12 @@ Created on Thu Feb  8 20:41:08 2024
 
 @author: casper
 
+Makes csv table for annual and monthly peaks.
 Makes figures that express load (im)balance.
 """
 
 import os
+import calendar
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -18,12 +20,30 @@ import pandas as pd
 from _config_estcp import *
 
 def setXAxisMonths():
-    # Set x-axis to display months
+    # Set x-axis to display months.
     #   The texts only show in the lowest subplot.
     #   All other subplots only show the tick marks but not the texts.
     X = plt.gca().xaxis
     X.set_major_locator(mdates.MonthLocator())
     X.set_major_formatter(mdates.DateFormatter('%b'))
+    
+def getPeak(s: str):
+    # Compute annual and monthly peaks for each building and combined.
+    #   The argument s does not decide which building to compute,
+    #       but only decides the 'bldg_no' field.
+    #   Heating is space heating and domest hot water combined.
+    for m in mons:
+        heaPea[m-1] = np.max(hea[t_moy == m])
+        dhwPea[m-1] = np.max(dhw[t_moy == m])
+        sndPea[m-1] = np.max(snd[t_moy == m])
+        cooPea[m-1] = np.max(coo[t_moy == m])
+        netPea[m-1] = np.max(net[t_moy == m])
+    #monPeaHea = calendar.month_name[np.argmax(sndPea) + 1]
+    #monPeaCoo = calendar.month_name[np.argmax(cooPea) + 1]
+    
+    dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [s, np.max(sndPea)] + heaPea.tolist()
+    dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [s, np.max(cooPea)] + cooPea.tolist()
+    
     
 def makePlot(tit: str):
     linewidth = 0.8
@@ -127,10 +147,15 @@ MOY = pd.date_range(start='2005-01-01',
     # array for month of year across one non-leap year
 """
 
-heaSum = np.zeros(8760) # heating, sum of all buildings
-dhwSum = np.zeros(8760) # domestic hot water, sum of all buildings
-cooSum = np.zeros(8760) # cooling, sum of all buildings
-netSum = np.zeros(8760) # net energy, sum of all buildings
+# Sum of all buildings
+heaSum = np.zeros(8760) # space heating
+dhwSum = np.zeros(8760) # domestic hot water
+sndSum = np.zeros(8760) # space heating and domestic hot water combined
+cooSum = np.zeros(8760) # cooling
+netSum = np.zeros(8760) # net energy
+
+dfPeaSnd = pd.DataFrame(columns = ['bldg_no', 'Annual'] + calendar.month_name[1:13])
+dfPeaCoo = pd.DataFrame(columns = ['bldg_no', 'Annual'] + calendar.month_name[1:13])
 
 #sBui = '1569'
 if flag_debug:
@@ -145,6 +170,8 @@ for sBui in sBuis:
         dhwSum += dhw
     else:
         dhw = np.zeros(8760)
+    snd = hea + dhw
+    sndSum += snd
     coo = np.array(readMID(sBui + '_coo'))
     cooSum += coo
     net = hea + dhw - coo
@@ -153,31 +180,29 @@ for sBui in sBuis:
     # Compute monthly peaks
     heaPea = np.zeros(12)
     dhwPea = np.zeros(12)
+    sndPea = np.zeros(12)
     cooPea = np.zeros(12)
-    for m in mons:
-        heaPea[m-1] = np.max(hea[t_moy == m])
-        dhwPea[m-1] = np.max(dhw[t_moy == m])
-        cooPea[m-1] = np.max(coo[t_moy == m])
-    netPea = heaPea + dhwPea - cooPea
+    netPea = np.zeros(12)
     
+    getPeak(sBui)
     makePlot(sBui + ' ' + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0])
 
 if not flag_debug:
     hea = heaSum
     dhw = dhwSum
+    snd = sndSum
     coo = cooSum
     net = netSum
     
-    heaPea = np.zeros(12)
-    dhwPea = np.zeros(12)
-    cooPea = np.zeros(12)
-    for m in mons:
-        heaPea[m-1] = np.max(hea[t_moy == m])
-        dhwPea[m-1] = np.max(dhw[t_moy == m])
-        cooPea[m-1] = np.max(coo[t_moy == m])
-    netPea = heaPea + dhwPea - cooPea
-    
+    getPeak('Combined')    
     makePlot('Combined ({} buildings)'.format(len(sBuis)))
+    
+    dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
+                    sep = delimiter,
+                    index = False)
+    dfPeaCoo.to_csv('Peaks_cooling.csv',
+                    sep = delimiter,
+                    index = False)
 
 """
 ax = fig.add_subplot(512)
