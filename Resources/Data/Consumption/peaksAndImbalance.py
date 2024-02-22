@@ -37,7 +37,7 @@ def getPeak(s: str):
         dhwPea[m-1] = np.max(dhw[t_moy == m])
         sndPea[m-1] = np.max(snd[t_moy == m])
         cooPea[m-1] = np.max(coo[t_moy == m])
-        netPea[m-1] = np.max(net[t_moy == m])
+        #netPea[m-1] = np.max(net[t_moy == m])
     #monPeaHea = calendar.month_name[np.argmax(sndPea) + 1]
     #monPeaCoo = calendar.month_name[np.argmax(cooPea) + 1]
     
@@ -74,8 +74,8 @@ def makePlot(tit: str):
                   'm', linewidth = linewidth)
     h1, = ax.plot(t_ms, - cooPea,
                   'b', linewidth = linewidth)
-    h1, = ax.plot(t_ms, netPea,
-                  'k', linewidth = linewidth)
+    #h1, = ax.plot(t_ms, netPea,
+    #              'k', linewidth = linewidth)
     plt.axhline(0, color = 'k', linewidth = linewidth/2)
     setXAxisMonths()
     ax.xaxis.set_major_formatter(plt.NullFormatter())
