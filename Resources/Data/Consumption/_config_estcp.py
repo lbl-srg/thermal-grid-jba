@@ -22,8 +22,8 @@ dfBldg = pd.read_csv('buildings.csv',
                      thousands = ',',
                      dtype = {'bldg_no' : str,
                               'name' : str,
-                              'area_sf' : float,
-                              'area_m2' : float})
+                              'gross_area_sf' : float,
+                              'gross_area_m2' : float})
 sBuis = dfBldg['bldg_no'].tolist()
 iCols = [16, 30, 31, 32]
     # column numbers of the respective utilities

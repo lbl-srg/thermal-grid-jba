@@ -1,16 +1,21 @@
-bldg_no,name,sqft,m2
-1045,Aerospace Physiology Fac,9624,894
-1349,316 Contracting Squadron,19815,1841
-1380,Presidential Inn,142005,13193
-1539,Air Force Communications,22719,2111
-1560,Navy Communications,27366,2542
-1569,AAFES Shopette,10128,941
-1631,Dorm,47077,4374
-1657,Dorm,47077,4374
-1676,Thrift Shop,16046.8,1491
-1690,Dorms,47125.8,4378
-1691,Dorms,48311.1,4488
-1692,Dorms,33696,3130
-1800,Transient Lodging Facility,75270,6993
-3500,ANG Readiness Center (N),158220,14699
-3501,ANG Readiness Center (S),194517,18071
+bldg_no,name,sqft_gross,m2_gross
+1045,Aerospace Physiology Fac,8230,765
+1058x1060,Malcom Grow Medical,265117,24630
+1065,Dental Clinic,28120,2612
+1345,Base Chapel,13840,1286
+1349,316 Contracting Squadron,18415,1711
+1359,General Smart Conf Center,45747,4250
+1380,Presidential Inn,143000,13285
+1500,Jones Building,330000,30658
+1539,Air Force Communications,24096,2239
+1560,Navy Communications,25336,2354
+1569,AAFES Shopette,10792,1003
+1631,Dorm,45449,4222
+1657,Dorm,46000,4274
+1676,Thrift Shop,15395,1430
+1690,Dorms,53126,4936
+1691,Dorms,50532,4695
+1692,Dorms,36609,3401
+1800,Transient Lodging Facility,69799,6485
+3500,ANG Readiness Center (N),148772,13821
+3501,ANG Readiness Center (S),187236,17395

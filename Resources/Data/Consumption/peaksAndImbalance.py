@@ -19,113 +19,161 @@ import pandas as pd
 
 from _config_estcp import *
 
-def setXAxisMonths():
-    # Set x-axis to display months.
-    #   The texts only show in the lowest subplot.
-    #   All other subplots only show the tick marks but not the texts.
-    X = plt.gca().xaxis
-    X.set_major_locator(mdates.MonthLocator())
-    X.set_major_formatter(mdates.DateFormatter('%b'))
-    
-def getPeak(s: str):
-    # Compute annual and monthly peaks for each building and combined.
-    #   The argument s does not decide which building to compute,
-    #       but only decides the 'bldg_no' field.
-    #   Heating is space heating and domest hot water combined.
-    for m in mons:
-        heaPea[m-1] = np.max(hea[t_moy == m])
-        dhwPea[m-1] = np.max(dhw[t_moy == m])
-        sndPea[m-1] = np.max(snd[t_moy == m])
-        cooPea[m-1] = np.max(coo[t_moy == m])
-        #netPea[m-1] = np.max(net[t_moy == m])
-    #monPeaHea = calendar.month_name[np.argmax(sndPea) + 1]
-    #monPeaCoo = calendar.month_name[np.argmax(cooPea) + 1]
-    
-    dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [s, np.max(sndPea)] + heaPea.tolist()
-    dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [s, np.max(cooPea)] + cooPea.tolist()
-    
-    
-def makePlot(tit: str):
-    linewidth = 0.8
-    
-    fig = plt.figure()
-    plt.rcParams['figure.figsize'] = [6, 6]
+def runBuildings(listBui,
+                 tit = '',
+                 saveFigures = True):
 
-    ax = fig.add_subplot(311)
-    ax.set_title('Hourly Consumption (kWh/h)',
-                 loc = 'left',
-                 fontsize = 12)
-    h1, = ax.plot(t_hoy, hea,
-                  'r', linewidth = linewidth)
-    h1, = ax.plot(t_hoy, dhw, 'm',
-                  linewidth = linewidth)
-    h1, = ax.plot(t_hoy, - coo,
-                  'b', linewidth = linewidth)
-    setXAxisMonths()
-    ax.xaxis.set_major_formatter(plt.NullFormatter())
+    def setXAxisMonths():
+        # Set x-axis to display months.
+        #   The texts only show in the lowest subplot.
+        #   All other subplots only show the tick marks but not the texts.
+        X = plt.gca().xaxis
+        X.set_major_locator(mdates.MonthLocator())
+        X.set_major_formatter(mdates.DateFormatter('%b'))
+        
+    def getPeak(bldg : str):
+        # Compute annual and monthly peaks.
+        #   Heating is space heating and domestic hot water combined.
+        
+        for m in mons:
+            heaPea[m-1] = np.max(hea[t_moy == m])
+            dhwPea[m-1] = np.max(dhw[t_moy == m])
+            sndPea[m-1] = np.max(snd[t_moy == m])
+            cooPea[m-1] = np.max(coo[t_moy == m])
+            #netPea[m-1] = np.max(net[t_moy == m])
+            #netPea[m-1] = net.flat[abs(net).argmax()]
+        #monPeaHea = calendar.month_name[np.argmax(sndPea) + 1]
+        #monPeaCoo = calendar.month_name[np.argmax(cooPea) + 1]
+        
+        dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [bldg, np.max(sndPea)] + sndPea.tolist()
+        dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [bldg, np.max(cooPea)] + cooPea.tolist()
+        
+    def makePlot(tit: str):
+        linewidth = 0.8
+        
+        fig = plt.figure()
+        plt.rcParams['figure.figsize'] = [6, 6]
     
-    ax = fig.add_subplot(312)
-    ax.set_title('Monthly Peak (kW)',
-                 loc = 'left',
-                 fontsize = 12)
-    h1, = ax.plot(t_ms, heaPea,
-                  'r', linewidth = linewidth)
-    h1, = ax.plot(t_ms, dhwPea,
-                  'm', linewidth = linewidth)
-    h1, = ax.plot(t_ms, - cooPea,
-                  'b', linewidth = linewidth)
-    #h1, = ax.plot(t_ms, netPea,
-    #              'k', linewidth = linewidth)
-    plt.axhline(0, color = 'k', linewidth = linewidth/2)
-    setXAxisMonths()
-    ax.xaxis.set_major_formatter(plt.NullFormatter())
+        ax = fig.add_subplot(311)
+        ax.set_title('Hourly Consumption (kWh/h)',
+                     loc = 'left',
+                     fontsize = 12)
+        h1, = ax.plot(t_hoy, snd,
+                      'r', linewidth = linewidth)
+        h1, = ax.plot(t_hoy, - coo,
+                      'b', linewidth = linewidth)
+        setXAxisMonths()
+        ax.xaxis.set_major_formatter(plt.NullFormatter())
+        
+        ax = fig.add_subplot(312)
+        ax.set_title('Monthly Peak (kW)',
+                     loc = 'left',
+                     fontsize = 12)
+        h1, = ax.plot(t_ms, sndPea,
+                      'r', linewidth = linewidth)
+        h1, = ax.plot(t_ms, - cooPea,
+                      'b', linewidth = linewidth)
+        #h1, = ax.plot(t_ms, netPea,
+        #              'k', linewidth = linewidth)
+        plt.axhline(0, color = 'k', linewidth = linewidth/2)
+        setXAxisMonths()
+        ax.xaxis.set_major_formatter(plt.NullFormatter())
+    
+        ax = fig.add_subplot(313)
+        ax.set_title('Cumulative Consumption (thousand kWh)',
+                     loc = 'left',
+                     fontsize = 12)
+        h1, = ax.plot(t_hoy, np.cumsum(snd)/1000,
+                      'r', linewidth = linewidth, label = 'combined heating')
+        h1, = ax.plot(t_hoy, - np.cumsum(coo)/1000,
+                      'b', linewidth = linewidth, label = 'cooling')
+        h1, = ax.plot(t_hoy, np.cumsum(net)/1000,
+                      'k', linewidth = linewidth, label = 'net energy')
+        plt.axhline(0, color = 'k', linewidth = linewidth/2)
+        setXAxisMonths()
+        xlabels = [item.get_text() for item in ax.get_xticklabels()]
+        xlabels[-1] = ''
+        ax.set_xticklabels(xlabels)
+        ax.legend(loc = 'upper center',
+                  bbox_to_anchor = (0.5, -0.2, - 0.1, 0.),
+                  fancybox = True,
+                  shadow = True,
+                  ncol = 4)
+        
+        plt.suptitle(tit,
+                     x = 0.05,
+                     y = 0.96,
+                     horizontalalignment = 'left',
+                     fontsize = 14)
+        fig.tight_layout()
+        
+        if saveFigures:
+            plt.savefig(os.path.join(dirFigu,tit + '.pdf'))
+            plt.close()
 
-    ax = fig.add_subplot(313)
-    ax.set_title('Cumulative Consumption (thousand kWh)',
-                 loc = 'left',
-                 fontsize = 12)
-    h1, = ax.plot(t_hoy, np.cumsum(hea)/1000,
-                  'r', linewidth = linewidth, label = 'sp. heating')
-    h1, = ax.plot(t_hoy, np.cumsum(dhw)/1000,
-                  'm', linewidth = linewidth, label = 'dom. hot water')
-    h1, = ax.plot(t_hoy, - np.cumsum(coo)/1000,
-                  'b', linewidth = linewidth, label = 'cooling')
-    h1, = ax.plot(t_hoy, np.cumsum(net)/1000,
-                  'k', linewidth = linewidth, label = 'net energy')
-    plt.axhline(0, color = 'k', linewidth = linewidth/2)
-    setXAxisMonths()
-    xlabels = [item.get_text() for item in ax.get_xticklabels()]
-    xlabels[-1] = ''
-    ax.set_xticklabels(xlabels)
-    ax.legend(loc = 'upper center',
-              bbox_to_anchor = (0.5, -0.2, - 0.1, 0.),
-              fancybox = True,
-              shadow = True,
-              ncol = 4)
+    # Sum of all buildings selected
+    hea = np.zeros(8760) # space heating
+    dhw = np.zeros(8760) # domestic hot water
+    snd = np.zeros(8760) # space heating and domestic hot water combined
+    coo = np.zeros(8760) # cooling
+    net = np.zeros(8760) # net energy
     
-    plt.suptitle(tit,
-                 x = 0.05,
-                 y = 0.96,
-                 horizontalalignment = 'left',
-                 fontsize = 14)
-    fig.tight_layout()
+    # Read MIDs and sum them up
+    for sBui in listBui:
+        hea_tmp = np.array(readMID(sBui + '_hea'))
+        hea += hea_tmp
+        hasDhw = os.path.isfile(os.path.join(dirExch, sBui + '_dhw.csv'))
+        if hasDhw:
+            dhw_tmp = np.array(readMID(sBui + '_dhw'))
+            dhw += dhw_tmp
+        else:
+            dhw_tmp = np.zeros(8760)
+            dhw = np.zeros(8760)
+        snd_tmp = hea_tmp + dhw_tmp
+        coo_tmp = np.array(readMID(sBui + '_coo'))
+        coo += coo_tmp
     
-    if not flag_debug:    
-        plt.savefig(os.path.join(dirFigu,tit + '.pdf'))
-        plt.close()
+    snd = hea + dhw
+    net = hea + dhw - coo
+    
+    # Monthly peaks
+    heaPea = np.zeros(12)
+    dhwPea = np.zeros(12)
+    sndPea = np.zeros(12)
+    cooPea = np.zeros(12)
+    netPea = np.zeros(12)
+    
+    if tit == '':
+        if len(listBui) == 1:
+            tit = sBui + ' ' + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0]
+        else:
+            tit = 'Combined ({} buildings)'.format(len(listBui))
+    getPeak(sBui if len(listBui) == 1 else tit)
+    makePlot(tit)
 
 ###########################################################################
 ## Start of main process ##
 
-flag_debug = False
-sBui_debug = '1539'
-# debug for plotting a single building
-#   will not delete existing plot files
-#   will not save the plot
-#   will not close the plot (so that it displays in spyder)
-#   will not plot the combined energy
+flag_deleteOldFiles = False
 
-if not flag_debug:
+mode = 'west'
+    # 'spec' -  plot a specified list of buildings (can have only one)
+    #           add a row to tables
+    # 'each' -  plot all of each individual building
+    #           rewrite the tables
+    # 'west' -  plot 18 west-wing buildings combined
+    #           add a row to the tables
+saveFigures = True
+saveTables = True
+
+#listBui - list of buildings, consumption is combined
+#   only used with mode == 'spec'
+#listBui = sBuis # 
+#listBui_spec = ['1045']
+listBui_spec = ['1045', '1349']
+tit_spec = ''
+
+if flag_deleteOldFiles:
     # Deletes the folder of the previous written exchange files
     #   and remake the directory'
     os.system('rm -rf ' + dirFigu)
@@ -140,86 +188,54 @@ mons = np.linspace(1,12,12,dtype = int)
 t_ms = pd.date_range(start='2005-01-01',
                      end='2006-01-01',
                      freq='MS')[0:12].tolist() # list for month starts
-"""
-MOY = pd.date_range(start='2005-01-01',
-                    end='2006-01-01',
-                    freq='h').month.tolist()[0:8760]
-    # array for month of year across one non-leap year
-"""
 
-# Sum of all buildings
-heaSum = np.zeros(8760) # space heating
-dhwSum = np.zeros(8760) # domestic hot water
-sndSum = np.zeros(8760) # space heating and domestic hot water combined
-cooSum = np.zeros(8760) # cooling
-netSum = np.zeros(8760) # net energy
+# Dataframes for monthly peaks
+dfPeaSnd = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
+dfPeaCoo = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 
-dfPeaSnd = pd.DataFrame(columns = ['bldg_no', 'Annual'] + calendar.month_name[1:13])
-dfPeaCoo = pd.DataFrame(columns = ['bldg_no', 'Annual'] + calendar.month_name[1:13])
-
-#sBui = '1569'
-if flag_debug:
-    sBuis = [sBui_debug]
-for sBui in sBuis:
-    ## Read MIDs
-    hea = np.array(readMID(sBui + '_hea'))
-    heaSum += hea
-    hasDhw = os.path.isfile(os.path.join(dirExch, sBui + '_dhw.csv'))
-    if hasDhw:
-        dhw = np.array(readMID(sBui + '_dhw'))
-        dhwSum += dhw
-    else:
-        dhw = np.zeros(8760)
-    snd = hea + dhw
-    sndSum += snd
-    coo = np.array(readMID(sBui + '_coo'))
-    cooSum += coo
-    net = hea + dhw - coo
-    netSum += net
-    
-    # Compute monthly peaks
-    heaPea = np.zeros(12)
-    dhwPea = np.zeros(12)
-    sndPea = np.zeros(12)
-    cooPea = np.zeros(12)
-    netPea = np.zeros(12)
-    
-    getPeak(sBui)
-    makePlot(sBui + ' ' + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0])
-
-if not flag_debug:
-    hea = heaSum
-    dhw = dhwSum
-    snd = sndSum
-    coo = cooSum
-    net = netSum
-    
-    getPeak('Combined')    
-    makePlot('Combined ({} buildings)'.format(len(sBuis)))
-    
-    dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
-                    sep = delimiter,
-                    index = False)
-    dfPeaCoo.to_csv('Peaks_cooling.csv',
-                    sep = delimiter,
-                    index = False)
-
-"""
-ax = fig.add_subplot(512)
-h1, = ax.plot(t, net, 'k')
-plt.axhline(0, color = 'k')
-
-ax = fig.add_subplot(513)
-h1, = ax.plot(np.array(t).reshape(int(8760/3),3)[:,0],
-              np.sum(np.array(net).reshape(int(8760/3),3), axis = 1),
-              'k')
-plt.axhline(0, color = 'k')
-
-ax = fig.add_subplot(514)
-h1, = ax.plot(np.array(t).reshape(int(8760/24),24)[:,0],
-              np.sum(np.array(net).reshape(int(8760/24),24), axis = 1),
-              'k')
-plt.axhline(0, color = 'k')
-"""
-
-
+if mode == 'spec':
+    # Run specified list of buildings (can have only one)
+    runBuildings(listBui_spec,
+                 tit = tit_spec,
+                 saveFigures = saveFigures)
+    if saveTables:
+        dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
+        dfPeaCoo.to_csv('Peaks_cooling.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
+elif mode == 'each':
+    # Run each building
+    for sBui in sBuis:
+        runBuildings([sBui],
+                     saveFigures = saveFigures)
+    if saveTables:
+        dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
+                        sep = delimiter,
+                        index = False)
+        dfPeaCoo.to_csv('Peaks_cooling.csv',
+                        sep = delimiter,
+                        index = False)
+elif mode == 'west':
+    # Combine 18 west-wing buildings
+    listBui = [elem for elem in sBuis if elem not in {'3500', '3501'}]
+    tit = 'West Wing Combined'
+    runBuildings(listBui,
+                 tit = tit,
+                 saveFigures = saveFigures)
+    if saveTables:
+        dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
+        dfPeaCoo.to_csv('Peaks_cooling.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
