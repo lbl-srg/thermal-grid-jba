@@ -22,7 +22,7 @@ import copy
 import os
 import pandas as pd
 import base64
-from ESTCP.dict_sympheny import conversion_ini, storage_ini
+from dict_sympheny import conversion_ini, storage_ini
 
 def open_target_file(target_path):
     with open(target_path,"rb") as excel_file:
