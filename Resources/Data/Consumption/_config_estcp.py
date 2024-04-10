@@ -16,7 +16,6 @@ dirExch = 'exchange'
 
 ## eQuest output csv files
 dirRead = 'eQuest'
-#sBuis = ['1045','1349','1380','1539','1560','1569']
 dfBldg = pd.read_csv('buildings.csv',
                      header = 0,
                      thousands = ',',
@@ -37,7 +36,7 @@ dirFigu = 'Figures'
 
 ## functions
 def readMID(MID : str):
-    df = pd.read_csv(os.path.join(dirExch, MID + '.csv'),
+    df = pd.read_csv(os.path.join(dirExch, f'{MID}.csv'),
                      header = None,
                      dtype = float,
                      names = ['value'])
