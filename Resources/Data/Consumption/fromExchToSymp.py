@@ -11,40 +11,74 @@ import pandas as pd
 
 from _config_estcp import *
 
-def main(sUti: str, sBuis):
+#%% Main function
+def main(sRet: str, sUti: str, sBuis, sHub = ''):
 
     df = pd.DataFrame({'row' : np.linspace(1,8760,8760,dtype = int),
                        'value' : np.zeros(8760)})
-    fno = sUti  # output file name
+    fno = sRet + '_' + sUti # file name output
 
-    flag = False
+    flag = False # flag when data found to generate output files
     for sBui in sBuis:
-        MID = sBui + '_' + sUti # meter ID
-        fni = os.path.join(dirExch, MID + '.csv')
+        MID = f'{sRet}_{sBui}_{sUti}' # meter ID
+        fni = os.path.join(dirExch, f'{MID}.csv')
         if os.path.isfile(fni):
-            dfr = pd.read_csv(os.path.join(dirExch, MID + '.csv'),
-                              header = None,
-                              dtype = float,
-                              names = ['value'])
-            df['value'] = df['value'] + dfr['value']
-            fno = fno + '_' + sBui
+            df['value'] = df['value'] + readMID(MID)
+            if sHub == '':
+                # construct file name from bldg list if no hub name provided
+                fno = fno + '_' + sBui
             flag = True
         else:
-            print('Not found: ' + MID)
+            print(f'Not found: {MID}')
 
     if flag:
-        fno = fno + '.xlsx'
-        df.to_excel(fno,
+        if sHub == '':
+            fno = fno + '.xlsx'
+        else:
+            fno = fno + f'_{sHub}.xlsx'
+        df.to_excel(os.path.join(dirWritSymp,fno),
                     engine = 'xlsxwriter',
                     header = False,
                     index = False)
-        print('Output file generated: ' + fno)
+        print(f'Output file generated: {fno}')
     else:
         print('No meter found. No output file generated.')
 
-#main('ele', ['1380','1045'])
+#%% Preprocessing
+flag_deleteOldDirectory = True
+if flag_deleteOldDirectory:
+    os.system('rm -rf ' + dirWritSymp)
+    os.makedirs(dirWritSymp)
 
+#%% Example call
+"""
+main('base', 'ele', ['1380','1045'])
+"""
+
+#%% Hub list
+"""
+# validation
+dictHubs = {'1058x1060':['1058x1060'],
+            '1065':['1065'],
+            'medical':['1058x1060','1065']}
+for sHub in dictHubs:
+    main('base','ele',sBuis=dictHubs[sHub],sHub=sHub)
+
+"""
+sRet = 'base' # 'base' baseline or 'post' post-retrofit
+dictHubs = {'medical':['1058x1060','1065'],
+            'dorm':['1631','1657','1690','1691','1692']}
+for sHub in dictHubs:
+    for sUti in sUtis:
+        main('base',sUti,sBuis=dictHubs[sHub],sHub=sHub)
+
+#%% Shell interface with argparse
+"""
 parser = argparse.ArgumentParser()
+parser.add_argument('r',
+                    type = str,
+                    choices = ['base', 'post'],
+                    help = 'retrofit status, {base, post}')
 parser.add_argument('u',
                     type = str,
                     choices = sUtis,
@@ -53,7 +87,8 @@ parser.add_argument('b',
                     nargs='+',
                     type = str,
                     choices = sBuis,
-                    help = '4-digit building number')
+                    help = '4-digit building number or \'1058x1060\'')
 args = parser.parse_args()
 
-main(args.u, args.b)
+main(args.r, args.u, args.b)
+"""
