@@ -15,11 +15,23 @@ from _config_estcp import *
 
 # Deletes the folder of the previous written exchange files
 #   and remake the directory
-os.system('rm -rf ' + dirExch)
-os.makedirs(dirExch)
+flag_deleteOldDirectory = True
+if flag_deleteOldDirectory:
+    os.system('rm -rf ' + dirExch)
+    os.makedirs(dirExch)
+
+sRet = 'base' # retrofit: 'base' baseline ,
+               #           'post' post-retrofit
 
 for sBui in sBuis:
-    with open(glob.glob(os.path.join(dirRead, sBui + '*.csv'))[0],
+    if sRet == 'base':
+        sfn = f'{sBui}*Baseline*.csv'
+    elif sRet == 'post':
+        sfn = f'{sBui}*Retrofit*.csv'
+    else:
+        sfn = ''
+    
+    with open(glob.glob(os.path.join(dirRead, sfn))[0],
               newline='') as fr:
         reader = csv.reader(fr, delimiter=',')
         rows = list(reader)
@@ -37,7 +49,7 @@ for sBui in sBuis:
             # if column is empty
             continue
 
-        with open(os.path.join(dirExch, sBui + '_' + sUti + '.csv'),
+        with open(os.path.join(dirExch, f'{sRet}_{sBui}_{sUti}.csv'),
                   'w',
                   newline='') as fw:
             writer = csv.DictWriter(fw,
