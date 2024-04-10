@@ -96,7 +96,7 @@ baseUrl = "https://eu-north-1-api.sympheny.com/"
 # if '1380' not in hubs:
 #     hub_ini = hub_current[hubs[0]]
 # else:
-#     hub_ini = hub_current['1380']
+    # hub_ini = hub_current['1380']
 
 #%% Getting scenarios GUID + creating new ones
 
@@ -245,6 +245,8 @@ for k in files.index:
 
     response = requests.post(url_demand, headers=headers, data=payload)
     rp = json.loads(response.text)
+    
+hubs_dhw = list(files[files['source'] == 'dhw']['hub'].unique())
 
 
 #%% Upload imports/exports
@@ -277,34 +279,51 @@ response = requests.get(url_techno, headers=headers)
 rp = json.loads(response.text)
 
 converting_list = [k['conversionTechnologyGuid'] for k in rp['data']['conversionTechnologies']]
+dhw_carrier = [energy_carrier[k] for k in energy_carrier if 'dhw' in k.lower()]
 
-for n in converting_list[:1]:
+url_nondhw = baseUrl + f"sympheny-app/scenarios/{scenarioGuid}/conversion-technologies"
+for n in converting_list:
+    dhw_flag = False
     url_techno = baseUrl + f"sympheny-app/scenarios/conversion-technologies/{n}"
     response = requests.get(url_techno, headers=headers)
     rp = json.loads(response.text)['data']
-    if rp['hubs'][0]['hubGuid'] == hub_ini:
+    if any(k['hubGuid'] == hub_ini for k in rp['hubs']):
         choices = ['input', 'output']
-        l_ene = []
-        for i in choices:
-            for k in rp['technologyModes'][0][f'{i}EnergyCarriers']:
-                ene_carrier = copy.deepcopy(conversion_ini['conversionTechnologyModes'][0]['energyCarriers'][0])
-                for m in k:
-                    if m in ene_carrier:
-                        ene_carrier[m] = k[m]
-                ene_carrier['type'] = i.upper()
-                l_ene.append(ene_carrier)
-        
-        l_conv = copy.deepcopy(conversion_ini['conversionTechnologyModes'][0])
-        l_conv['energyCarriers'] = l_ene
-        l_conv['primary'] = rp['technologyModes'][0]['primary']
-        l_conv['seasonalOperation'] = rp['technologyModes'][0]['seasonalOperationValue']
+        l_fin = []
+        l_nondhw = []
+        for o in rp['technologyModes']:
+            l_ene = []
+            dhw_current = False
+            for i in choices:
+                for k in o[f'{i}EnergyCarriers']:
+                    ene_carrier = copy.deepcopy(conversion_ini['conversionTechnologyModes'][0]['energyCarriers'][0])
+                    for m in k:
+                        if m in ene_carrier:
+                            ene_carrier[m] = k[m]
+                            if m == 'energyCarrierGuid':
+                                if ene_carrier[m] in dhw_carrier:
+                                    dhw_flag = True
+                                    dhw_current = True
+                    ene_carrier['type'] = i.upper()
+                    l_ene.append(ene_carrier)
+            
+            l_conv = copy.deepcopy(conversion_ini['conversionTechnologyModes'][0])
+            l_conv['energyCarriers'] = l_ene
+            l_conv['primary'] = o['primary']
+            l_conv['seasonalOperation'] = o['seasonalOperationValue']
+            l_fin.append(l_conv)
+            if dhw_current == False:
+                l_nondhw.append(l_conv)
         
         summary = copy.deepcopy(conversion_ini)
         for k in rp:
             if k in summary:
                 summary[k] = rp[k]
-        summary['conversionTechnologyModes'] = [l_conv]
-        summary['hubGuids'] = [hub_current[k] for k in hubs]
+        summary['conversionTechnologyModes'] = l_fin
+        if dhw_flag == True:
+            summary['hubGuids'] = [hub_current[k] for k in hubs_dhw]
+        else:
+            summary['hubGuids'] = [hub_current[k] for k in hubs]
                 
         for k in list(summary.keys()):
             if summary[k] == 'string':
@@ -312,7 +331,17 @@ for n in converting_list[:1]:
         
         payload = json.dumps(summary)
         response = requests.put(url_techno, headers=headers, data=payload)
-        rp = json.loads(response.text)
+        rp_generic = json.loads(response.text)
+        
+        if dhw_flag == True:
+            summary['conversionTechnologyModes'] = l_nondhw
+            summary['hubGuids'] = [hub_current[k] for k in hubs if k not in hubs_dhw]
+            summary['processName'] = f"{summary['processName']} (only SH)"
+            
+            payload2 = json.dumps(summary)
+            response = requests.post(url_nondhw, headers=headers, data=payload2)
+            rp_nondhw = json.loads(response.text)
+            
 
 
 #%% Update storage technologies
@@ -326,13 +355,16 @@ for n in storage_list:
     url_sto = baseUrl + f"sympheny-app/scenarios/storage-technologies/{n}"
     response = requests.get(url_sto, headers=headers)
     rp = json.loads(response.text)['data']
-    if rp['hubs'][0]['hubGuid'] == hub_ini:
+    if any(k['hubGuid'] == hub_ini for k in rp['hubs']):
         summary = copy.deepcopy(storage_ini)
         for k in rp:
             if k in summary:
                 summary[k] = rp[k]
-        summary['hubGuids'] = [hub_current[k] for k in hubs]
         summary['energyCarrierGuid'] = rp['storageCarrier']['energyCarrierGuid']
+        if summary['energyCarrierGuid'] in dhw_carrier:
+            summary['hubGuids'] = [hub_current[k] for k in hubs_dhw]
+        else:
+            summary['hubGuids'] = [hub_current[k] for k in hubs]
         for k in list(summary.keys()):
             if summary[k] == 'string':
                 del summary[k]
