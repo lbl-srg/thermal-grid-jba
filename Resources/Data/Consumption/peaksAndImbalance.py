@@ -11,6 +11,7 @@ Makes figures that express load (im)balance.
 
 import os
 import calendar
+import shutil
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -176,7 +177,7 @@ tit_spec = ''
 if flag_deleteOldFiles:
     # Deletes the folder of the previous written exchange files
     #   and remake the directory'
-    os.system('rm -rf ' + dirFigu)
+    shutil.rmtree(dirFigu)
     os.makedirs(dirFigu)
 
 t_dt = pd.date_range(start='2005-01-01',
