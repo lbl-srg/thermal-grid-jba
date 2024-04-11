@@ -17,8 +17,8 @@ def main(sRet: str, sUti: str, sBuis, sHub = ''):
 
     df = pd.DataFrame({'row' : np.linspace(1,8760,8760,dtype = int),
                        'value' : np.zeros(8760)})
-    fno = sRet + '_' + sUti # file name output
-
+    sBuiLis = '' # building list, remains '' if hub name sHub provided
+    
     flag = False # flag when data found to generate output files
     for sBui in sBuis:
         MID = f'{sRet}_{sBui}_{sUti}' # meter ID
@@ -27,16 +27,16 @@ def main(sRet: str, sUti: str, sBuis, sHub = ''):
             df['value'] = df['value'] + readMID(MID)
             if sHub == '':
                 # construct file name from bldg list if no hub name provided
-                fno = fno + '_' + sBui
+                sBuiLis = '-'.join(filter(None,[sBuiLis,sBui]))
             flag = True
         else:
             print(f'Not found: {MID}')
 
     if flag:
-        if sHub == '':
-            fno = fno + '.xlsx'
-        else:
-            fno = fno + f'_{sHub}.xlsx'
+        fno = '_'.join(filter(None,[sRet,sBuiLis,sHub,sUti])) + '.xlsx'
+            # file name output; either sBuiLis or sHub would be '' and omitted
+            #   example using building list: 'base_1045-1380_coo.xlsx'
+            #   example using hub name: 'base_medical_coo.xlsx'
         df.to_excel(os.path.join(dirWritSymp,fno),
                     engine = 'xlsxwriter',
                     header = False,
