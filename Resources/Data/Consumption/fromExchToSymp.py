@@ -5,6 +5,7 @@
 
 import os
 import argparse
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -47,7 +48,7 @@ def main(sRet: str, sUti: str, sBuis, sHub = ''):
 #%% Preprocessing
 flag_deleteOldDirectory = True
 if flag_deleteOldDirectory:
-    os.system('rm -rf ' + dirWritSymp)
+    shutil.rmtree(dirWritSymp)
     os.makedirs(dirWritSymp)
 
 #%% Example call
