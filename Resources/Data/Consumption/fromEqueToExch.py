@@ -8,6 +8,7 @@
 import os
 import csv
 import glob
+import shutil
 
 import numpy as np
 
@@ -17,11 +18,11 @@ from _config_estcp import *
 #   and remake the directory
 flag_deleteOldDirectory = True
 if flag_deleteOldDirectory:
-    os.system('rm -rf ' + dirExch)
+    shutil.rmtree(dirExch)
     os.makedirs(dirExch)
 
 sRet = 'base' # retrofit: 'base' baseline ,
-               #           'post' post-retrofit
+              #           'post' post-retrofit
 
 for sBui in sBuis:
     if sRet == 'base':
