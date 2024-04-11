@@ -178,7 +178,7 @@ if flag_deleteOldFiles:
     # Deletes the folder of the previous written exchange files
     #   and remake the directory'
     shutil.rmtree(dirFigu)
-    os.makedirs(dirFigu)
+    os.makedirs(dirFigu, exist_ok = True)
 
 t_dt = pd.date_range(start='2005-01-01',
                      end='2006-01-01',

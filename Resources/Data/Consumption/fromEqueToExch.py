@@ -19,7 +19,7 @@ from _config_estcp import *
 flag_deleteOldDirectory = True
 if flag_deleteOldDirectory:
     shutil.rmtree(dirExch)
-    os.makedirs(dirExch)
+    os.makedirs(dirExch, exist_ok = True)
 
 sRet = 'base' # retrofit: 'base' baseline ,
               #           'post' post-retrofit

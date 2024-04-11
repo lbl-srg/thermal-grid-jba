@@ -49,7 +49,7 @@ def main(sRet: str, sUti: str, sBuis, sHub = ''):
 flag_deleteOldDirectory = True
 if flag_deleteOldDirectory:
     shutil.rmtree(dirWritSymp)
-    os.makedirs(dirWritSymp)
+    os.makedirs(dirWritSymp, exist_ok = True)
 
 #%% Example call
 """
