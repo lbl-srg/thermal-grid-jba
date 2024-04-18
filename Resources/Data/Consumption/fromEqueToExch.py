@@ -16,19 +16,19 @@ from _config_estcp import *
 
 # Deletes the folder of the previous written exchange files
 #   and remake the directory
-flag_deleteOldDirectory = True
+flag_deleteOldDirectory = False
 if flag_deleteOldDirectory:
     shutil.rmtree(dirExch)
     os.makedirs(dirExch, exist_ok = True)
 
-sRet = 'base' # retrofit: 'base' baseline ,
-              #           'post' post-retrofit
+sRet = 'post' # retrofit: 'base' baseline ,
+              #           'post' post-ECM
 
 for sBui in sBuis:
     if sRet == 'base':
         sfn = f'{sBui}*Baseline*.csv'
     elif sRet == 'post':
-        sfn = f'{sBui}*Retrofit*.csv'
+        sfn = f'{sBui}*Post*.csv'
     else:
         sfn = ''
     
