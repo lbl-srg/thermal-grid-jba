@@ -21,6 +21,7 @@ import pandas as pd
 from _config_estcp import *
 
 def runBuildings(listBui,
+                 sRet = 'post',
                  tit = '',
                  saveFigures = True):
 
@@ -121,17 +122,17 @@ def runBuildings(listBui,
     
     # Read MIDs and sum them up
     for sBui in listBui:
-        hea_tmp = np.array(readMID(sBui + '_hea'))
+        hea_tmp = np.array(readMID(f'{sRet}_{sBui}_hea'))
         hea += hea_tmp
         hasDhw = os.path.isfile(os.path.join(dirExch, sBui + '_dhw.csv'))
         if hasDhw:
-            dhw_tmp = np.array(readMID(sBui + '_dhw'))
+            dhw_tmp = np.array(readMID(f'{sRet}_{sBui}_dhw'))
             dhw += dhw_tmp
         else:
             dhw_tmp = np.zeros(8760)
             dhw = np.zeros(8760)
         snd_tmp = hea_tmp + dhw_tmp
-        coo_tmp = np.array(readMID(sBui + '_coo'))
+        coo_tmp = np.array(readMID(f'{sRet}_{sBui}_coo'))
         coo += coo_tmp
     
     snd = hea + dhw
@@ -146,7 +147,7 @@ def runBuildings(listBui,
     
     if tit == '':
         if len(listBui) == 1:
-            tit = sBui + ' ' + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0]
+            tit = f'{sBui} ' +dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0] + f' {sRet}'
         else:
             tit = 'Combined ({} buildings)'.format(len(listBui))
     getPeak(sBui if len(listBui) == 1 else tit)
@@ -155,15 +156,18 @@ def runBuildings(listBui,
 ###########################################################################
 ## Start of main process ##
 
+#%% ======= FLAGS AND SWITCHES =======
 flag_deleteOldFiles = False
+retr = 'post' # retrofit status: 'base' baseline,
+              #                  'post' post-ECM
 
 mode = 'west'
     # 'spec' -  plot a specified list of buildings (can have only one)
-    #           add a row to tables
+    #           add a row to tables, if saveTables
     # 'each' -  plot all of each individual building
-    #           rewrite the tables
+    #           rewrite the tables, if saveTables
     # 'west' -  plot 18 west-wing buildings combined
-    #           add a row to the tables
+    #           add a row to the tables, if saveTables
 saveFigures = True
 saveTables = True
 
@@ -174,11 +178,17 @@ saveTables = True
 listBui_spec = ['1045', '1349']
 tit_spec = ''
 
+#%%
+
 if flag_deleteOldFiles:
     # Deletes the folder of the previous written exchange files
     #   and remake the directory'
     shutil.rmtree(dirFigu)
     os.makedirs(dirFigu, exist_ok = True)
+if retr == 'base':
+    retr_tit = 'Baseline'
+elif retr == 'post':
+    retr_tit = 'Post ECM'
 
 t_dt = pd.date_range(start='2005-01-01',
                      end='2006-01-01',
@@ -197,6 +207,7 @@ dfPeaCoo = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13]
 if mode == 'spec':
     # Run specified list of buildings (can have only one)
     runBuildings(listBui_spec,
+                 sRet = retr,
                  tit = tit_spec,
                  saveFigures = saveFigures)
     if saveTables:
@@ -214,6 +225,7 @@ elif mode == 'each':
     # Run each building
     for sBui in sBuis:
         runBuildings([sBui],
+                     sRet = retr,
                      saveFigures = saveFigures)
     if saveTables:
         dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
@@ -224,9 +236,10 @@ elif mode == 'each':
                         index = False)
 elif mode == 'west':
     # Combine 18 west-wing buildings
-    listBui = [elem for elem in sBuis if elem not in {'3500', '3501'}]
-    tit = 'West Wing Combined'
+    listBui = [elem for elem in sBuis if elem not in {'5300', '5301'}]
+    tit = f'West Wing Combined - {retr_tit}'
     runBuildings(listBui,
+                 sRet = retr,
                  tit = tit,
                  saveFigures = saveFigures)
     if saveTables:
