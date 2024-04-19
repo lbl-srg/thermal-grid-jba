@@ -33,8 +33,8 @@ def runBuildings(listBui,
         X.set_major_locator(mdates.MonthLocator())
         X.set_major_formatter(mdates.DateFormatter('%b'))
         
-    def getPeak(bldg : str):
-        # Compute annual and monthly peaks.
+    def getMonthly(bldg : str):
+        # Compute annual and monthly peaks and totals.
         #   Heating is space heating and domestic hot water combined.
         
         for m in mons:
@@ -44,11 +44,20 @@ def runBuildings(listBui,
             cooPea[m-1] = np.max(coo[t_moy == m])
             #netPea[m-1] = np.max(net[t_moy == m])
             #netPea[m-1] = net.flat[abs(net).argmax()]
+            
+            heaTot[m-1] = np.sum(hea[t_moy == m])
+            dhwTot[m-1] = np.sum(dhw[t_moy == m])
+            sndTot[m-1] = np.sum(snd[t_moy == m])
+            cooTot[m-1] = np.sum(coo[t_moy == m])
+            
         #monPeaHea = calendar.month_name[np.argmax(sndPea) + 1]
         #monPeaCoo = calendar.month_name[np.argmax(cooPea) + 1]
         
         dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [bldg, np.max(sndPea)] + sndPea.tolist()
         dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [bldg, np.max(cooPea)] + cooPea.tolist()
+        
+        dfTotSnd.loc[len(dfTotSnd.index) + 1] = [bldg, np.sum(sndTot)] + sndTot.tolist()
+        dfTotCoo.loc[len(dfTotCoo.index) + 1] = [bldg, np.sum(cooTot)] + cooTot.tolist()
         
     def makePlot(tit: str):
         linewidth = 0.8
@@ -147,6 +156,13 @@ def runBuildings(listBui,
     cooPea = np.zeros(12)
     netPea = np.zeros(12)
     
+    # Monthly totals
+    heaTot = np.zeros(12)
+    dhwTot = np.zeros(12)
+    sndTot = np.zeros(12)
+    cooTot = np.zeros(12)
+    netTot = np.zeros(12)
+    
     if tit == '':
         if len(listBui) == 1:
             tit = f'{sBui} '.replace('x','&') \
@@ -154,7 +170,7 @@ def runBuildings(listBui,
                 + f' ({retr_tit})'
         else:
             tit = 'Combined ({} buildings)'.format(len(listBui))
-    getPeak(sBui if len(listBui) == 1 else tit)
+    getMonthly(sBui if len(listBui) == 1 else tit)
     makePlot(tit)
 
 ###########################################################################
@@ -174,6 +190,7 @@ mode = 'west'
     #           add a row to the tables, if saveTables
 saveFigures = True
 saveTablesPeak = True
+saveTablesTotal = True
 
 #listBui - list of buildings, consumption is combined
 #   only used with mode == 'spec'
@@ -208,6 +225,10 @@ t_ms = pd.date_range(start='2005-01-01',
 dfPeaSnd = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 dfPeaCoo = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 
+# Dataframes for monthly totals
+dfTotSnd = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
+dfTotCoo = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
+
 if mode == 'spec':
     # Run specified list of buildings (can have only one)
     runBuildings(listBui_spec,
@@ -225,6 +246,17 @@ if mode == 'spec':
                         index = False,
                         mode = 'a',
                         header = False)
+    if saveTablesPeak:
+        dfTotSnd.to_csv(f'Total_combinedHeating_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
+        dfTotCoo.to_csv(f'Total_cooling_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
 elif mode == 'each':
     # Run each building
     for sBui in sBuis:
@@ -238,8 +270,15 @@ elif mode == 'each':
         dfPeaCoo.to_csv(f'Peaks_cooling_{retr_tit}.csv',
                         sep = delimiter,
                         index = False)
+    if saveTablesPeak:
+        dfTotSnd.to_csv(f'Total_combinedHeating_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False)
+        dfTotCoo.to_csv(f'Total_cooling_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False)
 elif mode == 'west':
-    # Combine 18 west-wing buildings
+    # Combine buildings but exclude 5300 & 5301 which are east of the runway
     listBui = [elem for elem in sBuis if elem not in {'5300', '5301'}]
     tit = f'West Combined - {retr_tit}'
     runBuildings(listBui,
@@ -253,6 +292,17 @@ elif mode == 'west':
                         mode = 'a',
                         header = False)
         dfPeaCoo.to_csv(f'Peaks_cooling_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
+    if saveTablesPeak:
+        dfTotSnd.to_csv(f'Total_combinedHeating_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
+        dfTotCoo.to_csv(f'Total_cooling_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
                         mode = 'a',
