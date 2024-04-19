@@ -124,7 +124,7 @@ def runBuildings(listBui,
     for sBui in listBui:
         hea_tmp = np.array(readMID(f'{sRet}_{sBui}_hea'))
         hea += hea_tmp
-        hasDhw = os.path.isfile(os.path.join(dirExch, f'{sRet}_{sBui}_hea.csv'))
+        hasDhw = os.path.isfile(os.path.join(dirExch, f'{sRet}_{sBui}_dhw.csv'))
         if hasDhw:
             dhw_tmp = np.array(readMID(f'{sRet}_{sBui}_dhw'))
         else:
