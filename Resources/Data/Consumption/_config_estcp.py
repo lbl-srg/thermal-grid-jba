@@ -5,16 +5,16 @@ import os
 
 import pandas as pd
 
-## shared attributes
+#%% shared attributes
 sUtis = ['ele', 'coo', 'hea', 'dhw']
     # utility types:
     #   electricity, cooling, heating, domestic hot water
 delimiter = ','
 
-## exchange csv files
+#%% exchange csv files
 dirExch = 'exchange'
 
-## eQuest output csv files
+#%% eQuest output csv files
 dirRead = 'eQuest'
 dfBldg = pd.read_csv('buildings.csv',
                      header = 0,
@@ -29,13 +29,16 @@ iCols = [16, 30, 31, 32]
     # column numbers of the respective utilities
     #   from the input file (base 0)
 
-## Sympheny input xlsx files
+#%% Sympheny input xlsx files
 dirWritSymp = 'Sympheny'
 
-## Figure outputs
+#%% Figure outputs
 dirFigu = 'Figures'
 
-## functions
+#%% Table outputs
+dirTabl = 'Tables'
+
+#%% functions
 def readMID(MID : str):
     df = pd.read_csv(os.path.join(dirExch, f'{MID}.csv'),
                      header = None,
