@@ -38,6 +38,7 @@ def runBuildings(listBui,
         #   Heating is space heating and domestic hot water combined.
         
         for m in mons:
+            elePea[m-1] = np.max(ele[t_moy == m])
             heaPea[m-1] = np.max(hea[t_moy == m])
             dhwPea[m-1] = np.max(dhw[t_moy == m])
             sndPea[m-1] = np.max(snd[t_moy == m])
@@ -45,6 +46,7 @@ def runBuildings(listBui,
             #netPea[m-1] = np.max(net[t_moy == m])
             #netPea[m-1] = net.flat[abs(net).argmax()]
             
+            eleTot[m-1] = np.sum(ele[t_moy == m])
             heaTot[m-1] = np.sum(hea[t_moy == m])
             dhwTot[m-1] = np.sum(dhw[t_moy == m])
             sndTot[m-1] = np.sum(snd[t_moy == m])
@@ -53,9 +55,11 @@ def runBuildings(listBui,
         #monPeaHea = calendar.month_name[np.argmax(sndPea) + 1]
         #monPeaCoo = calendar.month_name[np.argmax(cooPea) + 1]
         
+        dfPeaEle.loc[len(dfPeaEle.index) + 1] = [bldg, np.max(elePea)] + elePea.tolist()
         dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [bldg, np.max(sndPea)] + sndPea.tolist()
         dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [bldg, np.max(cooPea)] + cooPea.tolist()
         
+        dfTotEle.loc[len(dfTotEle.index) + 1] = [bldg, np.sum(eleTot)] + eleTot.tolist()
         dfTotSnd.loc[len(dfTotSnd.index) + 1] = [bldg, np.sum(sndTot)] + sndTot.tolist()
         dfTotCoo.loc[len(dfTotCoo.index) + 1] = [bldg, np.sum(cooTot)] + cooTot.tolist()
         
@@ -126,6 +130,7 @@ def runBuildings(listBui,
             plt.close()
 
     # Sum of all buildings selected
+    ele = np.zeros(8760) # end-use electricity
     hea = np.zeros(8760) # space heating
     dhw = np.zeros(8760) # domestic hot water
     snd = np.zeros(8760) # space heating and domestic hot water combined
@@ -134,6 +139,8 @@ def runBuildings(listBui,
     
     # Read MIDs and sum them up
     for sBui in listBui:
+        ele_tmp = np.array(readMID(f'{sRet}_{sBui}_ele'))
+        ele += ele_tmp
         hea_tmp = np.array(readMID(f'{sRet}_{sBui}_hea'))
         hea += hea_tmp
         hasDhw = os.path.isfile(os.path.join(dirExch, f'{sRet}_{sBui}_dhw.csv'))
@@ -150,6 +157,7 @@ def runBuildings(listBui,
     net = hea + dhw - coo
     
     # Monthly peaks
+    elePea = np.zeros(12)
     heaPea = np.zeros(12)
     dhwPea = np.zeros(12)
     sndPea = np.zeros(12)
@@ -157,6 +165,7 @@ def runBuildings(listBui,
     netPea = np.zeros(12)
     
     # Monthly totals
+    eleTot = np.zeros(12)
     heaTot = np.zeros(12)
     dhwTot = np.zeros(12)
     sndTot = np.zeros(12)
@@ -222,10 +231,12 @@ t_ms = pd.date_range(start='2005-01-01',
                      freq='MS')[0:12].tolist() # list for month starts
 
 # Dataframes for monthly peaks
+dfPeaEle = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 dfPeaSnd = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 dfPeaCoo = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 
 # Dataframes for monthly totals
+dfTotEle = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 dfTotSnd = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 dfTotCoo = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 
@@ -236,6 +247,11 @@ if mode == 'spec':
                  tit = tit_spec,
                  saveFigures = saveFigures)
     if saveTablesPeak:
+        dfPeaEle.to_csv(f'Peaks_endUseElectricity_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
         dfPeaSnd.to_csv(f'Peaks_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
@@ -247,6 +263,11 @@ if mode == 'spec':
                         mode = 'a',
                         header = False)
     if saveTablesPeak:
+        dfTotEle.to_csv(f'Total_endUseElectricity_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
         dfTotSnd.to_csv(f'Total_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
@@ -264,6 +285,9 @@ elif mode == 'each':
                      sRet = retr,
                      saveFigures = saveFigures)
     if saveTablesPeak:
+        dfPeaEle.to_csv(f'Peaks_endUseElectricity_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False)
         dfPeaSnd.to_csv(f'Peaks_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False)
@@ -271,6 +295,9 @@ elif mode == 'each':
                         sep = delimiter,
                         index = False)
     if saveTablesPeak:
+        dfTotEle.to_csv(f'Total_endUseElectricity_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False)
         dfTotSnd.to_csv(f'Total_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False)
@@ -286,6 +313,11 @@ elif mode == 'west':
                  tit = tit,
                  saveFigures = saveFigures)
     if saveTablesPeak:
+        dfPeaEle.to_csv(f'Peaks_endUseElectricity_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
         dfPeaSnd.to_csv(f'Peaks_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
@@ -297,6 +329,11 @@ elif mode == 'west':
                         mode = 'a',
                         header = False)
     if saveTablesPeak:
+        dfTotEle.to_csv(f'Total_endUseElectricity_{retr_tit}.csv',
+                        sep = delimiter,
+                        index = False,
+                        mode = 'a',
+                        header = False)
         dfTotSnd.to_csv(f'Total_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
