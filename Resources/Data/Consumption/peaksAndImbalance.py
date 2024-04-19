@@ -66,6 +66,7 @@ def runBuildings(listBui,
                       'b', linewidth = linewidth)
         setXAxisMonths()
         ax.xaxis.set_major_formatter(plt.NullFormatter())
+        plt.grid()
         
         ax = fig.add_subplot(312)
         ax.set_title('Monthly Peak (kW)',
@@ -80,6 +81,7 @@ def runBuildings(listBui,
         plt.axhline(0, color = 'k', linewidth = linewidth/2)
         setXAxisMonths()
         ax.xaxis.set_major_formatter(plt.NullFormatter())
+        plt.grid()
     
         ax = fig.add_subplot(313)
         ax.set_title('Cumulative Consumption (thousand kWh)',
@@ -101,6 +103,7 @@ def runBuildings(listBui,
                   fancybox = True,
                   shadow = True,
                   ncol = 4)
+        plt.grid()
         
         plt.suptitle(tit,
                      x = 0.05,
