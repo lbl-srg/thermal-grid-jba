@@ -149,7 +149,9 @@ def runBuildings(listBui,
     
     if tit == '':
         if len(listBui) == 1:
-            tit = f'{sBui} ' +dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0] + f' {sRet}'
+            tit = f'{sBui} '.replace('x','&') \
+                + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0] \
+                + f' ({retr_tit})'
         else:
             tit = 'Combined ({} buildings)'.format(len(listBui))
     getPeak(sBui if len(listBui) == 1 else tit)
@@ -171,7 +173,7 @@ mode = 'west'
     # 'west' -  plot 18 west-wing buildings combined
     #           add a row to the tables, if saveTables
 saveFigures = True
-saveTables = True
+saveTablesPeak = True
 
 #listBui - list of buildings, consumption is combined
 #   only used with mode == 'spec'
@@ -212,13 +214,13 @@ if mode == 'spec':
                  sRet = retr,
                  tit = tit_spec,
                  saveFigures = saveFigures)
-    if saveTables:
-        dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
+    if saveTablesPeak:
+        dfPeaSnd.to_csv(f'Peaks_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
                         mode = 'a',
                         header = False)
-        dfPeaCoo.to_csv('Peaks_cooling.csv',
+        dfPeaCoo.to_csv(f'Peaks_cooling_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
                         mode = 'a',
@@ -229,28 +231,28 @@ elif mode == 'each':
         runBuildings([sBui],
                      sRet = retr,
                      saveFigures = saveFigures)
-    if saveTables:
-        dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
+    if saveTablesPeak:
+        dfPeaSnd.to_csv(f'Peaks_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False)
-        dfPeaCoo.to_csv('Peaks_cooling.csv',
+        dfPeaCoo.to_csv(f'Peaks_cooling_{retr_tit}.csv',
                         sep = delimiter,
                         index = False)
 elif mode == 'west':
     # Combine 18 west-wing buildings
     listBui = [elem for elem in sBuis if elem not in {'5300', '5301'}]
-    tit = f'West Wing Combined - {retr_tit}'
+    tit = f'West Combined - {retr_tit}'
     runBuildings(listBui,
                  sRet = retr,
                  tit = tit,
                  saveFigures = saveFigures)
-    if saveTables:
-        dfPeaSnd.to_csv('Peaks_combinedHeating.csv',
+    if saveTablesPeak:
+        dfPeaSnd.to_csv(f'Peaks_combinedHeating_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
                         mode = 'a',
                         header = False)
-        dfPeaCoo.to_csv('Peaks_cooling.csv',
+        dfPeaCoo.to_csv(f'Peaks_cooling_{retr_tit}.csv',
                         sep = delimiter,
                         index = False,
                         mode = 'a',
