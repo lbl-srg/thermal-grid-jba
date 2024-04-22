@@ -85,12 +85,20 @@ def runBuildings(listBui,
         ax.set_title('Monthly Peak (kW)',
                      loc = 'left',
                      fontsize = 12)
+        """
         h1, = ax.plot(t_ms, sndPea,
                       'r', linewidth = linewidth)
         h1, = ax.plot(t_ms, - cooPea,
                       'b', linewidth = linewidth)
         #h1, = ax.plot(t_ms, netPea,
         #              'k', linewidth = linewidth)
+        """
+        h1 = ax.bar(t_ms, sndPea,
+                    color = 'r',
+                    width = 10)
+        h1 = ax.bar(t_ms, - cooPea,
+                    color = 'b',
+                    width = 10)
         plt.axhline(0, color = 'k', linewidth = linewidth/2)
         setXAxisMonths()
         ax.xaxis.set_major_formatter(plt.NullFormatter())
