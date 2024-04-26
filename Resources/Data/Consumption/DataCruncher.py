@@ -20,10 +20,12 @@ import pandas as pd
 
 from _config_estcp import *
 
-def runBuildings(listBui,
-                 sRet = 'post',
-                 tit = '',
-                 saveFigures = True):
+def runBuildings(listBui,                 
+                 sRet : str,
+                 titFig : str,
+                 titFil : str,
+                 saveFigures = True,
+                 titleOnFigure = False):
 
     def setXAxisMonths():
         # Set x-axis to display months.
@@ -63,7 +65,9 @@ def runBuildings(listBui,
         dfTotSnd.loc[len(dfTotSnd.index) + 1] = [bldg, np.sum(sndTot)] + sndTot.tolist()
         dfTotCoo.loc[len(dfTotCoo.index) + 1] = [bldg, np.sum(cooTot)] + cooTot.tolist()
         
-    def makePlot(tit: str):
+    def makePlot(titFig : str,
+                 titFil : str,
+                 titleOnFigure = True):
         linewidth = 0.8
         
         fig = plt.figure()
@@ -126,15 +130,16 @@ def runBuildings(listBui,
                   ncol = 4)
         plt.grid()
         
-        plt.suptitle(tit,
-                     x = 0.05,
-                     y = 0.96,
-                     horizontalalignment = 'left',
-                     fontsize = 14)
+        if titleOnFigure:
+            plt.suptitle(titFig,
+                         x = 0.05,
+                         y = 0.96,
+                         horizontalalignment = 'left',
+                         fontsize = 14)
         fig.tight_layout()
         
         if saveFigures:
-            plt.savefig(os.path.join(dirFigu,tit + '.pdf'))
+            plt.savefig(os.path.join(dirFigu,titFil))
             plt.close()
 
     # Sum of all buildings selected
@@ -180,21 +185,17 @@ def runBuildings(listBui,
     cooTot = np.zeros(12)
     netTot = np.zeros(12)
     
-    if tit == '':
-        if len(listBui) == 1:
-            tit = f'{sBui} '.replace('x','&') \
-                + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0] \
-                + f' ({retr_tit})'
-        else:
-            tit = 'Combined ({} buildings)'.format(len(listBui))
-    getMonthly(sBui if len(listBui) == 1 else tit)
-    makePlot(tit)
+    getMonthly(sBui if len(listBui) == 1 else titFig)
+    makePlot(titFig = titFig,
+             titFil = titFil,
+             titleOnFigure = titleOnFigure)
 
 ###########################################################################
 ## Start of main process ##
 
 #%% ======= FLAGS AND SWITCHES =======
-flag_deleteOldFiles = False
+flag_deleteOldFigures = False     # Deletes the folder of figures
+                                  #   and remake the directory
 retr = 'post' # retrofit status: 'base' baseline,
               #                  'post' post-ECM
 
@@ -209,18 +210,19 @@ saveFigures = False
 saveTablesPeak = False
 saveTablesTotal = False
 
+titleOnFigure = True # Set false if figures used for Latex
+
 #listBui - list of buildings, consumption is combined
 #   only used with mode == 'spec'
 #listBui = sBuis # 
 #listBui_spec = ['1045']
 listBui_spec = ['1045', '1349']
-tit_spec = ''
+titFig_spec = 'spec' # Title of the figure (on figure or in caption)
+titFil_spec = 'spec' # Title of the figure file
 
-#%%
+#%% Configure based on flags & switches
 
-if flag_deleteOldFiles:
-    # Deletes the folder of the previous written exchange files
-    #   and remake the directory'
+if flag_deleteOldFigures:
     shutil.rmtree(dirFigu)
     os.makedirs(dirFigu, exist_ok = True)
 if retr == 'base':
@@ -228,6 +230,7 @@ if retr == 'base':
 elif retr == 'post':
     retr_tit = 'Post ECM'
 
+#%% Construct
 t_dt = pd.date_range(start='2005-01-01',
                      end='2006-01-01',
                      freq='h')[0:8760] # time array as date
@@ -248,12 +251,17 @@ dfTotEle = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13]
 dfTotSnd = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 dfTotCoo = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13])
 
+#%% Run buildings
+
 if mode == 'spec':
     # Run specified list of buildings (can have only one)
+    
     runBuildings(listBui_spec,
                  sRet = retr,
-                 tit = tit_spec,
-                 saveFigures = saveFigures)
+                 titFig = titFig_spec,
+                 titFil = titFil_spec,
+                 saveFigures = saveFigures,
+                 titleOnFigure = titleOnFigure)
     if saveTablesPeak:
         dfPeaEle.to_csv(os.path.join(dirTabl,f'Peaks_endUseElectricity_{retr_tit}.csv'),
                         sep = delimiter,
@@ -289,9 +297,16 @@ if mode == 'spec':
 elif mode == 'each':
     # Run each building
     for sBui in sBuis:
+        titFig = f'{sBui} '.replace('x','&') \
+                + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0] \
+                + f' - {retr_tit}'
+        titFil = f'{retr}_{sBui}.pdf'
         runBuildings([sBui],
                      sRet = retr,
-                     saveFigures = saveFigures)
+                     titFig = titFig,
+                     titFil = titFil,
+                     saveFigures = saveFigures,
+                     titleOnFigure = titleOnFigure)
     if saveTablesPeak:
         dfPeaEle.to_csv(os.path.join(dirTabl,f'Peaks_endUseElectricity_{retr_tit}.csv'),
                         sep = delimiter,
@@ -315,11 +330,14 @@ elif mode == 'each':
 elif mode == 'west':
     # Combine buildings but exclude 5300 & 5301 which are east of the runway
     listBui = [elem for elem in sBuis if elem not in {'5300', '5301'}]
-    tit = f'West Combined - {retr_tit}'
+    titFig = f'West Combined - {retr_tit}'
+    titFil = f'{retr}_west.pdf'
     runBuildings(listBui,
                  sRet = retr,
-                 tit = tit,
-                 saveFigures = saveFigures)
+                 titFig = titFig,
+                 titFil = titFil,
+                 saveFigures = saveFigures,
+                 titleOnFigure = titleOnFigure)
     if saveTablesPeak:
         dfPeaEle.to_csv(os.path.join(dirTabl,f'Peaks_endUseElectricity_{retr_tit}.csv'),
                         sep = delimiter,
