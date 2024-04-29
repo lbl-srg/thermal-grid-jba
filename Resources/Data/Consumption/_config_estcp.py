@@ -14,7 +14,7 @@ delimiter = ','
 #%% exchange csv files
 dirExch = 'exchange'
 
-#%% eQuest output csv files
+#%% eQuest csv files
 dirRead = 'eQuest'
 dfBldg = pd.read_csv('buildings.csv',
                      header = 0,
@@ -30,13 +30,10 @@ iCols = [16, 30, 31, 32]
     #   from the input file (base 0)
 
 #%% Sympheny input xlsx files
-dirWritSymp = 'Sympheny'
-
-#%% Figure outputs
+dirWritSymp = 'Sympheny' # Sympheny input xlsx files
 dirFigu = 'Figures'
-
-#%% Table outputs
 dirTabl = 'Tables'
+dirTex = 'Latex'
 
 #%% functions
 def readMID(MID : str):
