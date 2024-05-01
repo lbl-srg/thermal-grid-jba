@@ -41,7 +41,7 @@ with open(os.path.join(dirTex, f'appendix_{retr}.tex'), 'w') as f:
         fn_base = os.path.basename(fns_full[idx])
         sBui = fn_base.replace('.','_').split(sep = '_')[1]
         if sBui in dfBldg['bldg_no'].tolist():
-            caption = sBui.replace('x','&') \
+            caption = sBui.replace('x','&') + ' ' \
                     + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0] \
                     + f', {retr_f}'
         else:
