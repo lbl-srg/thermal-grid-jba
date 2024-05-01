@@ -200,12 +200,12 @@ retr = 'post' # retrofit status: 'base' baseline,
               #                  'post' post-ECM
 
 mode = 'west'
-    # 'spec' -  plot a specified list of buildings (can have only one)
-    #           add a row to tables, if saveTables
-    # 'each' -  plot all of each individual building
-    #           rewrite the tables, if saveTables
-    # 'west' -  plot 18 west-wing buildings combined
-    #           add a row to the tables, if saveTables
+    # 'spec' -  specify one building or a list of buildings to be combined,
+    #           add a row to tables, if saveTables;
+    # 'each' -  each individual building processed separately,
+    #           rewrite the tables, if saveTables;
+    # 'west' -  buildings on the west wing combined,
+    #           add a row to the tables, if saveTables;
 saveFigures = False
 saveTablesPeak = False
 saveTablesTotal = False
@@ -234,7 +234,7 @@ elif retr == 'post':
 t_dt = pd.date_range(start='2005-01-01',
                      end='2006-01-01',
                      freq='h')[0:8760] # time array as date
-t_hoy = np.array(t_dt.tolist()) # hour of year
+t_hoy = np.array(t_dt.tolist()) # hour of year, 1 to 8760
 t_moy = np.array(t_dt.month.tolist()) # month of year, for each hour
 mons = np.linspace(1,12,12,dtype = int)
 t_ms = pd.date_range(start='2005-01-01',
