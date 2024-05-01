@@ -13,28 +13,28 @@ import pandas as pd
 from _config_estcp import *
 
 #%% Main function
-def main(sRet: str, sUti: str, sBuis, sHub = ''):
+def main(retr: str, util: str, bldg_nos, hubname = ''):
 
     df = pd.DataFrame({'row' : np.linspace(1,8760,8760,dtype = int),
                        'value' : np.zeros(8760)})
-    sBuiLis = '' # building list, remains '' if hub name sHub provided
+    bldglist = '' # building list, remains '' if hub name hubname provided
     
     flag = False # flag when data found to generate output files
-    for sBui in sBuis:
-        MID = f'{sRet}_{sBui}_{sUti}' # meter ID
+    for bldg_no in bldg_nos:
+        MID = f'{retr}_{bldg_no}_{util}' # meter ID
         fni = os.path.join(dirExch, f'{MID}.csv')
         if os.path.isfile(fni):
             df['value'] = df['value'] + readMID(MID)
-            if sHub == '':
+            if hubname == '':
                 # construct file name from bldg list if no hub name provided
-                sBuiLis = '-'.join(filter(None,[sBuiLis,sBui]))
+                bldglist = '-'.join(filter(None,[bldglist,bldg_no]))
             flag = True
         else:
             print(f'Not found: {MID}')
 
     if flag:
-        fno = '_'.join(filter(None,[sRet,sBuiLis,sHub,sUti])) + '.xlsx'
-            # file name output; either sBuiLis or sHub would be '' and omitted
+        fno = '_'.join(filter(None,[retr,bldglist,hubname,util])) + '.xlsx'
+            # file name output; either bldglist or hubname would be '' and omitted
             #   example using building list: 'base_1045-1380_coo.xlsx'
             #   example using hub name: 'base_medical_coo.xlsx'
         df.to_excel(os.path.join(dirWritSymp,fno),
@@ -59,19 +59,19 @@ main('base', 'ele', ['1380','1045'])
 #%% Hub list
 """
 # validation
-dictHubs = {'1058x1060':['1058x1060'],
+hub_dict = {'1058x1060':['1058x1060'],
             '1065':['1065'],
             'medical':['1058x1060','1065']}
-for sHub in dictHubs:
-    main('base','ele',sBuis=dictHubs[sHub],sHub=sHub)
+for hubname in hub_dict:
+    main('base','ele',bldg_nos=hub_dict[hubname],hubname=hubname)
 
 """
-sRet = 'base' # 'base' baseline or 'post' post-retrofit
-dictHubs = {'medical':['1058x1060','1065'],
+retr = 'base' # 'base' baseline or 'post' post-retrofit
+hub_dict = {'medical':['1058x1060','1065'],
             'dorm':['1631','1657','1690','1691','1692']}
-for sHub in dictHubs:
-    for sUti in sUtis:
-        main('base',sUti,sBuis=dictHubs[sHub],sHub=sHub)
+for hubname in hub_dict:
+    for util in utils:
+        main('base',util,bldg_nos=hub_dict[hubname],hubname=hubname)
 
 #%% Shell interface with argparse
 """
@@ -82,12 +82,12 @@ parser.add_argument('r',
                     help = 'retrofit status, {base, post}')
 parser.add_argument('u',
                     type = str,
-                    choices = sUtis,
+                    choices = utils,
                     help = 'type of utility, {ele, coo, hea, dhw}')
 parser.add_argument('b',
                     nargs='+',
                     type = str,
-                    choices = sBuis,
+                    choices = bldg_nos,
                     help = '4-digit building number or \'1058x1060\'')
 args = parser.parse_args()
 

@@ -21,36 +21,36 @@ if flag_deleteOldDirectory:
     shutil.rmtree(dirExch)
     os.makedirs(dirExch, exist_ok = True)
 
-sRet = 'post' # retrofit: 'base' baseline ,
+retr = 'post' # retrofit: 'base' baseline ,
               #           'post' post-ECM
 
-for sBui in sBuis:
-    if sRet == 'base':
-        sfn = f'{sBui}*Baseline*.csv'
-    elif sRet == 'post':
-        sfn = f'{sBui}*Post*.csv'
+for bldg_no in bldg_nos:
+    if retr == 'base':
+        filename = f'{bldg_no}*Baseline*.csv'
+    elif retr == 'post':
+        filename = f'{bldg_no}*Post*.csv'
     else:
-        sfn = ''
+        filename = ''
     
-    with open(glob.glob(os.path.join(dirRead, sfn))[0],
+    with open(glob.glob(os.path.join(dirRead, filename))[0],
               newline='') as fr:
         reader = csv.reader(fr, delimiter=',')
         rows = list(reader)
 
     # For each utility type
     for idxU in range(0,4):
-        sUti = sUtis[idxU]
-        iCol = iCols[idxU]
+        util = utils[idxU]
+        util_col = util_cols[idxU]
 
-        if len(rows[10]) <= iCol:
+        if len(rows[10]) <= util_col:
             # if column doesn't exist
             continue
             
-        if rows[10][iCol] == '':
+        if rows[10][util_col] == '':
             # if column is empty
             continue
 
-        with open(os.path.join(dirExch, f'{sRet}_{sBui}_{sUti}.csv'),
+        with open(os.path.join(dirExch, f'{retr}_{bldg_no}_{util}.csv'),
                   'w',
                   newline='') as fw:
             writer = csv.DictWriter(fw,
@@ -60,12 +60,12 @@ for sBui in sBuis:
                 #   value           - float non-negative
             
             for idxR in range(10,8770):
-                fUti = abs(float(rows[idxR][iCol]))
-                if sUti != 'ele':
+                valu = abs(float(rows[idxR][util_col]))
+                if util != 'ele':
                     # if ele, do nothing
                     # all others, convert from Btu to kWh
-                    fUti = fUti / 3412.142
+                    valu = valu / 3412.142
                 
-                writer.writerow({'value' : fUti})
+                writer.writerow({'value' : valu})
 
 fw.close

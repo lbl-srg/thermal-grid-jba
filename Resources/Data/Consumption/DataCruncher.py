@@ -21,9 +21,9 @@ import pandas as pd
 from _config_estcp import *
 
 def runBuildings(listBui,                 
-                 sRet : str,
-                 titFig : str,
-                 titFil : str,
+                 retr : str,
+                 figtitle : str,
+                 filename : str,
                  saveFigures = True,
                  titleOnFigure = False):
 
@@ -65,8 +65,8 @@ def runBuildings(listBui,
         dfTotSnd.loc[len(dfTotSnd.index) + 1] = [bldg, np.sum(sndTot)] + sndTot.tolist()
         dfTotCoo.loc[len(dfTotCoo.index) + 1] = [bldg, np.sum(cooTot)] + cooTot.tolist()
         
-    def makePlot(titFig : str,
-                 titFil : str,
+    def makePlot(figtitle : str,
+                 filename : str,
                  titleOnFigure = True):
         linewidth = 0.8
         
@@ -131,7 +131,7 @@ def runBuildings(listBui,
         plt.grid()
         
         if titleOnFigure:
-            plt.suptitle(titFig,
+            plt.suptitle(figtitle,
                          x = 0.05,
                          y = 0.96,
                          horizontalalignment = 'left',
@@ -139,7 +139,7 @@ def runBuildings(listBui,
         fig.tight_layout()
         
         if saveFigures:
-            plt.savefig(os.path.join(dirFigu,titFil))
+            plt.savefig(os.path.join(dirFigu,filename))
             plt.close()
 
     # Sum of all buildings selected
@@ -151,19 +151,19 @@ def runBuildings(listBui,
     net = np.zeros(8760) # net energy
     
     # Read MIDs and sum them up
-    for sBui in listBui:
-        ele_tmp = np.array(readMID(f'{sRet}_{sBui}_ele'))
+    for bldg_no in listBui:
+        ele_tmp = np.array(readMID(f'{retr}_{bldg_no}_ele'))
         ele += ele_tmp
-        hea_tmp = np.array(readMID(f'{sRet}_{sBui}_hea'))
+        hea_tmp = np.array(readMID(f'{retr}_{bldg_no}_hea'))
         hea += hea_tmp
-        hasDhw = os.path.isfile(os.path.join(dirExch, f'{sRet}_{sBui}_dhw.csv'))
+        hasDhw = os.path.isfile(os.path.join(dirExch, f'{retr}_{bldg_no}_dhw.csv'))
         if hasDhw:
-            dhw_tmp = np.array(readMID(f'{sRet}_{sBui}_dhw'))
+            dhw_tmp = np.array(readMID(f'{retr}_{bldg_no}_dhw'))
         else:
             dhw_tmp = np.zeros(8760)
         dhw += dhw_tmp
         #snd_tmp = hea_tmp + dhw_tmp
-        coo_tmp = np.array(readMID(f'{sRet}_{sBui}_coo'))
+        coo_tmp = np.array(readMID(f'{retr}_{bldg_no}_coo'))
         coo += coo_tmp
     
     snd = hea + dhw
@@ -185,9 +185,9 @@ def runBuildings(listBui,
     cooTot = np.zeros(12)
     netTot = np.zeros(12)
     
-    getMonthly(sBui if len(listBui) == 1 else titFig)
-    makePlot(titFig = titFig,
-             titFil = titFil,
+    getMonthly(bldg_no if len(listBui) == 1 else figtitle)
+    makePlot(figtitle = figtitle,
+             filename = filename,
              titleOnFigure = titleOnFigure)
 
 ###########################################################################
@@ -214,11 +214,11 @@ titleOnFigure = True # Set false if figures used for Latex
 
 #listBui - list of buildings, consumption is combined
 #   only used with mode == 'spec'
-#listBui = sBuis # 
+#listBui = bldg_nos # 
 #listBui_spec = ['1045']
 listBui_spec = ['1045', '1349']
-titFig_spec = 'spec' # Title of the figure (on figure or in caption)
-titFil_spec = 'spec' # Title of the figure file
+figtitle_spec = 'spec' # Title of the figure (on figure or in caption)
+filename_spec = 'spec' # Title of the figure file
 
 #%% Configure based on flags & switches
 
@@ -257,9 +257,9 @@ if mode == 'spec':
     # Run specified list of buildings (can have only one)
     
     runBuildings(listBui_spec,
-                 sRet = retr,
-                 titFig = titFig_spec,
-                 titFil = titFil_spec,
+                 retr = retr,
+                 figtitle = figtitle_spec,
+                 filename = filename_spec,
                  saveFigures = saveFigures,
                  titleOnFigure = titleOnFigure)
     if saveTablesPeak:
@@ -296,15 +296,15 @@ if mode == 'spec':
                         header = False)
 elif mode == 'each':
     # Run each building
-    for sBui in sBuis:
-        titFig = f'{sBui} '.replace('x','&') \
-                + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0] \
+    for bldg_no in bldg_nos:
+        figtitle = f'{bldg_no} '.replace('x','&') \
+                + dfBldg.loc[dfBldg['bldg_no'] == bldg_no,'name'].tolist()[0] \
                 + f' - {retr_tit}'
-        titFil = f'{retr}_{sBui}.pdf'
-        runBuildings([sBui],
-                     sRet = retr,
-                     titFig = titFig,
-                     titFil = titFil,
+        filename = f'{retr}_{bldg_no}.pdf'
+        runBuildings([bldg_no],
+                     retr = retr,
+                     figtitle = figtitle,
+                     filename = filename,
                      saveFigures = saveFigures,
                      titleOnFigure = titleOnFigure)
     if saveTablesPeak:
@@ -329,13 +329,13 @@ elif mode == 'each':
                         index = False)
 elif mode == 'west':
     # Combine buildings but exclude 5300 & 5301 which are east of the runway
-    listBui = [elem for elem in sBuis if elem not in {'5300', '5301'}]
-    titFig = f'West Combined - {retr_tit}'
-    titFil = f'{retr}_west.pdf'
+    listBui = [elem for elem in bldg_nos if elem not in {'5300', '5301'}]
+    figtitle = f'West Combined - {retr_tit}'
+    filename = f'{retr}_west.pdf'
     runBuildings(listBui,
-                 sRet = retr,
-                 titFig = titFig,
-                 titFil = titFil,
+                 retr = retr,
+                 figtitle = figtitle,
+                 filename = filename,
                  saveFigures = saveFigures,
                  titleOnFigure = titleOnFigure)
     if saveTablesPeak:

@@ -39,10 +39,10 @@ with open(os.path.join(dirTex, f'appendix_{retr}.tex'), 'w') as f:
     # include figures
     for idx, fn_full in enumerate(fns_full):
         fn_base = os.path.basename(fns_full[idx])
-        sBui = fn_base.replace('.','_').split(sep = '_')[1]
-        if sBui in dfBldg['bldg_no'].tolist():
-            caption = sBui.replace('x','&') + ' ' \
-                    + dfBldg.loc[dfBldg['bldg_no'] == sBui,'name'].tolist()[0] \
+        bldg_no = fn_base.replace('.','_').split(sep = '_')[1]
+        if bldg_no in dfBldg['bldg_no'].tolist():
+            caption = bldg_no.replace('x','&') + ' ' \
+                    + dfBldg.loc[dfBldg['bldg_no'] == bldg_no,'name'].tolist()[0] \
                     + f', {retr_f}'
         else:
             caption = 'CAPTION'

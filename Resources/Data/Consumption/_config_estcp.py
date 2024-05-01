@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 #%% shared attributes
-sUtis = ['ele', 'coo', 'hea', 'dhw']
+utils = ['ele', 'coo', 'hea', 'dhw']
     # utility types:
     #   electricity, cooling, heating, domestic hot water
 delimiter = ','
@@ -24,8 +24,8 @@ dfBldg = pd.read_csv('buildings.csv',
                               'gross_area_sf' : float,
                               'gross_area_m2' : float,
                               'remark1' : str})
-sBuis = dfBldg['bldg_no'].tolist()
-iCols = [16, 30, 31, 32]
+bldg_nos = dfBldg['bldg_no'].tolist()
+util_cols = [16, 30, 31, 32]
     # column numbers of the respective utilities
     #   from the input file (base 0)
 
