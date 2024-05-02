@@ -11,6 +11,7 @@ Makes figures that express load (im)balance.
 
 import os
 import calendar
+import datetime
 import shutil
 
 import matplotlib.pyplot as plt
@@ -73,67 +74,85 @@ def runBuildings(listBui,
         
         cooPea = monthly.peak.sel(retr=retr,util='coo',buil=builcoord)
         heaPea = monthly.peak.sel(retr=retr,util='hea',buil=builcoord)
+        if hasDhw:
+            dhwPea = monthly.peak.sel(retr=retr,util='dhw',buil=builcoord)
         
         linewidth = 0.8
         
-        fig = plt.figure()
-        plt.rcParams['figure.figsize'] = [6, 6]
+        fig, (ax1,ax2,ax3) = plt.subplots(3,1,
+                                          sharex=True,
+                                          figsize=(6,6),
+                                          constrained_layout=True)
+        
+        # fig = plt.figure()
+        # plt.rcParams['figure.figsize'] = [6, 6]
+        # plt.rcParams['figure.constrained_layout.use'] = True
     
-        ax = fig.add_subplot(311)
-        ax.set_title('Hourly Consumption (kWh/h)',
+        # ax = fig.add_subplot(311)
+        ax1.set_title('Hourly Consumption (kWh/h)',
                      loc = 'left',
                      fontsize = 12)
-        h1, = ax.plot(t_hoy, hea,
+        h1, = ax1.plot(t_hoy, hea,
                       'r', linewidth = linewidth)
-        h1, = ax.plot(t_hoy, - coo,
+        h1, = ax1.plot(t_hoy, - coo,
                       'b', linewidth = linewidth)
         if hasDhw:
-            h1, = ax.plot(t_hoy, dhw,
+            h1, = ax1.plot(t_hoy, dhw,
                           'm', linewidth = linewidth)
         setXAxisMonths()
-        ax.xaxis.set_major_formatter(plt.NullFormatter())
-        plt.grid()
+        ax1.xaxis.set_major_formatter(plt.NullFormatter())
+        ax1.grid()
         
-        ax = fig.add_subplot(312)
-        ax.set_title('Monthly Peak (kW)',
+        # ax = fig.add_subplot(312)
+        ax2.set_title('Monthly Peak (kW)',
                      loc = 'left',
-                     fontsize = 12)
-        h1 = ax.bar(t_ms, heaPea,
+                     fontsize = 12)        
+        if hasDhw:
+            _t_ms_shift = [t + datetime.timedelta(days=-5) for t in t_ms]
+        else:
+            _t_ms_shift = t_ms
+        h1 = ax2.bar(_t_ms_shift, heaPea,
                     color = 'r',
                     width = 10)
-        h1 = ax.bar(t_ms, - cooPea,
+        _t_ms_shift = [t + datetime.timedelta(days=5) for t in _t_ms_shift]
+        h1 = ax2.bar(t_ms, - cooPea,
                     color = 'b',
                     width = 10)
+        if hasDhw:
+            _t_ms_shift = [t + datetime.timedelta(days=5) for t in t_ms]
+            h1 = ax2.bar(_t_ms_shift, dhwPea,
+                        color = 'm',
+                        width = 10)
         plt.axhline(0, color = 'k', linewidth = linewidth/2)
         setXAxisMonths()
-        ax.xaxis.set_major_formatter(plt.NullFormatter())
-        plt.grid()
+        ax2.xaxis.set_major_formatter(plt.NullFormatter())
+        ax2.grid()
     
-        ax = fig.add_subplot(313)
-        ax.set_title('Cumulative Consumption (thousand kWh)',
+        # ax = fig.add_subplot(313)
+        ax3.set_title('Cumulative Consumption (thousand kWh)',
                      loc = 'left',
                      fontsize = 12)
-        h1, = ax.plot(t_hoy, np.cumsum(hea)/1000,
+        h1, = ax3.plot(t_hoy, np.cumsum(hea)/1000,
                       'r', linewidth = linewidth, label = 'heating')
-        h1, = ax.plot(t_hoy, - np.cumsum(coo)/1000,
+        h1, = ax3.plot(t_hoy, - np.cumsum(coo)/1000,
                       'b', linewidth = linewidth, label = 'cooling')
         if hasDhw:
-            h1, = ax.plot(t_hoy, np.cumsum(dhw)/1000,
+            h1, = ax3.plot(t_hoy, np.cumsum(dhw)/1000,
                           'm', linewidth = linewidth, label = 'dom. hot water')
-        h1, = ax.plot(t_hoy, np.cumsum(net)/1000,
+        h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
                       'k', linewidth = linewidth, label = 'net energy')
         plt.axhline(0, color = 'k', linewidth = linewidth/2)
         setXAxisMonths()
-        xlabels = [item.get_text() for item in ax.get_xticklabels()]
+        xlabels = [item.get_text() for item in ax3.get_xticklabels()]
         xlabels[-1] = ''
-        ax.set_xticks(ax.get_xticks())
-        ax.set_xticklabels(xlabels)
-        ax.legend(loc = 'upper center',
+        ax3.set_xticks(ax3.get_xticks())
+        ax3.set_xticklabels(xlabels)
+        ax3.legend(loc = 'upper center',
                   bbox_to_anchor = (0.5, -0.2, - 0.1, 0.),
                   fancybox = True,
                   shadow = True,
                   ncol = 4)
-        plt.grid()
+        ax3.grid()
         
         if titleOnFigure:
             plt.suptitle(figtitle,
@@ -182,6 +201,7 @@ def runBuildings(listBui,
              filename = filename,
              hasDhw = hourly.attrs['hasDhw'],
              titleOnFigure = titleOnFigure)
+    hasDhw = hasDhw or hourly.attrs['hasDhw']
 
 ###########################################################################
 ## Start of main process ##
@@ -189,10 +209,10 @@ def runBuildings(listBui,
 #%% ======= FLAGS AND SWITCHES =======
 flag_deleteOldFigures = False     # Deletes the folder of figures
                                   #   and remake the directory
-retr = 'post' # retrofit status: 'base' baseline,
+retr = 'base' # retrofit status: 'base' baseline,
               #                  'post' post-ECM
 
-mode = 'west'
+mode = 'each'
     # 'spec' -  specify one building or a list of buildings to be combined,
     #           add a row to tables, if saveTables;
     # 'each' -  each individual building processed separately,
@@ -200,7 +220,7 @@ mode = 'west'
     # 'west' -  buildings on the west wing combined,
     #           add a row to the tables, if saveTables;
 saveFigures = False
-saveTables = True
+saveTables = False
 
 titleOnFigure = True # Set false if figures used for Latex
 
@@ -221,6 +241,7 @@ if retr == 'base':
     retr_tit = 'Baseline'
 elif retr == 'post':
     retr_tit = 'Post ECM'
+hasDhw = False # global dhw flag
 
 #%% Construct
 t_dt = pd.date_range(start='2005-01-01',
@@ -288,6 +309,8 @@ elif mode == 'west':
 if saveTables:
     
     for util in utils:
+        if util == 'dhw' and not hasDhw:
+            continue
         dfPea = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
         dfTot = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
         for rowname in monthly.coords['buil'].values:
