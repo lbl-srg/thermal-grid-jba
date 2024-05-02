@@ -349,32 +349,32 @@ elif mode == 'west':
 #%% Save tables
 
 if saveTables:
-    dfPeaEle.to_csv(os.path.join(dirTabl,f'Peaks_endUseElectricity_{retr_tit}.csv'),
+    dfPeaEle.to_csv(os.path.join(dirTabl,f'Peak_ele_{retr}.csv'),
                     sep = delimiter,
                     index = False,
                     mode = saveTablesMode,
                     header = saveTablesHeader)
-    dfPeaSnd.to_csv(os.path.join(dirTabl,f'Peaks_combinedHeating_{retr_tit}.csv'),
+    dfPeaSnd.to_csv(os.path.join(dirTabl,f'Peak_snd_{retr}.csv'),
                     sep = delimiter,
                     index = False,
                     mode = saveTablesMode,
                     header = saveTablesHeader)
-    dfPeaCoo.to_csv(os.path.join(dirTabl,f'Peaks_cooling_{retr_tit}.csv'),
+    dfPeaCoo.to_csv(os.path.join(dirTabl,f'Peak_coo_{retr}.csv'),
                     sep = delimiter,
                     index = False,
                     mode = saveTablesMode,
                     header = saveTablesHeader)
-    dfTotEle.to_csv(os.path.join(dirTabl,f'Total_endUseElectricity_{retr_tit}.csv'),
+    dfTotEle.to_csv(os.path.join(dirTabl,f'Total_ele_{retr}.csv'),
                     sep = delimiter,
                     index = False,
                     mode = saveTablesMode,
                     header = saveTablesHeader)
-    dfTotSnd.to_csv(os.path.join(dirTabl,f'Total_combinedHeating_{retr_tit}.csv'),
+    dfTotSnd.to_csv(os.path.join(dirTabl,f'Total_hea_{retr}.csv'),
                     sep = delimiter,
                     index = False,
                     mode = saveTablesMode,
                     header = saveTablesHeader)
-    dfTotCoo.to_csv(os.path.join(dirTabl,f'Total_cooling_{retr_tit}.csv'),
+    dfTotCoo.to_csv(os.path.join(dirTabl,f'Total_coo_{retr}.csv'),
                     sep = delimiter,
                     index = False,
                     mode = saveTablesMode,
