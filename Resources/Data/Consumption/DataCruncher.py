@@ -36,31 +36,6 @@ def runBuildings(listBui,
         X.set_major_locator(mdates.MonthLocator())
         X.set_major_formatter(mdates.DateFormatter('%b'))
         
-    def getMonthly(bldg : str):
-        # Compute annual and monthly peaks and totals.
-        #   Heating is space heating and domestic hot water combined.
-        
-        for m in mons:         
-            elePea[m-1] = hourly.sel(retr=retr,util='ele',time=(hourly.time.dt.month==m)).max()
-            cooPea[m-1] = hourly.sel(retr=retr,util='coo',time=(hourly.time.dt.month==m)).max()
-            heaPea[m-1] = hourly.sel(retr=retr,util='hea',time=(hourly.time.dt.month==m)).max()
-            dhwPea[m-1] = hourly.sel(retr=retr,util='dhw',time=(hourly.time.dt.month==m)).max()
-            sndPea[m-1] = np.max(snd[t_moy == m])
-            
-            eleTot[m-1] = hourly.sel(retr=retr,util='ele',time=(hourly.time.dt.month==m)).sum()
-            cooTot[m-1] = hourly.sel(retr=retr,util='coo',time=(hourly.time.dt.month==m)).sum()
-            heaTot[m-1] = hourly.sel(retr=retr,util='hea',time=(hourly.time.dt.month==m)).sum()
-            dhwTot[m-1] = hourly.sel(retr=retr,util='dhw',time=(hourly.time.dt.month==m)).sum()
-            sndTot[m-1] = np.sum(snd[t_moy == m])
-        
-        dfPeaEle.loc[len(dfPeaEle.index) + 1] = [bldg, np.max(elePea)] + elePea.tolist()
-        dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [bldg, np.max(sndPea)] + sndPea.tolist()
-        dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [bldg, np.max(cooPea)] + cooPea.tolist()
-        
-        dfTotEle.loc[len(dfTotEle.index) + 1] = [bldg, np.sum(eleTot)] + eleTot.tolist()
-        dfTotSnd.loc[len(dfTotSnd.index) + 1] = [bldg, np.sum(sndTot)] + sndTot.tolist()
-        dfTotCoo.loc[len(dfTotCoo.index) + 1] = [bldg, np.sum(cooTot)] + cooTot.tolist()
-        
     def makePlot(figtitle : str,
                  filename : str,
                  hasDhw : bool,
@@ -158,16 +133,25 @@ def runBuildings(listBui,
                attrs = {
                    'hasDhw': False
                    })
-    """
+    
+    # monthly values
+    # NOTE: DO NOT pass a np object to xr.Dataset to assign initial values!
+    #         It will pass the object pointer (?) not the values.
+    #         As a result, modifying monthly.peak will also modify monthly.total,
+    #         because it is the underlying object that is being modified.
     monthly = xr.Dataset(
                {
-                   'peak':  (['retr', 'util', 'mon'], 0.0),
-                   'total': (['retr', 'util', 'mon'], 0.0)
+                   'peak':  (['retr', 'util', 'mon'],
+                             np.zeros((2,len(utils),len(mons)),dtype=float)),
+                   'total': (['retr', 'util', 'mon'],
+                             np.zeros((2,len(utils),len(mons)),dtype=float))
                },
-               coords = [
-                   ('retr', ['base', 'post']),
-                   ('util', utils),
-                   ('mon' , mons)])"""
+               coords = 
+               {
+                   'retr': ['base', 'post'],
+                   'util': utils,
+                   'mon' : mons
+               })
     
     # Read MIDs and sum them up
     for bldg_no in listBui:        
@@ -177,7 +161,9 @@ def runBuildings(listBui,
                 continue
             elif util == 'dhw' and hasDhw:
                 hourly.attrs['hasDhw'] = True
-            hourly.loc[dict(retr=retr,util=util)] = hourly.sel(retr=retr,util=util) + np.array(readMID(f'{retr}_{bldg_no}_{util}'))
+            hourly.loc[dict(retr=retr,util=util)] \
+                = hourly.sel(retr=retr,util=util) \
+                + np.array(readMID(f'{retr}_{bldg_no}_{util}'))
     
     ele = hourly.sel(retr=retr,util='ele')
     coo = hourly.sel(retr=retr,util='coo')
@@ -202,7 +188,44 @@ def runBuildings(listBui,
     cooTot = np.zeros(12)
     netTot = np.zeros(12)
     
-    getMonthly(bldg_no if len(listBui) == 1 else figtitle)
+    for m in mons:         
+        elePea[m-1] = hourly.sel(retr=retr,util='ele',time=(hourly.time.dt.month==m)).max()
+        cooPea[m-1] = hourly.sel(retr=retr,util='coo',time=(hourly.time.dt.month==m)).max()
+        heaPea[m-1] = hourly.sel(retr=retr,util='hea',time=(hourly.time.dt.month==m)).max()
+        dhwPea[m-1] = hourly.sel(retr=retr,util='dhw',time=(hourly.time.dt.month==m)).max()
+        sndPea[m-1] = np.max(snd[t_moy == m])
+        
+        eleTot[m-1] = hourly.sel(retr=retr,util='ele',time=(hourly.time.dt.month==m)).sum()
+        cooTot[m-1] = hourly.sel(retr=retr,util='coo',time=(hourly.time.dt.month==m)).sum()
+        heaTot[m-1] = hourly.sel(retr=retr,util='hea',time=(hourly.time.dt.month==m)).sum()
+        dhwTot[m-1] = hourly.sel(retr=retr,util='dhw',time=(hourly.time.dt.month==m)).sum()
+        sndTot[m-1] = np.sum(snd[t_moy == m])
+    
+    rowname = bldg_no if len(listBui) == 1 else figtitle
+    
+    #dfPeaEle.loc[len(dfPeaEle.index) + 1] = [rowname, np.max(elePea)] + elePea.tolist()
+    dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [rowname, np.max(sndPea)] + sndPea.tolist()
+    #dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [rowname, np.max(cooPea)] + cooPea.tolist()
+    
+    #dfTotEle.loc[len(dfTotEle.index) + 1] = [rowname, np.sum(eleTot)] + eleTot.tolist()
+    dfTotSnd.loc[len(dfTotSnd.index) + 1] = [rowname, np.sum(sndTot)] + sndTot.tolist()
+    #dfTotCoo.loc[len(dfTotCoo.index) + 1] = [rowname, np.sum(cooTot)] + cooTot.tolist()
+    
+    for util, mon in [(util, mon) for util in utils for mon in mons]:
+        monthly.peak.loc[dict(retr=retr,util=util,mon=mon)] \
+            = hourly.sel(retr=retr,util=util,time=(hourly.time.dt.month==mon)).max().item()
+        monthly.total.loc[dict(retr=retr,util=util,mon=mon)] \
+            = hourly.sel(retr=retr,util=util,time=(hourly.time.dt.month==mon)).sum().item()
+        
+    dfPeaEle.loc[len(dfPeaEle.index) + 1] = [rowname, np.max(elePea)] \
+        + monthly.peak.sel(retr=retr,util='ele').values.tolist()
+    dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [rowname, np.max(cooPea)] \
+        + monthly.peak.sel(retr=retr,util='coo').values.tolist()
+    dfTotEle.loc[len(dfTotEle.index) + 1] = [rowname, np.sum(eleTot)] \
+        + monthly.total.sel(retr=retr,util='ele').values.tolist()
+    dfTotCoo.loc[len(dfTotCoo.index) + 1] = [rowname, np.sum(cooTot)] \
+        + monthly.total.sel(retr=retr,util='coo').values.tolist()
+    
     makePlot(figtitle = figtitle,
              filename = filename,
              hasDhw = hourly.attrs['hasDhw'],
