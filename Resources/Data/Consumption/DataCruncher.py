@@ -40,23 +40,18 @@ def runBuildings(listBui,
         # Compute annual and monthly peaks and totals.
         #   Heating is space heating and domestic hot water combined.
         
-        for m in mons:
-            elePea[m-1] = np.max(ele[t_moy == m])
-            heaPea[m-1] = np.max(hea[t_moy == m])
-            dhwPea[m-1] = np.max(dhw[t_moy == m])
+        for m in mons:         
+            elePea[m-1] = hourly.sel(retr=retr,util='ele',time=(hourly.time.dt.month==m)).max()
+            cooPea[m-1] = hourly.sel(retr=retr,util='coo',time=(hourly.time.dt.month==m)).max()
+            heaPea[m-1] = hourly.sel(retr=retr,util='hea',time=(hourly.time.dt.month==m)).max()
+            dhwPea[m-1] = hourly.sel(retr=retr,util='dhw',time=(hourly.time.dt.month==m)).max()
             sndPea[m-1] = np.max(snd[t_moy == m])
-            cooPea[m-1] = np.max(coo[t_moy == m])
-            #netPea[m-1] = np.max(net[t_moy == m])
-            #netPea[m-1] = net.flat[abs(net).argmax()]
             
-            eleTot[m-1] = np.sum(ele[t_moy == m])
-            heaTot[m-1] = np.sum(hea[t_moy == m])
-            dhwTot[m-1] = np.sum(dhw[t_moy == m])
+            eleTot[m-1] = hourly.sel(retr=retr,util='ele',time=(hourly.time.dt.month==m)).sum()
+            cooTot[m-1] = hourly.sel(retr=retr,util='coo',time=(hourly.time.dt.month==m)).sum()
+            heaTot[m-1] = hourly.sel(retr=retr,util='hea',time=(hourly.time.dt.month==m)).sum()
+            dhwTot[m-1] = hourly.sel(retr=retr,util='dhw',time=(hourly.time.dt.month==m)).sum()
             sndTot[m-1] = np.sum(snd[t_moy == m])
-            cooTot[m-1] = np.sum(coo[t_moy == m])
-            
-        #monPeaHea = calendar.month_name[np.argmax(sndPea) + 1]
-        #monPeaCoo = calendar.month_name[np.argmax(cooPea) + 1]
         
         dfPeaEle.loc[len(dfPeaEle.index) + 1] = [bldg, np.max(elePea)] + elePea.tolist()
         dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [bldg, np.max(sndPea)] + sndPea.tolist()
@@ -158,19 +153,20 @@ def runBuildings(listBui,
                coords = [
                    ('retr', ['base', 'post']),
                    ('util', utils),
-                   ('dttm', t_dt)],
+                   ('time', t_dt)],
                attrs = {
                    'hasDhw': False
                    })
-    monthly = xr.DataArray(
-               0.0,
+    """
+    monthly = xr.Dataset(
+               {
+                   'peak':  (['retr', 'util', 'mon'], 0.0),
+                   'total': (['retr', 'util', 'mon'], 0.0)
+               },
                coords = [
                    ('retr', ['base', 'post']),
                    ('util', utils),
-                   ('mon' , mons)],
-               attrs = {
-                   'hasDhw': False
-                   })
+                   ('mon' , mons)])"""
     
     # Read MIDs and sum them up
     for bldg_no in listBui:        
