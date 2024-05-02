@@ -180,7 +180,7 @@ def runBuildings(listBui,
                 continue
             elif util == 'dhw' and hasDhw:
                 hourly.attrs['hasDhw'] = True
-            hourly.sel(retr=retr,util=util).values += np.array(readMID(f'{retr}_{bldg_no}_{util}'))
+            hourly.loc[dict(retr=retr,util=util)] = hourly.sel(retr=retr,util=util) + np.array(readMID(f'{retr}_{bldg_no}_{util}'))
     
     ele = hourly.sel(retr=retr,util='ele')
     coo = hourly.sel(retr=retr,util='coo')
