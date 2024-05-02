@@ -21,10 +21,34 @@ import xarray as xr
 
 from _config_estcp import *
 
+def constructDataset(bldg: list):
+    # Constructs the xarray dataset for monthly values
+    # NOTE: DO NOT pass a np object to xr.Dataset to assign initial values!
+    #         It will pass the object pointer (?) not the values.
+    #         As a result, modifying monthly.peak will also modify monthly.total,
+    #         because it is the underlying object that is being modified.
+    monthly = xr.Dataset(
+               {
+                   'peak':  (['retr', 'util', 'bldg', 'mon'],
+                             np.zeros((2,len(utils),len(bldg),len(mons)),dtype=float)),
+                   'total': (['retr', 'util', 'bldg', 'mon'],
+                             np.zeros((2,len(utils),len(bldg),len(mons)),dtype=float))
+               },
+               coords = 
+               {
+                   'retr': ['base', 'post'],
+                   'util': utils,
+                   'bldg': bldg,
+                   'mon' : mons
+               })
+    
+    return monthly
+
 def runBuildings(listBui,                 
                  retr : str,
                  figtitle : str,
                  filename : str,
+                 bldgcoord : str,
                  saveFigures = True,
                  titleOnFigure = False):
 
@@ -134,25 +158,6 @@ def runBuildings(listBui,
                    'hasDhw': False
                    })
     
-    # monthly values
-    # NOTE: DO NOT pass a np object to xr.Dataset to assign initial values!
-    #         It will pass the object pointer (?) not the values.
-    #         As a result, modifying monthly.peak will also modify monthly.total,
-    #         because it is the underlying object that is being modified.
-    monthly = xr.Dataset(
-               {
-                   'peak':  (['retr', 'util', 'mon'],
-                             np.zeros((2,len(utils),len(mons)),dtype=float)),
-                   'total': (['retr', 'util', 'mon'],
-                             np.zeros((2,len(utils),len(mons)),dtype=float))
-               },
-               coords = 
-               {
-                   'retr': ['base', 'post'],
-                   'util': utils,
-                   'mon' : mons
-               })
-    
     # Read MIDs and sum them up
     for bldg_no in listBui:        
         hasDhw = os.path.isfile(os.path.join(dirExch, f'{retr}_{bldg_no}_dhw.csv'))
@@ -212,19 +217,19 @@ def runBuildings(listBui,
     #dfTotCoo.loc[len(dfTotCoo.index) + 1] = [rowname, np.sum(cooTot)] + cooTot.tolist()
     
     for util, mon in [(util, mon) for util in utils for mon in mons]:
-        monthly.peak.loc[dict(retr=retr,util=util,mon=mon)] \
+        monthly.peak.loc[dict(retr=retr,util=util,bldg=bldgcoord,mon=mon)] \
             = hourly.sel(retr=retr,util=util,time=(hourly.time.dt.month==mon)).max().item()
-        monthly.total.loc[dict(retr=retr,util=util,mon=mon)] \
+        monthly.total.loc[dict(retr=retr,util=util,bldg=bldgcoord,mon=mon)] \
             = hourly.sel(retr=retr,util=util,time=(hourly.time.dt.month==mon)).sum().item()
         
     dfPeaEle.loc[len(dfPeaEle.index) + 1] = [rowname, np.max(elePea)] \
-        + monthly.peak.sel(retr=retr,util='ele').values.tolist()
+        + monthly.peak.sel(retr=retr,util='ele',bldg=bldgcoord).values.tolist()
     dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [rowname, np.max(cooPea)] \
-        + monthly.peak.sel(retr=retr,util='coo').values.tolist()
+        + monthly.peak.sel(retr=retr,util='coo',bldg=bldgcoord).values.tolist()
     dfTotEle.loc[len(dfTotEle.index) + 1] = [rowname, np.sum(eleTot)] \
-        + monthly.total.sel(retr=retr,util='ele').values.tolist()
+        + monthly.total.sel(retr=retr,util='ele',bldg=bldgcoord).values.tolist()
     dfTotCoo.loc[len(dfTotCoo.index) + 1] = [rowname, np.sum(cooTot)] \
-        + monthly.total.sel(retr=retr,util='coo').values.tolist()
+        + monthly.total.sel(retr=retr,util='coo',bldg=bldgcoord).values.tolist()
     
     makePlot(figtitle = figtitle,
              filename = filename,
@@ -295,26 +300,31 @@ dfTotCoo = pd.DataFrame(columns = ['bldg', 'Annual'] + calendar.month_name[1:13]
 
 if mode == 'spec':
     # Run specified list of buildings (can have only one)
-    
+    bldgcoord = filename_spec
+    monthly=constructDataset([bldgcoord])
     runBuildings(listBui_spec,
                  retr = retr,
                  figtitle = figtitle_spec,
                  filename = filename_spec,
+                 bldgcoord = bldgcoord,
                  saveFigures = saveFigures,
                  titleOnFigure = titleOnFigure)
     saveTablesMode = 'a'
     saveTablesHeader = False
 elif mode == 'each':
     # Run each building
+    monthly=constructDataset(bldg_nos)
     for bldg_no in bldg_nos:
         figtitle = f'{bldg_no} '.replace('x','&') \
                 + dfBldg.loc[dfBldg['bldg_no'] == bldg_no,'name'].tolist()[0] \
                 + f' - {retr_tit}'
         filename = f'{retr}_{bldg_no}.pdf'
+        bldgcoord = bldg_no
         runBuildings([bldg_no],
                      retr = retr,
                      figtitle = figtitle,
                      filename = filename,
+                     bldgcoord = bldgcoord,
                      saveFigures = saveFigures,
                      titleOnFigure = titleOnFigure)
     saveTablesMode = 'w'
@@ -324,10 +334,13 @@ elif mode == 'west':
     listBui = [elem for elem in bldg_nos if elem not in {'5300', '5301'}]
     figtitle = f'West Combined - {retr_tit}'
     filename = f'{retr}_west.pdf'
+    bldgcoord = 'west'
+    monthly=constructDataset([bldgcoord])
     runBuildings(listBui,
                  retr = retr,
                  figtitle = figtitle,
                  filename = filename,
+                 bldgcoord = bldgcoord,
                  saveFigures = saveFigures,
                  titleOnFigure = titleOnFigure)
     saveTablesMode = 'a'
