@@ -64,6 +64,16 @@ def runBuildings(listBui,
                  filename : str,
                  hasDhw : bool,
                  titleOnFigure = True):
+            
+        ele = hourly.sel(retr=retr,util='ele')
+        coo = hourly.sel(retr=retr,util='coo')
+        hea = hourly.sel(retr=retr,util='hea')
+        dhw = hourly.sel(retr=retr,util='dhw')
+        net = hea + dhw - coo
+        
+        cooPea = monthly.peak.sel(retr=retr,util='coo',buil=builcoord)
+        heaPea = monthly.peak.sel(retr=retr,util='hea',buil=builcoord)
+        
         linewidth = 0.8
         
         fig = plt.figure()
@@ -88,15 +98,7 @@ def runBuildings(listBui,
         ax.set_title('Monthly Peak (kW)',
                      loc = 'left',
                      fontsize = 12)
-        """
-        h1, = ax.plot(t_ms, sndPea,
-                      'r', linewidth = linewidth)
-        h1, = ax.plot(t_ms, - cooPea,
-                      'b', linewidth = linewidth)
-        #h1, = ax.plot(t_ms, netPea,
-        #              'k', linewidth = linewidth)
-        """
-        h1 = ax.bar(t_ms, sndPea,
+        h1 = ax.bar(t_ms, heaPea,
                     color = 'r',
                     width = 10)
         h1 = ax.bar(t_ms, - cooPea,
@@ -145,7 +147,7 @@ def runBuildings(listBui,
             plt.savefig(os.path.join(dirFigu,filename))
             plt.close()
             
-    ## ===== Start of sub-main process =====
+    ## ===== Start of main of sub-routine =====
     
     # consumption sum of buildings selected
     hourly = xr.DataArray(
@@ -170,66 +172,11 @@ def runBuildings(listBui,
                 = hourly.sel(retr=retr,util=util) \
                 + np.array(readMID(f'{retr}_{buil_no}_{util}'))
     
-    ele = hourly.sel(retr=retr,util='ele')
-    coo = hourly.sel(retr=retr,util='coo')
-    hea = hourly.sel(retr=retr,util='hea')
-    dhw = hourly.sel(retr=retr,util='dhw')
-    snd = hea + dhw
-    net = hea + dhw - coo
-    
-    # Monthly peaks
-    elePea = np.zeros(12)
-    heaPea = np.zeros(12)
-    dhwPea = np.zeros(12)
-    sndPea = np.zeros(12)
-    cooPea = np.zeros(12)
-    netPea = np.zeros(12)
-    
-    # Monthly totals
-    eleTot = np.zeros(12)
-    heaTot = np.zeros(12)
-    dhwTot = np.zeros(12)
-    sndTot = np.zeros(12)
-    cooTot = np.zeros(12)
-    netTot = np.zeros(12)
-    
-    for m in mons:         
-        elePea[m-1] = hourly.sel(retr=retr,util='ele',time=(hourly.time.dt.month==m)).max()
-        cooPea[m-1] = hourly.sel(retr=retr,util='coo',time=(hourly.time.dt.month==m)).max()
-        heaPea[m-1] = hourly.sel(retr=retr,util='hea',time=(hourly.time.dt.month==m)).max()
-        dhwPea[m-1] = hourly.sel(retr=retr,util='dhw',time=(hourly.time.dt.month==m)).max()
-        sndPea[m-1] = np.max(snd[t_moy == m])
-        
-        eleTot[m-1] = hourly.sel(retr=retr,util='ele',time=(hourly.time.dt.month==m)).sum()
-        cooTot[m-1] = hourly.sel(retr=retr,util='coo',time=(hourly.time.dt.month==m)).sum()
-        heaTot[m-1] = hourly.sel(retr=retr,util='hea',time=(hourly.time.dt.month==m)).sum()
-        dhwTot[m-1] = hourly.sel(retr=retr,util='dhw',time=(hourly.time.dt.month==m)).sum()
-        sndTot[m-1] = np.sum(snd[t_moy == m])
-    
-    rowname = buil_no if len(listBui) == 1 else figtitle
-    
-    #dfPeaEle.loc[len(dfPeaEle.index) + 1] = [rowname, np.max(elePea)] + elePea.tolist()
-    dfPeaSnd.loc[len(dfPeaSnd.index) + 1] = [rowname, np.max(sndPea)] + sndPea.tolist()
-    #dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [rowname, np.max(cooPea)] + cooPea.tolist()
-    
-    #dfTotEle.loc[len(dfTotEle.index) + 1] = [rowname, np.sum(eleTot)] + eleTot.tolist()
-    dfTotSnd.loc[len(dfTotSnd.index) + 1] = [rowname, np.sum(sndTot)] + sndTot.tolist()
-    #dfTotCoo.loc[len(dfTotCoo.index) + 1] = [rowname, np.sum(cooTot)] + cooTot.tolist()
-    
     for util, mon in [(util, mon) for util in utils for mon in mons]:
         monthly.peak.loc[dict(retr=retr,util=util,buil=builcoord,mon=mon)] \
             = hourly.sel(retr=retr,util=util,time=(hourly.time.dt.month==mon)).max().item()
         monthly.total.loc[dict(retr=retr,util=util,buil=builcoord,mon=mon)] \
             = hourly.sel(retr=retr,util=util,time=(hourly.time.dt.month==mon)).sum().item()
-        
-    dfPeaEle.loc[len(dfPeaEle.index) + 1] = [rowname, np.max(elePea)] \
-        + monthly.peak.sel(retr=retr,util='ele',buil=builcoord).values.tolist()
-    dfPeaCoo.loc[len(dfPeaCoo.index) + 1] = [rowname, np.max(cooPea)] \
-        + monthly.peak.sel(retr=retr,util='coo',buil=builcoord).values.tolist()
-    dfTotEle.loc[len(dfTotEle.index) + 1] = [rowname, np.sum(eleTot)] \
-        + monthly.total.sel(retr=retr,util='ele',buil=builcoord).values.tolist()
-    dfTotCoo.loc[len(dfTotCoo.index) + 1] = [rowname, np.sum(cooTot)] \
-        + monthly.total.sel(retr=retr,util='coo',buil=builcoord).values.tolist()
     
     makePlot(figtitle = figtitle,
              filename = filename,
@@ -286,16 +233,6 @@ t_ms = pd.date_range(start='2005-01-01',
                      end='2006-01-01',
                      freq='MS')[0:12].tolist() # list for month starts
 
-# Dataframes for monthly peaks
-dfPeaEle = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
-dfPeaSnd = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
-dfPeaCoo = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
-
-# Dataframes for monthly totals
-dfTotEle = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
-dfTotSnd = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
-dfTotCoo = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
-
 #%% Run buildings
 
 if mode == 'spec':
@@ -349,33 +286,22 @@ elif mode == 'west':
 #%% Save tables
 
 if saveTables:
-    dfPeaEle.to_csv(os.path.join(dirTabl,f'Peak_ele_{retr}.csv'),
+    
+    for util in utils:
+        dfPea = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
+        dfTot = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
+        for rowname in monthly.coords['buil'].values:
+            _row_mon = monthly.peak.sel(retr=retr,util=util,buil=rowname).values.tolist()
+            dfPea.loc[len(dfPea.index) + 1] = [rowname, np.max(_row_mon)] + _row_mon
+            _row_mon = monthly.total.sel(retr=retr,util=util,buil=rowname).values.tolist()
+            dfTot.loc[len(dfTot.index) + 1] = [rowname, np.sum(_row_mon)] + _row_mon
+        dfPea.to_csv(os.path.join(dirTabl,f'Peak_{util}_{retr}.csv'),
                     sep = delimiter,
                     index = False,
                     mode = saveTablesMode,
                     header = saveTablesHeader)
-    dfPeaSnd.to_csv(os.path.join(dirTabl,f'Peak_snd_{retr}.csv'),
-                    sep = delimiter,
-                    index = False,
-                    mode = saveTablesMode,
-                    header = saveTablesHeader)
-    dfPeaCoo.to_csv(os.path.join(dirTabl,f'Peak_coo_{retr}.csv'),
-                    sep = delimiter,
-                    index = False,
-                    mode = saveTablesMode,
-                    header = saveTablesHeader)
-    dfTotEle.to_csv(os.path.join(dirTabl,f'Total_ele_{retr}.csv'),
-                    sep = delimiter,
-                    index = False,
-                    mode = saveTablesMode,
-                    header = saveTablesHeader)
-    dfTotSnd.to_csv(os.path.join(dirTabl,f'Total_hea_{retr}.csv'),
-                    sep = delimiter,
-                    index = False,
-                    mode = saveTablesMode,
-                    header = saveTablesHeader)
-    dfTotCoo.to_csv(os.path.join(dirTabl,f'Total_coo_{retr}.csv'),
-                    sep = delimiter,
-                    index = False,
-                    mode = saveTablesMode,
-                    header = saveTablesHeader)
+        dfTot.to_csv(os.path.join(dirTabl,f'Total_{util}_{retr}.csv'),
+                        sep = delimiter,
+                        index = False,
+                        mode = saveTablesMode,
+                        header = saveTablesHeader)
