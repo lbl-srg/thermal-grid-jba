@@ -125,6 +125,7 @@ def runBuildings(listBui,
         setXAxisMonths()
         xlabels = [item.get_text() for item in ax.get_xticklabels()]
         xlabels[-1] = ''
+        ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(xlabels)
         ax.legend(loc = 'upper center',
                   bbox_to_anchor = (0.5, -0.2, - 0.1, 0.),
