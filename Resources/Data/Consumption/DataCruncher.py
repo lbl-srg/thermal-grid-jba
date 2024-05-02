@@ -52,14 +52,6 @@ def runBuildings(listBui,
                  builcoord : str,
                  saveFigures = True,
                  titleOnFigure = False):
-
-    def setXAxisMonths():
-        # Set x-axis to display months.
-        #   The texts only show in the lowest subplot.
-        #   All other subplots only show the tick marks but not the texts.
-        X = plt.gca().xaxis
-        X.set_major_locator(mdates.MonthLocator())
-        X.set_major_formatter(mdates.DateFormatter('%b'))
         
     def makePlot(figtitle : str,
                  filename : str,
@@ -81,14 +73,8 @@ def runBuildings(listBui,
         
         fig, (ax1,ax2,ax3) = plt.subplots(3,1,
                                           sharex=True,
-                                          figsize=(6,6),
-                                          constrained_layout=True)
+                                          figsize=(6,6))
         
-        # fig = plt.figure()
-        # plt.rcParams['figure.figsize'] = [6, 6]
-        # plt.rcParams['figure.constrained_layout.use'] = True
-    
-        # ax = fig.add_subplot(311)
         ax1.set_title('Hourly Consumption (kWh/h)',
                      loc = 'left',
                      fontsize = 12)
@@ -99,11 +85,8 @@ def runBuildings(listBui,
         if hasDhw:
             h1, = ax1.plot(t_hoy, dhw,
                           'm', linewidth = linewidth)
-        setXAxisMonths()
-        ax1.xaxis.set_major_formatter(plt.NullFormatter())
         ax1.grid()
         
-        # ax = fig.add_subplot(312)
         ax2.set_title('Monthly Peak (kW)',
                      loc = 'left',
                      fontsize = 12)        
@@ -124,11 +107,8 @@ def runBuildings(listBui,
                         color = 'm',
                         width = 10)
         plt.axhline(0, color = 'k', linewidth = linewidth/2)
-        setXAxisMonths()
-        ax2.xaxis.set_major_formatter(plt.NullFormatter())
         ax2.grid()
     
-        # ax = fig.add_subplot(313)
         ax3.set_title('Cumulative Consumption (thousand kWh)',
                      loc = 'left',
                      fontsize = 12)
@@ -142,11 +122,12 @@ def runBuildings(listBui,
         h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
                       'k', linewidth = linewidth, label = 'net energy')
         plt.axhline(0, color = 'k', linewidth = linewidth/2)
-        setXAxisMonths()
-        xlabels = [item.get_text() for item in ax3.get_xticklabels()]
-        xlabels[-1] = ''
-        ax3.set_xticks(ax3.get_xticks())
-        ax3.set_xticklabels(xlabels)
+        ax3.xaxis.set_major_locator(mdates.MonthLocator())
+        ax3.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+        # xlabels = [item.get_text() for item in ax3.get_xticklabels()]
+        # xlabels[-1] = ''
+        # ax3.set_xticks(ax3.get_xticks())
+        # ax3.set_xticklabels(xlabels)
         ax3.legend(loc = 'upper center',
                   bbox_to_anchor = (0.5, -0.2, - 0.1, 0.),
                   fancybox = True,
@@ -212,7 +193,7 @@ flag_deleteOldFigures = False     # Deletes the folder of figures
 retr = 'base' # retrofit status: 'base' baseline,
               #                  'post' post-ECM
 
-mode = 'each'
+mode = 'west'
     # 'spec' -  specify one building or a list of buildings to be combined,
     #           add a row to tables, if saveTables;
     # 'each' -  each individual building processed separately,
