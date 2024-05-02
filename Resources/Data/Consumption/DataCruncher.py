@@ -16,7 +16,8 @@ import shutil
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
-import pandas as pd
+#import pandas as pd
+import xarray as xr
 
 from _config_estcp import *
 
@@ -141,31 +142,43 @@ def runBuildings(listBui,
         if saveFigures:
             plt.savefig(os.path.join(dirFigu,filename))
             plt.close()
-
-    # Sum of all buildings selected
-    ele = np.zeros(8760) # end-use electricity
-    hea = np.zeros(8760) # space heating
-    dhw = np.zeros(8760) # domestic hot water
-    snd = np.zeros(8760) # space heating and domestic hot water combined
-    coo = np.zeros(8760) # cooling
-    net = np.zeros(8760) # net energy
+            
+    ## ===== Start of sub-main process =====
+    
+    # consumption sum of buildings selected
+    hourly = xr.DataArray(
+               0.0,
+               coords = [
+                   ('retr', ['base', 'post']),
+                   ('util', utils),
+                   ('dttm', t_dt)],
+               attrs = {
+                   'hasDhw': False
+                   })
+    monthly = xr.DataArray(
+               0.0,
+               coords = [
+                   ('retr', ['base', 'post']),
+                   ('util', utils),
+                   ('mon' , mons)],
+               attrs = {
+                   'hasDhw': False
+                   })
     
     # Read MIDs and sum them up
-    for bldg_no in listBui:
-        ele_tmp = np.array(readMID(f'{retr}_{bldg_no}_ele'))
-        ele += ele_tmp
-        hea_tmp = np.array(readMID(f'{retr}_{bldg_no}_hea'))
-        hea += hea_tmp
+    for bldg_no in listBui:        
         hasDhw = os.path.isfile(os.path.join(dirExch, f'{retr}_{bldg_no}_dhw.csv'))
-        if hasDhw:
-            dhw_tmp = np.array(readMID(f'{retr}_{bldg_no}_dhw'))
-        else:
-            dhw_tmp = np.zeros(8760)
-        dhw += dhw_tmp
-        #snd_tmp = hea_tmp + dhw_tmp
-        coo_tmp = np.array(readMID(f'{retr}_{bldg_no}_coo'))
-        coo += coo_tmp
+        for util in utils:
+            if util == 'dhw' and not hasDhw:
+                continue
+            elif util == 'dhw' and hasDhw:
+                hourly.attrs['hasDhw'] = True
+            hourly.sel(retr=retr,util=util).values += np.array(readMID(f'{retr}_{bldg_no}_{util}'))
     
+    ele = hourly.sel(retr=retr,util='ele')
+    coo = hourly.sel(retr=retr,util='coo')
+    hea = hourly.sel(retr=retr,util='hea')
+    dhw = hourly.sel(retr=retr,util='dhw')
     snd = hea + dhw
     net = hea + dhw - coo
     
