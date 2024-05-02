@@ -248,8 +248,7 @@ mode = 'west'
     # 'west' -  buildings on the west wing combined,
     #           add a row to the tables, if saveTables;
 saveFigures = False
-saveTablesPeak = False
-saveTablesTotal = False
+saveTables = True
 
 titleOnFigure = True # Set false if figures used for Latex
 
@@ -303,38 +302,8 @@ if mode == 'spec':
                  filename = filename_spec,
                  saveFigures = saveFigures,
                  titleOnFigure = titleOnFigure)
-    if saveTablesPeak:
-        dfPeaEle.to_csv(os.path.join(dirTabl,f'Peaks_endUseElectricity_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-        dfPeaSnd.to_csv(os.path.join(dirTabl,f'Peaks_combinedHeating_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-        dfPeaCoo.to_csv(os.path.join(dirTabl,f'Peaks_cooling_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-    if saveTablesPeak:
-        dfTotEle.to_csv(os.path.join(dirTabl,f'Total_endUseElectricity_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-        dfTotSnd.to_csv(os.path.join(dirTabl,f'Total_combinedHeating_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-        dfTotCoo.to_csv(os.path.join(dirTabl,f'Total_cooling_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
+    saveTablesMode = 'a'
+    saveTablesHeader = False
 elif mode == 'each':
     # Run each building
     for bldg_no in bldg_nos:
@@ -348,26 +317,8 @@ elif mode == 'each':
                      filename = filename,
                      saveFigures = saveFigures,
                      titleOnFigure = titleOnFigure)
-    if saveTablesPeak:
-        dfPeaEle.to_csv(os.path.join(dirTabl,f'Peaks_endUseElectricity_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False)
-        dfPeaSnd.to_csv(os.path.join(dirTabl,f'Peaks_combinedHeating_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False)
-        dfPeaCoo.to_csv(os.path.join(dirTabl,f'Peaks_cooling_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False)
-    if saveTablesPeak:
-        dfTotEle.to_csv(os.path.join(dirTabl,f'Total_endUseElectricity_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False)
-        dfTotSnd.to_csv(os.path.join(dirTabl,f'Total_combinedHeating_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False)
-        dfTotCoo.to_csv(os.path.join(dirTabl,f'Total_cooling_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False)
+    saveTablesMode = 'w'
+    saveTablesHeader = True
 elif mode == 'west':
     # Combine buildings but exclude 5300 & 5301 which are east of the runway
     listBui = [elem for elem in bldg_nos if elem not in {'5300', '5301'}]
@@ -379,35 +330,39 @@ elif mode == 'west':
                  filename = filename,
                  saveFigures = saveFigures,
                  titleOnFigure = titleOnFigure)
-    if saveTablesPeak:
-        dfPeaEle.to_csv(os.path.join(dirTabl,f'Peaks_endUseElectricity_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-        dfPeaSnd.to_csv(os.path.join(dirTabl,f'Peaks_combinedHeating_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-        dfPeaCoo.to_csv(os.path.join(dirTabl,f'Peaks_cooling_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-    if saveTablesPeak:
-        dfTotEle.to_csv(os.path.join(dirTabl,f'Total_endUseElectricity_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-        dfTotSnd.to_csv(os.path.join(dirTabl,f'Total_combinedHeating_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
-        dfTotCoo.to_csv(os.path.join(dirTabl,f'Total_cooling_{retr_tit}.csv'),
-                        sep = delimiter,
-                        index = False,
-                        mode = 'a',
-                        header = False)
+    saveTablesMode = 'a'
+    saveTablesHeader = False
+
+#%% Save tables
+
+if saveTables:
+    dfPeaEle.to_csv(os.path.join(dirTabl,f'Peaks_endUseElectricity_{retr_tit}.csv'),
+                    sep = delimiter,
+                    index = False,
+                    mode = saveTablesMode,
+                    header = saveTablesHeader)
+    dfPeaSnd.to_csv(os.path.join(dirTabl,f'Peaks_combinedHeating_{retr_tit}.csv'),
+                    sep = delimiter,
+                    index = False,
+                    mode = saveTablesMode,
+                    header = saveTablesHeader)
+    dfPeaCoo.to_csv(os.path.join(dirTabl,f'Peaks_cooling_{retr_tit}.csv'),
+                    sep = delimiter,
+                    index = False,
+                    mode = saveTablesMode,
+                    header = saveTablesHeader)
+    dfTotEle.to_csv(os.path.join(dirTabl,f'Total_endUseElectricity_{retr_tit}.csv'),
+                    sep = delimiter,
+                    index = False,
+                    mode = saveTablesMode,
+                    header = saveTablesHeader)
+    dfTotSnd.to_csv(os.path.join(dirTabl,f'Total_combinedHeating_{retr_tit}.csv'),
+                    sep = delimiter,
+                    index = False,
+                    mode = saveTablesMode,
+                    header = saveTablesHeader)
+    dfTotCoo.to_csv(os.path.join(dirTabl,f'Total_cooling_{retr_tit}.csv'),
+                    sep = delimiter,
+                    index = False,
+                    mode = saveTablesMode,
+                    header = saveTablesHeader)
