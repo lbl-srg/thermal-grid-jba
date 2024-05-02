@@ -68,6 +68,7 @@ def runBuildings(listBui,
         
     def makePlot(figtitle : str,
                  filename : str,
+                 hasDhw : bool,
                  titleOnFigure = True):
         linewidth = 0.8
         
@@ -78,10 +79,13 @@ def runBuildings(listBui,
         ax.set_title('Hourly Consumption (kWh/h)',
                      loc = 'left',
                      fontsize = 12)
-        h1, = ax.plot(t_hoy, snd,
+        h1, = ax.plot(t_hoy, hea,
                       'r', linewidth = linewidth)
         h1, = ax.plot(t_hoy, - coo,
                       'b', linewidth = linewidth)
+        if hasDhw:
+            h1, = ax.plot(t_hoy, dhw,
+                          'm', linewidth = linewidth)
         setXAxisMonths()
         ax.xaxis.set_major_formatter(plt.NullFormatter())
         plt.grid()
@@ -113,10 +117,13 @@ def runBuildings(listBui,
         ax.set_title('Cumulative Consumption (thousand kWh)',
                      loc = 'left',
                      fontsize = 12)
-        h1, = ax.plot(t_hoy, np.cumsum(snd)/1000,
-                      'r', linewidth = linewidth, label = 'combined heating')
+        h1, = ax.plot(t_hoy, np.cumsum(hea)/1000,
+                      'r', linewidth = linewidth, label = 'heating')
         h1, = ax.plot(t_hoy, - np.cumsum(coo)/1000,
                       'b', linewidth = linewidth, label = 'cooling')
+        if hasDhw:
+            h1, = ax.plot(t_hoy, np.cumsum(dhw)/1000,
+                          'm', linewidth = linewidth, label = 'dom. hot water')
         h1, = ax.plot(t_hoy, np.cumsum(net)/1000,
                       'k', linewidth = linewidth, label = 'net energy')
         plt.axhline(0, color = 'k', linewidth = linewidth/2)
@@ -201,6 +208,7 @@ def runBuildings(listBui,
     getMonthly(bldg_no if len(listBui) == 1 else figtitle)
     makePlot(figtitle = figtitle,
              filename = filename,
+             hasDhw = hourly.attrs['hasDhw'],
              titleOnFigure = titleOnFigure)
 
 ###########################################################################
