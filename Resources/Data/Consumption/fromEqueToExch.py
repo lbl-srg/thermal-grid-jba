@@ -24,11 +24,11 @@ if flag_deleteOldDirectory:
 retr = 'post' # retrofit: 'base' baseline ,
               #           'post' post-ECM
 
-for bldg_no in bldg_nos:
+for buil_no in buil_nos:
     if retr == 'base':
-        filename = f'{bldg_no}*Baseline*.csv'
+        filename = f'{buil_no}*Baseline*.csv'
     elif retr == 'post':
-        filename = f'{bldg_no}*Post*.csv'
+        filename = f'{buil_no}*Post*.csv'
     else:
         filename = ''
     
@@ -50,7 +50,7 @@ for bldg_no in bldg_nos:
             # if column is empty
             continue
 
-        with open(os.path.join(dirExch, f'{retr}_{bldg_no}_{util}.csv'),
+        with open(os.path.join(dirExch, f'{retr}_{buil_no}_{util}.csv'),
                   'w',
                   newline='') as fw:
             writer = csv.DictWriter(fw,

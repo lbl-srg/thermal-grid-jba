@@ -19,12 +19,12 @@ dirRead = 'eQuest'
 dfBldg = pd.read_csv('buildings.csv',
                      header = 0,
                      thousands = ',',
-                     dtype = {'bldg_no' : str,
+                     dtype = {'buil_no' : str,
                               'name' : str,
                               'gross_area_sf' : float,
                               'gross_area_m2' : float,
                               'remark1' : str})
-bldg_nos = dfBldg['bldg_no'].tolist()
+buil_nos = dfBldg['buil_no'].tolist()
 util_cols = [16, 30, 31, 32]
     # column numbers of the respective utilities
     #   from the input file (base 0)
