@@ -63,7 +63,7 @@ def runBuildings(listBui,
               (ax21,ax22),
               (ax31,ax32)) = plt.subplots(3,2,
                                           sharex=True,
-                                          sharey=True,
+                                          sharey='row',
                                           figsize=(9,5))
         
         for stag in stags:
