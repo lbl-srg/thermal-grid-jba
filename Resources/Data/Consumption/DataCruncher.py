@@ -147,7 +147,7 @@ def runBuildings(listBui,
             ax3.set_xticklabels(xlabels)
             ax3.grid()
         
-        # Format the y-axis
+        # Format the y-axes
         ax31.get_yaxis().set_major_formatter(
             tic.FuncFormatter(lambda x, p: format(int(x), ',')))
         ax11.set_ylabel('Hourly Use\n(kWh/h)')
@@ -216,8 +216,6 @@ def runBuildings(listBui,
 #%% ======= FLAGS AND SWITCHES =======
 flag_deleteOldFigures = False     # Deletes the folder of figures
                                   #   and remake the directory
-# retr = 'base' # retrofit status: 'base' baseline,
-#               #                  'post' post-ECM
 
 mode = 'west'
     # 'spec' -  specify one building or a list of buildings to be combined,
@@ -244,10 +242,6 @@ filename_spec = 'spec' # Title of the figure file
 if flag_deleteOldFigures:
     shutil.rmtree(dirFigu)
     os.makedirs(dirFigu, exist_ok = True)
-# if retr == 'base':
-#     retr_tit = 'Baseline'
-# elif retr == 'post':
-#     retr_tit = 'Post ECM'
 hasDhw = False # global dhw flag
 
 #%% Construct
