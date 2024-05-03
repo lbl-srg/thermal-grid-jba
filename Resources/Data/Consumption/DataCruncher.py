@@ -208,6 +208,7 @@ def runBuildings(listBui,
              filename = filename,
              hasDhw = hourly.attrs['hasDhw'],
              titleOnFigure = titleOnFigure)
+    global hasDhw
     if hourly.attrs['hasDhw']:
         hasDhw = True
 
