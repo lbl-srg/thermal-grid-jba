@@ -122,12 +122,15 @@ def runBuildings(listBui,
         h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
                       'k', linewidth = linewidth, label = 'net energy')
         plt.axhline(0, color = 'k', linewidth = linewidth/2)
+        
+        # Formats the x-axis
         ax3.xaxis.set_major_locator(mdates.MonthLocator())
         ax3.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-        # xlabels = [item.get_text() for item in ax3.get_xticklabels()]
-        # xlabels[-1] = ''
-        # ax3.set_xticks(ax3.get_xticks())
-        # ax3.set_xticklabels(xlabels)
+        plt.draw() # This forces xticklabels to populate
+        xlabels = [item.get_text() for item in ax3.get_xticklabels()]
+        xlabels[-1] = '' # removes the last "Jan"
+        ax3.set_xticks(ax3.get_xticks())
+        ax3.set_xticklabels(xlabels)
         ax3.legend(loc = 'upper center',
                   bbox_to_anchor = (0.5, -0.2, - 0.1, 0.),
                   fancybox = True,
