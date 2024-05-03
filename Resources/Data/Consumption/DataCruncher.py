@@ -169,7 +169,8 @@ def runBuildings(listBui,
         fig.tight_layout()
         
         if saveFigures:
-            plt.savefig(os.path.join(dirFigu,filename))
+            plt.savefig(os.path.join(dirFigu,filename),
+                        bbox_inches = 'tight')
             plt.close()
             
     ## ===== Start of main of sub-routine =====
