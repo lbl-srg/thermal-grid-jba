@@ -17,12 +17,11 @@ import shutil
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
-#import pandas as pd
 import xarray as xr
 
 from _config_estcp import *
 
-def constructDataset(buil: list):
+def constructDataset(buils: list):
     # Constructs the xarray dataset for monthly values
     # NOTE: DO NOT pass a np object to xr.Dataset to assign initial values!
     #         It will pass the object pointer (?) not the values.
@@ -30,23 +29,22 @@ def constructDataset(buil: list):
     #         because it is the underlying object that is being modified.
     monthly = xr.Dataset(
                {
-                   'peak':  (['retr', 'util', 'buil', 'mon'],
-                             np.zeros((2,len(utils),len(buil),len(mons)),dtype=float)),
-                   'total': (['retr', 'util', 'buil', 'mon'],
-                             np.zeros((2,len(utils),len(buil),len(mons)),dtype=float))
+                   'peak':  (['stag', 'util', 'buil', 'mon'],
+                             np.zeros((len(stags),len(utils),len(buils),len(mons)),dtype=float)),
+                   'total': (['stag', 'util', 'buil', 'mon'],
+                             np.zeros((len(stags),len(utils),len(buils),len(mons)),dtype=float))
                },
                coords = 
                {
-                   'retr': ['base', 'post'],
+                   'stag': stags,
                    'util': utils,
-                   'buil': buil,
+                   'buil': buils,
                    'mon' : mons
                })
     
     return monthly
 
-def runBuildings(listBui,                 
-                 retr : str,
+def runBuildings(listBui,
                  figtitle : str,
                  filename : str,
                  builcoord : str,
@@ -57,17 +55,19 @@ def runBuildings(listBui,
                  filename : str,
                  hasDhw : bool,
                  titleOnFigure = True):
-            
-        ele = hourly.sel(retr=retr,util='ele')
-        coo = hourly.sel(retr=retr,util='coo')
-        hea = hourly.sel(retr=retr,util='hea')
-        dhw = hourly.sel(retr=retr,util='dhw')
+        
+        stag = 'base' # temp implementation
+        
+        ele = hourly.sel(stag=stag,util='ele')
+        coo = hourly.sel(stag=stag,util='coo')
+        hea = hourly.sel(stag=stag,util='hea')
+        dhw = hourly.sel(stag=stag,util='dhw')
         net = hea + dhw - coo
         
-        cooPea = monthly.peak.sel(retr=retr,util='coo',buil=builcoord)
-        heaPea = monthly.peak.sel(retr=retr,util='hea',buil=builcoord)
+        cooPea = monthly.peak.sel(stag=stag,util='coo',buil=builcoord)
+        heaPea = monthly.peak.sel(stag=stag,util='hea',buil=builcoord)
         if hasDhw:
-            dhwPea = monthly.peak.sel(retr=retr,util='dhw',buil=builcoord)
+            dhwPea = monthly.peak.sel(stag=stag,util='dhw',buil=builcoord)
         
         linewidth = 0.8
         
@@ -156,7 +156,7 @@ def runBuildings(listBui,
     hourly = xr.DataArray(
                0.0,
                coords = [
-                   ('retr', ['base', 'post']),
+                   ('stag', stags),
                    ('util', utils),
                    ('time', t_dt)],
                attrs = {
@@ -164,28 +164,29 @@ def runBuildings(listBui,
                    })
     
     # Read MIDs and sum them up
-    for buil_no in listBui:        
-        hasDhw = os.path.isfile(os.path.join(dirExch, f'{retr}_{buil_no}_dhw.csv'))
+    for stag, buil_no in [(stag, buil_no) for stag in stags for buil_no in listBui]:        
+        _hasDhw = os.path.isfile(os.path.join(dirExch, f'{stag}_{buil_no}_dhw.csv'))
         for util in utils:
-            if util == 'dhw' and not hasDhw:
+            if util == 'dhw' and not _hasDhw:
                 continue
-            elif util == 'dhw' and hasDhw:
+            elif util == 'dhw' and _hasDhw:
                 hourly.attrs['hasDhw'] = True
-            hourly.loc[dict(retr=retr,util=util)] \
-                = hourly.sel(retr=retr,util=util) \
-                + np.array(readMID(f'{retr}_{buil_no}_{util}'))
+            hourly.loc[dict(stag=stag,util=util)] \
+                = hourly.sel(stag=stag,util=util) \
+                + np.array(readMID(f'{stag}_{buil_no}_{util}'))
     
-    for util, mon in [(util, mon) for util in utils for mon in mons]:
-        monthly.peak.loc[dict(retr=retr,util=util,buil=builcoord,mon=mon)] \
-            = hourly.sel(retr=retr,util=util,time=(hourly.time.dt.month==mon)).max().item()
-        monthly.total.loc[dict(retr=retr,util=util,buil=builcoord,mon=mon)] \
-            = hourly.sel(retr=retr,util=util,time=(hourly.time.dt.month==mon)).sum().item()
+    for stag, util, mon in [(stag, util, mon) for stag in stags for util in utils for mon in mons]:
+        monthly.peak.loc[dict(stag=stag,util=util,buil=builcoord,mon=mon)] \
+            = hourly.sel(stag=stag,util=util,time=(hourly.time.dt.month==mon)).max().item()
+        monthly.total.loc[dict(stag=stag,util=util,buil=builcoord,mon=mon)] \
+            = hourly.sel(stag=stag,util=util,time=(hourly.time.dt.month==mon)).sum().item()
     
     makePlot(figtitle = figtitle,
              filename = filename,
              hasDhw = hourly.attrs['hasDhw'],
              titleOnFigure = titleOnFigure)
-    hasDhw = hasDhw or hourly.attrs['hasDhw']
+    if hourly.attrs['hasDhw']:
+        hasDhw = True
 
 ###########################################################################
 ## Start of main process ##
@@ -193,8 +194,8 @@ def runBuildings(listBui,
 #%% ======= FLAGS AND SWITCHES =======
 flag_deleteOldFigures = False     # Deletes the folder of figures
                                   #   and remake the directory
-retr = 'base' # retrofit status: 'base' baseline,
-              #                  'post' post-ECM
+# retr = 'base' # retrofit status: 'base' baseline,
+#               #                  'post' post-ECM
 
 mode = 'west'
     # 'spec' -  specify one building or a list of buildings to be combined,
@@ -204,7 +205,7 @@ mode = 'west'
     # 'west' -  buildings on the west wing combined,
     #           add a row to the tables, if saveTables;
 saveFigures = False
-saveTables = False
+saveTables = True
 
 titleOnFigure = True # Set false if figures used for Latex
 
@@ -221,10 +222,11 @@ filename_spec = 'spec' # Title of the figure file
 if flag_deleteOldFigures:
     shutil.rmtree(dirFigu)
     os.makedirs(dirFigu, exist_ok = True)
-if retr == 'base':
-    retr_tit = 'Baseline'
-elif retr == 'post':
-    retr_tit = 'Post ECM'
+# if retr == 'base':
+#     retr_tit = 'Baseline'
+# elif retr == 'post':
+#     retr_tit = 'Post ECM'
+stag_tit = 'Baseline' # temp implementation
 hasDhw = False # global dhw flag
 
 #%% Construct
@@ -245,7 +247,6 @@ if mode == 'spec':
     builcoord = filename_spec
     monthly=constructDataset([builcoord])
     runBuildings(listBui_spec,
-                 retr = retr,
                  figtitle = figtitle_spec,
                  filename = filename_spec,
                  builcoord = builcoord,
@@ -258,12 +259,10 @@ elif mode == 'each':
     monthly=constructDataset(buil_nos)
     for buil_no in buil_nos:
         figtitle = f'{buil_no} '.replace('x','&') \
-                + dfBldg.loc[dfBldg['buil_no'] == buil_no,'name'].tolist()[0] \
-                + f' - {retr_tit}'
-        filename = f'{retr}_{buil_no}.pdf'
+                + dfBldg.loc[dfBldg['buil_no'] == buil_no,'name'].tolist()[0]
+        filename = f'{buil_no}.pdf'
         builcoord = buil_no
         runBuildings([buil_no],
-                     retr = retr,
                      figtitle = figtitle,
                      filename = filename,
                      builcoord = builcoord,
@@ -274,12 +273,11 @@ elif mode == 'each':
 elif mode == 'west':
     # Combine buildings but exclude 5300 & 5301 which are east of the runway
     listBui = [elem for elem in buil_nos if elem not in {'5300', '5301'}]
-    figtitle = f'West Combined - {retr_tit}'
-    filename = f'{retr}_west.pdf'
+    figtitle = f'West Combined'
+    filename = f'west.pdf'
     builcoord = 'west'
     monthly=constructDataset([builcoord])
     runBuildings(listBui,
-                 retr = retr,
                  figtitle = figtitle,
                  filename = filename,
                  builcoord = builcoord,
@@ -292,22 +290,22 @@ elif mode == 'west':
 
 if saveTables:
     
-    for util in utils:
+    for stag, util in [(stag, util) for stag in stags for util in utils]:
         if util == 'dhw' and not hasDhw:
             continue
         dfPea = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
         dfTot = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
         for rowname in monthly.coords['buil'].values:
-            _row_mon = monthly.peak.sel(retr=retr,util=util,buil=rowname).values.tolist()
+            _row_mon = monthly.peak.sel(stag=stag,util=util,buil=rowname).values.tolist()
             dfPea.loc[len(dfPea.index) + 1] = [rowname, np.max(_row_mon)] + _row_mon
-            _row_mon = monthly.total.sel(retr=retr,util=util,buil=rowname).values.tolist()
+            _row_mon = monthly.total.sel(stag=stag,util=util,buil=rowname).values.tolist()
             dfTot.loc[len(dfTot.index) + 1] = [rowname, np.sum(_row_mon)] + _row_mon
-        dfPea.to_csv(os.path.join(dirTabl,f'Peak_{util}_{retr}.csv'),
+        dfPea.to_csv(os.path.join(dirTabl,f'Peak_{util}_{stag}.csv'),
                     sep = delimiter,
                     index = False,
                     mode = saveTablesMode,
                     header = saveTablesHeader)
-        dfTot.to_csv(os.path.join(dirTabl,f'Total_{util}_{retr}.csv'),
+        dfTot.to_csv(os.path.join(dirTabl,f'Total_{util}_{stag}.csv'),
                         sep = delimiter,
                         index = False,
                         mode = saveTablesMode,

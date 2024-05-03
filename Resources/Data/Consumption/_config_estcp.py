@@ -6,6 +6,9 @@ import os
 import pandas as pd
 
 #%% shared attributes
+stags = ['base', 'post']
+    # stages:
+    #   baseline, post-ECM
 utils = ['ele', 'coo', 'hea', 'dhw']
     # utility types:
     #   electricity, cooling, heating, domestic hot water
