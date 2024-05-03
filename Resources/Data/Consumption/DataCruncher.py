@@ -56,87 +56,103 @@ def runBuildings(listBui,
                  hasDhw : bool,
                  titleOnFigure = True):
         
-        stag = 'base' # temp implementation
-        
-        ele = hourly.sel(stag=stag,util='ele')
-        coo = hourly.sel(stag=stag,util='coo')
-        hea = hourly.sel(stag=stag,util='hea')
-        dhw = hourly.sel(stag=stag,util='dhw')
-        net = hea + dhw - coo
-        
-        cooPea = monthly.peak.sel(stag=stag,util='coo',buil=builcoord)
-        heaPea = monthly.peak.sel(stag=stag,util='hea',buil=builcoord)
-        if hasDhw:
-            dhwPea = monthly.peak.sel(stag=stag,util='dhw',buil=builcoord)
-        
         linewidth = 0.8
-        
-        fig, (ax1,ax2,ax3) = plt.subplots(3,1,
+        # three subplots for two different stages
+        fig, ((ax11,ax12),
+              (ax21,ax22),
+              (ax31,ax32)) = plt.subplots(3,2,
                                           sharex=True,
-                                          figsize=(6,6))
+                                          sharey=True,
+                                          figsize=(9,5))
         
-        ax1.set_title('Hourly Consumption (kWh/h)',
-                     loc = 'left',
-                     fontsize = 12)
-        h1, = ax1.plot(t_hoy, hea,
-                      'r', linewidth = linewidth)
-        h1, = ax1.plot(t_hoy, - coo,
-                      'b', linewidth = linewidth)
-        if hasDhw:
-            h1, = ax1.plot(t_hoy, dhw,
-                          'm', linewidth = linewidth)
-        ax1.grid()
-        
-        ax2.set_title('Monthly Peak (kW)',
-                     loc = 'left',
-                     fontsize = 12)        
-        if hasDhw:
-            _t_ms_shift = [t + datetime.timedelta(days=-5) for t in t_ms]
-        else:
-            _t_ms_shift = t_ms
-        h1 = ax2.bar(_t_ms_shift, heaPea,
-                    color = 'r',
-                    width = 10)
-        _t_ms_shift = [t + datetime.timedelta(days=5) for t in _t_ms_shift]
-        h1 = ax2.bar(t_ms, - cooPea,
-                    color = 'b',
-                    width = 10)
-        if hasDhw:
-            _t_ms_shift = [t + datetime.timedelta(days=5) for t in t_ms]
-            h1 = ax2.bar(_t_ms_shift, dhwPea,
-                        color = 'm',
+        for stag in stags:
+            ele = hourly.sel(stag=stag,util='ele')
+            coo = hourly.sel(stag=stag,util='coo')
+            hea = hourly.sel(stag=stag,util='hea')
+            dhw = hourly.sel(stag=stag,util='dhw')
+            net = hea + dhw - coo
+            
+            cooPea = monthly.peak.sel(stag=stag,util='coo',buil=builcoord)
+            heaPea = monthly.peak.sel(stag=stag,util='hea',buil=builcoord)
+            if hasDhw:
+                dhwPea = monthly.peak.sel(stag=stag,util='dhw',buil=builcoord)
+            
+            if stag == stags[0]:
+                ax1 = ax11
+                ax2 = ax21
+                ax3 = ax31
+            elif stag == stags[1]:
+                ax1 = ax12
+                ax2 = ax22
+                ax3 = ax32
+            
+            ax1.set_title('Hourly Consumption (kWh/h)',
+                         loc = 'left',
+                         fontsize = 12)
+            h1, = ax1.plot(t_hoy, hea,
+                          'r', linewidth = linewidth)
+            h1, = ax1.plot(t_hoy, - coo,
+                          'b', linewidth = linewidth)
+            if hasDhw:
+                h1, = ax1.plot(t_hoy, dhw,
+                              'm', linewidth = linewidth)
+            ax1.grid()
+            
+            ax2.set_title('Monthly Peak (kW)',
+                         loc = 'left',
+                         fontsize = 12)        
+            if hasDhw:
+                _t_ms_shift = [t + datetime.timedelta(days=-5) for t in t_ms]
+            else:
+                _t_ms_shift = t_ms
+            h1 = ax2.bar(_t_ms_shift, heaPea,
+                        color = 'r',
                         width = 10)
-        plt.axhline(0, color = 'k', linewidth = linewidth/2)
-        ax2.grid()
-    
-        ax3.set_title('Cumulative Consumption (thousand kWh)',
-                     loc = 'left',
-                     fontsize = 12)
-        h1, = ax3.plot(t_hoy, np.cumsum(hea)/1000,
-                      'r', linewidth = linewidth, label = 'heating')
-        h1, = ax3.plot(t_hoy, - np.cumsum(coo)/1000,
-                      'b', linewidth = linewidth, label = 'cooling')
-        if hasDhw:
-            h1, = ax3.plot(t_hoy, np.cumsum(dhw)/1000,
-                          'm', linewidth = linewidth, label = 'dom. hot water')
-        h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
-                      'k', linewidth = linewidth, label = 'net energy')
-        plt.axhline(0, color = 'k', linewidth = linewidth/2)
+            _t_ms_shift = [t + datetime.timedelta(days=5) for t in _t_ms_shift]
+            h1 = ax2.bar(t_ms, - cooPea,
+                        color = 'b',
+                        width = 10)
+            if hasDhw:
+                _t_ms_shift = [t + datetime.timedelta(days=5) for t in t_ms]
+                h1 = ax2.bar(_t_ms_shift, dhwPea,
+                            color = 'm',
+                            width = 10)
+            plt.axhline(0, color = 'k', linewidth = linewidth/2)
+            ax2.grid()
         
-        # Formats the x-axis
-        ax3.xaxis.set_major_locator(mdates.MonthLocator())
-        ax3.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-        plt.draw() # This forces xticklabels to populate
-        xlabels = [item.get_text() for item in ax3.get_xticklabels()]
-        xlabels[-1] = '' # removes the last "Jan"
-        ax3.set_xticks(ax3.get_xticks())
-        ax3.set_xticklabels(xlabels)
-        ax3.legend(loc = 'upper center',
-                  bbox_to_anchor = (0.5, -0.2, - 0.1, 0.),
-                  fancybox = True,
-                  shadow = True,
-                  ncol = 4)
-        ax3.grid()
+            ax3.set_title('Cumulative Consumption (thousand kWh)',
+                         loc = 'left',
+                         fontsize = 12)
+            h1, = ax3.plot(t_hoy, np.cumsum(hea)/1000,
+                          'r', linewidth = linewidth,
+                          label = 'heating' if stag==stags[0] else '')
+            h1, = ax3.plot(t_hoy, - np.cumsum(coo)/1000,
+                          'b', linewidth = linewidth,
+                          label = 'cooling'  if stag==stags[0] else '')
+            if hasDhw:
+                h1, = ax3.plot(t_hoy, np.cumsum(dhw)/1000,
+                              'm', linewidth = linewidth,
+                              label = 'dom. hot water' if stag==stags[0] else '')
+            h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
+                          'k', linewidth = linewidth * 2,
+                          label = 'net energy' if stag==stags[0] else '')
+            plt.axhline(0, color = 'k', linewidth = linewidth/2)
+            
+            # Formats the x-axis
+            ax3.xaxis.set_major_locator(mdates.MonthLocator())
+            ax3.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+            plt.draw() # This forces xticklabels to populate
+            xlabels = [item.get_text() for item in ax3.get_xticklabels()]
+            xlabels[-1] = '' # removes the last "Jan"
+            ax3.set_xticks(ax3.get_xticks())
+            ax3.set_xticklabels(xlabels)
+            ax3.grid()
+        
+        fig.legend(loc = 'upper center',
+                   bbox_to_anchor = (0.5, 0.02, 0., 0.),
+                   fancybox = True,
+                   shadow = True,
+                   ncol = 4)
         
         if titleOnFigure:
             plt.suptitle(figtitle,
@@ -205,7 +221,7 @@ mode = 'west'
     # 'west' -  buildings on the west wing combined,
     #           add a row to the tables, if saveTables;
 saveFigures = False
-saveTables = True
+saveTables = False
 
 titleOnFigure = True # Set false if figures used for Latex
 
@@ -226,7 +242,6 @@ if flag_deleteOldFigures:
 #     retr_tit = 'Baseline'
 # elif retr == 'post':
 #     retr_tit = 'Post ECM'
-stag_tit = 'Baseline' # temp implementation
 hasDhw = False # global dhw flag
 
 #%% Construct
