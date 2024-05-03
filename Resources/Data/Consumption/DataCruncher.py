@@ -16,6 +16,7 @@ import shutil
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.ticker as tic
 import numpy as np
 import xarray as xr
 
@@ -147,6 +148,10 @@ def runBuildings(listBui,
             ax3.set_xticks(ax3.get_xticks())
             ax3.set_xticklabels(xlabels)
             ax3.grid()
+        
+        # Format the y-axis
+        ax31.get_yaxis().set_major_formatter(
+            tic.FuncFormatter(lambda x, p: format(int(x), ',')))
         
         fig.legend(loc = 'upper center',
                    bbox_to_anchor = (0.5, 0.02, 0., 0.),
