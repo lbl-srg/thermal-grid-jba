@@ -87,9 +87,14 @@ def runBuildings(listBui,
                 ax2 = ax22
                 ax3 = ax32
             
-            ax1.set_title('Hourly Consumption (kWh/h)',
-                         loc = 'left',
-                         fontsize = 12)
+            if stag == stags[0]:
+                ax1.set_title('Baseline',
+                              loc = 'right',
+                              fontsize = 12)
+            elif stag == stags[1]:
+                ax1.set_title('Post-ECM',
+                              loc = 'left',
+                              fontsize = 12)
             h1, = ax1.plot(t_hoy, hea,
                           'r', linewidth = linewidth)
             h1, = ax1.plot(t_hoy, - coo,
@@ -98,10 +103,7 @@ def runBuildings(listBui,
                 h1, = ax1.plot(t_hoy, dhw,
                               'm', linewidth = linewidth)
             ax1.grid()
-            
-            ax2.set_title('Monthly Peak (kW)',
-                         loc = 'left',
-                         fontsize = 12)        
+              
             if hasDhw:
                 _t_ms_shift = [t + datetime.timedelta(days=-5) for t in t_ms]
             else:
@@ -120,10 +122,7 @@ def runBuildings(listBui,
                             width = 10)
             plt.axhline(0, color = 'k', linewidth = linewidth/2)
             ax2.grid()
-        
-            ax3.set_title('Cumulative Consumption (thousand kWh)',
-                         loc = 'left',
-                         fontsize = 12)
+            
             h1, = ax3.plot(t_hoy, np.cumsum(hea)/1000,
                           'r', linewidth = linewidth,
                           label = 'heating' if stag==stags[0] else '')
@@ -137,7 +136,6 @@ def runBuildings(listBui,
             h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
                           'k', linewidth = linewidth * 2,
                           label = 'net energy' if stag==stags[0] else '')
-            plt.axhline(0, color = 'k', linewidth = linewidth/2)
             
             # Formats the x-axis
             ax3.xaxis.set_major_locator(mdates.MonthLocator())
@@ -152,6 +150,9 @@ def runBuildings(listBui,
         # Format the y-axis
         ax31.get_yaxis().set_major_formatter(
             tic.FuncFormatter(lambda x, p: format(int(x), ',')))
+        ax11.set_ylabel('Hourly Use\n(kWh/h)')
+        ax21.set_ylabel('Monthly Peak\n(kW)')
+        ax31.set_ylabel('Cumulative Use\n(thousand kWh)')
         
         fig.legend(loc = 'upper center',
                    bbox_to_anchor = (0.5, 0.02, 0., 0.),
