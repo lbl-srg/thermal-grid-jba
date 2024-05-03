@@ -235,7 +235,7 @@ titleOnFigure = True # Set false if figures used for Latex
 #listBui_spec = ['1045']
 listBui_spec = ['1045', '1349']
 figtitle_spec = 'spec' # Title of the figure (on figure or in caption)
-filename_spec = 'spec' # Title of the figure file
+filename_spec = 'spec' # Name of the figure file
 
 #%% Configure based on flags & switches
 
