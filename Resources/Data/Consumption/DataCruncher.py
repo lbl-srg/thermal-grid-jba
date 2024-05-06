@@ -57,6 +57,15 @@ def runBuildings(listBui,
                  hasDhw : bool,
                  titleOnFigure = True):
         
+        def setPrimaryY(ax,label):
+            """
+            Set primary y-axis with SI units
+            """
+            ax.set_ylabel(label)
+            ax.get_yaxis().set_major_formatter(
+                tic.FuncFormatter(lambda x, p: format(int(x), ',')))
+            ax.yaxis.set_major_locator(plt.MaxNLocator(5))
+        
         def setSecondY(ax,label):
             """
             Set secondary y-axis with IP units
@@ -114,6 +123,8 @@ def runBuildings(listBui,
             if hasDhw:
                 h1, = ax1.plot(t_hoy, dhw,
                               'm', linewidth = linewidth)
+            if stag == stags[0]:
+                setPrimaryY(ax1,'Hourly Use\n(kWh/h)')
             if stag == stags[1]:
                 setSecondY(ax1,'(kBtu/hr)')
             ax1.grid()
@@ -135,7 +146,9 @@ def runBuildings(listBui,
                             color = 'm',
                             width = 10)
             plt.axhline(0, color = 'k', linewidth = linewidth/2)
-            if stag == stags[1]:
+            if stag == stags[0]:
+                setPrimaryY(ax2,'Monthly Peak\n(kW)')
+            elif stag == stags[1]:
                 setSecondY(ax2,'(kBtu/hr)')
             ax2.grid()
             
@@ -152,29 +165,25 @@ def runBuildings(listBui,
             h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
                           'k', linewidth = linewidth * 2,
                           label = 'net energy' if stag==stags[0] else '')
-            if stag == stags[1]:
+            if stag == stags[0]:
+                setPrimaryY(ax3,'Cumulative Use\n(thousand kWh)')
+            elif stag == stags[1]:
                 setSecondY(ax3,'(MMBtu)')
             
-            # Formats the x-axis
+            # Format the x-axis
             ax3.xaxis.set_major_locator(mdates.MonthLocator())
             ax3.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
             plt.draw() # This forces xticklabels to populate
             xlabels = [item.get_text() for item in ax3.get_xticklabels()]
-            xlabels[-1] = '' # removes the last "Jan"
+            for i in range(0,len(xlabels)):
+                if i % 2 == 0:
+                    xlabels[i] = xlabels[i] + '-1'
+                else:
+                    xlabels[i] = ''
             ax3.set_xticks(ax3.get_xticks())
             ax3.set_xticklabels(xlabels)
+            ax3.tick_params(axis='x', labelrotation=60)
             ax3.grid()
-        
-        # Format primary y-axes (SI units)
-        ax11.set_ylabel('Hourly Use\n(kWh/h)')
-        ax11.get_yaxis().set_major_formatter(
-            tic.FuncFormatter(lambda x, p: format(int(x), ',')))
-        ax21.set_ylabel('Monthly Peak\n(kW)')
-        ax21.get_yaxis().set_major_formatter(
-            tic.FuncFormatter(lambda x, p: format(int(x), ',')))
-        ax31.set_ylabel('Cumulative Use\n(thousand kWh)')
-        ax31.get_yaxis().set_major_formatter(
-            tic.FuncFormatter(lambda x, p: format(int(x), ',')))
         
         fig.legend(loc = 'upper center',
                    bbox_to_anchor = (0.5, 0.02, 0., 0.),
