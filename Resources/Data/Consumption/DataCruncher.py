@@ -57,6 +57,18 @@ def runBuildings(listBui,
                  hasDhw : bool,
                  titleOnFigure = True):
         
+        def setSecondY(ax,label):
+            """
+            Set secondary y-axis with IP units
+            """
+            fac = 3.41214
+            axr = ax.twinx()
+            ymin, ymax = ax.get_ylim()
+            axr.set_ylim(ymin*fac,ymax*fac)
+            axr.set_ylabel(label)
+            axr.get_yaxis().set_major_formatter(
+                tic.FuncFormatter(lambda x, p: format(int(x), ',')))
+        
         linewidth = 0.8
         # three subplots for two different stages
         fig, ((ax11,ax12),
@@ -102,6 +114,8 @@ def runBuildings(listBui,
             if hasDhw:
                 h1, = ax1.plot(t_hoy, dhw,
                               'm', linewidth = linewidth)
+            if stag == stags[1]:
+                setSecondY(ax1,'(kBtu/hr)')
             ax1.grid()
               
             if hasDhw:
@@ -121,6 +135,8 @@ def runBuildings(listBui,
                             color = 'm',
                             width = 10)
             plt.axhline(0, color = 'k', linewidth = linewidth/2)
+            if stag == stags[1]:
+                setSecondY(ax2,'(kBtu/hr)')
             ax2.grid()
             
             h1, = ax3.plot(t_hoy, np.cumsum(hea)/1000,
@@ -136,6 +152,8 @@ def runBuildings(listBui,
             h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
                           'k', linewidth = linewidth * 2,
                           label = 'net energy' if stag==stags[0] else '')
+            if stag == stags[1]:
+                setSecondY(ax3,'(MMBtu)')
             
             # Formats the x-axis
             ax3.xaxis.set_major_locator(mdates.MonthLocator())
@@ -147,7 +165,7 @@ def runBuildings(listBui,
             ax3.set_xticklabels(xlabels)
             ax3.grid()
         
-        # Format the y-axes
+        # Format primary y-axes (SI units)
         ax11.set_ylabel('Hourly Use\n(kWh/h)')
         ax11.get_yaxis().set_major_formatter(
             tic.FuncFormatter(lambda x, p: format(int(x), ',')))
