@@ -148,11 +148,15 @@ def runBuildings(listBui,
             ax3.grid()
         
         # Format the y-axes
+        ax11.set_ylabel('Hourly Use\n(kWh/h)')
+        ax11.get_yaxis().set_major_formatter(
+            tic.FuncFormatter(lambda x, p: format(int(x), ',')))
+        ax21.set_ylabel('Monthly Peak\n(kW)')
+        ax21.get_yaxis().set_major_formatter(
+            tic.FuncFormatter(lambda x, p: format(int(x), ',')))
+        ax31.set_ylabel('Cumulative Use\n(thousand kWh)')
         ax31.get_yaxis().set_major_formatter(
             tic.FuncFormatter(lambda x, p: format(int(x), ',')))
-        ax11.set_ylabel('Hourly Use\n(kWh/h)')
-        ax21.set_ylabel('Monthly Peak\n(kW)')
-        ax31.set_ylabel('Cumulative Use\n(thousand kWh)')
         
         fig.legend(loc = 'upper center',
                    bbox_to_anchor = (0.5, 0.02, 0., 0.),
