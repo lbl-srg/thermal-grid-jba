@@ -77,6 +77,7 @@ def runBuildings(listBui,
             axr.set_ylabel(label)
             axr.get_yaxis().set_major_formatter(
                 tic.FuncFormatter(lambda x, p: format(int(x), ',')))
+            axr.yaxis.set_major_locator(plt.MaxNLocator(5))
         
         linewidth = 0.8
         # three subplots for two different stages
