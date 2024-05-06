@@ -20,7 +20,7 @@ import matplotlib.ticker as tic
 import numpy as np
 import xarray as xr
 
-from _config_estcp import *
+from _config_estcp import * # This imports os and pandas as pd
 
 def constructDataset(buils: list):
     # Constructs the xarray dataset for monthly values
