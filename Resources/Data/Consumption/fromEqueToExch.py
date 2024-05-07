@@ -5,14 +5,13 @@
 #   to generate input files for Sympheny or Modelica
 #   by other scripts
 
-import os
+from _config_estcp import * # This imports os and pandas as pd
+
 import csv
 import glob
 import shutil
 
 import numpy as np
-
-from _config_estcp import *
 
 # Deletes the folder of the previous written exchange files
 #   and remake the directory

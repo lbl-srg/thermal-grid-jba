@@ -8,10 +8,10 @@ Created on Mon Apr 22 15:25:44 2024
 This script merges pdf figures to a single file.
 """
 
-import glob
-import os
+from _config_estcp import * # This imports os and pandas as pd
 
-from _config_estcp import *
+import glob
+
 from PyPDF2 import PdfMerger
 
 m = PdfMerger()

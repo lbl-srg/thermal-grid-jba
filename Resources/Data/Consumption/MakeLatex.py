@@ -8,10 +8,9 @@ Created on Fri Apr 26 16:11:54 2024
 This script reads the Figures folder and generates Latex code.
 """
 
-import glob
-import os
+from _config_estcp import * # This imports os and pandas as pd
 
-from _config_estcp import *
+import glob
 
 retr = 'base' # 'base' - baseline
               # 'post' - post-ECM

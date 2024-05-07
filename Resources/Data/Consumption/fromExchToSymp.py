@@ -3,14 +3,13 @@
 #   to Sympheny input xlsx files.
 # It is interfaced with the shell using argparse.
 
-import os
+
+from _config_estcp import * # This imports os and pandas as pd
+
 import argparse
 import shutil
 
 import numpy as np
-import pandas as pd
-
-from _config_estcp import *
 
 #%% Main function
 def main(stag: str, util: str, buil_nos, hubname = ''):

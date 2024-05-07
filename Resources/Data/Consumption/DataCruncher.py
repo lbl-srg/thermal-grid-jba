@@ -9,7 +9,8 @@ Makes csv table for annual and monthly peaks.
 Makes figures that express load (im)balance.
 """
 
-import os
+from _config_estcp import * # This imports os and pandas as pd
+
 import calendar
 import datetime
 import shutil
@@ -19,8 +20,6 @@ import matplotlib.dates as mdates
 import matplotlib.ticker as tic
 import numpy as np
 import xarray as xr
-
-from _config_estcp import * # This imports os and pandas as pd
 
 def constructDataset(buils: list):
     # Constructs the xarray dataset for monthly values
