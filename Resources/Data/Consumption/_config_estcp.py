@@ -32,11 +32,15 @@ util_cols = [16, 30, 31, 32]
     # column numbers of the respective utilities
     #   from the input file (base 0)
 
-#%% Sympheny input xlsx files
+#%% Directories
 dirWritSymp = 'Sympheny' # Sympheny input xlsx files
 dirFigu = 'Figures'
 dirTabl = 'Tables'
 dirTex = 'Latex'
+
+#%% building groups
+west = [elem for elem in buil_nos if elem not in {'5300', '5301'}]
+    # west campus, excludes the two buildings east of runway
 
 #%% functions
 def readMID(MID : str):

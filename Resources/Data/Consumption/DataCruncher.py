@@ -320,7 +320,7 @@ elif mode == 'each':
     saveTablesHeader = True
 elif mode == 'west':
     # Combine buildings but exclude 5300 & 5301 which are east of the runway
-    listBui = [elem for elem in buil_nos if elem not in {'5300', '5301'}]
+    listBui = west
     figtitle = f'West Combined'
     filename = f'west.pdf'
     builcoord = 'west'
