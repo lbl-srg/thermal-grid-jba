@@ -66,5 +66,3 @@ for buil_no in buil_nos:
                     valu = valu / 3412.142
                 
                 writer.writerow({'value' : valu})
-
-fw.close
