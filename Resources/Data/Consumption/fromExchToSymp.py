@@ -13,7 +13,7 @@ import pandas as pd
 from _config_estcp import *
 
 #%% Main function
-def main(retr: str, util: str, buil_nos, hubname = ''):
+def main(stag: str, util: str, buil_nos, hubname = ''):
 
     df = pd.DataFrame({'row' : np.linspace(1,8760,8760,dtype = int),
                        'value' : np.zeros(8760)})
@@ -21,7 +21,7 @@ def main(retr: str, util: str, buil_nos, hubname = ''):
     
     flag = False # flag when data found to generate output files
     for buil_no in buil_nos:
-        MID = f'{retr}_{buil_no}_{util}' # meter ID
+        MID = f'{stag}_{buil_no}_{util}' # meter ID
         fni = os.path.join(dirExch, f'{MID}.csv')
         if os.path.isfile(fni):
             df['value'] = df['value'] + readMID(MID)
@@ -33,7 +33,7 @@ def main(retr: str, util: str, buil_nos, hubname = ''):
             print(f'Not found: {MID}')
 
     if flag:
-        fno = '_'.join(filter(None,[retr,buillist,hubname,util])) + '.xlsx'
+        fno = '_'.join(filter(None,[stag,buillist,hubname,util])) + '.xlsx'
             # file name output; either buillist or hubname would be '' and omitted
             #   example using building list: 'base_1045-1380_coo.xlsx'
             #   example using hub name: 'base_medical_coo.xlsx'
@@ -66,12 +66,12 @@ for hubname in hub_dict:
     main('base','ele',buil_nos=hub_dict[hubname],hubname=hubname)
 
 """
-retr = 'base' # 'base' baseline or 'post' post-retrofit
+stag = 'post' # 'base' baseline or 'post' post-stagofit
 hub_dict = {'medical':['1058x1060','1065'],
             'dorm':['1631','1657','1690','1691','1692']}
 for hubname in hub_dict:
     for util in utils:
-        main('base',util,buil_nos=hub_dict[hubname],hubname=hubname)
+        main(stag=stag,util=util,buil_nos=hub_dict[hubname],hubname=hubname)
 
 #%% Shell interface with argparse
 """
