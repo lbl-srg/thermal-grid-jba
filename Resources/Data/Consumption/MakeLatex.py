@@ -17,7 +17,7 @@ fns_full = [s for s in sorted(glob.glob(os.path.join(dirFigu,f"*.pdf")))]
 with open(os.path.join(dirTex, f'appendix_energy-profiles.tex'), 'w') as f:
     # appendix section title
     f.write(r"""\newpage
-\section{Whole-Year Energy Consumption Profiles}
+\section{Energy Consumption Profiles}
 """)
     
     # figure set up
@@ -38,10 +38,10 @@ with open(os.path.join(dirTex, f'appendix_energy-profiles.tex'), 'w') as f:
         label = 'fig:appendix_' + fn_base.split(sep = '.')[0]
         
         f.write(r"""
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=1\textwidth]{resources/figures/%s}
-\captionof{figure}{%s}
+\caption{%s}
 \label{%s}
 \end{figure}
 """%(fn_base,caption,label))
