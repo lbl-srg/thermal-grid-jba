@@ -12,28 +12,19 @@ from _config_estcp import * # This imports os and pandas as pd
 
 import glob
 
-retr = 'base' # 'base' - baseline
-              # 'post' - post-ECM
+fns_full = [s for s in sorted(glob.glob(os.path.join(dirFigu,f"*.pdf")))]
 
-if retr == 'base':
-    retr_f = 'Baseline'
-elif retr == 'post':
-    retr_f = 'Post-ECM'
-
-fns_full = [s for s in sorted(glob.glob(os.path.join(dirFigu,f"{retr}*.pdf")))]
-#fns_base = os.path.basename(fns_full) # doesn't work with list
-
-
-with open(os.path.join(dirTex, f'appendix_{retr}.tex'), 'w') as f:
+with open(os.path.join(dirTex, f'appendix_energy-profiles.tex'), 'w') as f:
     # appendix section title
     f.write(r"""\newpage
-\section{Whole-Year Energy Consumption Profiles, %s}
-"""%retr_f)
+\section{Whole-Year Energy Consumption Profiles}
+""")
     
     # figure set up
     f.write(r"""
 \renewcommand\thefigure{\Alph{section}.\arabic{figure}}
-\setcounter{figure}{0}""")
+\setcounter{figure}{0}
+""")
     
     # include figures
     for idx, fn_full in enumerate(fns_full):
@@ -41,32 +32,16 @@ with open(os.path.join(dirTex, f'appendix_{retr}.tex'), 'w') as f:
         buil_no = fn_base.replace('.','_').split(sep = '_')[1]
         if buil_no in dfBldg['buil_no'].tolist():
             caption = buil_no.replace('x','&') + ' ' \
-                    + dfBldg.loc[dfBldg['buil_no'] == buil_no,'name'].tolist()[0] \
-                    + f', {retr_f}'
+                    + dfBldg.loc[dfBldg['buil_no'] == buil_no,'name'].tolist()[0]
         else:
             caption = 'CAPTION'
         label = 'fig:appendix_' + fn_base.split(sep = '.')[0]
         
-        if idx % 2 == 0: # figure on the left
-            f.write(r"""
+        f.write(r"""
 \begin{figure}[h]
 \centering
-\begin{minipage}{0.49\textwidth}
-  \centering
-  \includegraphics[width=1\textwidth]{resources/figures/%s}
-  \captionof{figure}{%s}
-  \label{%s}
-\end{minipage}"""%(fn_base,caption,label))
-        else: # figure on the right
-            f.write(r"""
-\begin{minipage}{0.49\textwidth}
-  \centering
-  \includegraphics[width=1\textwidth]{resources/figures/%s}
-  \captionof{figure}{%s}
-  \label{%s}
-\end{minipage}
-\end{figure}"""%(fn_base,caption,label))
-    
-    if len(fns_full) % 2 != 0: # close off figure if odd
-        f.write(r"""
-\end{figure}""")
+\includegraphics[width=1\textwidth]{resources/figures/%s}
+\captionof{figure}{%s}
+\label{%s}
+\end{figure}
+"""%(fn_base,caption,label))
