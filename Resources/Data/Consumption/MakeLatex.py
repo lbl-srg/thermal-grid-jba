@@ -38,8 +38,7 @@ with open(os.path.join(dirTex, f'appendix_energy-profiles.tex'), 'w') as f:
         label = 'fig:appendix_' + fn_base.split(sep = '.')[0]
         
         f.write(r"""
-\begin{figure}[ht]
-\centering
+\begin{figure}[H]
 \includegraphics[width=1\textwidth]{resources/figures/%s}
 \caption{%s}
 \label{%s}
