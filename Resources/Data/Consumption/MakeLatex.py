@@ -24,6 +24,7 @@ with open(os.path.join(dirTex, f'appendix_energy-profiles.tex'), 'w') as f:
     f.write(r"""
 \newpage
 \section{Energy Consumption Profiles}
+\label{sec:app_energy-profiles}
 """)
     
     # figure set up
