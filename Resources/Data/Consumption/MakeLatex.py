@@ -15,9 +15,16 @@ import glob
 fns_full = [s for s in sorted(glob.glob(os.path.join(dirFigu,f"*.pdf")))]
 
 with open(os.path.join(dirTex, f'appendix_energy-profiles.tex'), 'w') as f:
+    # preceding comments
+    f.write(r"""%%% This file is generated from
+%%%   thermal-grid-jba/Resources/Data/Consumption/MakeLatex.py
+""")
+    
     # appendix section title
-    f.write(r"""\newpage
+    f.write(r"""
+\newpage
 \section{Energy Consumption Profiles}
+\label{sec:app_energy-profiles}
 """)
     
     # figure set up
