@@ -34,6 +34,7 @@ util_cols = [16, 30, 31, 32]
 
 #%% Directories
 dirWritSymp = 'Sympheny' # Sympheny input xlsx files
+dirWritMode = 'Modelica' # Modelica input xlsx files
 dirFigu = 'Figures'
 dirTabl = 'Tables'
 dirTex = 'Latex'
