@@ -29,7 +29,7 @@ model ConnectedETS "Load connected to the network via ETS"
       //nPorts_aHeaWat=1,
       //nPorts_aChiWat=1
 
-  parameter String filNam="modelica://ThermalGridJBA/Resources/Data/Hubs/1380.mos"
+  parameter String filNam=""
     "File name with thermal loads as time series";
   parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(max=-Modelica.Constants.eps)=
        -1e6 "Design cooling heat flow rate (<=0)"
