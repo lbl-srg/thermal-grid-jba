@@ -4,6 +4,10 @@ model ConnectedETS
   extends Modelica.Icons.Example;
   package Medium=Buildings.Media.Water
     "Medium model";
+
+  parameter String filNam="modelica://ThermalGridJBA/Resources/Data/Hubs/1380.mos"
+    "File name with thermal loads as time series";
+
   Buildings.Fluid.Sources.Boundary_pT supAmbWat(
     redeclare package Medium = Medium,
     p(displayUnit="bar"),
@@ -28,24 +32,16 @@ model ConnectedETS
   ThermalGridJBA.Hubs.ConnectedETS bui(
     redeclare package MediumSer = Medium,
     redeclare package MediumBui = Medium,
-    bui(facMul=10),
     allowFlowReversalSer=true,
     THotWatSup_nominal=322.15,
-    filNam="modelica://ThermalGridJBA/Resources/Data/Hubs/1380.mos")
+    final filNam=filNam,
+    QCoo_flow_nominal=Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+      string="#Peak space cooling load",
+      filNam=Modelica.Utilities.Files.loadResource(filNam)),
+    QHea_flow_nominal=Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+      string="#Peak space heating load",
+      filNam=Modelica.Utilities.Files.loadResource(filNam)))
     annotation (Placement(transformation(extent={{40,-20},{60,0}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(
-    k=bui.TChiWatSup_nominal)
-    "Chilled water supply temperature set point"
-    annotation (Placement(transformation(extent={{-90,60},{-70,80}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupMaxSet(
-    k=bui.THeaWatSup_nominal)
-    "Heating water supply temperature set point - Maximum value"
-    annotation (Placement(transformation(extent={{-40,60},{-20,80}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupMinSet(
-    k(final unit="K",
-      displayUnit="degC") = 301.15)
-    "Heating water supply temperature set point - Minimum value"
-    annotation (Placement(transformation(extent={{0,60},{20,80}})));
 equation
   connect(supAmbWat.ports[1], senMasFlo.port_a)
     annotation (Line(points={{-40,-10},{-20,-10}},
@@ -56,13 +52,6 @@ equation
           {40,-10}},              color={0,127,255}));
   connect(sinAmbWat.ports[1], bui.port_bSerAmb) annotation (Line(points={{-40,-70},
           {70,-70},{70,-10},{60,-10}}, color={0,127,255}));
-  connect(THeaWatSupMinSet.y, bui.THeaWatSupMinSet) annotation (Line(points={{22,70},
-          {34,70},{34,0},{38,0},{38,-1}},                 color={0,0,127}));
-  connect(THeaWatSupMaxSet.y, bui.THeaWatSupMaxSet) annotation (Line(points={{-18,70},
-          {-10,70},{-10,34},{32,34},{32,-3},{38,-3}},     color={0,0,127}));
-  connect(TChiWatSupSet.y, bui.TChiWatSupSet) annotation (Line(points={{-68,70},
-          {-52,70},{-52,32},{30,32},{30,-5},{38,-5}},
-                                                color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(

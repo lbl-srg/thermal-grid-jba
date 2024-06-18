@@ -1,6 +1,6 @@
 within ThermalGridJBA.Hubs;
 model ConnectedETS "Load connected to the network via ETS"
-  extends Buildings.DHC.Loads.Combined.BaseClasses.PartialBuildingWithETS(
+  extends Buildings.DHC.Loads.BaseClasses.PartialBuildingWithPartialETS(
     redeclare Buildings.DHC.Loads.BaseClasses.BuildingTimeSeries bui(
       filNam=filNam,
       have_hotWat=true,
@@ -9,8 +9,6 @@ model ConnectedETS "Load connected to the network via ETS"
       T_aChiWat_nominal=TChiWatSup_nominal,
       T_bChiWat_nominal=TChiWatRet_nominal),
     redeclare Buildings.DHC.ETS.Combined.ChillerBorefield ets(
-      //redeclare package MediumSer = MediumSer,
-      //redeclare package MediumBui = MediumBui,
       QChiWat_flow_nominal=QCoo_flow_nominal,
       QHeaWat_flow_nominal=QHea_flow_nominal,
       dp1Hex_nominal=40E3,
@@ -23,11 +21,9 @@ model ConnectedETS "Load connected to the network via ETS"
       QWSE_flow_nominal=QCoo_flow_nominal,
       dpCon_nominal=40E3,
       dpEva_nominal=40E3,
-      datChi=datChi));
-      //nPorts_bChiWat=1,
-      //nPorts_bHeaWat=1,
-      //nPorts_aHeaWat=1,
-      //nPorts_aChiWat=1
+      datChi=datChi),
+    nPorts_heaWat=1,
+    nPorts_chiWat=1);
 
   parameter String filNam=""
     "File name with thermal loads as time series";
@@ -61,6 +57,33 @@ model ConnectedETS "Load connected to the network via ETS"
       TChiWatSup_nominal + dT_nominal "Chilled water return temperature";
   final parameter Modelica.Units.SI.Temperature THeaWatRet_nominal=
       THeaWatSup_nominal - dT_nominal "Heating water return temperature";
+  parameter Modelica.Units.SI.Temperature TDisWatMin=6 + 273.15
+    "District water minimum temperature" annotation (Dialog(group="ETS model parameters"));
+  parameter Modelica.Units.SI.Temperature TDisWatMax=17 + 273.15
+    "District water maximum temperature" annotation (Dialog(group="ETS model parameters"));
+  parameter Modelica.Units.SI.TemperatureDifference dT_nominal(min=0) = 4
+    "Water temperature drop/increase accross load and source-side HX (always positive)"
+    annotation (Dialog(group="ETS model parameters"));
+  parameter Modelica.Units.SI.Temperature TChiWatSup_nominal=18 + 273.15
+    "Chilled water supply temperature"
+    annotation (Dialog(group="ETS model parameters"));
+  parameter Modelica.Units.SI.Temperature THeaWatSup_nominal=38 + 273.15
+    "Heating water supply temperature"
+    annotation (Dialog(group="ETS model parameters"));
+  parameter Modelica.Units.SI.Temperature THotWatSup_nominal=63 + 273.15
+    "Domestic hot water supply temperature to fixtures"
+    annotation (Dialog(group="ETS model parameters", enable=have_hotWat));
+  parameter Modelica.Units.SI.Temperature TColWat_nominal=288.15
+    "Cold water temperature (for hot water production)"
+    annotation (Dialog(group="ETS model parameters", enable=have_hotWat));
+  parameter Modelica.Units.SI.Pressure dp_nominal(displayUnit="Pa")=50000
+    "Pressure difference at nominal flow rate (for each flow leg)"
+    annotation (Dialog(group="ETS model parameters"));
+  parameter Real COPHeaWat_nominal(final unit="1") = 4.0
+    "COP of heat pump for heating water production"
+    annotation (Dialog(group="ETS model parameters"));
+  parameter Real COPHotWat_nominal(final unit="1") = 2.3
+    "COP of heat pump for hot water production";
 
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter loaHeaNor(k=1/
         QHea_flow_nominal) "Normalized heating load"
@@ -76,6 +99,14 @@ model ConnectedETS "Load connected to the network via ETS"
         0.005)
     "Enable cooling"
     annotation (Placement(transformation(extent={{-100,-170},{-80,-150}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(k=45 + 273.15,
+      y(final unit="K", displayUnit="degC"))
+    "Heating water supply temperature set point"
+    annotation (Placement(transformation(extent={{-100,-30},{-80,-10}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(k=7 + 273.15,
+      y(final unit="K", displayUnit="degC"))
+    "Chilled water supply temperature set point"
+    annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));
 equation
   connect(loaHeaNor.y, uHea.u)
     annotation (Line(points={{-118,-120},{-102,-120}}, color={0,0,127}));
@@ -91,8 +122,10 @@ equation
   connect(loaCooNor.u, bui.QReqCoo_flow) annotation (Line(points={{-142,-160},{
           -150,-160},{-150,-142},{80,-142},{80,-4},{24,-4},{24,4}}, color={0,0,
           127}));
-  connect(loaHeaNor.y, resTHeaWatSup.u) annotation (Line(points={{-118,-120},{
-          -114,-120},{-114,-40},{-112,-40}}, color={0,0,127}));
+  connect(THeaWatSupSet.y, ets.THeaWatSupSet) annotation (Line(points={{-78,-20},
+          {-64,-20},{-64,-60},{-34,-60}}, color={0,0,127}));
+  connect(ets.TChiWatSupSet, TChiWatSupSet.y) annotation (Line(points={{-34,-66},
+          {-68,-66},{-68,-60},{-78,-60}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
         defaultComponentName = "bui");
