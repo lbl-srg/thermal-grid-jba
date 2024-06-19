@@ -27,11 +27,18 @@ model ConnectedETS "Load connected to the network via ETS"
 
   parameter String filNam=""
     "File name with thermal loads as time series";
-  parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(max=-Modelica.Constants.eps)=
-       -1e6 "Design cooling heat flow rate (<=0)"
+  parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(
+    max=-Modelica.Constants.eps)=
+      Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+        string="#Peak space cooling load",
+        filNam=Modelica.Utilities.Files.loadResource(filNam))
+    "Design cooling heat flow rate (<=0)"
     annotation (Dialog(group="Design parameter"));
-  parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(min=Modelica.Constants.eps)=
-       abs(QCoo_flow_nominal)*(1 + 1/datChi.COP_nominal)
+  parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(
+    min=Modelica.Constants.eps)=
+      Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+        string="#Peak space heating load",
+        filNam=Modelica.Utilities.Files.loadResource(filNam))
     "Design heating heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic datChi(

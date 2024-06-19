@@ -34,13 +34,7 @@ model ConnectedETS
     redeclare package MediumBui = Medium,
     allowFlowReversalSer=true,
     THotWatSup_nominal=322.15,
-    final filNam=filNam,
-    QCoo_flow_nominal=Buildings.DHC.Loads.BaseClasses.getPeakLoad(
-      string="#Peak space cooling load",
-      filNam=Modelica.Utilities.Files.loadResource(filNam)),
-    QHea_flow_nominal=Buildings.DHC.Loads.BaseClasses.getPeakLoad(
-      string="#Peak space heating load",
-      filNam=Modelica.Utilities.Files.loadResource(filNam)))
+    final filNam=filNam)
     annotation (Placement(transformation(extent={{40,-20},{60,0}})));
 equation
   connect(supAmbWat.ports[1], senMasFlo.port_a)
