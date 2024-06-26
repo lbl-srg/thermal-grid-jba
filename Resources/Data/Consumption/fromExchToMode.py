@@ -89,25 +89,10 @@ if flag_deleteOldDirectory:
 
 #%% Example call
 
-main(['1380'])
+#main(['1560'])
 
 
-#%% Hub list
-"""
-# validation
-hub_dict = {'1058x1060':['1058x1060'],
-            '1065':['1065'],
-            'medical':['1058x1060','1065']}
-for hubname in hub_dict:
-    main('base','ele',buil_nos=hub_dict[hubname],hubname=hubname)
+#%% Individual files for each building
 
-"""
-"""
-stag = 'post' # 'base' baseline or 'post' post-stagofit
-hub_dict = {'medical':['1058x1060','1065'],
-            'dorm':['1631','1657','1690','1691','1692']}
-for hubname in hub_dict:
-    for util in utils:
-        main(buil_nos=hub_dict[hubname],hubname=hubname)
-"""
-
+for buil_no in buil_nos:
+    main([buil_no])

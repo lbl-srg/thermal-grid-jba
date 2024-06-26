@@ -6,9 +6,9 @@ model MultiHub "Multiple prosumer hubs in a district loop"
 
   parameter Integer nBui=3 "Number of buildings";
   parameter String filNam[nBui]={
-    "modelica://ThermalGridJBA/Resources/Data/Hubs/1569.mos",
-    "modelica://ThermalGridJBA/Resources/Data/Hubs/1676.mos",
-    "modelica://ThermalGridJBA/Resources/Data/Hubs/1560.mos"}
+    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1569.mos",
+    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1676.mos",
+    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1560.mos"}
     "Library paths of the files with thermal loads as time series";
   parameter Modelica.Units.SI.MassFlowRate mDis_flow_nominal=50 "Nominal mass flow rate of district";
   parameter Modelica.Units.SI.Temperature TDis_nominal=273.15+15 "Nominal temperature of district supply";

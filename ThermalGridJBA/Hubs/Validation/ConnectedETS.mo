@@ -5,7 +5,7 @@ model ConnectedETS
   package Medium=Buildings.Media.Water
     "Medium model";
 
-  parameter String filNam="modelica://ThermalGridJBA/Resources/Data/Hubs/1380.mos"
+  parameter String filNam="modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1380.mos"
     "File name with thermal loads as time series";
 
   Buildings.Fluid.Sources.Boundary_pT supAmbWat(
