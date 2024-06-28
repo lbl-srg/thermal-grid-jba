@@ -1,0 +1,21 @@
+within ThermalGridJBA.Hubs.Validation;
+model StandaloneAWHP
+  extends Modelica.Icons.Example;
+  ThermalGridJBA.Hubs.StandaloneAWHP bui
+    annotation (Placement(transformation(extent={{-20,-20},{20,20}})));
+  BoundaryConditions.WeatherData weatherData "Andrews AFB TMY3 weather data"
+    annotation (Placement(transformation(extent={{-40,60},{-20,80}})));
+equation
+  connect(weatherData.weaBus, bui.busWea) annotation (Line(
+      points={{-20,70},{0,70},{0,20}},
+      color={255,204,51},
+      thickness=0.5));
+annotation(
+    __Dymola_Commands(
+      file=
+        "modelica://Buildings/Resources/Scripts/Dymola/Templates/Plants/HeatPumps/Validation/AirToWater.mos"
+        "Simulate and plot"),
+    experiment(
+      Tolerance=1e-6,
+      StopTime=86400.0));
+end StandaloneAWHP;
