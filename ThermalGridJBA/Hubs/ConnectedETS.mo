@@ -4,10 +4,10 @@ model ConnectedETS "Load connected to the network via ETS"
     redeclare Buildings.DHC.Loads.BaseClasses.BuildingTimeSeries bui(
       filNam=filNam,
       have_hotWat=true,
-      T_aHeaWat_nominal=THeaWatSup_nominal,
-      T_bHeaWat_nominal=THeaWatRet_nominal,
-      T_aChiWat_nominal=TChiWatSup_nominal,
-      T_bChiWat_nominal=TChiWatRet_nominal),
+      T_aHeaWat_nominal=355.15,
+      T_bHeaWat_nominal=bui.T_aHeaWat_nominal - 22,
+      T_aChiWat_nominal=277.85,
+      T_bChiWat_nominal=bui.T_aChiWat_nominal + 5.6),
     redeclare Buildings.DHC.ETS.Combined.ChillerBorefield ets(
       QChiWat_flow_nominal=QCoo_flow_nominal,
       QHeaWat_flow_nominal=QHea_flow_nominal,
@@ -106,11 +106,11 @@ model ConnectedETS "Load connected to the network via ETS"
         0.005)
     "Enable cooling"
     annotation (Placement(transformation(extent={{-100,-170},{-80,-150}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(k=45 + 273.15,
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(k=355.15,
       y(final unit="K", displayUnit="degC"))
     "Heating water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-30},{-80,-10}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(k=7 + 273.15,
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(k=277.85,
       y(final unit="K", displayUnit="degC"))
     "Chilled water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));
