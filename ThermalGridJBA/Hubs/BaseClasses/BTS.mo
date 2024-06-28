@@ -4,9 +4,9 @@ model BTS "Adapted BTS validation model with key parameters exposed"
     bui(
       final filNam=buiDat.filNam,
       final T_aHeaWat_nominal=buiDat.THeaWatSup_nominal,
-      final T_bHeaWat_nominal=buiDat.THeaWatSup_nominal-buiDat.dTHeaWat_nominal,
+      final T_bHeaWat_nominal=buiDat.THeaWatRet_nominal,
       final T_aChiWat_nominal=buiDat.TChiWatSup_nominal,
-      final T_bChiWat_nominal=buiDat.TChiWatSup_nominal+buiDat.dTChiWat_nominal));
+      final T_bChiWat_nominal=buiDat.TChiWatRet_nominal));
 
 parameter ThermalGridJBA.Data.Individual.B1380 buiDat
     annotation (Placement(transformation(extent={{-40,
