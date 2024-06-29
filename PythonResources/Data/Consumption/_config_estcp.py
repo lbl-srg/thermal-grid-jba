@@ -26,7 +26,12 @@ dfBldg = pd.read_csv('buildings.csv',
                               'name' : str,
                               'gross_area_sf' : float,
                               'gross_area_m2' : float,
-                              'remark1' : str})
+                              'remark1' : str,
+                              'chw_sup_f' : float,
+                              'chw_dt_f' : float,
+                              'hhw_sup_f' : float,
+                              'hhw_dt_f' : float,
+                              'dhw_sup_f' : float})
 buil_nos = dfBldg['buil_no'].tolist()
 util_cols = [16, 30, 31, 32]
     # column numbers of the respective utilities
