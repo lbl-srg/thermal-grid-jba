@@ -83,11 +83,15 @@ def writeOneFile(buil_no : str):
         
         # tail
         f.write(f'end B{buil_no};')
-        
+    
+    open(os.path.join(dirOutput,'package.order'),'a').write(f'B{buil_no}\n')
+    
 #%% Main process
 # Remove old files    
 if flagRemoveOldFiles:
     for f in glob.glob(os.path.join(dirOutput,'B*.mo')):
         os.remove(f)
+    open(os.path.join(dirOutput,'package.order'),'w').close()
 
-writeOneFile('1380')
+for bui in buil_nos:
+    writeOneFile(bui)
