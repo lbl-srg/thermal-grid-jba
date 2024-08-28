@@ -1,20 +1,20 @@
-buil_no,name,sqft_gross,m2_gross,remark1,chw_sup_f,chw_dt_f,hhw_sup_f,hhw_dt_f,dhw_sup_f
-1045,Aerospace Physiology Fac,8230,765,,44,10,120,40,135
-1058x1060,Malcolm Grow Medical,265117,24630,,44,10,140,40,135
-1065,Dental Clinic,28120,2612,,44,10,140,40,135
-1345,Base Chapel,13840,1286,,44,10,180,40,135
-1349,316 Contracting Squadron,18415,1711,,44,10,140,40,135
-1359,General Smart Conf Center,45747,4250,,44,10,180,40,135
-1380,Presidential Inn,143000,13285,,44,10,180,40,135
-1500,Jones Building,330000,30658,,44,10,140,40,135
-1560,Navy Communications,25336,2354,,44,10,180,40,135
-1569,AAFES Shopette,10792,1003,,44,10,180,40,135
-1631,Dorm,45449,4222,,44,10,180,40,135
-1657,Dorm,46000,4274,,44,10,180,40,135
-1676,Thrift Shop,15395,1430,,44,10,180,40,135
-1690,Dorms,53126,4936,,44,10,180,40,135
-1691,Dorms,50532,4695,,44,10,180,40,135
-1692,Dorms,36609,3401,,44,10,180,40,135
-1800,Transient Lodging Facility,69799,6485,,44,10,180,40,135
-5300,ANG Readiness Center (N),148772,13821,East,44,10,180,40,135
-5301,ANG Readiness Center (S),187236,17395,East,44,10,180,40,135
+buil_no,name,sqft_gross,m2_gross,remark1,chw_sup_f,chw_dt_f,hhw_sup_f,hhw_dt_f,dhw_sup_f,have_dhw
+1045,Aerospace Physiology Fac,8230,765,,44,10,120,40,135,false
+1058x1060,Malcolm Grow Medical,265117,24630,,44,10,140,40,135,true
+1065,Dental Clinic,28120,2612,,44,10,140,40,135,true
+1345,Base Chapel,13840,1286,,44,10,180,40,135,false
+1349,316 Contracting Squadron,18415,1711,,44,10,140,40,135,false
+1359,General Smart Conf Center,45747,4250,,44,10,180,40,135,false
+1380,Presidential Inn,143000,13285,,44,10,180,40,135,true
+1500,Jones Building,330000,30658,,44,10,140,40,135,false
+1560,Navy Communications,25336,2354,,44,10,180,40,135,false
+1569,AAFES Shopette,10792,1003,,44,10,180,40,135,false
+1631,Dorm,45449,4222,,44,10,180,40,135,true
+1657,Dorm,46000,4274,,44,10,180,40,135,true
+1676,Thrift Shop,15395,1430,,44,10,180,40,135,false
+1690,Dorms,53126,4936,,44,10,180,40,135,true
+1691,Dorms,50532,4695,,44,10,180,40,135,true
+1692,Dorms,36609,3401,,44,10,180,40,135,true
+1800,Transient Lodging Facility,69799,6485,,44,10,180,40,135,true
+5300,ANG Readiness Center (N),148772,13821,East,44,10,180,40,135,false
+5301,ANG Readiness Center (S),187236,17395,East,44,10,180,40,135,false

@@ -1,44 +1,32 @@
-within ThermalGridJBA.Hubs;
-model ConnectedETS "Load connected to the network via ETS"
+within ThermalGridJBA.Hubs.BaseClasses;
+partial model PartialConnectedETS
   extends Buildings.DHC.Loads.BaseClasses.PartialBuildingWithPartialETS(
     redeclare Buildings.DHC.Loads.BaseClasses.BuildingTimeSeries bui(
-      filNam=filNam,
-      have_hotWat=true,
-      T_aHeaWat_nominal=355.15,
-      T_bHeaWat_nominal=bui.T_aHeaWat_nominal - 22,
-      T_aChiWat_nominal=277.85,
-      T_bChiWat_nominal=bui.T_aChiWat_nominal + 5.6),
-    redeclare Buildings.DHC.ETS.Combined.ChillerBorefield ets(
-      QChiWat_flow_nominal=QCoo_flow_nominal,
-      QHeaWat_flow_nominal=QHea_flow_nominal,
-      dp1Hex_nominal=40E3,
-      dp2Hex_nominal=40E3,
-      QHex_flow_nominal=-QCoo_flow_nominal,
-      T_a1Hex_nominal=284.15,
-      T_b1Hex_nominal=279.15,
-      T_a2Hex_nominal=277.15,
-      T_b2Hex_nominal=282.15,
-      QWSE_flow_nominal=QCoo_flow_nominal,
-      dpCon_nominal=40E3,
-      dpEva_nominal=40E3,
-      datChi=datChi),
+      final filNam=buiDat.filNam,
+      final T_aHeaWat_nominal=buiDat.THeaWatSup_nominal,
+      final T_bHeaWat_nominal=buiDat.THeaWatRet_nominal,
+      final T_aChiWat_nominal=buiDat.TChiWatSup_nominal,
+      final T_bChiWat_nominal=buiDat.TChiWatRet_nominal,
+      final have_hotWat=buiDat.have_hotWat),
     nPorts_heaWat=1,
     nPorts_chiWat=1);
 
-  parameter String filNam=""
-    "File name with thermal loads as time series";
+  replaceable parameter ThermalGridJBA.Data.GenericConsumer buiDat
+    "Building data" annotation (Placement(
+      transformation(extent={{20,140},{40,160}})), choicesAllMatching=true);
+
   parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(
     max=-Modelica.Constants.eps)=
       Buildings.DHC.Loads.BaseClasses.getPeakLoad(
         string="#Peak space cooling load",
-        filNam=Modelica.Utilities.Files.loadResource(filNam))
+        filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
     "Design cooling heat flow rate (<=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(
     min=Modelica.Constants.eps)=
       Buildings.DHC.Loads.BaseClasses.getPeakLoad(
         string="#Peak space heating load",
-        filNam=Modelica.Utilities.Files.loadResource(filNam))
+        filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
     "Design heating heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic datChi(
@@ -92,26 +80,29 @@ model ConnectedETS "Load connected to the network via ETS"
   parameter Real COPHotWat_nominal(final unit="1") = 2.3
     "COP of heat pump for hot water production";
 
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter loaHeaNor(k=1/
-        QHea_flow_nominal) "Normalized heating load"
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter loaHeaNor(
+    k=1/QHea_flow_nominal) "Normalized heating load"
     annotation (Placement(transformation(extent={{-140,-130},{-120,-110}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter loaCooNor(k=1/
-        QCoo_flow_nominal) "Normalized cooling load"
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter loaCooNor(
+    k=1/QCoo_flow_nominal) "Normalized cooling load"
     annotation (Placement(transformation(extent={{-140,-170},{-120,-150}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold uHea(final t=0.01, final h=
-        0.005)
-    "Enable heating"
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold uHea(
+    final t=0.01,
+    final h=0.005) "Enable heating"
     annotation (Placement(transformation(extent={{-100,-130},{-80,-110}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold uCoo(final t=0.01, final h=
-        0.005)
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold uCoo(
+    final t=0.01,
+    final h=0.005)
     "Enable cooling"
     annotation (Placement(transformation(extent={{-100,-170},{-80,-150}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(k=355.15,
-      y(final unit="K", displayUnit="degC"))
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(
+    final k=buiDat.THeaWatSup_nominal,
+    y(final unit="K", displayUnit="degC"))
     "Heating water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-30},{-80,-10}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(k=277.85,
-      y(final unit="K", displayUnit="degC"))
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(
+    final k=buiDat.TChiWatSup_nominal,
+    y(final unit="K", displayUnit="degC"))
     "Chilled water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));
 equation
@@ -120,9 +111,9 @@ equation
   connect(loaCooNor.y, uCoo.u)
     annotation (Line(points={{-118,-160},{-102,-160}}, color={0,0,127}));
   connect(uHea.y, ets.uHea) annotation (Line(points={{-78,-120},{-50,-120},{-50,
-          -48},{-34,-48}}, color={255,0,255}));
+          -46},{-34,-46}}, color={255,0,255}));
   connect(uCoo.y, ets.uCoo) annotation (Line(points={{-78,-160},{-40,-160},{-40,
-          -54},{-34,-54}}, color={255,0,255}));
+          -50},{-34,-50}}, color={255,0,255}));
   connect(bui.QReqHea_flow, loaHeaNor.u) annotation (Line(points={{20,4},{20,-6},
           {76,-6},{76,-138},{-150,-138},{-150,-120},{-142,-120}}, color={0,0,
           127}));
@@ -130,10 +121,10 @@ equation
           -150,-160},{-150,-142},{80,-142},{80,-4},{24,-4},{24,4}}, color={0,0,
           127}));
   connect(THeaWatSupSet.y, ets.THeaWatSupSet) annotation (Line(points={{-78,-20},
-          {-64,-20},{-64,-60},{-34,-60}}, color={0,0,127}));
-  connect(ets.TChiWatSupSet, TChiWatSupSet.y) annotation (Line(points={{-34,-66},
-          {-68,-66},{-68,-60},{-78,-60}}, color={0,0,127}));
+          {-64,-20},{-64,-58},{-34,-58}}, color={0,0,127}));
+  connect(ets.TChiWatSupSet, TChiWatSupSet.y) annotation (Line(points={{-34,-62},
+          {-68,-62},{-68,-60},{-78,-60}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
         defaultComponentName = "bui");
-end ConnectedETS;
+end PartialConnectedETS;

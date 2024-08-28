@@ -31,7 +31,8 @@ dfBldg = pd.read_csv('buildings.csv',
                               'chw_dt_f' : float,
                               'hhw_sup_f' : float,
                               'hhw_dt_f' : float,
-                              'dhw_sup_f' : float})
+                              'dhw_sup_f' : float,
+                              'have_dhw' : str})
 buil_nos = dfBldg['buil_no'].tolist()
 util_cols = [16, 30, 31, 32]
     # column numbers of the respective utilities
@@ -55,3 +56,41 @@ def readMID(MID : str):
                      dtype = float,
                      names = ['value'])
     return df['value'].tolist()
+
+def f_to_c_T(f):
+    """
+    Converts temperature from F to C.
+    
+    Parameters
+    ----------
+    f : float
+        farenheit
+
+    """
+    c = (f-32)*5/9
+    return c
+
+def f_to_c_dT(f):
+    """
+    Converts temperature difference from F to C (K).
+
+    Parameters
+    ----------
+    f : float
+        farenheit
+
+    """
+    c = f*5/9
+    return c
+
+def findMeta(buil_no, colname):
+    """
+    Short-hand for finding building metadata from dfBldg
+
+    Parameters
+    ----------
+    buil_no : building number such as '1045'
+    colname : column name such as 'hhw_dt_f'
+
+    """
+    return dfBldg.loc[dfBldg['buil_no']==buil_no,colname].tolist()[0]

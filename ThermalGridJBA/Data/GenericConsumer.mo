@@ -18,5 +18,9 @@ record GenericConsumer "Generic data record for a consumer hub"
   final parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatRet_nominal
   = THeaWatSup_nominal - dTHeaWat_nominal
     "Nominal heating hot water supply temperature";
+  parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSup_nominal
+    "Nominal domestic hot water supply temperature";
+  parameter Boolean have_hotWat
+    "Building has domestic hot water system";
 annotation(defaultComponentName="buiDat");
 end GenericConsumer;

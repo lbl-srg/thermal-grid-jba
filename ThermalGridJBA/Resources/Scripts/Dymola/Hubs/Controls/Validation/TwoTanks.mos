@@ -1,0 +1,11 @@
+simulateModel("ThermalGridJBA.Hubs.Controls.Validation.TwoTanks", tolerance=1e-6, startTime=0, stopTime=864000, method="CVode", resultFile="TwoTanks");
+createPlot(id=1, position={137, 17, 1110, 596}, y={"loa.y[3]"}, range={0.0, 10.0, 0.0, 80000.0}, grid=true, subPlot=101, colors={{28,108,200}}, timeUnit="d", displayUnits={"W"});
+createPlot(id=1, position={137, 17, 1110, 596}, y={"dhw.domHotWatTan.TTanTop.T", "dhw.domHotWatTan.TTanBot.T", "dhw.domHotWatTan.senTemRet.T"}, range={0.0, 10.0, 0.0, 80.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="d", displayUnits={"degC", "degC", "degC"});
+createPlot(id=1, position={137, 17, 1110, 596}, y={"dhw.charge"}, range={0.0, 10.0, -0.5, 1.5}, grid=true, subPlot=103, colors={{28,108,200}}, timeUnit="d");
+createPlot(id=2, position={110, 47, 1106, 590}, y={"loa.y[2]"}, range={0.0, 10.0, -100000.0, 300000.0}, grid=true, subPlot=101, colors={{28,108,200}}, timeUnit="d", displayUnits={"W"});
+createPlot(id=2, position={110, 47, 1106, 590}, y={"tanHea.T[1]", "tanHea.T[2]", "tanHea.T[3]", "senTRetHea.T"}, range={0.0, 10.0, 50.0, 90.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}, {0,140,72}, {217,67,180}}, timeUnit="d", displayUnits={"degC", "degC", "degC", "degC"});
+createPlot(id=2, position={110, 47, 1106, 590}, y={"tanChaTwoSpe.y"}, range={0.0, 10.0, 0.0, 4.0}, grid=true, subPlot=103, colors={{28,108,200}}, timeUnit="d");
+createPlot(id=3, position={80, 78, 1101, 506}, y={"twoTanCon.twoTanCom.y"}, range={0.0, 900000.0, 0.0, 6.0}, grid=true, subPlot=101, colors={{28,108,200}}, timeUnit="s");
+createPlot(id=3, position={80, 78, 1101, 506}, y={"pumPri.m_flow"}, range={0.0, 900000.0, -2.0, 6.0}, grid=true, subPlot=102, colors={{28,108,200}}, timeUnit="s", displayUnits={"kg/s"});
+createPlot(id=3, position={80, 78, 1101, 506}, y={"val.y_actual"}, range={0.0, 900000.0, -1.0, 2.0}, grid=true, subPlot=103, colors={{28,108,200}}, timeUnit="s");
+

@@ -1,0 +1,3 @@
+simulateModel("ThermalGridJBA.Hubs.Controls.Validation.HeatingWaterThreeStatus", tolerance=1e-6, startTime=0, stopTime=864000, method="CVode", resultFile="HeatingWaterThreeStatus");
+createPlot(id=1, position={15, 15, 1056, 430}, y={"tan.T[1]", "tan.T[2]", "tan.T[3]", "senTRet.T"}, range={0.0, 620000.0, 50.0, 90.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}, {0,140,72}, {217,67,180}}, timeUnit="s", displayUnits={"degC", "degC", "degC", "degC"});
+createPlot(id=1, position={15, 15, 1056, 430}, y={"pumPri.m_flow", "pumSec.m_flow"}, range={0.0, 620000.0, -2.0, 6.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"kg/s", "kg/s"});

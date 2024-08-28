@@ -32,32 +32,6 @@ def writeOneFile(buil_no : str):
         
     """
     
-    def f_to_c_T(f):
-        """
-        Converts temperature from F to C.
-        
-        Parameters
-        ----------
-        f : float
-            farenheit
-
-        """
-        c = (f-32)*5/9
-        return c
-    
-    def f_to_c_dT(f):
-        """
-        Converts temperature difference from F to C (K).
-
-        Parameters
-        ----------
-        f : float
-            farenheit
-
-        """
-        c = f*5/9
-        return c
-    
     dict_bui=dfBldg.loc[dfBldg['buil_no']==buil_no].to_dict('records')[0]
     
     name=dict_bui['name']
@@ -65,7 +39,9 @@ def writeOneFile(buil_no : str):
     TChi=f_to_c_T(f=dict_bui['chw_sup_f'])
     dTChi=f_to_c_dT(f=dict_bui['chw_dt_f'])
     THea=f_to_c_T(f=dict_bui['hhw_sup_f'])
-    dTHea=f_to_c_dT(f=dict_bui['hhw_dt_f'])    
+    dTHea=f_to_c_dT(f=dict_bui['hhw_dt_f'])
+    THot=f_to_c_T(f=dict_bui['dhw_sup_f'])
+    haveHot=dict_bui['have_dhw']
     
     with open(os.path.join(dirOutput, f'B{buil_no}.mo'), 'w') as f:
         # header
@@ -79,7 +55,9 @@ def writeOneFile(buil_no : str):
         f.write(f'    TChiWatSup_nominal={TChi}+273.15,\n')
         f.write(f'    dTChiWat_nominal={dTChi},\n')
         f.write(f'    THeaWatSup_nominal={THea}+273.15,\n')
-        f.write(f'    dTHeaWat_nominal={dTHea});\n')
+        f.write(f'    dTHeaWat_nominal={dTHea},\n')
+        f.write(f'    THotWatSup_nominal={THot}+273.15,\n')
+        f.write(f'    have_hotWat={haveHot});\n')
         
         # tail
         f.write(f'end B{buil_no};')

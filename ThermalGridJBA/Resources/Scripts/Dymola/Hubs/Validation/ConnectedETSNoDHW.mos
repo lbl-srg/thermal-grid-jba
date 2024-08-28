@@ -1,0 +1,8 @@
+simulateModel("ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW", tolerance=1e-6, startTime=0, stopTime=864000, method="CVode", resultFile="ConnectedETSNoDHW");
+createPlot(id=1, position={123, 20, 784, 626}, y={"bui.QHeaWat_flow_nominal", "bui.ets.chi.chi.QCon_flow"}, range={0.0, 10.0, -1000000.0, 2000000.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}}, timeUnit="d", displayUnits={"W", "W"});
+createPlot(id=1, position={123, 20, 784, 626}, y={"bui.QChiWat_flow_nominal", "bui.ets.chi.chi.QEva_flow"}, range={0.0, 10.0, -2000000.0, 1000000.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}}, timeUnit="d", displayUnits={"W", "W"});
+createPlot(id=1, position={123, 20, 784, 626}, y={"bui.PCoo", "bui.PPum"}, range={0.0, 10.0, -100000.0, 300000.0}, grid=true, subPlot=103, colors={{238,46,47}, {0,140,72}}, timeUnit="d", displayUnits={"W", "W"});
+createPlot(id=1, position={123, 20, 784, 626}, y={"bui.bui.QReqHea_flow", "bui.bui.QReqCoo_flow", "bui.bui.QHea_flow", 
+"bui.bui.QCoo_flow"}, range={0.0, 10.0, -200000.0, 400000.0}, grid=true, subPlot=104, colors={{28,108,200}, {238,46,47}, {0,140,72}, {217,67,180}}, timeUnit="d", displayUnits={"W", "W", "W", "W"});
+createPlot(id=2, position={252, 115, 713, 249}, y={"dHChiWat.y", "dHHeaWat.y"}, range={0.0, 900000.0, -20000000000.0, 80000000000.0}, grid=true, colors={{28,108,200}, {238,46,47}}, timeUnit="s");
+

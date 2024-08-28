@@ -6,5 +6,7 @@ record B1045
     TChiWatSup_nominal=6.666666666666667+273.15,
     dTChiWat_nominal=5.555555555555555,
     THeaWatSup_nominal=48.888888888888886+273.15,
-    dTHeaWat_nominal=22.22222222222222);
+    dTHeaWat_nominal=22.22222222222222,
+    THotWatSup_nominal=57.22222222222222+273.15,
+    have_hotWat=false);
 end B1045;
