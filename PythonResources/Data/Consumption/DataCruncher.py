@@ -250,14 +250,14 @@ def runBuildings(listBui,
 flag_deleteOldFigures = False     # Deletes the folder of figures
                                   #   and remake the directory
 
-mode = 'spec'
+mode = 'all'
     # 'spec' -  specify one building or a list of buildings to be combined,
     #           add a row to tables, if saveTables;
     # 'each' -  each individual building processed separately,
     #           rewrite the tables, if saveTables;
-    # 'west' -  buildings on the west wing combined,
+    # 'all'  -  all buildings combined,
     #           add a row to the tables, if saveTables;
-saveFigures = False
+saveFigures = True
 saveTables = True
 
 titleOnFigure = True # Set false if figures used for Latex
@@ -318,12 +318,12 @@ elif mode == 'each':
                      titleOnFigure = titleOnFigure)
     saveTablesMode = 'w'
     saveTablesHeader = True
-elif mode == 'west':
+elif mode == 'all':
     # Combine buildings but exclude 5300 & 5301 which are east of the runway
     listBui = west
-    figtitle = f'West Combined'
-    filename = f'west'
-    builcoord = 'west'
+    figtitle = f'All Combined'
+    filename = f'all.pdf'
+    builcoord = 'all'
     monthly=constructDataset([builcoord])
     runBuildings(listBui,
                  figtitle = figtitle,

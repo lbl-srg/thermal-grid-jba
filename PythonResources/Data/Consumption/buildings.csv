@@ -16,5 +16,3 @@ buil_no,name,sqft_gross,m2_gross,remark1,chw_sup_f,chw_dt_f,hhw_sup_f,hhw_dt_f,d
 1691,Dorms,50532,4695,,44,10,180,40,135,true
 1692,Dorms,36609,3401,,44,10,180,40,135,true
 1800,Transient Lodging Facility,69799,6485,,44,10,180,40,135,true
-5300,ANG Readiness Center (N),148772,13821,East,44,10,180,40,135,false
-5301,ANG Readiness Center (S),187236,17395,East,44,10,180,40,135,false
