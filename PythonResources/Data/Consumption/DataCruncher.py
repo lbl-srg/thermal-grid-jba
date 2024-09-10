@@ -250,7 +250,7 @@ def runBuildings(listBui,
 flag_deleteOldFigures = False     # Deletes the folder of figures
                                   #   and remake the directory
 
-mode = 'west'
+mode = 'spec'
     # 'spec' -  specify one building or a list of buildings to be combined,
     #           add a row to tables, if saveTables;
     # 'each' -  each individual building processed separately,
@@ -258,7 +258,7 @@ mode = 'west'
     # 'west' -  buildings on the west wing combined,
     #           add a row to the tables, if saveTables;
 saveFigures = False
-saveTables = False
+saveTables = True
 
 titleOnFigure = True # Set false if figures used for Latex
 
@@ -266,9 +266,9 @@ titleOnFigure = True # Set false if figures used for Latex
 #   only used with mode == 'spec'
 #listBui = buil_nos # 
 #listBui_spec = ['1045']
-listBui_spec = ['1045', '1349']
-figtitle_spec = 'spec' # Title of the figure (on figure or in caption)
-filename_spec = 'spec' # Name of the figure file
+listBui_spec = buil_nos
+figtitle_spec = 'All Combined' # Title of the figure (on figure or in caption)
+filename_spec = 'all' # Name of the figure file
 
 #%% Configure based on flags & switches
 
@@ -296,7 +296,7 @@ if mode == 'spec':
     monthly=constructDataset([builcoord])
     runBuildings(listBui_spec,
                  figtitle = figtitle_spec,
-                 filename = filename_spec,
+                 filename = filename_spec+'.pdf',
                  builcoord = builcoord,
                  saveFigures = saveFigures,
                  titleOnFigure = titleOnFigure)
@@ -322,7 +322,7 @@ elif mode == 'west':
     # Combine buildings but exclude 5300 & 5301 which are east of the runway
     listBui = west
     figtitle = f'West Combined'
-    filename = f'west.pdf'
+    filename = f'west'
     builcoord = 'west'
     monthly=constructDataset([builcoord])
     runBuildings(listBui,
