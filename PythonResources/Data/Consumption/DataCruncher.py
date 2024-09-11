@@ -60,6 +60,12 @@ def runBuildings(listBui,
             """
             Set primary y-axis with SI units
             """
+            # set symmetric around y = 0
+            low, high = ax.get_ylim()
+            bound = max(abs(low), abs(high))
+            ax.set_ylim(-bound, bound)
+            
+            # set labels
             ax.set_ylabel(label)
             ax.get_yaxis().set_major_formatter(
                 tic.FuncFormatter(lambda x, p: format(int(x), ',')))
@@ -128,6 +134,7 @@ def runBuildings(listBui,
             if stag == stags[1]:
                 setSecondY(ax1,'(kBtu/hr)')
             ax1.grid()
+            ax1.axhline(color = 'k', linewidth = linewidth*0.8)
               
             if hasDhw:
                 _t_ms_shift = [t + datetime.timedelta(days=-5) for t in t_ms]
@@ -145,12 +152,12 @@ def runBuildings(listBui,
                 h1 = ax2.bar(_t_ms_shift, dhwPea,
                             color = 'm',
                             width = 10)
-            plt.axhline(0, color = 'k', linewidth = linewidth/2)
             if stag == stags[0]:
                 setPrimaryY(ax2,'Monthly Peak\n(kW)')
             elif stag == stags[1]:
                 setSecondY(ax2,'(kBtu/hr)')
             ax2.grid()
+            ax2.axhline(color = 'k', linewidth = linewidth*0.8)
             
             h1, = ax3.plot(t_hoy, np.cumsum(hea)/1000,
                           'r', linewidth = linewidth,
@@ -166,7 +173,7 @@ def runBuildings(listBui,
                           'k', linewidth = linewidth * 2,
                           label = 'net energy' if stag==stags[0] else '')
             if stag == stags[0]:
-                setPrimaryY(ax3,'Cumulative Use\n(thousand kWh)')
+                setPrimaryY(ax3,'Cumulative Use\n(MWh)')
             elif stag == stags[1]:
                 setSecondY(ax3,'(MMBtu)')
             
@@ -184,6 +191,7 @@ def runBuildings(listBui,
             ax3.set_xticklabels(xlabels)
             ax3.tick_params(axis='x', labelrotation=60)
             ax3.grid()
+            ax3.axhline(color = 'k', linewidth = linewidth*0.8)
         
         fig.legend(loc = 'upper center',
                    bbox_to_anchor = (0.5, 0.02, 0., 0.),
