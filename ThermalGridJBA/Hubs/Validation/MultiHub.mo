@@ -5,15 +5,17 @@ model MultiHub "Multiple prosumer hubs in a district loop"
     "Medium model";
 
   parameter Integer nBui=3 "Number of buildings";
-  parameter Modelica.Units.SI.MassFlowRate mDis_flow_nominal=50 "Nominal mass flow rate of district";
+  parameter Modelica.Units.SI.MassFlowRate mDis_flow_nominal=
+    sum(bui[:].ets.hex.m2_flow_nominal)*2
+    "Nominal mass flow rate of district";
   parameter Modelica.Units.SI.Temperature TDis_nominal=273.15+15 "Nominal temperature of district supply";
 
-  ThermalGridJBA.Hubs.ConnectedETSNoDHW bui[nBui](
+  ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
     redeclare final package MediumSer = Medium,
     redeclare final package MediumBui = Medium,
-    final buiDat={
+    final datBui={
       ThermalGridJBA.Data.Individual.B1569(),
-      ThermalGridJBA.Data.Individual.B1676(),
+      ThermalGridJBA.Data.Individual.B1380(),
       ThermalGridJBA.Data.Individual.B1560()},
     each allowFlowReversalSer=true,
     each THotWatSup_nominal=322.15)
@@ -27,72 +29,60 @@ model MultiHub "Multiple prosumer hubs in a district loop"
     mCon_flow_nominal=fill(mDis_flow_nominal, nBui),
     lDis=fill(1, nBui),
     lEnd=1) annotation (Placement(transformation(extent={{0,0},{40,20}})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow mov(
-    redeclare final package Medium = Medium,
-    addPowerToMedium=false,
-    m_flow_nominal=mDis_flow_nominal)
-    annotation (Placement(transformation(extent={{30,-90},{10,-70}})));
   Buildings.Fluid.Sources.Boundary_pT bou(
-    redeclare final package Medium = Medium,
-    nPorts=1)
-    annotation (Placement(transformation(extent={{100,-90},{80,-70}})));
-  Buildings.DHC.ETS.BaseClasses.Junction jun1(
-    redeclare final package Medium = Medium,
-    m_flow_nominal={-mDis_flow_nominal,mDis_flow_nominal,mDis_flow_nominal})
-    annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=-90,
-        origin={-20,-10})));
-  Buildings.DHC.ETS.BaseClasses.Junction jun2(
-    redeclare final package Medium = Medium,
-    m_flow_nominal={-mDis_flow_nominal,-mDis_flow_nominal,mDis_flow_nominal})
-    annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=-90,
-        origin={-20,-50})));
+    redeclare final package Medium = Medium, nPorts=1)
+    annotation (Placement(transformation(extent={{100,-80},{80,-60}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow mov1(
     redeclare final package Medium = Medium,
     addPowerToMedium=false,
     m_flow_nominal=mDis_flow_nominal)
-    annotation (Placement(transformation(extent={{-50,-60},{-70,-40}})));
-  Buildings.Fluid.HeatExchangers.Heater_T hea(
-    redeclare final package Medium = Medium,
-    m_flow_nominal=mDis_flow_nominal,
-    dp_nominal=0)
-    annotation (Placement(transformation(extent={{-70,-20},{-50,0}})));
+    annotation (Placement(transformation(extent={{20,-80},{0,-60}})));
   Modelica.Blocks.Sources.Constant TDis(k=TDis_nominal)
-    annotation (Placement(transformation(extent={{-120,0},{-100,20}})));
+    annotation (Placement(transformation(extent={{-150,0},{-130,20}})));
   Modelica.Blocks.Sources.Constant mDis(k=mDis_flow_nominal)
-    annotation (Placement(transformation(extent={{-120,-40},{-100,-20}})));
+    annotation (Placement(transformation(extent={{-150,-40},{-130,-20}})));
+  Buildings.Fluid.Sensors.TemperatureTwoPort senTPlaLvg(
+    redeclare final package Medium = Medium,
+    final m_flow_nominal=mDis_flow_nominal)
+    "Fluid temperature leaving plant" annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=0,
+        origin={-30,10})));
+  Buildings.Fluid.Interfaces.PrescribedOutlet outCon(
+    redeclare final package Medium = Medium,
+    final mWatMax_flow=0,
+    final mWatMin_flow=0,
+    final T_start=TDis_nominal,
+    final use_TSet=true,
+    final use_X_wSet=false,
+    final X_start=Medium.X_default,
+    final m_flow_nominal=mDis_flow_nominal)
+                   "Model to set outlet conditions"
+    annotation (Placement(transformation(extent={{-80,0},{-60,20}})));
 equation
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{8,20},{4,20},
           {4,50},{10,50}}, color={0,127,255}));
   connect(bui.port_bSerAmb, dis.ports_aCon) annotation (Line(points={{30,50},{36,
           50},{36,20},{32,20}}, color={0,127,255}));
-  connect(dis.port_bDisSup, mov.port_a) annotation (Line(points={{40,10},{50,10},
-          {50,-80},{30,-80}}, color={0,127,255}));
-  connect(mov.port_a, bou.ports[1])
-    annotation (Line(points={{30,-80},{80,-80}}, color={0,127,255}));
-  connect(jun1.port_1, dis.port_aDisSup)
-    annotation (Line(points={{-20,0},{-20,10},{0,10}}, color={0,127,255}));
-  connect(jun2.port_2, mov.port_b) annotation (Line(points={{-20,-60},{-20,-80},
-          {10,-80}}, color={0,127,255}));
-  connect(jun2.port_1, jun1.port_2)
-    annotation (Line(points={{-20,-40},{-20,-20}}, color={0,127,255}));
-  connect(mov1.port_a, jun2.port_3)
-    annotation (Line(points={{-50,-50},{-30,-50}}, color={0,127,255}));
-  connect(hea.port_b, jun1.port_3)
-    annotation (Line(points={{-50,-10},{-30,-10}}, color={0,127,255}));
-  connect(mov1.port_b, hea.port_a) annotation (Line(points={{-70,-50},{-80,-50},
-          {-80,-10},{-70,-10}}, color={0,127,255}));
-  connect(TDis.y, hea.TSet) annotation (Line(points={{-99,10},{-80,10},{-80,-2},
-          {-72,-2}}, color={0,0,127}));
-  connect(mDis.y, mov.m_flow_in)
-    annotation (Line(points={{-99,-30},{20,-30},{20,-68}}, color={0,0,127}));
   connect(mDis.y, mov1.m_flow_in)
-    annotation (Line(points={{-99,-30},{-60,-30},{-60,-38}}, color={0,0,127}));
+    annotation (Line(points={{-129,-30},{10,-30},{10,-58}},  color={0,0,127}));
+  connect(senTPlaLvg.port_b, dis.port_aDisSup)
+    annotation (Line(points={{-20,10},{0,10}}, color={0,127,255}));
+  connect(mov1.port_a, bou.ports[1])
+    annotation (Line(points={{20,-70},{80,-70}}, color={0,127,255}));
+  connect(dis.port_bDisSup, mov1.port_a) annotation (Line(points={{40,10},{50,10},
+          {50,-70},{20,-70}}, color={0,127,255}));
+  connect(outCon.port_b, senTPlaLvg.port_a)
+    annotation (Line(points={{-60,10},{-40,10}}, color={0,127,255}));
+  connect(outCon.TSet, TDis.y) annotation (Line(points={{-81,18},{-124,18},{-124,
+          10},{-129,10}}, color={0,0,127}));
+  connect(outCon.port_a, mov1.port_b) annotation (Line(points={{-80,10},{-90,10},
+          {-90,-70},{0,-70}}, color={0,127,255}));
 annotation(experiment(
-      StopTime=864000,
+      StartTime=7776000,
+      StopTime=8640000,
       Interval=60,
-      Tolerance=1e-06));
+      Tolerance=1e-06),
+  __Dymola_Commands(
+      file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Hubs/Validation/MultiHub.mos" "Simulate and plot"));
 end MultiHub;

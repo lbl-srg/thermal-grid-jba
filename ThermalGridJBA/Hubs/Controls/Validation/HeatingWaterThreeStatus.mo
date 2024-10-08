@@ -4,20 +4,20 @@ model HeatingWaterThreeStatus
 
   replaceable package Medium = Buildings.Media.Water "Medium model";
 
-  parameter ThermalGridJBA.Data.Individual.B1380 buiDat
+  parameter ThermalGridJBA.Data.Individual.B1380 datBui
     annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
   parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(min=Modelica.Constants.eps)
     =Buildings.DHC.Loads.BaseClasses.getPeakLoad(
     string="#Peak space heating load",
-    filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
+    filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
     "Design heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
-  parameter Modelica.Units.SI.ThermodynamicTemperature T_start=buiDat.THeaWatRet_nominal
+  parameter Modelica.Units.SI.ThermodynamicTemperature T_start=datBui.THeaWatRet_nominal
     "Temperature start value for components";
   parameter Modelica.Units.SI.MassFlowRate mCon_flow_nominal=mSec_flow_nominal
     "Condenser nominal mass flow rate";
   parameter Modelica.Units.SI.MassFlowRate mSec_flow_nominal=QHea_flow_nominal/
-      buiDat.dTHeaWat_nominal/4182
+      datBui.dTHeaWat_nominal/4182
     "Secondary loop nominal mass flow rate";
 
   Buildings.Fluid.Sources.PropertySource_T con(redeclare final package Medium
@@ -34,12 +34,12 @@ model HeatingWaterThreeStatus
     final m_flow_nominal=mCon_flow_nominal,
     final dp_nominal=preDroCon.dp_nominal) "Primary CHW pump"
     annotation (Placement(transformation(extent={{140,10},{120,30}})));
-  Modelica.Blocks.Sources.Constant TSupSet(k=buiDat.THeaWatSup_nominal)
+  Modelica.Blocks.Sources.Constant TSupSet(k=datBui.THeaWatSup_nominal)
     annotation (Placement(transformation(extent={{140,60},{160,80}})));
   ThermalGridJBA.Hubs.BaseClasses.StratifiedTank tan(
     redeclare final package Medium = Medium,
     final m_flow_nominal=mSec_flow_nominal,
-    final VTan=mCon_flow_nominal*buiDat.dTHeaWat_nominal*60/1000,
+    final VTan=mCon_flow_nominal*datBui.dTHeaWat_nominal*60/1000,
     final hTan=(tan.VTan*16/Modelica.Constants.pi)^(1/3),
     final dIns=0.1,
     final nSeg=9,
@@ -95,7 +95,7 @@ model HeatingWaterThreeStatus
   Modelica.Blocks.Sources.CombiTimeTable loa(
     tableOnFile=true,
     tableName="tab1",
-    fileName=Modelica.Utilities.Files.loadResource(buiDat.filNam),
+    fileName=Modelica.Utilities.Files.loadResource(datBui.filNam),
     extrapolation=Modelica.Blocks.Types.Extrapolation.Periodic,
     y(each unit="W"),
     offset={0,0,0},

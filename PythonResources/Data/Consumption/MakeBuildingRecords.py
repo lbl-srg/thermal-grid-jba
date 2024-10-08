@@ -39,7 +39,9 @@ def writeOneFile(buil_no : str):
     TChi=f_to_c_T(f=dict_bui['chw_sup_f'])
     dTChi=f_to_c_dT(f=dict_bui['chw_dt_f'])
     THea=f_to_c_T(f=dict_bui['hhw_sup_f'])
-    dTHea=f_to_c_dT(f=dict_bui['hhw_dt_f'])
+    if THea > 60:
+        THea = 60 # Forces HHW supply to be no higher than 60 C (140 F)
+    dTHea=min(f_to_c_dT(f=dict_bui['hhw_dt_f']), dTChi) # Use dTChi for dTHea
     THot=f_to_c_T(f=dict_bui['dhw_sup_f'])
     haveHot=dict_bui['have_dhw']
     

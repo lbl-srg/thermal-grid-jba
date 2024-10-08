@@ -2,16 +2,16 @@ within ThermalGridJBA.Hubs.BaseClasses;
 partial model PartialConnectedETS
   extends Buildings.DHC.Loads.BaseClasses.PartialBuildingWithPartialETS(
     redeclare Buildings.DHC.Loads.BaseClasses.BuildingTimeSeries bui(
-      final filNam=buiDat.filNam,
-      final T_aHeaWat_nominal=buiDat.THeaWatSup_nominal,
-      final T_bHeaWat_nominal=buiDat.THeaWatRet_nominal,
-      final T_aChiWat_nominal=buiDat.TChiWatSup_nominal,
-      final T_bChiWat_nominal=buiDat.TChiWatRet_nominal,
-      final have_hotWat=buiDat.have_hotWat),
+      final filNam=datBui.filNam,
+      final T_aHeaWat_nominal=datBui.THeaWatSup_nominal,
+      final T_bHeaWat_nominal=datBui.THeaWatRet_nominal,
+      final T_aChiWat_nominal=datBui.TChiWatSup_nominal,
+      final T_bChiWat_nominal=datBui.TChiWatRet_nominal,
+      final have_hotWat=datBui.have_hotWat),
     nPorts_heaWat=1,
     nPorts_chiWat=1);
 
-  replaceable parameter ThermalGridJBA.Data.GenericConsumer buiDat
+  replaceable parameter ThermalGridJBA.Data.GenericConsumer datBui
     "Building data" annotation (Placement(
       transformation(extent={{20,140},{40,160}})), choicesAllMatching=true);
 
@@ -19,14 +19,14 @@ partial model PartialConnectedETS
     max=-Modelica.Constants.eps)=
       Buildings.DHC.Loads.BaseClasses.getPeakLoad(
         string="#Peak space cooling load",
-        filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
+        filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
     "Design cooling heat flow rate (<=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(
     min=Modelica.Constants.eps)=
       Buildings.DHC.Loads.BaseClasses.getPeakLoad(
         string="#Peak space heating load",
-        filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
+        filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
     "Design heating heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic datChi(
@@ -96,12 +96,12 @@ partial model PartialConnectedETS
     "Enable cooling"
     annotation (Placement(transformation(extent={{-100,-170},{-80,-150}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(
-    final k=buiDat.THeaWatSup_nominal,
+    final k=datBui.THeaWatSup_nominal,
     y(final unit="K", displayUnit="degC"))
     "Heating water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-30},{-80,-10}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(
-    final k=buiDat.TChiWatSup_nominal,
+    final k=datBui.TChiWatSup_nominal,
     y(final unit="K", displayUnit="degC"))
     "Chilled water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));

@@ -4,11 +4,11 @@ model HotWaterTwoStatus
 
   replaceable package Medium = Buildings.Media.Water "Medium model";
 
-  parameter Data.Individual.B1380 buiDat
+  parameter Data.Individual.B1380 datBui
     annotation (Placement(transformation(extent={{-40,60},{-20,80}})));
   parameter Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger
     datWatHea(
-    VTan=mCon_flow_nominal*buiDat.dTHeaWat_nominal*30*60/1000,
+    VTan=mCon_flow_nominal*datBui.dTHeaWat_nominal*30*60/1000,
     mDom_flow_nominal=QHotWat_flow_nominal/4200/(TDom_nominal-TCol_nominal),
     QHex_flow_nominal=QHotWat_flow_nominal)
     "Data for heat pump water heater with tank"
@@ -17,20 +17,20 @@ model HotWaterTwoStatus
     min=Modelica.Constants.eps) =
     Buildings.DHC.Loads.BaseClasses.getPeakLoad(
       string="#Peak water heating load",
-      filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
+      filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
     "Design heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Modelica.Units.SI.HeatFlowRate QHeaWat_flow_nominal(
     min=Modelica.Constants.eps) =
     Buildings.DHC.Loads.BaseClasses.getPeakLoad(
       string="#Peak space heating load",
-      filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
+      filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
     "Design heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
-  parameter Modelica.Units.SI.ThermodynamicTemperature T_start=buiDat.THeaWatRet_nominal
+  parameter Modelica.Units.SI.ThermodynamicTemperature T_start=datBui.THeaWatRet_nominal
     "Temperature start value for components";
   parameter Modelica.Units.SI.MassFlowRate mCon_flow_nominal=
-    QHeaWat_flow_nominal/buiDat.dTHeaWat_nominal/4182
+    QHeaWat_flow_nominal/datBui.dTHeaWat_nominal/4182
     "Secondary loop nominal mass flow rate";
     // Sized for HHW
   parameter Modelica.Units.SI.Temperature TDom_nominal = 40 + 273.15
@@ -42,7 +42,7 @@ model HotWaterTwoStatus
     redeclare final package Medium = Medium,
     final dat=datWatHea,
     final QHotWat_flow_nominal=QHotWat_flow_nominal,
-    final dT_nominal=buiDat.dTHeaWat_nominal)
+    final dT_nominal=datBui.dTHeaWat_nominal)
     annotation (Placement(transformation(extent={{0,-20},{20,0}})));
   Buildings.Fluid.Sources.PropertySource_T con(redeclare final package Medium
       = Medium, final use_T_in=true)
@@ -71,7 +71,7 @@ model HotWaterTwoStatus
   Modelica.Blocks.Sources.CombiTimeTable loa(
     tableOnFile=true,
     tableName="tab1",
-    fileName=Modelica.Utilities.Files.loadResource(buiDat.filNam),
+    fileName=Modelica.Utilities.Files.loadResource(datBui.filNam),
     extrapolation=Modelica.Blocks.Types.Extrapolation.Periodic,
     y(each unit="W"),
     offset={0,0,0},

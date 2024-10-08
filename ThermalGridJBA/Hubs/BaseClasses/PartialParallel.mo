@@ -75,6 +75,13 @@ model PartialParallel
   parameter Integer nSegTan=3
     "Number of volume segments for tanks"
     annotation (Dialog(group="Buffer Tank"));
+  parameter Integer nSegTanHea=9
+    "Number of volume segments for heating hot water tank"
+    annotation (Dialog(group="Buffer Tank"));
+  parameter Integer iMidTanHea=3
+    "Idex of the middle volume for heating hot water tank"
+    annotation (Dialog(group="Buffer Tank"));
+
   // IO VARIABLES
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uHea
     "Heating enable signal"
@@ -106,13 +113,14 @@ model PartialParallel
     redeclare final package Medium = MediumBui,
     final dpValve_nominal=dpValIso_nominal,
     final m_flow_nominal=colAmbWat.mDis_flow_nominal,
-    use_inputFilter=false) "Evaporator to ambient loop isolation valve"
+    use_strokeTime=false) "Evaporator to ambient loop isolation valve"
     annotation (Placement(transformation(extent={{70,-130},{50,-110}})));
   Buildings.Fluid.Actuators.Valves.TwoWayLinear valIsoCon(
     redeclare final package Medium = MediumBui,
     final dpValve_nominal=dpValIso_nominal,
     final m_flow_nominal=colAmbWat.mDis_flow_nominal,
-    use_inputFilter=false) "Condenser to ambient loop isolation valve"
+    use_strokeTime=false)
+                         "Condenser to ambient loop isolation valve"
     annotation (Placement(transformation(extent={{-70,-130},{-50,-110}})));
   Buildings.DHC.ETS.Combined.Subsystems.HeatExchanger hex(
     redeclare final package Medium1=MediumSer,
@@ -138,14 +146,15 @@ model PartialParallel
     final dIns=dInsTanChiWat,
     final nSeg=nSegTan) "Chilled water tank"
     annotation (Placement(transformation(extent={{180,96},{200,116}})));
-  Buildings.DHC.ETS.BaseClasses.StratifiedTank tanHeaWat(
+  ThermalGridJBA.Hubs.BaseClasses.StratifiedTank tanHeaWat(
     redeclare final package Medium = MediumBui,
     final m_flow_nominal=colHeaWat.mDis_flow_nominal,
     final VTan=VTanHeaWat,
     final hTan=hTanHeaWat,
     final dIns=dInsTanHeaWat,
-    final nSeg=nSegTan) "Heating water tank"
-    annotation (Placement(transformation(extent={{-220,96},{-200,116}})));
+    final nSeg=nSegTanHea,
+    final iMid=iMidTanHea) "Heating hot water tank"
+    annotation (Placement(transformation(extent={{-200,94},{-180,114}})));
   Buildings.DHC.ETS.BaseClasses.CollectorDistributor colChiWat(
     redeclare final package Medium = MediumBui,
     final nCon=1 + nSysCoo,
@@ -199,10 +208,6 @@ protected
 equation
   connect(hex.PPum,totPPum.u[1])
     annotation (Line(points={{12,-254},{36,-254},{36,-60},{258,-60}},color={0,0,127}));
-  connect(THeaWatSupSet,conSup.THeaWatSupPreSet)
-    annotation (Line(points={{-320,-20},{-292,-20},{-292,27},{-262,27}},color={0,0,127}));
-  connect(tanHeaWat.TTop,conSup.THeaWatTop)
-    annotation (Line(points={{-199,115},{-190,115},{-190,80},{-274,80},{-274,25},{-262,25}},color={0,0,127}));
   connect(tanChiWat.TBot,conSup.TChiWatBot)
     annotation (Line(points={{201,97},{206,97},{206,0},{-274,0},{-274,19},{-262,
           19}},                                                                        color={0,0,127}));
@@ -227,8 +232,6 @@ equation
     annotation (Line(points={{-320,-60},{-290,-60},{-290,21},{-262,21}},color={0,0,127}));
   connect(uCoo,conSup.uCoo)
     annotation (Line(points={{-320,60},{-292,60},{-292,29},{-262,29}},color={255,0,255}));
-  connect(uHea,conSup.uHea)
-    annotation (Line(points={{-320,100},{-290,100},{-290,31},{-262,31}},color={255,0,255}));
   connect(valIsoEva.port_a,colChiWat.ports_aCon[1])
     annotation (Line(points={{70,-120},{90,-120},{90,-24},{108,-24}},
                                                              color={0,127,255}));
@@ -245,10 +248,6 @@ equation
     annotation (Line(points={{140,-40},{170,-40},{170,100},{180,100}},color={0,127,255}));
   connect(colChiWat.port_aDisSup,tanChiWat.port_bTop)
     annotation (Line(points={{140,-34},{160,-34},{160,112},{180,112}},color={0,127,255}));
-  connect(colHeaWat.port_bDisRet,tanHeaWat.port_aTop)
-    annotation (Line(points={{-140,-40},{-160,-40},{-160,112},{-200,112}},color={0,127,255}));
-  connect(tanHeaWat.port_bBot,colHeaWat.port_aDisSup)
-    annotation (Line(points={{-200,100},{-180,100},{-180,-34},{-140,-34}},color={0,127,255}));
   connect(valIsoCon.port_a,colHeaWat.ports_aCon[1])
     annotation (Line(points={{-70,-120},{-90,-120},{-90,-24},{-108,-24}},
                                                                 color={0,127,255}));

@@ -4,11 +4,11 @@ model TwoTanks
 
   package Medium = Buildings.Media.Water "Medium model";
 
-  parameter Data.Individual.B1380 buiDat
+  parameter Data.Individual.B1380 datBui
     annotation (Placement(transformation(extent={{40,120},{60,140}})));
   parameter Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger
     datWatHea(
-    VTan=mCon_flow_nominal*buiDat.dTHeaWat_nominal*5*60/1000,
+    VTan=mCon_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
     mDom_flow_nominal=QHot_flow_nominal/4200/(datWatHea.TDom_nominal - datWatHea.TCol_nominal),
     QHex_flow_nominal=QHot_flow_nominal)
     "Data for heat pump water heater with tank"
@@ -17,27 +17,27 @@ model TwoTanks
     min=Modelica.Constants.eps) =
     Buildings.DHC.Loads.BaseClasses.getPeakLoad(
       string="#Peak water heating load",
-      filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
+      filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
     "Design domestic hot water load (>=0)";
   parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(
     min=Modelica.Constants.eps) =
     Buildings.DHC.Loads.BaseClasses.getPeakLoad(
       string="#Peak space heating load",
-      filNam=Modelica.Utilities.Files.loadResource(buiDat.filNam))
+      filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
     "Design heating hot water load (>=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Modelica.Units.SI.MassFlowRate mSecHot_flow_nominal =
-    QHot_flow_nominal/buiDat.dTHeaWat_nominal/4182
+    QHot_flow_nominal/datBui.dTHeaWat_nominal/4182
     "Domestic hot water secondary loop nominal mass flow rate";
     // DHW loop dT is the same as HHW. Not an error.
   parameter Modelica.Units.SI.MassFlowRate mSecHea_flow_nominal =
-    QHea_flow_nominal/buiDat.dTHeaWat_nominal/4182
+    QHea_flow_nominal/datBui.dTHeaWat_nominal/4182
     "Domestic hot water secondary loop nominal mass flow rate";
   parameter Modelica.Units.SI.MassFlowRate mCon_flow_nominal =
     max(mSecHot_flow_nominal,mSecHea_flow_nominal)
     "Condenser nominal mass flow rate";
   parameter Modelica.Units.SI.ThermodynamicTemperature T_start =
-    buiDat.THeaWatRet_nominal
+    datBui.THeaWatRet_nominal
     "Temperature start value for components";
 
   Buildings.Fluid.Sources.PropertySource_T con(
@@ -59,12 +59,12 @@ model TwoTanks
   ThermalGridJBA.Hubs.BaseClasses.StratifiedTank tanHea(
     redeclare final package Medium = Medium,
     final m_flow_nominal=mSecHea_flow_nominal,
-    final VTan=mSecHea_flow_nominal*buiDat.dTHeaWat_nominal*5*60/1000,
+    final VTan=mSecHea_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
     final hTan=(tanHea.VTan*16/Modelica.Constants.pi)^(1/3),
     final dIns=0.1,
     final nSeg=9,
     final iMid=5,
-    tan(T_start=buiDat.THeaWatSup_nominal)) "Heating hot water tank"
+    tan(T_start=datBui.THeaWatSup_nominal)) "Heating hot water tank"
     annotation (Placement(transformation(extent={{-82,-20},{-62,0}})));
   Buildings.Fluid.MixingVolumes.MixingVolume volHea(
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
@@ -117,7 +117,7 @@ model TwoTanks
   Modelica.Blocks.Sources.CombiTimeTable loa(
     tableOnFile=true,
     tableName="tab1",
-    fileName=Modelica.Utilities.Files.loadResource(buiDat.filNam),
+    fileName=Modelica.Utilities.Files.loadResource(datBui.filNam),
     extrapolation=Modelica.Blocks.Types.Extrapolation.Periodic,
     y(each unit="W"),
     offset={0,0,0},
@@ -172,19 +172,19 @@ model TwoTanks
         origin={-10,-40})));
   ThermalGridJBA.Hubs.Controls.TwoTankControl twoTanCon(
     T2Sup=323.15,
-    T3Sup=buiDat.THeaWatSup_nominal,
+    T3Sup=datBui.THeaWatSup_nominal,
     m_flow_set=mCon_flow_nominal,
     rSlo=0.3)
     annotation (Placement(transformation(extent={{40,60},{60,80}})));
   ThermalGridJBA.Hubs.Controls.TankChargingTwoSpeed tanChaTwoSpe
     annotation (Placement(transformation(extent={{-40,40},{-20,60}})));
-  Modelica.Blocks.Sources.Constant TTanHeaSet(k=buiDat.THeaWatSup_nominal - 3)
+  Modelica.Blocks.Sources.Constant TTanHeaSet(k=datBui.THeaWatSup_nominal - 3)
     annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
   ThermalGridJBA.Hubs.BaseClasses.DHWConsumption dhw(
     redeclare final package Medium = Medium,
     final dat=datWatHea,
     QHotWat_flow_nominal=QHot_flow_nominal,
-    dT_nominal=buiDat.dTHeaWat_nominal)
+    dT_nominal=datBui.dTHeaWat_nominal)
     annotation (Placement(transformation(extent={{-120,80},{-100,100}})));
   Modelica.Blocks.Sources.Constant TTanHotSet(k=40 + 273.15)
     annotation (Placement(transformation(extent={{-300,120},{-280,140}})));

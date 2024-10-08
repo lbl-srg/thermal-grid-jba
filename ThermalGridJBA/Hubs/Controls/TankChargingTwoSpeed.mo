@@ -2,12 +2,14 @@ within ThermalGridJBA.Hubs.Controls;
 block TankChargingTwoSpeed
   extends Modelica.Blocks.Icons.Block;
 
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput TTan[3](final unit="K",
-      displayUnit="degC") "Temperature vector of the tank" annotation (
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TTan[3](
+    each final unit="K",
+    each displayUnit="degC") "Temperature vector of the tank" annotation (
       Placement(transformation(extent={{-140,-80},{-100,-40}}),
         iconTransformation(extent={{-140,-80},{-100,-40}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput TSet(each final unit="K",
-      each displayUnit="degC") "Temperature set point" annotation (Placement(
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TSet(
+    each final unit="K",
+    each displayUnit="degC") "Temperature set point" annotation (Placement(
         transformation(extent={{-140,40},{-100,80}}), iconTransformation(extent
           ={{-140,40},{-100,80}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput y

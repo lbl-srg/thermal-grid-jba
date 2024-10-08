@@ -1,0 +1,3 @@
+simulateModel("ThermalGridJBA.Hubs.Validation.MultiHub", tolerance=1e-6, startTime=7776000, stopTime=8640000, method="CVode", resultFile="MultiHub");
+createPlot(id=1, position={55, 55, 983, 343}, y={"senTPlaLvg.T", "dis.TOut[1]", "dis.TOut[2]", "dis.TOut[3]"}, range={0.0, 900000.0, 13.0, 21.0}, grid=true, colors={{28,108,200}, {238,46,47}, {0,140,72}, {217,67,180}}, timeUnit="s", displayUnits={"degC", "degC", "degC", "degC"});
+

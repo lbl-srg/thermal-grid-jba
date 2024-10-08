@@ -1,6 +1,6 @@
 within ThermalGridJBA.Hubs.Validation;
 model ConnectedETSNoDHW
-  "Validation model for the ConnectedETSNoDHW component model"
+  "Validation model for ConnectedETS without DHW"
   extends Modelica.Icons.Example;
   package Medium=Buildings.Media.Water
     "Medium model";
@@ -26,10 +26,10 @@ model ConnectedETSNoDHW
       displayUnit="degC") = 288.15)
     "District supply temperature"
     annotation (Placement(transformation(extent={{-92,-16},{-72,4}})));
-  ThermalGridJBA.Hubs.ConnectedETSNoDHW bui(
+  ThermalGridJBA.Hubs.ConnectedETS bui(
     redeclare package MediumSer = Medium,
     redeclare package MediumBui = Medium,
-    redeclare ThermalGridJBA.Data.Individual.B1380 buiDat,
+    redeclare ThermalGridJBA.Data.Individual.B1380 datBui(have_hotWat=false),
     allowFlowReversalSer=true)
     annotation (Placement(transformation(extent={{40,-20},{60,0}})));
   Modelica.Blocks.Continuous.Integrator dHHeaWat
@@ -38,6 +38,9 @@ model ConnectedETSNoDHW
   Modelica.Blocks.Continuous.Integrator dHChiWat
     "Cumulative enthalpy difference of chilled water"
     annotation (Placement(transformation(extent={{40,70},{60,90}})));
+  Modelica.Blocks.Continuous.Integrator dHHotWat if bui.datBui.have_hotWat
+    "Cumulative enthalpy difference of domestic hot water"
+    annotation (Placement(transformation(extent={{40,10},{60,30}})));
 equation
   connect(supAmbWat.ports[1], senMasFlo.port_a)
     annotation (Line(points={{-40,-10},{-20,-10}},
@@ -52,6 +55,8 @@ equation
           -38},{22,-38},{22,50},{38,50}}, color={0,0,127}));
   connect(bui.dHChiWat_flow, dHChiWat.u) annotation (Line(points={{48,-22},{48,
           -40},{20,-40},{20,80},{38,80}}, color={0,0,127}));
+  connect(bui.dHHotWat_flow, dHHotWat.u) annotation (Line(points={{44,-22},{44,-36},
+          {24,-36},{24,20},{38,20}}, color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(
@@ -62,14 +67,16 @@ equation
     __Dymola_Commands(
       file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Hubs/Validation/ConnectedETSNoDHW.mos" "Simulate and plot"),
     experiment(
-      StopTime=864000,
+      StartTime=7776000,
+      StopTime=8640000,
       Tolerance=1e-06),
     Documentation(info="<html>
 <p>
-Validation model adapted from
-<a href=\"modelica://Buildings.DHC.Loads.Combined.Examples.BuildingTimeSeriesWithETS\">
-Buildings.DHC.Loads.Combined.Examples.BuildingTimeSeriesWithETS</a>.
-The <code>bui</code> component is replaced.
+Validation model for a single building without DHW integration in the ETS.
+The model can load any building record even if the record has
+<code>have_hotWat=true</code>.
+This Boolean switch would be overriden to <code>false</code> and any DHW
+load would be ignored.
 </p>
 </html>"));
 end ConnectedETSNoDHW;

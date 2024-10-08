@@ -124,6 +124,10 @@ equation
         extent={{-100,-100},{100,100}},
         lineColor={0,0,127},
         fillColor={255,255,255},
-        fillPattern=FillPattern.Solid)}), Diagram(
+        fillPattern=FillPattern.Solid), Text(
+          extent={{-66,40},{60,-38}},
+          textColor={102,44,145},
+          textString="DHW",
+          textStyle={TextStyle.Bold})}),  Diagram(
         coordinateSystem(preserveAspectRatio=false)));
 end DHWConsumption;

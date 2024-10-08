@@ -22,5 +22,5 @@ record GenericConsumer "Generic data record for a consumer hub"
     "Nominal domestic hot water supply temperature";
   parameter Boolean have_hotWat
     "Building has domestic hot water system";
-annotation(defaultComponentName="buiDat");
+annotation(defaultComponentName="datBui");
 end GenericConsumer;
