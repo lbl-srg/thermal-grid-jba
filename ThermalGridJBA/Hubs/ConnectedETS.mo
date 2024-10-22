@@ -19,7 +19,7 @@ model ConnectedETS
       dpEva_nominal=40E3,
       datChi=datChi,
       datDhw=datDhw,
-      kHot=if datBui.have_hotWat then 0.001 else 0.05));
+      kHot=0.02));
   parameter
     Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
     VTan=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*1*60/1000,
