@@ -111,7 +111,7 @@ def _simulate(spec):
         s.addParameters(spec['parameters'])
     s.setStartTime(spec["start_time"])
     s.setStopTime(spec["stop_time"])
-    s.setTolerance(1E-5)
+    s.setTolerance(1E-6)
     s.showGUI(False)
     s.exitSimulator(True)
     print("Starting simulation in {}".format(out_dir))
@@ -130,6 +130,29 @@ def _simulate(spec):
         shutil.rmtree(wor_dir)
     except:
         print(f"Simulation failed: {spec['name']}")
+
+def check_tests():
+    
+    import os
+    
+    directory = os.path.join(CWD, "simulations")
+    nfolders = [entry for entry in os.listdir(directory) if os.path.isdir(os.path.join(directory, entry))]
+        # names of folders
+    numcases = len(list_of_cases) # number of cases
+    numfail = 0 # number of failed tests
+    listfail = list()
+    
+    print("")
+    print("="*30)
+    for casename in [item['name'] for item in list_of_cases]:
+        if not casename in nfolders:
+            numfail += 1
+            listfail.append([casename])
+    if numfail == 0:
+        print(f"All {numcases} cases simulated successfully.")
+    else:
+        print(f"{numfail} out of {numcases} cases failed. Failed cases:")
+        print(listfail)
 
 ################################################################################
 if __name__=='__main__':
@@ -168,3 +191,5 @@ if __name__=='__main__':
     po.map(_simulate, list_of_cases)
     # Delete the checked out repository
     shutil.rmtree(lib_dir)
+
+    check_tests()
