@@ -1,5 +1,9 @@
+Invert
 RealListParameters
 SelectTank
+SideCold
+SideHot
+Supervisory
 TankChargingController
 TankChargingTwoSpeed
 TwoTankCommand

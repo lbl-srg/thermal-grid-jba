@@ -1,7 +1,7 @@
 within ThermalGridJBA.Hubs.Validation;
 model ConnectedETSWithDHW
   extends ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW(
-    bui(redeclare ThermalGridJBA.Data.Individual.B1380 datBui(have_hotWat=true)));
+    redeclare ThermalGridJBA.Data.Individual.B1380 datBui(have_hotWat=true));
 
 equation
 

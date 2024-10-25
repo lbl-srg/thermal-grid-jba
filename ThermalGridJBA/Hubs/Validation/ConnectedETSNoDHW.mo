@@ -5,6 +5,11 @@ model ConnectedETSNoDHW
   package Medium=Buildings.Media.Water
     "Medium model";
 
+  replaceable parameter ThermalGridJBA.Data.Individual.B1045 datBui(
+    have_hotWat=false)
+    "Building data" annotation (Placement(
+      transformation(extent={{-20,20},{0,40}})), choicesAllMatching=true);
+
   Buildings.Fluid.Sources.Boundary_pT supAmbWat(
     redeclare package Medium = Medium,
     p(displayUnit="bar"),
@@ -29,7 +34,7 @@ model ConnectedETSNoDHW
   ThermalGridJBA.Hubs.ConnectedETS bui(
     redeclare package MediumSer = Medium,
     redeclare package MediumBui = Medium,
-    redeclare ThermalGridJBA.Data.Individual.B1380 datBui(have_hotWat=false),
+    final datBui=datBui,
     allowFlowReversalSer=true)
     annotation (Placement(transformation(extent={{40,-20},{60,0}})));
   Modelica.Blocks.Continuous.Integrator dHHeaWat

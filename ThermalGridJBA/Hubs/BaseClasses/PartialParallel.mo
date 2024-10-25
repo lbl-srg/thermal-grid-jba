@@ -244,10 +244,6 @@ equation
     annotation (Line(points={{-238,23},{-218,23},{-218,-76},{-60,-76},{-60,-108}},color={0,0,127}));
   connect(conSup.yAmb[nSouAmb],hex.u)
     annotation (Line(points={{-238,25},{-200,25},{-200,-256},{-12,-256}},color={0,0,127}));
-  connect(colChiWat.port_bDisRet,tanChiWat.port_aBot)
-    annotation (Line(points={{140,-40},{170,-40},{170,100},{180,100}},color={0,127,255}));
-  connect(colChiWat.port_aDisSup,tanChiWat.port_bTop)
-    annotation (Line(points={{140,-34},{160,-34},{160,112},{180,112}},color={0,127,255}));
   connect(valIsoCon.port_a,colHeaWat.ports_aCon[1])
     annotation (Line(points={{-70,-120},{-90,-120},{-90,-24},{-108,-24}},
                                                                 color={0,127,255}));
