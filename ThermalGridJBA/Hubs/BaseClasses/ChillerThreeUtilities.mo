@@ -4,7 +4,7 @@ model ChillerThreeUtilities
   extends ThermalGridJBA.Hubs.BaseClasses.PartialParallel   (
     final have_eleCoo=true,
     final have_fan=false,
-    redeclare ThermalGridJBA.Hubs.Controls.Supervisory conSup(
+    redeclare Buildings.DHC.ETS.Combined.Controls.Supervisory conSup(
         final controllerType=controllerType,
         final kHot=kHot,
         final kCol=kCol,
