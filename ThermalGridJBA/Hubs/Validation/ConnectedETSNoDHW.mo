@@ -5,7 +5,7 @@ model ConnectedETSNoDHW
   package Medium=Buildings.Media.Water
     "Medium model";
 
-  replaceable parameter ThermalGridJBA.Data.Individual.B1045 datBui(
+  replaceable parameter ThermalGridJBA.Data.Individual.B1500 datBui(
     have_hotWat=false)
     "Building data" annotation (Placement(
       transformation(extent={{-20,20},{0,40}})), choicesAllMatching=true);

@@ -75,12 +75,6 @@ model PartialParallel
   parameter Integer nSegTan=3
     "Number of volume segments for tanks"
     annotation (Dialog(group="Buffer Tank"));
-  parameter Integer nSegTanHea=9
-    "Number of volume segments for heating hot water tank"
-    annotation (Dialog(group="Buffer Tank"));
-  parameter Integer iMidTanHea=3
-    "Idex of the middle volume for heating hot water tank"
-    annotation (Dialog(group="Buffer Tank"));
 
   // IO VARIABLES
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uHea
@@ -146,14 +140,13 @@ model PartialParallel
     final dIns=dInsTanChiWat,
     final nSeg=nSegTan) "Chilled water tank"
     annotation (Placement(transformation(extent={{180,96},{200,116}})));
-  ThermalGridJBA.Hubs.BaseClasses.StratifiedTank tanHeaWat(
+  ThermalGridJBA.Hubs.BaseClasses.StratifiedTankWithCommand tanHeaWat(
     redeclare final package Medium = MediumBui,
     final m_flow_nominal=colHeaWat.mDis_flow_nominal,
     final VTan=VTanHeaWat,
     final hTan=hTanHeaWat,
     final dIns=dInsTanHeaWat,
-    final nSeg=nSegTanHea,
-    final iMid=iMidTanHea) "Heating hot water tank"
+    final nSeg=nSegTan) "Heating hot water tank"
     annotation (Placement(transformation(extent={{-200,94},{-180,114}})));
   Buildings.DHC.ETS.BaseClasses.CollectorDistributor colChiWat(
     redeclare final package Medium = MediumBui,
