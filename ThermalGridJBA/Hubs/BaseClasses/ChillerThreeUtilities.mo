@@ -219,8 +219,6 @@ model ChillerThreeUtilities
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState)
                                        "Diversion valve on evaporator side"
     annotation (Placement(transformation(extent={{150,40},{170,60}})));
-  ThermalGridJBA.Hubs.Controls.Invert invEva "Invert signal: y = 1 - u"
-    annotation (Placement(transformation(extent={{120,40},{140,60}})));
   Buildings.Fluid.HydronicConfigurations.ActiveNetworks.Diversion valDivCon(
     redeclare final package Medium = MediumBui,
     m2_flow_nominal=datChi.mCon_flow_nominal,
@@ -234,6 +232,9 @@ model ChillerThreeUtilities
   Controls.TwoTankCoordination twoTankCoordination(final have_hotWat=
         have_hotWat)
     annotation (Placement(transformation(extent={{-140,170},{-120,190}})));
+protected
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant uni(final k=1) "Unity"
+    annotation (Placement(transformation(extent={{120,40},{140,60}})));
 equation
   connect(port_aSerAmb, hex.port_a1) annotation (Line(points={{-300,-200},{-280,
           -200},{-280,-260},{-10,-260}}, color={0,127,255}));
@@ -316,10 +317,6 @@ equation
           140,-34},{154,-34},{154,40}}, color={0,127,255}));
   connect(valDivEva.port_b1, colChiWat.port_bDisRet) annotation (Line(points={{
           166,40},{166,-40},{140,-40}}, color={0,127,255}));
-  connect(valDivEva.yVal, invEva.y)
-    annotation (Line(points={{148,50},{142,50}}, color={0,0,127}));
-  connect(conSup.yValIsoEva, invEva.u) annotation (Line(points={{-238,21},{-220,
-          21},{-220,-80},{60,-80},{60,50},{118,50}}, color={0,0,127}));
   connect(colHeaWat.port_aDisSup, valDivCon.port_b1) annotation (Line(points={{
           -140,-34},{-164,-34},{-164,-30}}, color={0,127,255}));
   connect(parPip.port_b2, valDivCon.port_a2)
@@ -372,6 +369,8 @@ equation
           110},{-140,110},{-140,98},{-180,98}}, color={0,127,255}));
   connect(valMixHea.port_3, dHFloHotWat.port_a1) annotation (Line(points={{-90,
           120},{-90,130},{-84,130},{-84,204}}, color={0,127,255}));
+  connect(valDivEva.yVal, uni.y)
+    annotation (Line(points={{148,50},{142,50}}, color={0,0,127}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},
