@@ -51,7 +51,7 @@ equation
   if uHot and uHea then
    yMix = 0.5;
    yDiv = 1;
-   TTop = if TSetHot > TSetHea then TSetHot else TSetHea;
+   TTop = if TSetHot > TSetHea then TTopHot else TTopHea;
    TSet = max(TSetHot,TSetHea);
   elseif uHot and not uHea then
    yMix = 0;
