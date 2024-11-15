@@ -226,7 +226,7 @@ model ChillerThreeUtilities
     typCha=Buildings.Fluid.HydronicConfigurations.Types.ValveCharacteristic.Linear,
     dpBal1_nominal=0.05*dpCon_nominal,
     dpBal3_nominal=0.05*dpCon_nominal,
-    energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     val(from_dp=have_hotWat))      "Diversion valve on condenser side"
     annotation (Placement(transformation(extent={{-180,-30},{-160,-10}})));
   Controls.TwoTankCoordination twoTankCoordination(final have_hotWat=
