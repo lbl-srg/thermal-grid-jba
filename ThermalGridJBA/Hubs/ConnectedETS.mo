@@ -20,7 +20,8 @@ model ConnectedETS
       dpEva_nominal=40E3,
       datChi=datChi,
       datDhw=datDhw,
-      kHot=0.02));
+      kHot=0.02),
+    allowFlowReversalBui=true);
   parameter
     Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
     VTan=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
