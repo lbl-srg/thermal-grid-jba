@@ -116,8 +116,8 @@ model ChillerThreeUtilities
   ThermalGridJBA.Hubs.BaseClasses.DHWConsumption dhw(
     redeclare final package Medium = MediumBui,
     final dat = datDhw,
-    final QHotWat_flow_nominal=QHotWat_flow_nominal,
-    dT_nominal=22.22222222222222) if have_hotWat
+    final QHotWat_flow_nominal=datDhw.QHex_flow_nominal,
+    dT_nominal=6)                 if have_hotWat
     annotation (Placement(transformation(extent={{-200,220},{-180,240}})));
   Buildings.Fluid.Actuators.Valves.ThreeWayLinear valMixHea(
     redeclare package Medium = MediumBui,
