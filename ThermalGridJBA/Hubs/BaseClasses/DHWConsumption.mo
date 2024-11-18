@@ -13,11 +13,15 @@ model DHWConsumption
   parameter Modelica.Units.SI.TemperatureDifference dT_nominal(min=Modelica.Constants.eps)
     "Nominal temperature difference from the condenser"
     annotation(Dialog(group="Nominal condition"));
+  parameter Medium.Temperature T_start=Medium.T_default
+    "Temperature start value of the tank"
+    annotation(Dialog(tab = "Initialization"));
 
   Buildings.DHC.Loads.HotWater.StorageTankWithExternalHeatExchanger domHotWatTan(
     redeclare final package MediumDom = Medium,
     redeclare final package MediumHea = Medium,
-    final dat=dat)
+    final dat=dat,
+    final TTan_start=T_start)
     annotation (Placement(transformation(extent={{20,-20},{40,0}})));
   Buildings.DHC.Loads.HotWater.ThermostaticMixingValve theMixVal(
     redeclare final package Medium = Medium, mMix_flow_nominal=1.2*dat.mDom_flow_nominal)

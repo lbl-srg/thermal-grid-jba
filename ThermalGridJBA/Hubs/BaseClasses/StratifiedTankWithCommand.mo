@@ -19,6 +19,10 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
     "Number of volume segments";
   parameter Modelica.Units.SI.MassFlowRate m_flow_nominal
     "Nominal mass flow rate" annotation (Dialog(group="Nominal condition"));
+  parameter Medium.Temperature T_start=Medium.T_default
+    "Temperature start value"
+    annotation(Dialog(tab = "Initialization"));
+
   // IO CONNECTORS
   Modelica.Fluid.Interfaces.FluidPort_a port_aTop(
     redeclare final package Medium=Medium,
@@ -100,7 +104,8 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
     final hTan=hTan,
     final dIns=dIns,
     final kIns=kIns,
-    final nSeg=nSeg) "Stratified tank"
+    final nSeg=nSeg,
+    final T_start=T_start) "Stratified tank"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
   Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor senTBot
     "Tank bottom temperature"

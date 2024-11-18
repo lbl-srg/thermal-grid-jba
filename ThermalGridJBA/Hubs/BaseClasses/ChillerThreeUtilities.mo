@@ -28,7 +28,9 @@ model ChillerThreeUtilities
     nPorts_bHeaWat=1,
     totPHea(nin=1),
     totPCoo(nin=1),
-    totPPum(nin=if have_hotWat then 3 else 2));
+    totPPum(nin=if have_hotWat then 3 else 2),
+    tanHeaWat(final T_start=TCon_start),
+    tanChiWat(tan(final T_start=TEva_start)));
 
   replaceable parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic datChi
     "Chiller performance data" annotation (
@@ -73,6 +75,13 @@ model ChillerThreeUtilities
      = datChi.TEvaLvgMin
     "Minimum value of chilled water supply temperature set point"
     annotation (Dialog(group="Supervisory controller"));
+  parameter MediumBui.Temperature TCon_start = MediumBui.T_default
+    "Temperature start value on the condenser side"
+    annotation(Dialog(tab = "Initialization"));
+  parameter MediumBui.Temperature TEva_start = MediumBui.T_default
+    "Temperature start value on the evaporator side"
+    annotation(Dialog(tab = "Initialization"));
+
 
   replaceable
     Buildings.DHC.ETS.Combined.Subsystems.Chiller
@@ -117,7 +126,8 @@ model ChillerThreeUtilities
     redeclare final package Medium = MediumBui,
     final dat = datDhw,
     final QHotWat_flow_nominal=datDhw.QHex_flow_nominal,
-    dT_nominal=6)                 if have_hotWat
+    dT_nominal=6,
+    final T_start=TCon_start)     if have_hotWat
     annotation (Placement(transformation(extent={{-200,220},{-180,240}})));
   Buildings.Fluid.Actuators.Valves.ThreeWayLinear valMixHea(
     redeclare package Medium = MediumBui,
