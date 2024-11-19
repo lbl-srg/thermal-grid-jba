@@ -23,8 +23,7 @@ model ConnectedETS
       final TCon_start=if have_hotWat
                        then min(datBui.THeaWatSup_nominal,datBui.THotWatSup_nominal)
                        else datBui.THeaWatSup_nominal,
-      final TEva_start=datBui.TChiWatSup_nominal),
-    allowFlowReversalBui=true);
+      final TEva_start=datBui.TChiWatSup_nominal));
   parameter
     Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
     VTan=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
