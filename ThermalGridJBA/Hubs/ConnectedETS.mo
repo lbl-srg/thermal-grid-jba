@@ -30,7 +30,7 @@ model ConnectedETS
     VTan=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
     mDom_flow_nominal=datDhw.QHex_flow_nominal/4200/(datDhw.TDom_nominal -
         datDhw.TCol_nominal),
-    QHex_flow_nominal=max(QHotWat_flow_nominal, QHeaWat_flow_nominal),
+    QHex_flow_nominal=QHotWat_flow_nominal,
     TDom_nominal=datBui.THotWatSup_nominal)
     "Performance data of the domestic hot water component"
     annotation (Placement(transformation(extent={{20,222},{40,242}})));
