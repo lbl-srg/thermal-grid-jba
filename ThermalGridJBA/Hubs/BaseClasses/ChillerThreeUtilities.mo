@@ -144,9 +144,6 @@ model ChillerThreeUtilities
         origin={-90,110})));
   Buildings.Fluid.FixedResistances.Junction jun(
     redeclare final package Medium = MediumBui,
-    final portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    final portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    final portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     final dp_nominal={0,0,0},
     final energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
     final tau=1,
