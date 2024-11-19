@@ -20,7 +20,6 @@ model ConnectedETS
       dpEva_nominal=40E3,
       datChi=datChi,
       datDhw=datDhw,
-      kHot=0.02,
       final TCon_start=if have_hotWat
                        then min(datBui.THeaWatSup_nominal,datBui.THotWatSup_nominal)
                        else datBui.THeaWatSup_nominal,
