@@ -4,5 +4,6 @@ ChillerThreeUtilities
 DHWConsumption
 PartialConnectedETS
 PartialParallel
+StorageTankWithExternalHeatExchanger
 StratifiedTank
 StratifiedTankWithCommand

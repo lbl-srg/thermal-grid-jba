@@ -17,7 +17,7 @@ model DHWConsumption
     "Temperature start value of the tank"
     annotation(Dialog(tab = "Initialization"));
 
-  Buildings.DHC.Loads.HotWater.StorageTankWithExternalHeatExchanger domHotWatTan(
+  ThermalGridJBA.Hubs.BaseClasses.StorageTankWithExternalHeatExchanger domHotWatTan(
     redeclare final package MediumDom = Medium,
     redeclare final package MediumHea = Medium,
     final dat=dat,
