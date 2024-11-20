@@ -136,6 +136,10 @@ def check_tests():
     import os
     
     directory = os.path.join(CWD, "simulations")
+    if not os.pathisdir(directory):
+        print("The output directory does not exist, possibly because all simulations failed.")
+        return
+    
     nfolders = [entry for entry in os.listdir(directory) if os.path.isdir(os.path.join(directory, entry))]
         # names of folders
     numcases = len(list_of_cases) # number of cases
