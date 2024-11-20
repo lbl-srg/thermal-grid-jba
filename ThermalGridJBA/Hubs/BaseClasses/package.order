@@ -1,9 +1,7 @@
 BTS
-ChillerBorefield
 ChillerThreeUtilities
 DHWConsumption
 PartialConnectedETS
 PartialParallel
 StorageTankWithExternalHeatExchanger
-StratifiedTank
 StratifiedTankWithCommand
