@@ -12,6 +12,7 @@ CASE_LIST = 'construct'
         handwrite: explicitly listed cases
         construct: rule-constructed list of cases
 """
+KEEP_MAT_FILES = False # Set false to delete result mat files to save space
 
 CWD = os.getcwd()
 
@@ -69,6 +70,7 @@ def checkout_repository(working_directory):
 
 def _simulate(spec):
     import os
+    import glob
 
     from buildingspy.simulate.Dymola import Simulator
     if not spec["simulate"]:
@@ -116,9 +118,18 @@ def _simulate(spec):
     s.exitSimulator(True)
     print("Starting simulation in {}".format(out_dir))
     
+    flag = False 
+    """
+    This flag checks if the try-except block ran without raising an exception.
+    This avoids wrapping additional code inside the try block and potentially
+        raises exceptions which would get mixed up with the code to be tested.
+    """
     try:
         s.simulate()
-    
+        flag = True
+    except:
+        print(f"Simulation failed: {spec['name']}")
+    if flag:
         # Copy results back
         res_des = os.path.join(CWD, "simulations", spec["name"])
         if os.path.isdir(res_des):
@@ -128,18 +139,18 @@ def _simulate(spec):
     
         # Delete the working directory
         shutil.rmtree(wor_dir)
-    except:
-        print(f"Simulation failed: {spec['name']}")
+        
+        # Delete mat files if asked to
+        if not KEEP_MAT_FILES:
+            pattern = os.path.join(res_des,"*.mat")
+            for f in glob.glob(pattern):
+                os.remove(f)
 
 def check_tests():
     
     import os
     
     directory = os.path.join(CWD, "simulations")
-    if not os.pathisdir(directory):
-        print("The output directory does not exist, possibly because all simulations failed.")
-        return
-    
     nfolders = [entry for entry in os.listdir(directory) if os.path.isdir(os.path.join(directory, entry))]
         # names of folders
     numcases = len(list_of_cases) # number of cases
@@ -152,6 +163,14 @@ def check_tests():
         if not casename in nfolders:
             numfail += 1
             listfail.append([casename])
+        else:
+            with open(os.path.join(directory,casename,"dslog.txt"),'r') as f:
+                for line in f:
+                    if "Warning" in line:
+                        warning_line = line.strip()
+                        print(" "*4+f"There are warnings from {casename}. First occurance:")
+                        print(" "*8+warning_line)
+                        break
     if numfail == 0:
         print(f"All {numcases} cases simulated successfully.")
     else:
@@ -197,3 +216,5 @@ if __name__=='__main__':
     shutil.rmtree(lib_dir)
 
     check_tests()
+    if not KEEP_MAT_FILES:
+        print("All mat files deleted because KEEP_MAT_FILES=False")

@@ -1,5 +1,5 @@
 within ThermalGridJBA.Hubs.BaseClasses;
-model StratifiedTank "Stratified buffer tank model"
+model StratifiedTankWithCommand "Stratified buffer tank model"
   replaceable package Medium=Modelica.Media.Interfaces.PartialMedium
     "Medium model"
     annotation (choices(
@@ -15,13 +15,14 @@ model StratifiedTank "Stratified buffer tank model"
   parameter Modelica.Units.SI.ThermalConductivity kIns=0.04
     "Specific heat conductivity of insulation";
   parameter Integer nSeg(
-    min=3)=3
+    min=2)=3
     "Number of volume segments";
-  parameter Integer iMid(
-    min=2)=2
-    "Index of the middle volume";
   parameter Modelica.Units.SI.MassFlowRate m_flow_nominal
     "Nominal mass flow rate" annotation (Dialog(group="Nominal condition"));
+  parameter Medium.Temperature T_start=Medium.T_default
+    "Temperature start value"
+    annotation(Dialog(tab = "Initialization"));
+
   // IO CONNECTORS
   Modelica.Fluid.Interfaces.FluidPort_a port_aTop(
     redeclare final package Medium=Medium,
@@ -78,18 +79,20 @@ model StratifiedTank "Stratified buffer tank model"
   Modelica.Blocks.Interfaces.RealOutput Ql_flow(
     final unit="W")
     "Heat loss of tank (positive if heat flows from tank to ambient)"
-    annotation (Placement(transformation(extent={{-20,-20},{20,20}},
-        rotation=0,
-        origin={120,20}),                                             iconTransformation(extent={{-10,-10},
-            {10,10}},
-        rotation=0,
-        origin={110,20})));
-  Modelica.Blocks.Interfaces.RealOutput T[3](
-    each final unit="K",
-    each displayUnit="degC")
-    "Fluid temperature: 1 = top; 2 = middle; 3 = bottom" annotation (Placement(
-        transformation(extent={{100,-40},{140,0}}), iconTransformation(extent={{
-            100,-30},{120,-10}})));
+    annotation (Placement(transformation(extent={{100,10},{140,50}}), iconTransformation(extent={{100,20},
+            {120,40}})));
+  Modelica.Blocks.Interfaces.RealOutput TTop(
+    final unit="K",
+    displayUnit="degC")
+    "Fluid temperature at tank top"
+    annotation (Placement(transformation(extent={{100,70},{140,110}}),
+                                                                     iconTransformation(extent={{100,80},{120,100}})));
+  Modelica.Blocks.Interfaces.RealOutput TBot(
+    final unit="K",
+    displayUnit="degC")
+    "Fluid temperature at tank bottom"
+    annotation (Placement(transformation(extent={{100,-110},{140,-70}}),
+                                                                       iconTransformation(extent={{100,-100},{120,-80}})));
   Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heaPorAmb
     "Heat port at interface with ambient (outside insulation)"
     annotation (Placement(transformation(extent={{-106,-6},{-94,6}})));
@@ -101,11 +104,31 @@ model StratifiedTank "Stratified buffer tank model"
     final hTan=hTan,
     final dIns=dIns,
     final kIns=kIns,
-    final nSeg=nSeg) "Stratified tank"
+    final nSeg=nSeg,
+    final T_start=T_start) "Stratified tank"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
-  Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor senT[3]
-    "Tank fluid temperature sensors: 1 = top; 2 = middle; 3 = bottom"
-    annotation (Placement(transformation(extent={{60,-30},{80,-10}})));
+  Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor senTBot
+    "Tank bottom temperature"
+    annotation (Placement(transformation(extent={{30,-50},{50,-30}})));
+  Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor senTTop
+    "Tank top temperature"
+    annotation (Placement(transformation(extent={{30,30},{50,50}})));
+  ThermalGridJBA.Hubs.Controls.TankChargingController tanCha(
+    hysTop=-1,
+    hysBot=-1)
+    "Tank charging command"
+    annotation (Placement(transformation(extent={{70,-40},{90,-20}})));
+  Modelica.Blocks.Interfaces.RealInput TTanTopSet(final unit="K", displayUnit=
+        "degC")
+    "Temperature setpoint for top section of hot water tank" annotation (
+      Placement(transformation(extent={{-140,70},{-100,110}}),
+        iconTransformation(extent={{-120,80},{-100,100}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput charge
+    "Outputs true if tank should be charged" annotation (Placement(
+        transformation(extent={{100,-50},{140,-10}}),iconTransformation(extent={{100,-50},
+            {140,-10}})));
+  Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(p=-2) "Offset"
+    annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
 protected
   Modelica.Thermal.HeatTransfer.Components.ThermalCollector theCol(
     m=3)
@@ -123,9 +146,15 @@ equation
   connect(port_aBot,tan.fluPorVol[nSeg])
     annotation (Line(points={{-100,-60},{0,-60},{0,0},{-5,0}},  color={0,127,255}));
   connect(tan.Ql_flow,Ql_flow)
-    annotation (Line(points={{11,7.2},{40,7.2},{40,20},{120,20}},  color={0,0,127}));
-  connect(senT.T, T)
-    annotation (Line(points={{81,-20},{120,-20}}, color={0,0,127}));
+    annotation (Line(points={{11,7.2},{80,7.2},{80,30},{120,30}},  color={0,0,127}));
+  connect(tan.heaPorVol[nSeg],senTBot.port)
+    annotation (Line(points={{0,0},{16,0},{16,-40},{30,-40}},color={191,0,0}));
+  connect(tan.heaPorVol[1],senTTop.port)
+    annotation (Line(points={{0,-0.2},{16,-0.2},{16,40},{30,40}},color={191,0,0}));
+  connect(senTTop.T,TTop)
+    annotation (Line(points={{51,40},{60,40},{60,90},{120,90}},color={0,0,127}));
+  connect(senTBot.T,TBot)
+    annotation (Line(points={{51,-40},{60,-40},{60,-90},{120,-90}},color={0,0,127}));
   connect(heaPorAmb,theCol.port_b)
     annotation (Line(points={{-100,0},{-66,0}},color={191,0,0}));
   connect(theCol.port_a[1],tan.heaPorTop)
@@ -134,12 +163,16 @@ equation
     annotation (Line(points={{-54,0},{5.6,0}},color={191,0,0}));
   connect(theCol.port_a[3],tan.heaPorBot)
     annotation (Line(points={{-53.8,0},{-26,0},{-26,-7.4},{2,-7.4}},color={191,0,0}));
-  connect(tan.heaPorVol[1], senT[1].port) annotation (Line(points={{0,-0.2},{0,0},
-          {40,0},{40,-20},{60,-20}}, color={191,0,0}));
-  connect(tan.heaPorVol[iMid], senT[2].port) annotation (Line(points={{0,0},{40,
-          0},{40,-20},{60,-20}}, color={191,0,0}));
-  connect(tan.heaPorVol[nSeg], senT[3].port) annotation (Line(points={{0,0},{40,
-          0},{40,-20},{60,-20}}, color={191,0,0}));
+  connect(senTTop.T, tanCha.TTanTop) annotation (Line(points={{51,40},{60,40},{
+          60,-30},{68,-30}}, color={0,0,127}));
+  connect(senTBot.T, tanCha.TTanBot) annotation (Line(points={{51,-40},{60,-40},
+          {60,-38},{68,-38}}, color={0,0,127}));
+  connect(tanCha.charge, charge)
+    annotation (Line(points={{92,-30},{120,-30}}, color={255,0,255}));
+  connect(tanCha.TTanTopSet, dTOff.y) annotation (Line(points={{69,-22},{24,-22},
+          {24,90},{-58,90}}, color={0,0,127}));
+  connect(dTOff.u, TTanTopSet)
+    annotation (Line(points={{-82,90},{-120,90}}, color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(
@@ -234,11 +267,33 @@ First implementation.
 </html>",
       info="<html>
 <p>
-Modified from
-<a href=\"modelica://Buildings.DHC.ETS.BaseClasses.StratifiedTank\">
-Buildings.DHC.ETS.BaseClasses.StratifiedTank</a>
-to have a third temperature output to the \"middle\" of the tank.
-The \"middle\" volume has the index <code>iMid</code>.
+This is a four-port tank model based on
+<a href=\"modelica://Buildings.Fluid.Storage.Stratified\">
+Buildings.Fluid.Storage.Stratified</a>
+which includes the following features.
+</p>
+<ul>
+<li>
+The two fluid ports suffixed with <code>Top</code> are connected
+to the fluid volume at the top of the tank.
+</li>
+<li>
+The two fluid ports suffixed with <code>Bot</code> are connected
+to the fluid volume at the bottom of the tank.
+</li>
+<li>
+A unique heat port is exposed as an external connector. It is
+meant to provide a uniform temperature boundary condition at
+the external surface of the tank (outside insulation).
+</li>
+<li>
+The model outputs the temperature of the fluid volumes at the top
+and at the bottom of the tank.
+</li>
+</ul>
+<h4>ESTCP modification</h4>
+<p>
+A block is added to also report whether the tank requests charging.
 </p>
 </html>"));
-end StratifiedTank;
+end StratifiedTankWithCommand;

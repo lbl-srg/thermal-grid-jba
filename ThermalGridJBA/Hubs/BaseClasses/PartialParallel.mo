@@ -75,12 +75,6 @@ model PartialParallel
   parameter Integer nSegTan=3
     "Number of volume segments for tanks"
     annotation (Dialog(group="Buffer Tank"));
-  parameter Integer nSegTanHea=9
-    "Number of volume segments for heating hot water tank"
-    annotation (Dialog(group="Buffer Tank"));
-  parameter Integer iMidTanHea=3
-    "Idex of the middle volume for heating hot water tank"
-    annotation (Dialog(group="Buffer Tank"));
 
   // IO VARIABLES
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uHea
@@ -146,14 +140,13 @@ model PartialParallel
     final dIns=dInsTanChiWat,
     final nSeg=nSegTan) "Chilled water tank"
     annotation (Placement(transformation(extent={{180,96},{200,116}})));
-  ThermalGridJBA.Hubs.BaseClasses.StratifiedTank tanHeaWat(
+  ThermalGridJBA.Hubs.BaseClasses.StratifiedTankWithCommand tanHeaWat(
     redeclare final package Medium = MediumBui,
     final m_flow_nominal=colHeaWat.mDis_flow_nominal,
     final VTan=VTanHeaWat,
     final hTan=hTanHeaWat,
     final dIns=dInsTanHeaWat,
-    final nSeg=nSegTanHea,
-    final iMid=iMidTanHea) "Heating hot water tank"
+    final nSeg=nSegTan) "Heating hot water tank"
     annotation (Placement(transformation(extent={{-200,94},{-180,114}})));
   Buildings.DHC.ETS.BaseClasses.CollectorDistributor colChiWat(
     redeclare final package Medium = MediumBui,
@@ -244,10 +237,6 @@ equation
     annotation (Line(points={{-238,23},{-218,23},{-218,-76},{-60,-76},{-60,-108}},color={0,0,127}));
   connect(conSup.yAmb[nSouAmb],hex.u)
     annotation (Line(points={{-238,25},{-200,25},{-200,-256},{-12,-256}},color={0,0,127}));
-  connect(colChiWat.port_bDisRet,tanChiWat.port_aBot)
-    annotation (Line(points={{140,-40},{170,-40},{170,100},{180,100}},color={0,127,255}));
-  connect(colChiWat.port_aDisSup,tanChiWat.port_bTop)
-    annotation (Line(points={{140,-34},{160,-34},{160,112},{180,112}},color={0,127,255}));
   connect(valIsoCon.port_a,colHeaWat.ports_aCon[1])
     annotation (Line(points={{-70,-120},{-90,-120},{-90,-24},{-108,-24}},
                                                                 color={0,127,255}));

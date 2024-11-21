@@ -1,7 +1,4 @@
-RealListParameters
-SelectTank
 TankChargingController
-TankChargingTwoSpeed
-TwoTankCommand
-TwoTankControl
-Validation
+TwoTankCoordination
+DiversionLock
+BaseClasses

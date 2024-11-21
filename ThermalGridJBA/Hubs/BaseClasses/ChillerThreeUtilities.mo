@@ -28,7 +28,9 @@ model ChillerThreeUtilities
     nPorts_bHeaWat=1,
     totPHea(nin=1),
     totPCoo(nin=1),
-    totPPum(nin=if have_hotWat then 3 else 2));
+    totPPum(nin=if have_hotWat then 3 else 2),
+    tanHeaWat(final T_start=TCon_start),
+    tanChiWat(tan(final T_start=TEva_start)));
 
   replaceable parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic datChi
     "Chiller performance data" annotation (
@@ -73,6 +75,13 @@ model ChillerThreeUtilities
      = datChi.TEvaLvgMin
     "Minimum value of chilled water supply temperature set point"
     annotation (Dialog(group="Supervisory controller"));
+  parameter MediumBui.Temperature TCon_start = MediumBui.T_default
+    "Temperature start value on the condenser side"
+    annotation(Dialog(tab = "Initialization"));
+  parameter MediumBui.Temperature TEva_start = MediumBui.T_default
+    "Temperature start value on the evaporator side"
+    annotation(Dialog(tab = "Initialization"));
+
 
   replaceable
     Buildings.DHC.ETS.Combined.Subsystems.Chiller
@@ -116,15 +125,13 @@ model ChillerThreeUtilities
   ThermalGridJBA.Hubs.BaseClasses.DHWConsumption dhw(
     redeclare final package Medium = MediumBui,
     final dat = datDhw,
-    final QHotWat_flow_nominal=QHotWat_flow_nominal,
-    dT_nominal=22.22222222222222) if have_hotWat
-    annotation (Placement(transformation(extent={{-220,220},{-200,240}})));
+    final QHotWat_flow_nominal=datDhw.QHex_flow_nominal,
+    dT_nominal=6,
+    final T_start=TCon_start)     if have_hotWat
+    annotation (Placement(transformation(extent={{-200,220},{-180,240}})));
   Buildings.Fluid.Actuators.Valves.ThreeWayLinear valMixHea(
     redeclare package Medium = MediumBui,
-    energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     use_strokeTime=false,
     m_flow_nominal=datChi.mCon_flow_nominal,
     dpValve_nominal=dpCon_nominal*0.05,
@@ -132,22 +139,19 @@ model ChillerThreeUtilities
     linearized={true,true}) if have_hotWat
     "Three way valve selecting condenser flow from HHW or DHW return"
     annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=270,
-        origin={-80,100})));
+        extent={{-10,10},{10,-10}},
+        rotation=0,
+        origin={-90,110})));
   Buildings.Fluid.FixedResistances.Junction jun(
     redeclare final package Medium = MediumBui,
-    final portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    final portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    final portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     final dp_nominal={0,0,0},
     final energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
     final tau=1,
-    final m_flow_nominal=datChi.mCon_flow_nominal*{-1,1,1}) if have_hotWat
-                               "Junction" annotation (Placement(transformation(
-        extent={{-10,10},{10,-10}},
-        rotation=90,
-        origin={-110,100})));
+    final m_flow_nominal=datChi.mCon_flow_nominal*{1,-1,-1}) if have_hotWat
+    "Junction"                            annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=180,
+        origin={-130,130})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uDHW if have_hotWat
     "DHW production enable signal"
     annotation (Placement(transformation(extent={{-340,0},{-300,40}}),
@@ -184,25 +188,10 @@ model ChillerThreeUtilities
         rotation=0,
         origin={-340,-180})));
 
-  ThermalGridJBA.Hubs.Controls.TankChargingTwoSpeed tanChaTwoSpe if have_hotWat
-    annotation (Placement(transformation(extent={{-160,170},{-140,190}})));
-  ThermalGridJBA.Hubs.Controls.SelectTank selTan if have_hotWat
-    "Select the set point and top temperature signal from HHW or DHW"
-    annotation (Placement(transformation(extent={{-80,170},{-60,190}})));
-  Buildings.Controls.OBC.CDL.Logical.Or or2 if have_hotWat
-    annotation (Placement(transformation(extent={{-280,70},{-260,90}})));
-  Buildings.DHC.Networks.BaseClasses.DifferenceEnthalpyFlowRate dHFloHotWat(
-      redeclare final package Medium1 = MediumBui, final m_flow_nominal=
-        colHeaWat.mDis_flow_nominal) if have_hotWat
-                                     "Variation of enthalpy flow rate"
-    annotation (Placement(transformation(
-        extent={{10,-10},{-10,10}},
-        rotation=-90,
-        origin={-90,130})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TConLvgHotSet(final k=55 +
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TConLvgHotSet(final k=50 +
         273.15) if have_hotWat
-                "Condenser leaving temperature set point for DHW"
-    annotation (Placement(transformation(extent={{-160,270},{-140,290}})));
+    "Condenser leaving temperature set point for DHW"
+    annotation (Placement(transformation(extent={{-220,270},{-200,290}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput dHHotWat_flow(final unit="W")
     if have_hotWat
     "Domestic hot water distributed energy flow rate" annotation (Placement(
@@ -210,24 +199,39 @@ model ChillerThreeUtilities
         extent={{-40,-40},{40,40}},
         rotation=-90,
         origin={200,-340})));
-  Modelica.Blocks.Routing.BooleanPassThrough booPas if not have_hotWat
-    "Routing block" annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=-90,
-        origin={-210,70})));
   Buildings.DHC.Plants.Cooling.BaseClasses.ParallelPipes parPip(
     redeclare final package Medium = MediumBui,
-    m_flow_nominal=6000,
-    dp_nominal=0) if not have_hotWat annotation (Placement(transformation(
+    m_flow_nominal=datChi.mCon_flow_nominal,
+    dp_nominal=0) if not have_hotWat "Parallel pipes for routing purposes"
+                                     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
-        origin={-170,60})));
-  Modelica.Blocks.Routing.RealPassThrough reaPasTan if not have_hotWat
-    annotation (Placement(transformation(extent={{-160,110},{-140,130}})));
-  Modelica.Blocks.Routing.RealPassThrough reaPasSet if not have_hotWat
-    annotation (Placement(transformation(extent={{-252,-50},{-232,-30}})));
+        origin={-150,84})));
   Modelica.Blocks.Routing.RealPassThrough reaPasDhwPum if have_hotWat
+    "Routing block"
     annotation (Placement(transformation(extent={{-80,230},{-60,250}})));
+  Buildings.Fluid.HydronicConfigurations.ActiveNetworks.Diversion valDivCon(
+    redeclare final package Medium = MediumBui,
+    m2_flow_nominal=datChi.mCon_flow_nominal,
+    dp2_nominal=0.05*dpCon_nominal,
+    typCha=Buildings.Fluid.HydronicConfigurations.Types.ValveCharacteristic.Linear,
+    dpBal1_nominal=0.05*dpCon_nominal,
+    dpBal3_nominal=0.05*dpCon_nominal,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    val(from_dp=false))  "Diversion valve on condenser side"
+    annotation (Placement(transformation(extent={{-160,48},{-140,68}})));
+  ThermalGridJBA.Hubs.Controls.TwoTankCoordination twoTankCoordination(
+    final have_hotWat=have_hotWat)
+    annotation (Placement(transformation(extent={{-140,170},{-120,190}})));
+  ThermalGridJBA.Hubs.Controls.DiversionLock locDivCon
+    "Condenser-side diversion valve lock off"
+    annotation (Placement(transformation(extent={{-190,48},{-170,68}})));
+  Buildings.Fluid.Sensors.TemperatureTwoPort TConOut(
+    redeclare final package Medium = MediumBui,
+    m_flow_nominal=datChi.mCon_flow_nominal,
+    tau=0,
+    T_start=TCon_start) "Fluid temperature out of the condenser"
+    annotation (Placement(transformation(extent={{-160,-50},{-180,-30}})));
 equation
   connect(port_aSerAmb, hex.port_a1) annotation (Line(points={{-300,-200},{-280,
           -200},{-280,-260},{-10,-260}}, color={0,127,255}));
@@ -275,90 +279,90 @@ equation
   connect(valIsoEva.y_actual,conSup.yValIsoEva_actual)
     annotation (Line(points={{55,-113},{40,-113},{40,-64},{-270,-64},{-270,13},{
           -262,13}},                                                                      color={0,0,127}));
-  connect(dhw.THotWatSupSet, THotWatSupSet) annotation (Line(points={{-222,238},
-          {-246,238},{-246,60},{-286,60},{-286,-100},{-320,-100}}, color={0,0,127}));
+  connect(dhw.THotWatSupSet, THotWatSupSet) annotation (Line(points={{-202,238},
+          {-228,238},{-228,68},{-286,68},{-286,-100},{-320,-100}}, color={0,0,127}));
   connect(TColWat, dhw.TColWat) annotation (Line(points={{-320,-140},{-282,-140},
-          {-282,56},{-242,56},{-242,234},{-222,234}}, color={0,0,127}));
-  connect(QReqHotWat_flow, dhw.QReqHotWat_flow) annotation (Line(points={{-320,-180},
-          {-278,-180},{-278,54},{-238,54},{-238,226},{-222,226}}, color={0,0,127}));
+          {-282,64},{-224,64},{-224,234},{-202,234}}, color={0,0,127}));
+  connect(QReqHotWat_flow, dhw.QReqHotWat_flow) annotation (Line(points={{-320,
+          -180},{-278,-180},{-278,60},{-220,60},{-220,226},{-202,226}},
+                                                                  color={0,0,127}));
   connect(dHFloHeaWat.port_a1, tanHeaWat.port_bTop) annotation (Line(points={{-268,
           120},{-268,110},{-200,110}}, color={0,127,255}));
   connect(tanHeaWat.port_aBot, dHFloHeaWat.port_b2) annotation (Line(points={{-200,
           98},{-280,98},{-280,120}}, color={0,127,255}));
-  connect(tanHeaWat.T, tanChaTwoSpe.TTan) annotation (Line(points={{-179,102},{-170,
-          102},{-170,174},{-162,174}}, color={0,0,127}));
-  connect(tanChaTwoSpe.y, selTan.u3) annotation (Line(points={{-138,180},{-104,180},
-          {-104,186},{-82,186}}, color={255,127,0}));
-  connect(dhw.charge, selTan.u2) annotation (Line(points={{-198,224},{-84,224},{
-          -84,190},{-82,190}}, color={255,0,255}));
-  connect(THeaWatSupSet, selTan.THeaWatSupPreSet) annotation (Line(points={{-320,
-          -20},{-228,-20},{-228,168},{-100,168},{-100,182},{-82,182}}, color={0,
-          0,127}));
-  connect(tanHeaWat.T[1], selTan.THeaWatTop) annotation (Line(points={{-179,
-          101.667},{-170,101.667},{-170,164},{-96,164},{-96,178},{-82,178}},
-                                                                    color={0,0,127}));
-  connect(dhw.TTanTop, selTan.THotWatTop) annotation (Line(points={{-198,240},{-92,
-          240},{-92,170},{-82,170}}, color={0,0,127}));
-  connect(selTan.TWatSupSet, conSup.THeaWatSupPreSet) annotation (Line(points={{-58,186},
-          {-48,186},{-48,40},{-272,40},{-272,28},{-262,28},{-262,27}},
-        color={0,0,127}));
-  connect(selTan.TTanTop, conSup.THeaWatTop) annotation (Line(points={{-58,180},
-          {-52,180},{-52,44},{-274,44},{-274,25},{-262,25}}, color={0,0,127}));
-  connect(valMixHea.y, selTan.yVal) annotation (Line(points={{-68,100},{-56,100},
-          {-56,174},{-58,174}},           color={0,0,127}));
-  connect(or2.u1, uHea) annotation (Line(points={{-282,80},{-296,80},{-296,100},
-          {-320,100}}, color={255,0,255}));
-  connect(or2.u2,uDHW)  annotation (Line(points={{-282,72},{-296,72},{-296,20},
-          {-320,20}}, color={255,0,255}));
-  connect(conSup.uHea, or2.y) annotation (Line(points={{-262,31},{-290,31},{
-          -290,64},{-250,64},{-250,80},{-258,80}}, color={255,0,255}));
-  connect(tanHeaWat.port_bBot,valMixHea. port_3) annotation (Line(points={{-180,98},
-          {-164,98},{-164,80},{-100,80},{-100,100},{-90,100}},
-                                              color={0,127,255}));
-  connect(tanHeaWat.port_aTop, jun.port_3) annotation (Line(points={{-180,110},{
-          -164,110},{-164,100},{-120,100}},  color={0,127,255}));
-  connect(dHFloHotWat.port_b2, jun.port_2) annotation (Line(points={{-96,120},{-110,
-          120},{-110,110}},       color={0,127,255}));
-  connect(valMixHea.port_1, dHFloHotWat.port_a1) annotation (Line(points={{-80,110},
-          {-80,120},{-84,120}},                            color={0,127,255}));
-  connect(dHFloHotWat.port_b1, dhw.port_b) annotation (Line(points={{-84,140},{-84,
-          150},{-192,150},{-192,230},{-200,230}},       color={0,127,255}));
-  connect(tanChaTwoSpe.TSet, THeaWatSupSet) annotation (Line(points={{-162,186},
-          {-228,186},{-228,-20},{-320,-20}}, color={0,0,127}));
-  connect(selTan.THotWatSupPreSet, TConLvgHotSet.y) annotation (Line(points={{
-          -82,174},{-120,174},{-120,280},{-138,280}}, color={0,0,127}));
-  connect(dhw.port_a, dHFloHotWat.port_a2) annotation (Line(points={{-220,230},{
-          -234,230},{-234,140},{-96,140}},   color={0,127,255}));
-  connect(dHFloHotWat.dH_flow, dHHotWat_flow) annotation (Line(points={{-87,142},
-          {-87,156},{200,156},{200,300},{318,300}},       color={0,0,127}));
-  connect(booPas.u, uHea) annotation (Line(points={{-210,82},{-210,96},{-296,96},
-          {-296,100},{-320,100}}, color={255,0,255}));
-  connect(conSup.uHea, booPas.y) annotation (Line(points={{-262,31},{-276,31},{-276,
-          52},{-210,52},{-210,59}}, color={255,0,255}));
   connect(tanHeaWat.port_bBot, parPip.port_a2) annotation (Line(points={{-180,98},
-          {-164,98},{-164,70}}, color={0,127,255}));
-  connect(parPip.port_b1, tanHeaWat.port_aTop) annotation (Line(points={{-176,70},
-          {-176,110},{-180,110}},                     color={0,127,255}));
-  connect(tanHeaWat.T[1], reaPasTan.u) annotation (Line(points={{-179,101.667},
-          {-170,101.667},{-170,120},{-162,120}},color={0,0,127}));
-  connect(reaPasTan.y, conSup.THeaWatTop) annotation (Line(points={{-139,120},{-132,
-          120},{-132,44},{-274,44},{-274,25},{-262,25}}, color={0,0,127}));
-  connect(THeaWatSupSet, reaPasSet.u) annotation (Line(points={{-320,-20},{-264,
-          -20},{-264,-40},{-254,-40}}, color={0,0,127}));
-  connect(reaPasSet.y, conSup.THeaWatSupPreSet) annotation (Line(points={{-231,-40},
-          {-196,-40},{-196,40},{-272,40},{-272,27},{-262,27}}, color={0,0,127}));
-  connect(dhw.PEle, reaPasDhwPum.u) annotation (Line(points={{-199,236},{-88,236},
-          {-88,240},{-82,240}}, color={0,0,127}));
+          {-144,98},{-144,94}}, color={0,127,255}));
+  connect(parPip.port_b1, tanHeaWat.port_aTop) annotation (Line(points={{-156,94},
+          {-156,110},{-180,110}},                     color={0,127,255}));
   connect(reaPasDhwPum.y, totPPum.u[3]) annotation (Line(points={{-59,240},{-48,
           240},{-48,252},{210,252},{210,-60},{258,-60}}, color={0,0,127}));
-  connect(parPip.port_b2, colHeaWat.port_aDisSup) annotation (Line(points={{
-          -164,50},{-164,-34},{-140,-34}}, color={0,127,255}));
-  connect(parPip.port_a1, colHeaWat.port_bDisRet) annotation (Line(points={{
-          -176,50},{-176,-40},{-140,-40}}, color={0,127,255}));
-  connect(jun.port_1, colHeaWat.port_bDisRet) annotation (Line(points={{-110,90},
-          {-110,26},{-176,26},{-176,-40},{-140,-40}}, color={0,127,255}));
-  connect(valMixHea.port_2, colHeaWat.port_aDisSup) annotation (Line(points={{
-          -80,90},{-80,24},{-164,24},{-164,-34},{-140,-34}}, color={0,127,255}));
+  connect(colHeaWat.port_aDisSup, valDivCon.port_b1) annotation (Line(points={{-140,
+          -34},{-144,-34},{-144,48}},       color={0,127,255}));
+  connect(parPip.port_b2, valDivCon.port_a2)
+    annotation (Line(points={{-144,74},{-144,68}},  color={0,127,255}));
+  connect(valMixHea.port_2, valDivCon.port_a2) annotation (Line(points={{-80,110},
+          {-72,110},{-72,70},{-144,70},{-144,68}},
+                                          color={0,127,255}));
+  connect(valDivCon.port_b2, parPip.port_a1)
+    annotation (Line(points={{-156,68},{-156,74}},  color={0,127,255}));
+  connect(jun.port_1, valDivCon.port_b2) annotation (Line(points={{-120,130},{
+          -112,130},{-112,72},{-156,72},{-156,68}},
+                                          color={0,127,255}));
+  connect(THeaWatSupSet, tanHeaWat.TTanTopSet) annotation (Line(points={{-320,
+          -20},{-208,-20},{-208,114},{-201,114},{-201,113}}, color={0,0,127}));
+  connect(dhw.charge, twoTankCoordination.uHot) annotation (Line(points={{-178,
+          222},{-152,222},{-152,190},{-142,190}}, color={255,0,255}));
+  connect(TConLvgHotSet.y, twoTankCoordination.TSetHot) annotation (Line(points
+        ={{-198,280},{-160,280},{-160,182},{-142,182}}, color={0,0,127}));
+  connect(dhw.TTanTop, twoTankCoordination.TTopHot) annotation (Line(points={{-178,
+          238},{-156,238},{-156,186},{-142,186}},      color={0,0,127}));
+  connect(dhw.PEle, reaPasDhwPum.u) annotation (Line(points={{-179,226},{-152,
+          226},{-152,240},{-82,240}}, color={0,0,127}));
+  connect(tanHeaWat.TTop, twoTankCoordination.TTopHea) annotation (Line(points=
+          {{-179,113},{-156,113},{-156,174},{-142,174}}, color={0,0,127}));
+  connect(tanHeaWat.charge, twoTankCoordination.uHea) annotation (Line(points={
+          {-178,101},{-160,101},{-160,178},{-142,178}}, color={255,0,255}));
+  connect(THeaWatSupSet, twoTankCoordination.TSetHea) annotation (Line(points={
+          {-320,-20},{-208,-20},{-208,170},{-142,170}}, color={0,0,127}));
+  connect(twoTankCoordination.yMix, valMixHea.y) annotation (Line(points={{-118,
+          188},{-106,188},{-106,92},{-90,92},{-90,98}},
+                                               color={0,0,127}));
+  connect(twoTankCoordination.TTop, conSup.THeaWatTop) annotation (Line(points=
+          {{-119,176},{-52,176},{-52,44},{-268,44},{-268,24},{-262,24},{-262,25}},
+        color={0,0,127}));
+  connect(conSup.THeaWatSupPreSet, twoTankCoordination.TSet) annotation (Line(
+        points={{-262,27},{-266,27},{-266,40},{-48,40},{-48,172},{-119,172}},
+        color={0,0,127}));
+  connect(twoTankCoordination.y, conSup.uHea) annotation (Line(points={{-118,
+          180},{-44,180},{-44,38},{-262,38},{-262,31}}, color={255,0,255}));
+  connect(jun.port_2, tanHeaWat.port_aTop) annotation (Line(points={{-140,130},
+          {-148,130},{-148,110},{-180,110}}, color={0,127,255}));
+  connect(valMixHea.port_1, tanHeaWat.port_bBot) annotation (Line(points={{-100,
+          110},{-140,110},{-140,98},{-180,98}}, color={0,127,255}));
+  connect(twoTankCoordination.yDiv, locDivCon.u) annotation (Line(points={{-118,
+          184},{-40,184},{-40,34},{-202,34},{-202,64},{-191,64}}, color={0,0,
+          127}));
+  connect(twoTankCoordination.TSet, locDivCon.TSet) annotation (Line(points={{-119,
+          172},{-48,172},{-48,40},{-194,40},{-194,52},{-191,52}}, color={0,0,
+          127}));
+  connect(colHeaWat.port_bDisRet, TConOut.port_a)
+    annotation (Line(points={{-140,-40},{-160,-40}}, color={0,127,255}));
+  connect(TConOut.port_b, valDivCon.port_a1) annotation (Line(points={{-180,-40},
+          {-186,-40},{-186,-20},{-156,-20},{-156,48}}, color={0,127,255}));
+  connect(TConOut.T, locDivCon.T) annotation (Line(points={{-170,-29},{-170,-16},
+          {-198,-16},{-198,58},{-191,58}}, color={0,0,127}));
+  connect(locDivCon.y, valDivCon.yVal)
+    annotation (Line(points={{-168,58},{-162,58}}, color={0,0,127}));
+  connect(dhw.dHFlo, dHHotWat_flow) annotation (Line(points={{-179,234},{-170,
+          234},{-170,300},{318,300}}, color={0,0,127}));
+  connect(dhw.port_b, valMixHea.port_3) annotation (Line(points={{-180,230},{
+          -90,230},{-90,120}}, color={0,127,255}));
+  connect(dhw.port_a, jun.port_3) annotation (Line(points={{-200,230},{-212,230},
+          {-212,148},{-130,148},{-130,140}}, color={0,127,255}));
+  connect(tanChiWat.port_aBot, colChiWat.port_bDisRet) annotation (Line(points=
+          {{180,100},{168,100},{168,-40},{140,-40}}, color={0,127,255}));
+  connect(colChiWat.port_aDisSup, tanChiWat.port_bTop) annotation (Line(points=
+          {{140,-34},{160,-34},{160,112},{180,112}}, color={0,127,255}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},

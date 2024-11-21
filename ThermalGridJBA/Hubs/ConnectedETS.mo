@@ -14,15 +14,19 @@ model ConnectedETS
       T_b1Hex_nominal=279.15,
       T_a2Hex_nominal=277.15,
       T_b2Hex_nominal=282.15,
-      VTanHeaWat=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*0.1*60/1000,
+      VTanHeaWat=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
+      VTanChiWat=datChi.mEva_flow_nominal*datBui.dTChiWat_nominal*5*60/1000,
       dpCon_nominal=40E3,
       dpEva_nominal=40E3,
       datChi=datChi,
       datDhw=datDhw,
-      kHot=if datBui.have_hotWat then 0.001 else 0.05));
+      final TCon_start=if have_hotWat
+                       then min(datBui.THeaWatSup_nominal,datBui.THotWatSup_nominal)
+                       else datBui.THeaWatSup_nominal,
+      final TEva_start=datBui.TChiWatSup_nominal));
   parameter
     Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
-    VTan=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*1*60/1000,
+    VTan=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
     mDom_flow_nominal=datDhw.QHex_flow_nominal/4200/(datDhw.TDom_nominal -
         datDhw.TCol_nominal),
     QHex_flow_nominal=QHotWat_flow_nominal,

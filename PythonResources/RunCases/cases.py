@@ -21,14 +21,14 @@ def handwrite_cases():
     """
     
     cases = list()
-    buil = '1065'
+    buil = '1045'
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
           "name": f"no_dhw_{buil}_transit",
           "building": buil,
           "start_time": 90*24*3600,
           "stop_time":  100*24*3600,
-          "modifiers": f"bui(redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=false))"})
+          "modifiers": f"redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=false)"})
     buil = '1065'
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
@@ -36,7 +36,7 @@ def handwrite_cases():
           "building": buil,
           "start_time": 90*24*3600,
           "stop_time":  100*24*3600,
-          "modifiers": f"bui(redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=true))"})
+          "modifiers": f"redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=true)"})
     
     return cases
 
@@ -105,7 +105,7 @@ def construct_cases():
               "building": buil,
               "start_time": 90*24*3600,
               "stop_time":  100*24*3600,
-              "modifiers": f"bui(redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=true))"})    
+              "modifiers": f"redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=true)"})    
     
     return cases
 
