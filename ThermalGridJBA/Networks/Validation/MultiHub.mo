@@ -1,4 +1,4 @@
-within ThermalGridJBA.Hubs.Validation;
+within ThermalGridJBA.Networks.Validation;
 model MultiHub "Multiple prosumer hubs in a district loop"
   extends Modelica.Icons.Example;
   package Medium=Buildings.Media.Water
@@ -84,5 +84,5 @@ annotation(experiment(
       Interval=60,
       Tolerance=1e-06),
   __Dymola_Commands(
-      file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Hubs/Validation/MultiHub.mos" "Simulate and plot"));
+      file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/MultiHub.mos" "Simulate and plot"));
 end MultiHub;
