@@ -1,7 +1,7 @@
 within ThermalGridJBA.Networks.Validation;
 model SeriesVariableFlowAgentControl
   "Example of series connection with variable district water mass flow rate with updated agent controller"
-  extends Buildings.DHC.Examples.Combined.BaseClasses.PartialSeries(redeclare
+  extends ThermalGridJBA.Networks.Validation.BaseClasses.PartialSeries(redeclare
       Buildings.DHC.Loads.Combined.BuildingTimeSeriesWithETS bui[nBui](final filNam=filNam),
       datDes(
       mPumDis_flow_nominal=97.3,
@@ -11,7 +11,11 @@ model SeriesVariableFlowAgentControl
       TLooMin=279.15,
       dp_length_nominal=250,
       epsPla=0.91),
-    pumSto(dp_nominal=40000));
+    pumSto(dp_nominal=40000),
+    pla(
+      final TLooMin=datDes.TLooMin,
+      final TLooMax=datDes.TLooMax,
+      dTOff=2));
   parameter String filNam[nBui]={
     "modelica://Buildings/Resources/Data/DHC/Loads/Examples/SwissOffice_20190916.mos",
     "modelica://Buildings/Resources/Data/DHC/Loads/Examples/SwissResidential_20190916.mos",
@@ -68,8 +72,7 @@ model SeriesVariableFlowAgentControl
         extent={{10,-10},{-10,10}},
         rotation=90,
         origin={80,128})));
-  Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 3]
-    (
+  Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 3](
     each lPip=lDisPip,
     each rPip=rPip,
     each thiGroLay=thiGroLay,
@@ -221,8 +224,6 @@ equation
   connect(retDisPluFlo.heatPort, pipeGroundCouplingMulti[nBui + 3].heatPorts[1])
     annotation (Line(points={{70,92},{1,92},{1,95}},                     color={
           191,0,0}));
-  connect(HXtemperature.y[1], pla.TSewWat) annotation (Line(points={{-267,40},{
-          -172,40},{-172,7.33333},{-161.333,7.33333}}, color={0,0,127}));
   connect(HXtemperature.y[1], pumPlantControlNsew.TSou) annotation (Line(points={{-267,40},
           {-260,40},{-260,20},{-288,20},{-288,3},{-281.538,3}},
                      color={0,0,127}));

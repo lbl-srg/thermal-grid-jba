@@ -82,14 +82,11 @@ partial model PartialSeries "Partial model for series network"
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,-90})));
-  Buildings.DHC.Plants.Heating.SewageHeatRecovery
+  ThermalGridJBA.Networks.IdealHeatingCoolingPlant
     pla(
     redeclare final package Medium = Medium,
-    final mSew_flow_nominal=datDes.mPla_flow_nominal,
-    final mDis_flow_nominal=datDes.mPla_flow_nominal,
-    final dpSew_nominal=datDes.dpPla_nominal,
-    final dpDis_nominal=datDes.dpPla_nominal,
-    final epsHex=datDes.epsPla) "Sewage heat recovery plant"
+    final m_flow_nominal=datDes.mPla_flow_nominal,
+    final dp_nominal=datDes.dpPla_nominal) "Sewage heat recovery plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup(redeclare final package
       Medium = Medium, final m_flow_nominal=datDes.mPumDis_flow_nominal)
