@@ -1,5 +1,5 @@
 within ThermalGridJBA.Networks.Validation;
-model SeriesVariableFlowAgentControl
+model DistrictGroundCoupled
   "Example of series connection with variable district water mass flow rate with updated agent controller"
   extends ThermalGridJBA.Networks.Validation.BaseClasses.PartialSeries(redeclare
       Buildings.DHC.Loads.Combined.BuildingTimeSeriesWithETS bui[nBui](final filNam=filNam),
@@ -277,4 +277,4 @@ In Proceedings of the 15th International Modelica Conference. Aachen, Germany, O
 
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
-end SeriesVariableFlowAgentControl;
+end DistrictGroundCoupled;
