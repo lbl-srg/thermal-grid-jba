@@ -3,7 +3,7 @@ model ConnectedETS
   "Load connected to the network via ETS with or without DHW integration"
   extends ThermalGridJBA.Hubs.BaseClasses.PartialConnectedETS(redeclare
       ThermalGridJBA.Hubs.BaseClasses.ChillerThreeUtilities ets(
-      final have_hotWat=datBui.have_hotWat,
+      final have_hotWat= QHotWat_flow_nominal > Modelica.Constants.eps,
       QChiWat_flow_nominal=QCoo_flow_nominal,
       QHeaWat_flow_nominal=QHea_flow_nominal,
       QHotWat_flow_nominal=QHot_flow_nominal,
@@ -14,40 +14,40 @@ model ConnectedETS
       T_b1Hex_nominal=279.15,
       T_a2Hex_nominal=277.15,
       T_b2Hex_nominal=282.15,
-      VTanHeaWat=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
-      VTanChiWat=datChi.mEva_flow_nominal*datBui.dTChiWat_nominal*5*60/1000,
+      VTanHeaWat=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
+      VTanChiWat=datChi.mEva_flow_nominal*datBuiSet.dTChiWat_nominal*5*60/1000,
       dpCon_nominal=40E3,
       dpEva_nominal=40E3,
       datChi=datChi,
       datDhw=datDhw,
-      final TCon_start=if have_hotWat
-                       then min(datBui.THeaWatSup_nominal,datBui.THotWatSup_nominal)
-                       else datBui.THeaWatSup_nominal,
-      final TEva_start=datBui.TChiWatSup_nominal));
+      TCon_start=if have_hotWat
+                 then min(datBuiSet.THeaWatSup_nominal,datBuiSet.THotWatSupTan_nominal)
+                 else datBuiSet.THeaWatSup_nominal,
+      TEva_start=datBuiSet.TChiWatSup_nominal));
   parameter
     Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
-    VTan=datChi.mCon_flow_nominal*datBui.dTHeaWat_nominal*5*60/1000,
+    VTan=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
     mDom_flow_nominal=datDhw.QHex_flow_nominal/4200/(datDhw.TDom_nominal -
         datDhw.TCol_nominal),
-    QHex_flow_nominal=QHotWat_flow_nominal,
-    TDom_nominal=datBui.THotWatSup_nominal)
+    QHex_flow_nominal=if have_hotWat then QHotWat_flow_nominal else
+        QHeaWat_flow_nominal,
+    TDom_nominal=datBuiSet.THotWatSupTan_nominal)
     "Performance data of the domestic hot water component"
     annotation (Placement(transformation(extent={{20,222},{40,242}})));
   parameter Modelica.Units.SI.HeatFlowRate QHot_flow_nominal(
-    min=Modelica.Constants.eps)=
-    max(Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+    min=0)=Buildings.DHC.Loads.BaseClasses.getPeakLoad(
           string="#Peak water heating load",
-          filNam=Modelica.Utilities.Files.loadResource(datBui.filNam)),
-        1)
+          filNam=Modelica.Utilities.Files.loadResource(filNam))
     "Design heating heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant THotWatSupSet(
-    final k=40 + 273.15,
-    y(final unit="K", displayUnit="degC")) if datBui.have_hotWat
+    final k=datBuiSet.THotWatSupFix_nominal,
+    y(final unit="K", displayUnit="degC")) if have_hotWat
     "Domestic hot water supply temperature set point"
     annotation (Placement(transformation(extent={{-140,-10},{-120,10}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TColWat(final k=15 + 273.15,
-      y(final unit="K", displayUnit="degC")) if datBui.have_hotWat
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TColWat(
+    final k=datBuiSet.TColWat_nominal,
+    y(final unit="K", displayUnit="degC")) if have_hotWat
                                              "Domestic cold water temperature"
     annotation (Placement(transformation(extent={{-140,-50},{-120,-30}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter loaHotNor(k=1/

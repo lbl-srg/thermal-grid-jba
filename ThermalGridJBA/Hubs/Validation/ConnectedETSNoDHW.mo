@@ -5,10 +5,8 @@ model ConnectedETSNoDHW
   package Medium=Buildings.Media.Water
     "Medium model";
 
-  replaceable parameter ThermalGridJBA.Data.Individual.B1500 datBui(
-    have_hotWat=false)
-    "Building data" annotation (Placement(
-      transformation(extent={{-20,20},{0,40}})), choicesAllMatching=true);
+  parameter String filNam =
+    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1500.mos";
 
   Buildings.Fluid.Sources.Boundary_pT supAmbWat(
     redeclare package Medium = Medium,
@@ -34,7 +32,7 @@ model ConnectedETSNoDHW
   ThermalGridJBA.Hubs.ConnectedETS bui(
     redeclare package MediumSer = Medium,
     redeclare package MediumBui = Medium,
-    final datBui=datBui,
+    final filNam=filNam,
     allowFlowReversalSer=true)
     annotation (Placement(transformation(extent={{40,-20},{60,0}})));
   Modelica.Blocks.Continuous.Integrator dHHeaWat
@@ -43,7 +41,7 @@ model ConnectedETSNoDHW
   Modelica.Blocks.Continuous.Integrator dHChiWat
     "Cumulative enthalpy difference of chilled water"
     annotation (Placement(transformation(extent={{40,70},{60,90}})));
-  Modelica.Blocks.Continuous.Integrator dHHotWat if bui.datBui.have_hotWat
+  Modelica.Blocks.Continuous.Integrator dHHotWat if bui.have_hotWat
     "Cumulative enthalpy difference of domestic hot water"
     annotation (Placement(transformation(extent={{40,10},{60,30}})));
 equation
