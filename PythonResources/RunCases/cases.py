@@ -28,7 +28,8 @@ def handwrite_cases():
           "building": buil,
           "start_time": 90*24*3600,
           "stop_time":  100*24*3600,
-          "modifiers": f"redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=false)"})
+          "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/{buil}.mos"}})
+         
     buil = '1065'
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
@@ -36,7 +37,7 @@ def handwrite_cases():
           "building": buil,
           "start_time": 90*24*3600,
           "stop_time":  100*24*3600,
-          "modifiers": f"redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=true)"})
+          "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/{buil}.mos"}})
     
     return cases
 
@@ -45,32 +46,6 @@ def construct_cases():
     """
 
     cases = list()
-
-    # buil_nos = ['1045',
-    #             '1058x1060',
-    #             '1065',
-    #             '1345',
-    #             '1349',
-    #             '1359',
-    #             '1380',
-    #             '1500',
-    #             '1560',
-    #             '1569',
-    #             '1631',
-    #             '1657',
-    #             '1676',
-    #             '1690',
-    #             '1691',
-    #             '1692',
-    #             '1800'] # list of all building numbers, forcing no DHW
-    # for buil in buil_nos:
-    #     cases.append( \
-    #         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-    #           "name": f"no_dhw_{buil}_transit",
-    #           "building": buil,
-    #           "start_time": 90*24*3600,
-    #           "stop_time":  100*24*3600,
-    #           "modifiers": f"bui(redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=false))"})
 
     buil_nos = ['1045',
                 '1345',
@@ -87,7 +62,7 @@ def construct_cases():
               "building": buil,
               "start_time": 90*24*3600,
               "stop_time":  100*24*3600,
-              "modifiers": f"bui(redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=false))"})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/{buil}.mos"}})
 
     buil_nos = ['1058x1060',
                 '1065',
@@ -105,7 +80,7 @@ def construct_cases():
               "building": buil,
               "start_time": 90*24*3600,
               "stop_time":  100*24*3600,
-              "modifiers": f"redeclare ThermalGridJBA.Data.Individual.B{buil} datBui(have_hotWat=true)"})    
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/{buil}.mos"}})    
     
     return cases
 

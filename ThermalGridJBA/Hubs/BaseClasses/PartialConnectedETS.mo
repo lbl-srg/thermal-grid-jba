@@ -2,31 +2,33 @@ within ThermalGridJBA.Hubs.BaseClasses;
 partial model PartialConnectedETS
   extends Buildings.DHC.Loads.BaseClasses.PartialBuildingWithPartialETS(
     redeclare Buildings.DHC.Loads.BaseClasses.BuildingTimeSeries bui(
-      final filNam=datBui.filNam,
-      final T_aHeaWat_nominal=datBui.THeaWatSup_nominal,
-      final T_bHeaWat_nominal=datBui.THeaWatRet_nominal,
-      final T_aChiWat_nominal=datBui.TChiWatSup_nominal,
-      final T_bChiWat_nominal=datBui.TChiWatRet_nominal,
-      final have_hotWat=datBui.have_hotWat),
+      final filNam=filNam,
+      final T_aHeaWat_nominal=datBuiSet.THeaWatSup_nominal,
+      final T_bHeaWat_nominal=datBuiSet.THeaWatRet_nominal,
+      final T_aChiWat_nominal=datBuiSet.TChiWatSup_nominal,
+      final T_bChiWat_nominal=datBuiSet.TChiWatRet_nominal,
+      final have_hotWat=have_hotWat),
     nPorts_heaWat=1,
     nPorts_chiWat=1);
 
-  replaceable parameter ThermalGridJBA.Data.GenericConsumer datBui
-    "Building data" annotation (Placement(
-      transformation(extent={{20,140},{40,160}})), choicesAllMatching=true);
+  parameter String filNam
+    "File name for the load profile";
+  parameter ThermalGridJBA.Data.BuildingSetPoints datBuiSet
+    "Building set points" annotation (Placement(
+      transformation(extent={{20,140},{40,160}})));
 
   parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(
     max=-Modelica.Constants.eps)=
       Buildings.DHC.Loads.BaseClasses.getPeakLoad(
         string="#Peak space cooling load",
-        filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
+        filNam=Modelica.Utilities.Files.loadResource(filNam))
     "Design cooling heat flow rate (<=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(
     min=Modelica.Constants.eps)=
       Buildings.DHC.Loads.BaseClasses.getPeakLoad(
         string="#Peak space heating load",
-        filNam=Modelica.Utilities.Files.loadResource(datBui.filNam))
+        filNam=Modelica.Utilities.Files.loadResource(filNam))
     "Design heating heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
   parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic datChi(
@@ -38,7 +40,7 @@ partial model PartialConnectedETS
     etaMotor=1,
     mEva_flow_nominal=abs(QCoo_flow_nominal)/5/4186,
     mCon_flow_nominal=QHea_flow_nominal/5/4186,
-    TEvaLvg_nominal=277.15,
+    TEvaLvg_nominal=datBuiSet.TChiWatSup_nominal,
     capFunT={1.72,0.02,0,-0.02,0,0},
     EIRFunT={0.28,-0.02,0,0.02,0,0},
     EIRFunPLR={0.1,0.9,0},
@@ -49,9 +51,9 @@ partial model PartialConnectedETS
     TConEntMax=328.15) "Chiller performance data"
     annotation (Placement(transformation(extent={{20,180},{40,200}})));
   final parameter Modelica.Units.SI.Temperature TChiWatRet_nominal=
-      TChiWatSup_nominal + dT_nominal "Chilled water return temperature";
+      datBuiSet.TChiWatRet_nominal "Chilled water return temperature";
   final parameter Modelica.Units.SI.Temperature THeaWatRet_nominal=
-      THeaWatSup_nominal - dT_nominal "Heating water return temperature";
+      datBuiSet.THeaWatRet_nominal "Heating water return temperature";
   parameter Modelica.Units.SI.Temperature TDisWatMin=6 + 273.15
     "District water minimum temperature" annotation (Dialog(group="ETS model parameters"));
   parameter Modelica.Units.SI.Temperature TDisWatMax=17 + 273.15
@@ -59,16 +61,17 @@ partial model PartialConnectedETS
   parameter Modelica.Units.SI.TemperatureDifference dT_nominal(min=0) = 4
     "Water temperature drop/increase accross load and source-side HX (always positive)"
     annotation (Dialog(group="ETS model parameters"));
-  parameter Modelica.Units.SI.Temperature TChiWatSup_nominal=18 + 273.15
-    "Chilled water supply temperature"
+  parameter Modelica.Units.SI.Temperature TChiWatSup_nominal =
+    datBuiSet.TChiWatSup_nominal "Chilled water supply temperature"
     annotation (Dialog(group="ETS model parameters"));
-  parameter Modelica.Units.SI.Temperature THeaWatSup_nominal=38 + 273.15
-    "Heating water supply temperature"
+  parameter Modelica.Units.SI.Temperature THeaWatSup_nominal =
+    datBuiSet.THeaWatSup_nominal "Heating water supply temperature"
     annotation (Dialog(group="ETS model parameters"));
-  parameter Modelica.Units.SI.Temperature THotWatSup_nominal=63 + 273.15
-    "Domestic hot water supply temperature to fixtures"
+  parameter Modelica.Units.SI.Temperature THotWatSup_nominal =
+    datBuiSet.THotWatSupFix_nominal "Domestic hot water supply temperature to fixtures"
     annotation (Dialog(group="ETS model parameters", enable=have_hotWat));
-  parameter Modelica.Units.SI.Temperature TColWat_nominal=288.15
+  parameter Modelica.Units.SI.Temperature TColWat_nominal =
+    datBuiSet.TColWat_nominal
     "Cold water temperature (for hot water production)"
     annotation (Dialog(group="ETS model parameters", enable=have_hotWat));
   parameter Modelica.Units.SI.Pressure dp_nominal(displayUnit="Pa")=50000
@@ -96,12 +99,12 @@ partial model PartialConnectedETS
     "Enable cooling"
     annotation (Placement(transformation(extent={{-100,-170},{-80,-150}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(
-    final k=datBui.THeaWatSup_nominal,
+    final k=datBuiSet.THeaWatSup_nominal,
     y(final unit="K", displayUnit="degC"))
     "Heating water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-30},{-80,-10}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(
-    final k=datBui.TChiWatSup_nominal,
+    final k=datBuiSet.TChiWatSup_nominal,
     y(final unit="K", displayUnit="degC"))
     "Chilled water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));
