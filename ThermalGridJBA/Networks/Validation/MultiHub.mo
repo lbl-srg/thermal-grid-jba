@@ -10,15 +10,17 @@ model MultiHub "Multiple prosumer hubs in a district loop"
     "Nominal mass flow rate of district";
   parameter Modelica.Units.SI.Temperature TDis_nominal=273.15+15 "Nominal temperature of district supply";
 
+  parameter String filNam[nBui] =
+    {"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1569.mos",
+     "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1380.mos",
+     "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1560.mos"}
+    "Array of building file names";
+
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
     redeclare final package MediumSer = Medium,
     redeclare final package MediumBui = Medium,
-    final datBui={
-      ThermalGridJBA.Data.Individual.B1569(),
-      ThermalGridJBA.Data.Individual.B1380(),
-      ThermalGridJBA.Data.Individual.B1560()},
-    each allowFlowReversalSer=true,
-    each THotWatSup_nominal=322.15)
+    final filNam = filNam,
+    each allowFlowReversalSer=true)
     annotation (Placement(transformation(extent={{10,40},{30,60}})));
 
   Buildings.DHC.Networks.Distribution1Pipe_R dis(
