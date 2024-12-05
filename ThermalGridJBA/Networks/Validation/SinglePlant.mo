@@ -2,8 +2,14 @@ within ThermalGridJBA.Networks.Validation;
 model SinglePlant "District network with a single plant"
   extends Modelica.Icons.Example;
   package Medium = Buildings.Media.Water "Medium model";
+
   constant Real facMul = 1
     "Building loads multiplier factor";
+  parameter String filNam[nBui] =
+    {"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1569.mos",
+     "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1380.mos",
+     "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1560.mos"}
+    "Array of building load profile file names";
   parameter Real dpDis_length_nominal(final unit="Pa/m") = 250
     "Pressure drop per pipe length at nominal flow rate - Distribution line";
   parameter Real dpCon_length_nominal(final unit="Pa/m") = 250
@@ -79,12 +85,8 @@ model SinglePlant "District network with a single plant"
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
     redeclare final package MediumSer = Medium,
     redeclare final package MediumBui = Medium,
-    final datBui={
-      ThermalGridJBA.Data.Individual.B1569(),
-      ThermalGridJBA.Data.Individual.B1380(),
-      ThermalGridJBA.Data.Individual.B1560()},
-    each allowFlowReversalSer=true,
-    each THotWatSup_nominal=322.15) "Building and ETS"
+    final filNam = filNam,
+    each allowFlowReversalSer=true) "Building and ETS"
     annotation (Placement(transformation(extent={{-10,170},{10,190}})));
  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)
     "ETS pump power"
