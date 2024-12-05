@@ -14,7 +14,7 @@ model MultiHub "Multiple prosumer hubs in a district loop"
     {"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1569.mos",
      "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1380.mos",
      "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1560.mos"}
-    "Array of building file names";
+    "Array of building load profile file names";
 
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
     redeclare final package MediumSer = Medium,
