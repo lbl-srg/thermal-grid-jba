@@ -62,12 +62,24 @@ model IdealHeatingCoolingPlant
   Buildings.Controls.OBC.CDL.Reals.Limiter limHea(
     uMax=Modelica.Constants.inf,
     uMin=0) "Limiter taking positive heat flow for heating"
-    annotation (Placement(transformation(extent={{340,270},{360,290}})));
+    annotation (Placement(transformation(extent={{340,350},{360,370}})));
   Buildings.Controls.OBC.CDL.Reals.Limiter limCoo(
     uMax=0,
     uMin=-Modelica.Constants.inf)
     "Limiter taking negative heat flow for cooling"
-    annotation (Placement(transformation(extent={{340,230},{360,250}})));
+    annotation (Placement(transformation(extent={{340,310},{360,330}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QHea_flow(final unit="W")
+    "Heat flow rate for heating" annotation (Placement(transformation(extent={{380,
+            340},{420,380}}), iconTransformation(
+        extent={{-40,-40},{40,40}},
+        rotation=90,
+        origin={240,340})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QCoo_fllow(final unit="W")
+    "Heat flow rate for cooling" annotation (Placement(transformation(extent={{380,
+            300},{420,340}}), iconTransformation(
+        extent={{-40,-40},{40,40}},
+        rotation=90,
+        origin={280,340})));
 equation
   connect(heaCoo.port_b, pum.port_a)
     annotation (Line(points={{10,0},{80,0}}, color={0,127,255}));
@@ -85,12 +97,24 @@ equation
     annotation (Line(points={{-110,11},{-110,30},{-62,30}}, color={0,0,127}));
   connect(lim.y, heaCoo.TSet) annotation (Line(points={{-38,30},{-24,30},{-24,8},
           {-11,8}}, color={0,0,127}));
-  connect(limHea.y, PHea)
-    annotation (Line(points={{362,280},{400,280}}, color={0,0,127}));
-  connect(limCoo.y, PCoo)
-    annotation (Line(points={{362,240},{400,240}}, color={0,0,127}));
-  connect(heaCoo.Q_flow, limHea.u) annotation (Line(points={{11,8},{20,8},{20,280},
-          {338,280}}, color={0,0,127}));
-  connect(heaCoo.Q_flow, limCoo.u) annotation (Line(points={{11,8},{20,8},{20,240},
-          {338,240}}, color={0,0,127}));
+  connect(heaCoo.Q_flow, limHea.u) annotation (Line(points={{11,8},{20,8},{20,360},
+          {338,360}}, color={0,0,127}));
+  connect(heaCoo.Q_flow, limCoo.u) annotation (Line(points={{11,8},{20,8},{20,320},
+          {338,320}}, color={0,0,127}));
+  connect(limHea.y, QHea_flow)
+    annotation (Line(points={{362,360},{400,360}}, color={0,0,127}));
+  connect(limCoo.y, QCoo_fllow)
+    annotation (Line(points={{362,320},{400,320}}, color={0,0,127}));
+    annotation(defaultComponentName="pla",
+Documentation(info="
+<html>
+<p>
+This model represents an idealised heating and cooling plant.
+The temperature of the fluid that goes through this component is imposed
+to be within <i>T<sub>min</sub> + &Delta;T<sub>offset</sub></i>
+and <i>T<sub>max</sub> - &Delta;T<sub>offset</sub></i> when it leaves.
+The component then outputs how much heating and cooling energy is consumed
+to achieve this temperature change.
+</p>
+</html>"));
 end IdealHeatingCoolingPlant;
