@@ -25,7 +25,6 @@ model IdealHeatingCoolingPlant
     "Offset temperature"
     annotation (Dialog(group="Temperatures"));
 
-
   Buildings.Fluid.Interfaces.PrescribedOutlet heaCoo(
     redeclare final package Medium = Medium,
     final m_flow_nominal=m_flow_nominal,
@@ -60,13 +59,14 @@ model IdealHeatingCoolingPlant
   Buildings.Controls.OBC.CDL.Reals.Limiter lim(uMax=TLooMax - dTOff, uMin=
         TLooMin + dTOff)
     annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
-  Buildings.Controls.OBC.CDL.Reals.Abs abs1
-    annotation (Placement(transformation(extent={{300,270},{320,290}})));
-  Buildings.Controls.OBC.CDL.Reals.Abs abs2
-    annotation (Placement(transformation(extent={{300,230},{320,250}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=-1)
-    annotation (Placement(transformation(extent={{260,230},{280,250}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(k=-1)
+  Buildings.Controls.OBC.CDL.Reals.Limiter limHea(
+    uMax=Modelica.Constants.inf,
+    uMin=0) "Limiter taking positive heat flow for heating"
+    annotation (Placement(transformation(extent={{340,270},{360,290}})));
+  Buildings.Controls.OBC.CDL.Reals.Limiter limCoo(
+    uMax=0,
+    uMin=-Modelica.Constants.inf)
+    "Limiter taking negative heat flow for cooling"
     annotation (Placement(transformation(extent={{340,230},{360,250}})));
 equation
   connect(heaCoo.port_b, pum.port_a)
@@ -85,16 +85,12 @@ equation
     annotation (Line(points={{-110,11},{-110,30},{-62,30}}, color={0,0,127}));
   connect(lim.y, heaCoo.TSet) annotation (Line(points={{-38,30},{-24,30},{-24,8},
           {-11,8}}, color={0,0,127}));
-  connect(abs1.y, PHea)
-    annotation (Line(points={{322,280},{400,280}}, color={0,0,127}));
-  connect(abs2.y, gai2.u)
-    annotation (Line(points={{322,240},{338,240}}, color={0,0,127}));
-  connect(gai2.y, PCoo)
+  connect(limHea.y, PHea)
+    annotation (Line(points={{362,280},{400,280}}, color={0,0,127}));
+  connect(limCoo.y, PCoo)
     annotation (Line(points={{362,240},{400,240}}, color={0,0,127}));
-  connect(gai1.y, abs2.u)
-    annotation (Line(points={{282,240},{298,240}}, color={0,0,127}));
-  connect(heaCoo.Q_flow, gai1.u) annotation (Line(points={{11,8},{40,8},{40,240},
-          {258,240}}, color={0,0,127}));
-  connect(heaCoo.Q_flow, abs1.u) annotation (Line(points={{11,8},{40,8},{40,280},
-          {298,280}}, color={0,0,127}));
+  connect(heaCoo.Q_flow, limHea.u) annotation (Line(points={{11,8},{20,8},{20,280},
+          {338,280}}, color={0,0,127}));
+  connect(heaCoo.Q_flow, limCoo.u) annotation (Line(points={{11,8},{20,8},{20,240},
+          {338,240}}, color={0,0,127}));
 end IdealHeatingCoolingPlant;
