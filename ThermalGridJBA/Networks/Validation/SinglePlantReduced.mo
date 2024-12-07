@@ -4,11 +4,11 @@ model SinglePlantReduced
   extends Modelica.Icons.Example;
 
   parameter String filNam[nBui]={
-    "modelica://Buildings/Resources/Data/DHC/Loads/Examples/SwissOffice_20190916.mos",
-    "modelica://Buildings/Resources/Data/DHC/Loads/Examples/SwissResidential_20190916.mos",
-    "modelica://Buildings/Resources/Data/DHC/Loads/Examples/SwissHospital_20190916.mos"}
+    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1569.mos",
+    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1380.mos",
+    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1560.mos"}
     "Library paths of the files with thermal loads as time series";
-  parameter Modelica.Units.SI.Length diameter=sqrt(4*datDes.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
+  parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
     "Pipe diameter (without insulation)";
   parameter Modelica.Units.SI.Height lDisPip=200 "Distribution pipes length";
   parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
@@ -29,26 +29,14 @@ model SinglePlantReduced
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
   parameter Modelica.Units.SI.Length dhPla(fixed=false,start=0.05,min=0.01)
     "Hydraulic diameter of the distribution pipe before each connection";
-  parameter Integer nBui = datDes.nBui
+  parameter Integer nBui =datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
-  inner parameter
-    Buildings.DHC.Examples.Combined.BaseClasses.DesignDataSeries datDes(
-    mCon_flow_nominal=fill(datDes.mPipDis_flow_nominal,nBui),
-    lEnd=100,
-    mPumDis_flow_nominal=97.3,
-    mPipDis_flow_nominal=69.5,
-    mSto_flow_nominal=75,
-    dpPla_nominal(displayUnit="bar") = 50000,
-    TLooMin=279.15,
-    dp_length_nominal=250,
-    epsPla=0.91) "Design data"
+  inner parameter ThermalGridJBA.Data.GenericDistrict datDis(
+    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
+    "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
-  Modelica.Blocks.Sources.Constant masFloDisPla(
-    k=datDes.mPla_flow_nominal)
-    "District water flow rate to plant"
-    annotation (Placement(transformation(extent={{-250,10},{-230,30}})));
   Buildings.DHC.Networks.Controls.MainPump1Pipe conPum(
     nMix=nBui,
     nSou=1,
@@ -57,24 +45,18 @@ model SinglePlantReduced
     TMax=290.15,
     dTSlo=1.5) "Main pump controller"
     annotation (Placement(transformation(extent={{-52,-198},{-28,-162}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(k=datDes.mPumDis_flow_nominal)
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(k=datDis.mPumDis_flow_nominal)
     "Scale with nominal mass flow rate"
     annotation (Placement(transformation(extent={{24,-190},{44,-170}})));
-  Modelica.Blocks.Sources.CombiTimeTable HXtemperature(table=[0,14 + 273.15; 60
-        *86400,12 + 273.15; 210*86400,20 + 273.15; 365*86400,14 + 273.15],
-                                     extrapolation=Modelica.Blocks.Types.Extrapolation.Periodic)
-    annotation (Placement(transformation(extent={{-288,30},{-268,50}})));
-  Modelica.Blocks.Math.Product product1
-    annotation (Placement(transformation(extent={{-216,4},{-196,24}})));
 
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup1(redeclare final
-      package Medium = Medium, final m_flow_nominal=datDes.mPumDis_flow_nominal)
+      package Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water supply temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,128})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet1(redeclare final
-      package Medium = Medium, final m_flow_nominal=datDes.mPumDis_flow_nominal)
+      package Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water return temperature" annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
         rotation=90,
@@ -89,31 +71,23 @@ model SinglePlantReduced
       each c=1000,
       each d=2600))
     annotation (Placement(transformation(extent={{-10,100},{12,80}})));
-  Buildings.DHC.Networks.Controls.AgentPump1Pipe pumPlantControlNsew(
-    yPumMin=0,
-    dToff=0.5,
-    k=0.8,
-    Ti=600,
-    uLowHea=0.75,
-    uHighHea=1.5,
-    h=0.5) annotation (Placement(transformation(extent={{-280,-10},{-260,10}})));
 
   Buildings.DHC.Networks.Distribution1PipePlugFlow_v dis(
     nCon=nBui,
     allowFlowReversal=allowFlowReversalSer,
     redeclare package Medium = Medium,
     show_TOut=true,
-    mDis_flow_nominal=datDes.mPipDis_flow_nominal,
-    mCon_flow_nominal=datDes.mCon_flow_nominal,
-    lDis=datDes.lDis,
-    lEnd=datDes.lEnd,
+    mDis_flow_nominal=datDis.mPipDis_flow_nominal,
+    mCon_flow_nominal=datDis.mCon_flow_nominal,
+    lDis=datDis.lDis,
+    lEnd=datDis.lEnd,
     dIns=0.02,
     kIns=0.2)
     annotation (Placement(transformation(extent={{-20,132},{20,152}})));
   Buildings.Fluid.FixedResistances.PlugFlowPipe supDisPluFlo(
     redeclare package Medium = Medium,
     allowFlowReversal=allowFlowReversalSer,
-    m_flow_nominal=datDes.mPipDis_flow_nominal,
+    m_flow_nominal=datDis.mPipDis_flow_nominal,
     length=lDisPip,
     dIns=0.02,
     kIns=0.2) annotation (Placement(transformation(
@@ -123,7 +97,7 @@ model SinglePlantReduced
   Buildings.Fluid.FixedResistances.PlugFlowPipe retDisPluFlo(
     redeclare package Medium = Medium,
     allowFlowReversal=allowFlowReversalSer,
-    m_flow_nominal=datDes.mPipDis_flow_nominal,
+    m_flow_nominal=datDis.mPipDis_flow_nominal,
     length=lDisPip,
     dIns=0.02,
     kIns=0.2) annotation (Placement(transformation(
@@ -132,7 +106,7 @@ model SinglePlantReduced
         origin={80,92})));
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumDis(
     redeclare final package Medium = Medium,
-    final m_flow_nominal=datDes.mPumDis_flow_nominal,
+    final m_flow_nominal=datDis.mPumDis_flow_nominal,
     final allowFlowReversal=allowFlowReversalSer,
     dp_nominal=150E3)
     "Distribution pump"
@@ -149,8 +123,8 @@ model SinglePlantReduced
         origin={112,-100})));
   Buildings.DHC.Networks.Connections.Connection1Pipe_R conPla(
     redeclare final package Medium = Medium,
-    final mDis_flow_nominal=datDes.mPipDis_flow_nominal,
-    final mCon_flow_nominal=datDes.mPla_flow_nominal,
+    final mDis_flow_nominal=datDis.mPipDis_flow_nominal,
+    final mCon_flow_nominal=pla.m_flow_nominal,
     lDis=50,
     final allowFlowReversal=allowFlowReversalSer,
     dhDis=dhPla)
@@ -162,20 +136,20 @@ model SinglePlantReduced
   ThermalGridJBA.Networks.IdealHeatingCoolingPlant
     pla(
     redeclare final package Medium = Medium,
-    final m_flow_nominal=datDes.mPla_flow_nominal,
-    final dp_nominal=datDes.dpPla_nominal,
-    final TLooMin=datDes.TLooMin,
-    final TLooMax=datDes.TLooMax,
+    final m_flow_nominal=sum(datDis.mCon_flow_nominal),
+    final dp_nominal=5000000,
+    final TLooMin=datDis.TLooMin,
+    final TLooMax=datDis.TLooMax,
     dTOff=2) "Ideal heating and cooling plant"
-    annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
+    annotation (Placement(transformation(extent={{-160,-12},{-140,8}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup(redeclare final package
-      Medium = Medium, final m_flow_nominal=datDes.mPumDis_flow_nominal)
+      Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water supply temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,20})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatBorLvg(redeclare final
-      package Medium = Medium, final m_flow_nominal=datDes.mPumDis_flow_nominal)
+      package Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water borefield leaving temperature" annotation (Placement(
         transformation(
         extent={{-10,-10},{10,10}},
@@ -189,8 +163,8 @@ model SinglePlantReduced
     redeclare each final package MediumSer = Medium,
     each final allowFlowReversalBui=allowFlowReversalBui,
     each final allowFlowReversalSer=allowFlowReversalSer,
-    each final TDisWatMin=datDes.TLooMin,
-    each final TDisWatMax=datDes.TLooMax) "Building and ETS"
+    each final TDisWatMin=datDis.TLooMin,
+    each final TDisWatMax=datDis.TLooMax) "Building and ETS"
     annotation (Placement(transformation(extent={{-10,170},{10,190}})));
  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)
     "ETS pump power"
@@ -219,12 +193,17 @@ model SinglePlantReduced
  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=2) "Total electric energy"
     annotation (Placement(transformation(extent={{320,150},{340,170}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
-    final uMin(final unit="K", displayUnit="degC")=datDes.TLooMin,
-    final uMax(final unit="K", displayUnit="degC")=datDes.TLooMax,
+    final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
+    final uMax(final unit="K", displayUnit="degC")=datDis.TLooMax,
     final nu=2,
     u(each final unit="K", each displayUnit="degC"))
     "Check if loop temperatures are within given range"
     annotation (Placement(transformation(extent={{320,10},{340,30}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant mPumPla_flow_set(
+    final k=pla.m_flow_nominal,
+    y(quantity="MassFlowRate"))
+    "Plant pump flow rate"
+    annotation (Placement(transformation(extent={{-240,20},{-220,40}})));
 equation
   connect(pumDis.m_flow_in, gai.y)
     annotation (Line(points={{68,-60},{60,-60},{60,-180},{46,-180}},
@@ -238,24 +217,6 @@ equation
   connect(TDisWatSup.T, conPum.TSouOut[1]) annotation (Line(points={{-91,20},{
           -102,20},{-102,-183.6},{-54.0308,-183.6}},
                                                    color={0,0,127}));
-  connect(masFloDisPla.y, product1.u1)
-    annotation (Line(points={{-229,20},{-218,20}},           color={0,0,127}));
-  connect(product1.y, pla.mPum_flow) annotation (Line(points={{-195,14},{-195,
-          4.66667},{-161.333,4.66667}}, color={0,0,127}));
-  connect(TDisWatBorLvg.T, pumPlantControlNsew.TSouIn) annotation (Line(points={{-91,-40},
-          {-286,-40},{-286,7},{-281.538,7}},
-        color={0,0,127}));
-  connect(TDisWatSup.T,pumPlantControlNsew.TSouOut)  annotation (Line(points={{-91,20},
-          {-100,20},{-100,60},{-296,60},{-296,-1},{-281.538,-1}},     color={0,0,
-          127}));
-  connect(TDisWatSup1.T,pumPlantControlNsew.TSupDis)  annotation (Line(points={{-91,128},
-          {-312,128},{-312,-8},{-281.538,-8}},          color={0,0,127}));
-  connect(TDisWatRet1.T,pumPlantControlNsew.TRetDis)  annotation (Line(points={{69,128},
-          {40,128},{40,112},{-308,112},{-308,-5},{-281.538,-5}},
-        color={0,0,127}));
-  connect(pumPlantControlNsew.y, product1.u2) annotation (Line(points={{
-          -258.462,0},{-220,0},{-220,8},{-218,8}},
-                                 color={0,0,127}));
   connect(TDisWatSup1.port_b, dis.port_aDisSup) annotation (Line(points={{-80,138},
           {-80,142},{-20,142}}, color={0,127,255}));
   connect(dis.port_bDisSup, TDisWatRet1.port_a)
@@ -283,9 +244,6 @@ equation
   connect(retDisPluFlo.heatPort, pipeGroundCouplingMulti[nBui + 3].heatPorts[1])
     annotation (Line(points={{70,92},{1,92},{1,95}},                     color={
           191,0,0}));
-  connect(HXtemperature.y[1], pumPlantControlNsew.TSou) annotation (Line(points={{-267,40},
-          {-260,40},{-260,20},{-288,20},{-288,3},{-281.538,3}},
-                     color={0,0,127}));
   connect(bui.QCoo_flow, conPum.QCoo_flow) annotation (Line(points={{7,168},{7,
           160},{-388,160},{-388,-190.8},{-54.0308,-190.8}},
         color={0,0,127}));
@@ -293,17 +251,18 @@ equation
     annotation (Line(points={{-80,0},{-80,10}}, color={0,127,255}));
   connect(TDisWatBorLvg.port_b, conPla.port_aDis)
     annotation (Line(points={{-80,-30},{-80,-20}}, color={0,127,255}));
-  connect(pla.port_bSerAmb, conPla.port_aCon) annotation (Line(points={{-140,1.33333},
-          {-100,1.33333},{-100,-4},{-90,-4}}, color={0,127,255}));
+  connect(pla.port_bSerAmb, conPla.port_aCon) annotation (Line(points={{-140,-0.666667},
+          {-100,-0.666667},{-100,-4},{-90,-4}},
+                                              color={0,127,255}));
   connect(conPla.port_bCon, pla.port_aSerAmb) annotation (Line(points={{-90,-10},
-          {-100,-10},{-100,-20},{-200,-20},{-200,1.33333},{-160,1.33333}},
+          {-100,-10},{-100,-20},{-200,-20},{-200,-0.666667},{-160,-0.666667}},
         color={0,127,255}));
   connect(PPumETS.y, EPumETS.u)
     annotation (Line(points={{162,200},{218,200}}, color={0,0,127}));
   connect(pumDis.P, EPumDis.u)
     annotation (Line(points={{71,-71},{71,-80},{218,-80}}, color={0,0,127}));
-  connect(pla.PPum, EPumPla.u) annotation (Line(points={{-138.667,5.33333},{
-          -120,5.33333},{-120,40},{218,40}}, color={0,0,127}));
+  connect(pla.PPum, EPumPla.u) annotation (Line(points={{-138.667,3.33333},{
+          -120,3.33333},{-120,40},{218,40}}, color={0,0,127}));
   connect(EPumETS.y, EPum.u[1]) annotation (Line(points={{241,200},{260,200},{
           260,119.333},{278,119.333}},
                                color={0,0,127}));
@@ -336,6 +295,8 @@ equation
           160},{138,160}}, color={0,0,127}));
   connect(retDisPluFlo.port_b, pumDis.port_a)
     annotation (Line(points={{80,82},{80,-50}}, color={0,127,255}));
+  connect(mPumPla_flow_set.y, pla.mPum_flow) annotation (Line(points={{-218,30},
+          {-200,30},{-200,4},{-161.333,4},{-161.333,2.66667}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
