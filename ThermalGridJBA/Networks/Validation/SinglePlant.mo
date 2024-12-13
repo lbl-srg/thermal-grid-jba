@@ -301,7 +301,7 @@ equation
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
     __Dymola_Commands(
-  file="modelica://Buildings/Resources/Scripts/Dymola/DHC/Examples/Combined/SeriesVariableFlowAgentControl.mos"
+  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlant.mos"
   "Simulate and plot"),
   experiment(
       StopTime=604800,
