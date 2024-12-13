@@ -10,7 +10,6 @@ model SinglePlant
     "Library paths of the files with thermal loads as time series";
   parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
     "Pipe diameter (without insulation)";
-  parameter Modelica.Units.SI.Height lDisPip=200 "Distribution pipes length";
   parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
   parameter Modelica.Units.SI.Radius thiGroLay=0.5
     "Dynamic ground layer thickness";
@@ -33,7 +32,9 @@ model SinglePlant
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
   inner parameter ThermalGridJBA.Data.GenericDistrict datDis(
-    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
+    nBui=3,
+    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal,
+    lDis={104,1138,4627/2,4627/2})
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
@@ -49,9 +50,8 @@ model SinglePlant
     "Scale with nominal mass flow rate"
     annotation (Placement(transformation(extent={{24,-190},{44,-170}})));
 
-  Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 1]
-    (
-    each lPip=lDisPip,
+  Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 1](
+    lPip=datDis.lDis,
     each rPip=rPip,
     each thiGroLay=thiGroLay,
     each nSeg=1,
@@ -68,8 +68,8 @@ model SinglePlant
     show_TOut=true,
     mDis_flow_nominal=datDis.mPipDis_flow_nominal,
     mCon_flow_nominal=datDis.mCon_flow_nominal,
-    lDis=datDis.lDis,
-    lEnd=datDis.lEnd,
+    lDis=datDis.lDis[1:end - 1],
+    lEnd=datDis.lDis[end],
     dIns=0.02,
     kIns=0.2)
     annotation (Placement(transformation(extent={{-20,132},{20,152}})));
@@ -77,7 +77,7 @@ model SinglePlant
     redeclare final package Medium = Medium,
     final m_flow_nominal=datDis.mPumDis_flow_nominal,
     final allowFlowReversal=allowFlowReversalSer,
-    dp_nominal=150E3)
+    final dp_nominal=sum(dis.con.pipDis.res.dp_nominal) + dis.pipEnd.res.dp_nominal)
     "Distribution pump"
     annotation (Placement(transformation(
       extent={{10,-10},{-10,10}},
@@ -180,7 +180,8 @@ equation
     annotation (Line(points={{-26.1538,-180},{22,-180}},
                                                  color={0,0,127}));
   connect(TDisWatRet.T, conPum.TSouIn[1]) annotation (Line(points={{-91,-40},{
-          -100,-40},{-100,-174.6},{-54.0308,-174.6}}, color={0,0,127}));
+          -100,-40},{-100,-174.6},{-54.0308,-174.6}},
+                                                 color={0,0,127}));
   connect(TDisWatSup.T, conPum.TSouOut[1]) annotation (Line(points={{-91,20},{
           -102,20},{-102,-183.6},{-54.0308,-183.6}},
                                                    color={0,0,127}));
@@ -235,19 +236,16 @@ equation
   connect(TDisWatRet.T, conVio.u[2]) annotation (Line(points={{-91,-40},{-100,-40},
           {-100,-30},{-60,-30},{-60,-40},{300,-40},{300,20.5},{318,20.5}},
         color={0,0,127}));
-  connect(bou.ports[1], pumDis.port_b)
-    annotation (Line(points={{102,-100},{80,-100},{80,-70}},
-                                                           color={0,127,255}));
-  connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-50},
-          {-80,-100},{80,-100},{80,-70}}, color={0,127,255}));
+  connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-50},{
+          -80,-100},{80,-100},{80,-70}}, color={0,127,255}));
   connect(bui.PPum, PPumETS.u) annotation (Line(points={{12,183},{128,183},{128,
           200},{138,200}}, color={0,0,127}));
   connect(bui.PCoo, PHeaPump.u) annotation (Line(points={{12,187},{120,187},{120,
           160},{138,160}}, color={0,0,127}));
   connect(mPumPla_flow_set.y, pla.mPum_flow) annotation (Line(points={{-218,30},
           {-200,30},{-200,4},{-161.333,4},{-161.333,2.66667}}, color={0,0,127}));
-  connect(dis.port_aDisSup, TDisWatSup.port_b) annotation (Line(points={{-20,
-          142},{-80,142},{-80,30}}, color={0,127,255}));
+  connect(dis.port_aDisSup, TDisWatSup.port_b) annotation (Line(points={{-20,142},
+          {-80,142},{-80,30}}, color={0,127,255}));
   connect(dis.port_bDisSup, pumDis.port_a)
     annotation (Line(points={{20,142},{80,142},{80,-50}}, color={0,127,255}));
   annotation (

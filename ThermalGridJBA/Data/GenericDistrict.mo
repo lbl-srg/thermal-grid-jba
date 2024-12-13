@@ -16,12 +16,10 @@ record GenericDistrict "District network design parameters"
     "Maximum loop temperature";
   parameter Real dp_length_nominal(final unit="Pa/m") = 250
     "Pressure drop per pipe length at nominal flow rate";
-  parameter Modelica.Units.SI.Length lDis[nBui]=fill(100, nBui)
-    "Length of the distribution pipe before each connection";
+  parameter Modelica.Units.SI.Length lDis[nBui+1]=fill(100, nBui+1)
+    "Length of distribution pipe, from plant to each building back to plant";
   parameter Modelica.Units.SI.Length lCon[nBui]=fill(10, nBui)
     "Length of each connection pipe (supply only, not counting return line)";
-  parameter Modelica.Units.SI.Length lEnd=sum(lDis)
-    "Length of the end of the distribution line (after last connection)";
   annotation (
     defaultComponentName="datDis",
     defaultComponentPrefixes="inner",
