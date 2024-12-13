@@ -4,9 +4,7 @@ model SinglePlant
   extends Modelica.Icons.Example;
 
   parameter String filNam[nBui]={
-    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1569.mos",
-    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1380.mos",
-    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1560.mos"}
+    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All.mos"}
     "Library paths of the files with thermal loads as time series";
   parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
     "Pipe diameter (without insulation)";
@@ -32,9 +30,9 @@ model SinglePlant
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
   inner parameter ThermalGridJBA.Data.GenericDistrict datDis(
-    nBui=3,
+    nBui=1,
     mCon_flow_nominal=bui.ets.hex.m1_flow_nominal,
-    lDis={104,1138,4627/2,4627/2})
+    lDis={1242,4627})
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
