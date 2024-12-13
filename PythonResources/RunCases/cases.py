@@ -28,7 +28,7 @@ def handwrite_cases():
           "building": buil,
           "start_time": 90*24*3600,
           "stop_time":  100*24*3600,
-          "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/{buil}.mos"}})
+          "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
          
     buil = '1065'
     cases.append( \
@@ -37,7 +37,7 @@ def handwrite_cases():
           "building": buil,
           "start_time": 90*24*3600,
           "stop_time":  100*24*3600,
-          "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/{buil}.mos"}})
+          "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
     
     return cases
 
@@ -62,7 +62,7 @@ def construct_cases():
               "building": buil,
               "start_time": 90*24*3600,
               "stop_time":  100*24*3600,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/{buil}.mos"}})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
 
     buil_nos = ['1058x1060',
                 '1065',
@@ -80,7 +80,7 @@ def construct_cases():
               "building": buil,
               "start_time": 90*24*3600,
               "stop_time":  100*24*3600,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/{buil}.mos"}})    
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})    
     
     return cases
 

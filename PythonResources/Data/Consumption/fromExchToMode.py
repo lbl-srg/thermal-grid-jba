@@ -4,11 +4,18 @@
 Created on Wed Jun 12 13:52:38 2024
 
 @author: casper
-"""
 
-# Python script converting
-#   the exchange csv file
-#   to Modelica input mos files.
+This file converts the energy consumption profiles in the csv exchange files
+    to Modelica input mos files.
+The mos files are generated at four levels of grouping indicated in the file name:
+    1. B0000.mos is for a single building, e.g. B1380.
+        Note that the medical complex B1058x1060 is considered one building.
+    2. H00.mos is for a hub used in MILP, e.g. H04 = B1690 + B1691 + B1692.
+    3. CX.mos is for a cluster, which is intended to limit the number of ETS
+        to keep the computation tractable, e.g. CA = H01 + H14 = B1500 + B1345.
+    4. All.mos is for all buildings combined.
+    
+"""
 
 from _config_estcp import * # This imports os and pandas as pd
 
@@ -82,17 +89,53 @@ def main(buil_nos, hubname = ''):
         print(f'Output file generated: {fno}')
 
 #%% Preprocessing
-flag_deleteOldDirectory = False
+flag_deleteOldDirectory = True
 if flag_deleteOldDirectory:
     shutil.rmtree(dirWritMode)
     os.makedirs(dirWritMode, exist_ok = True)
+
+# list of hubs
+dict_hub = {'H01' : ['1500'],
+            'H02' : ['1560'],
+            'H03' : ['1569'],
+            'H04' : ['1690', '1691', '1692'],
+            'H05' : ['1800'],
+            'H06' : ['1676'],
+            'H07' : ['1657'],
+            'H08' : ['1631'],
+            'H09' : ['1359', '1380'],
+            'H10' : ['1045'],
+            'H11' : ['1065'],
+            'H12' : ['1058x1060'],
+            'H13' : ['1349'],
+            'H14' : ['1345']}
+
+# list of clusters
+dict_clu = {'CA' : ['1345', '1500'],
+            'CB' : ['1349', '1058x1060'],
+            'CC' : ['1045', '1065'],
+            'CD' : ['1359', '1380'],
+            'CE' : ['1560', '1569', '1631', '1657', '1676', '1690', '1691', '1692', '1800']}
+
 
 #%% Example call
 
 #main(['1560'])
 
 
-#%% Individual files for each building
+#%% Generate files
 
+# 1. individual buildings
 for buil_no in buil_nos:
-    main([buil_no])
+    main([buil_no],f'B{buil_no}')
+
+# 2. hubs as used in MILP
+for hub, buils in dict_hub.items():
+    main(buils, hub)
+
+# 3. clusters as needed for Modelica
+for hub, buils in dict_clu.items():
+    main(buils, hub)
+
+# 4. all buildings combined
+main(buil_nos, "All")
