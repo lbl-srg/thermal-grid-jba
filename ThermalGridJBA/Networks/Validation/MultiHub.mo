@@ -11,9 +11,9 @@ model MultiHub "Multiple prosumer hubs in a district loop"
   parameter Modelica.Units.SI.Temperature TDis_nominal=273.15+15 "Nominal temperature of district supply";
 
   parameter String filNam[nBui] =
-    {"modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1569.mos",
-     "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1380.mos",
-     "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1560.mos"}
+    {"modelica://ThermalGridJBA/Resources/Data/Consumptions/CA.mos",
+     "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB.mos",
+     "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD.mos"}
     "Array of building load profile file names";
 
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
