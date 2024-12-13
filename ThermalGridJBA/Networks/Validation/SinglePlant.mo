@@ -89,7 +89,7 @@ model SinglePlant
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=180,
-        origin={112,-100})));
+        origin={150,-60})));
   Buildings.DHC.Networks.Connections.Connection1Pipe_R conPla(
     redeclare final package Medium = Medium,
     final mDis_flow_nominal=datDis.mPipDis_flow_nominal,
@@ -248,6 +248,8 @@ equation
           {-80,142},{-80,30}}, color={0,127,255}));
   connect(dis.port_bDisSup, pumDis.port_a)
     annotation (Line(points={{20,142},{80,142},{80,-50}}, color={0,127,255}));
+  connect(pumDis.port_a, bou.ports[1]) annotation (Line(points={{80,-50},{80,
+          -44},{128,-44},{128,-60},{140,-60}}, color={0,127,255}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
