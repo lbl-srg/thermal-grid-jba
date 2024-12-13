@@ -49,19 +49,8 @@ model SinglePlant
     "Scale with nominal mass flow rate"
     annotation (Placement(transformation(extent={{24,-190},{44,-170}})));
 
-  Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup1(redeclare final
-      package Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
-    "District water supply temperature" annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=90,
-        origin={-80,128})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet1(redeclare final
-      package Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
-    "District water return temperature" annotation (Placement(transformation(
-        extent={{10,-10},{-10,10}},
-        rotation=90,
-        origin={80,128})));
-  Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 3](
+  Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 1]
+    (
     each lPip=lDisPip,
     each rPip=rPip,
     each thiGroLay=thiGroLay,
@@ -84,26 +73,6 @@ model SinglePlant
     dIns=0.02,
     kIns=0.2)
     annotation (Placement(transformation(extent={{-20,132},{20,152}})));
-  Buildings.Fluid.FixedResistances.PlugFlowPipe supDisPluFlo(
-    redeclare package Medium = Medium,
-    allowFlowReversal=allowFlowReversalSer,
-    m_flow_nominal=datDis.mPipDis_flow_nominal,
-    length=lDisPip,
-    dIns=0.02,
-    kIns=0.2) annotation (Placement(transformation(
-        extent={{-10,10},{10,-10}},
-        rotation=90,
-        origin={-80,92})));
-  Buildings.Fluid.FixedResistances.PlugFlowPipe retDisPluFlo(
-    redeclare package Medium = Medium,
-    allowFlowReversal=allowFlowReversalSer,
-    m_flow_nominal=datDis.mPipDis_flow_nominal,
-    length=lDisPip,
-    dIns=0.02,
-    kIns=0.2) annotation (Placement(transformation(
-        extent={{10,-10},{-10,10}},
-        rotation=90,
-        origin={80,92})));
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumDis(
     redeclare final package Medium = Medium,
     final m_flow_nominal=datDis.mPumDis_flow_nominal,
@@ -148,10 +117,9 @@ model SinglePlant
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,20})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatBorLvg(redeclare final
-      package Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
-    "District water borefield leaving temperature" annotation (Placement(
-        transformation(
+  Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet(redeclare final package
+      Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
+    "District water return temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,-40})));
@@ -211,16 +179,11 @@ equation
   connect(conPum.y, gai.u)
     annotation (Line(points={{-26.1538,-180},{22,-180}},
                                                  color={0,0,127}));
-  connect(TDisWatBorLvg.T, conPum.TSouIn[1]) annotation (Line(points={{-91,-40},
-          {-100,-40},{-100,-174.6},{-54.0308,-174.6}},
-                                                  color={0,0,127}));
+  connect(TDisWatRet.T, conPum.TSouIn[1]) annotation (Line(points={{-91,-40},{
+          -100,-40},{-100,-174.6},{-54.0308,-174.6}}, color={0,0,127}));
   connect(TDisWatSup.T, conPum.TSouOut[1]) annotation (Line(points={{-91,20},{
           -102,20},{-102,-183.6},{-54.0308,-183.6}},
                                                    color={0,0,127}));
-  connect(TDisWatSup1.port_b, dis.port_aDisSup) annotation (Line(points={{-80,138},
-          {-80,142},{-20,142}}, color={0,127,255}));
-  connect(dis.port_bDisSup, TDisWatRet1.port_a)
-    annotation (Line(points={{20,142},{80,142},{80,138}}, color={0,127,255}));
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,152},
           {-14,152},{-14,180},{-10,180}},color={0,127,255}));
   connect(dis.ports_aCon, bui.port_bSerAmb) annotation (Line(points={{12,152},{
@@ -229,27 +192,15 @@ equation
   connect(dis.TOut, conPum.TMix) annotation (Line(points={{22,136},{34,136},{34,
           156},{-380,156},{-380,-168},{-54.0308,-168},{-54.0308,-167.4}},
                                                     color={0,0,127}));
-  connect(TDisWatSup.port_b, supDisPluFlo.port_a)
-    annotation (Line(points={{-80,30},{-80,82}}, color={0,127,255}));
-  connect(supDisPluFlo.port_b, TDisWatSup1.port_a) annotation (Line(points={{-80,102},
-          {-80,118}},                color={0,127,255}));
-  connect(TDisWatRet1.port_b, retDisPluFlo.port_a)
-    annotation (Line(points={{80,118},{80,102}}, color={0,127,255}));
   connect(pipeGroundCouplingMulti[1:(nBui+1)].heatPorts[1], dis.heatPorts)
     annotation (Line(points={{1,95},{1,96},{0.4,96},{0.4,139.8}},
         color={127,0,0}));
-  connect(supDisPluFlo.heatPort, pipeGroundCouplingMulti[nBui + 2].heatPorts[1])
-    annotation (Line(points={{-70,92},{1,92},{1,95}},
-        color={191,0,0}));
-  connect(retDisPluFlo.heatPort, pipeGroundCouplingMulti[nBui + 3].heatPorts[1])
-    annotation (Line(points={{70,92},{1,92},{1,95}},                     color={
-          191,0,0}));
   connect(bui.QCoo_flow, conPum.QCoo_flow) annotation (Line(points={{7,168},{7,
           160},{-388,160},{-388,-190.8},{-54.0308,-190.8}},
         color={0,0,127}));
   connect(conPla.port_bDis, TDisWatSup.port_a)
     annotation (Line(points={{-80,0},{-80,10}}, color={0,127,255}));
-  connect(TDisWatBorLvg.port_b, conPla.port_aDis)
+  connect(TDisWatRet.port_b, conPla.port_aDis)
     annotation (Line(points={{-80,-30},{-80,-20}}, color={0,127,255}));
   connect(pla.port_bSerAmb, conPla.port_aCon) annotation (Line(points={{-140,-0.666667},
           {-100,-0.666667},{-100,-4},{-90,-4}},
@@ -281,22 +232,24 @@ equation
                            color={0,0,127}));
   connect(TDisWatSup.T, conVio.u[1]) annotation (Line(points={{-91,20},{-100,20},
           {-100,12},{-60,12},{-60,19.5},{318,19.5}},       color={0,0,127}));
-  connect(TDisWatBorLvg.T, conVio.u[2]) annotation (Line(points={{-91,-40},{-100,
-          -40},{-100,-30},{-60,-30},{-60,-40},{300,-40},{300,20.5},{318,20.5}},
-                                                        color={0,0,127}));
+  connect(TDisWatRet.T, conVio.u[2]) annotation (Line(points={{-91,-40},{-100,-40},
+          {-100,-30},{-60,-30},{-60,-40},{300,-40},{300,20.5},{318,20.5}},
+        color={0,0,127}));
   connect(bou.ports[1], pumDis.port_b)
     annotation (Line(points={{102,-100},{80,-100},{80,-70}},
                                                            color={0,127,255}));
-  connect(TDisWatBorLvg.port_a, pumDis.port_b) annotation (Line(points={{-80,-50},
+  connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-50},
           {-80,-100},{80,-100},{80,-70}}, color={0,127,255}));
   connect(bui.PPum, PPumETS.u) annotation (Line(points={{12,183},{128,183},{128,
           200},{138,200}}, color={0,0,127}));
   connect(bui.PCoo, PHeaPump.u) annotation (Line(points={{12,187},{120,187},{120,
           160},{138,160}}, color={0,0,127}));
-  connect(retDisPluFlo.port_b, pumDis.port_a)
-    annotation (Line(points={{80,82},{80,-50}}, color={0,127,255}));
   connect(mPumPla_flow_set.y, pla.mPum_flow) annotation (Line(points={{-218,30},
           {-200,30},{-200,4},{-161.333,4},{-161.333,2.66667}}, color={0,0,127}));
+  connect(dis.port_aDisSup, TDisWatSup.port_b) annotation (Line(points={{-20,
+          142},{-80,142},{-80,30}}, color={0,127,255}));
+  connect(dis.port_bDisSup, pumDis.port_a)
+    annotation (Line(points={{20,142},{80,142},{80,-50}}, color={0,127,255}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
