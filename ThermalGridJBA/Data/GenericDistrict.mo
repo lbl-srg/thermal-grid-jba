@@ -4,7 +4,8 @@ record GenericDistrict "District network design parameters"
   parameter Integer nBui = 3
     "Number of served buildings"
     annotation(Evaluate=true);
-  parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=95
+  parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=
+    sum(mCon_flow_nominal)
     "Nominal mass flow rate of main distribution pump";
   parameter Modelica.Units.SI.MassFlowRate mPipDis_flow_nominal=
       mPumDis_flow_nominal "Nominal mass flow rate for main pipe sizing";
