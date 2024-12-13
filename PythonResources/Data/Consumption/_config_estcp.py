@@ -6,9 +6,9 @@ import os
 import pandas as pd
 
 #%% shared attributes
-stags = ['base', 'post']
+stags = ['base', 'post', 'futu']
     # stages:
-    #   baseline, post-ECM
+    #   baseline, post-ECM, future
 utils = ['ele', 'coo', 'hea', 'dhw']
     # utility types:
     #   electricity, cooling, heating, domestic hot water
@@ -44,10 +44,6 @@ dirWritMode = 'Modelica' # Modelica input xlsx files
 dirFigu = 'Figures'
 dirTabl = 'Tables'
 dirTex = 'Latex'
-
-#%% building groups
-west = [elem for elem in buil_nos if elem not in {'5300', '5301'}]
-    # west campus, excludes the two buildings east of runway
 
 #%% functions
 def readMID(MID : str):

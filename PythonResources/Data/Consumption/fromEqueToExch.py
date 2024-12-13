@@ -20,14 +20,17 @@ if flag_deleteOldDirectory:
     shutil.rmtree(dirExch)
     os.makedirs(dirExch, exist_ok = True)
 
-retr = 'post' # retrofit: 'base' baseline ,
-              #           'post' post-ECM
+stag = 'futu' # stage: 'base' baseline ,
+              #        'post' post-ECM ,
+              #        'futu' future .
 
 for buil_no in buil_nos:
-    if retr == 'base':
+    if stag == 'base':
         filename = f'{buil_no}*Baseline*.csv'
-    elif retr == 'post':
+    elif stag == 'post':
         filename = f'{buil_no}*Post*.csv'
+    elif stag == 'futu':
+        filename = f'{buil_no}*Future*.csv'
     else:
         filename = ''
     
@@ -49,7 +52,7 @@ for buil_no in buil_nos:
             # if column is empty
             continue
 
-        with open(os.path.join(dirExch, f'{retr}_{buil_no}_{util}.csv'),
+        with open(os.path.join(dirExch, f'{stag}_{buil_no}_{util}.csv'),
                   'w',
                   newline='') as fw:
             writer = csv.DictWriter(fw,
