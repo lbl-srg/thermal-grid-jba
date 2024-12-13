@@ -257,7 +257,8 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlant.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=604800,
+      StartTime=7776000,
+      StopTime=8640000,
       Tolerance=1e-06),
     Documentation(info="<html>
 <p>
