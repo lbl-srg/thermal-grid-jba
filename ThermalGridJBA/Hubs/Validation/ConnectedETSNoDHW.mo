@@ -6,7 +6,7 @@ model ConnectedETSNoDHW
     "Medium model";
 
   parameter String filNam =
-    "modelica://ThermalGridJBA/Resources/Data/Hubs/Individual/1500.mos";
+    "modelica://ThermalGridJBA/Resources/Data/Consumptions/B1500.mos";
 
   Buildings.Fluid.Sources.Boundary_pT supAmbWat(
     redeclare package Medium = Medium,
