@@ -74,7 +74,7 @@ model IdealHeatingCoolingPlant
         extent={{-40,-40},{40,40}},
         rotation=90,
         origin={240,340})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QCoo_fllow(final unit="W")
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QCoo_flow(final unit="W")
     "Heat flow rate for cooling" annotation (Placement(transformation(extent={{380,
             300},{420,340}}), iconTransformation(
         extent={{-40,-40},{40,40}},
@@ -103,7 +103,7 @@ equation
           {338,320}}, color={0,0,127}));
   connect(limHea.y, QHea_flow)
     annotation (Line(points={{362,360},{400,360}}, color={0,0,127}));
-  connect(limCoo.y, QCoo_fllow)
+  connect(limCoo.y, QCoo_flow)
     annotation (Line(points={{362,320},{400,320}}, color={0,0,127}));
     annotation(defaultComponentName="pla",
 Documentation(info="
