@@ -35,11 +35,11 @@ def main(buil_nos, hubname = ''):
     flag = False # flag when data found to generate output files
     #for buil_no, util in [(buil_no, util) for buil_no in buil_nos for util in utils]:
     for buil_no in buil_nos:
-        MID_coo = f'post_{buil_no}_coo'
+        MID_coo = f'futu_{buil_no}_coo'
         df['coo'] = df['coo'] - np.array(readMID(MID_coo)) * 1000
-        MID_hea = f'post_{buil_no}_hea'
+        MID_hea = f'futu_{buil_no}_hea'
         df['hea'] = df['hea'] + np.array(readMID(MID_hea)) * 1000
-        MID_dhw = f'post_{buil_no}_dhw'
+        MID_dhw = f'futu_{buil_no}_dhw'
         if os.path.isfile(os.path.join(dirExch, f'{MID_dhw}.csv')):
             df['dhw'] = df['dhw'] + np.array(readMID(MID_dhw)) * 1000        
         
