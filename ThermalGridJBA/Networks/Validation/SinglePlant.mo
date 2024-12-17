@@ -12,7 +12,7 @@ model SinglePlant
   parameter Modelica.Units.SI.Radius thiGroLay=0.5
     "Dynamic ground layer thickness";
   package Medium = Buildings.Media.Water "Medium model";
-  constant Real facMul = 10
+  constant Real facMul = 1
     "Building loads multiplier factor";
   parameter Real dpDis_length_nominal(final unit="Pa/m") = 250
     "Pressure drop per pipe length at nominal flow rate - Distribution line";
@@ -26,7 +26,7 @@ model SinglePlant
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
   parameter Modelica.Units.SI.Length dhPla(fixed=false,start=0.05,min=0.01)
     "Hydraulic diameter of the distribution pipe before each connection";
-  parameter Integer nBui =datDis.nBui
+  final parameter Integer nBui =datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
   inner parameter ThermalGridJBA.Data.GenericDistrict datDis(
