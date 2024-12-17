@@ -24,11 +24,8 @@ model SinglePlant
   final parameter Integer nBui =datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
-  inner parameter ThermalGridJBA.Data.GenericDistrict datDis(
-    nBui=1,
-    filNam={"modelica://ThermalGridJBA/Resources/Data/Consumptions/All.mos"},
-    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal,
-    lDis={1242,4627})
+  inner parameter ThermalGridJBA.Data.Districts.SingleHub datDis(
+    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
