@@ -1,9 +1,11 @@
 within ThermalGridJBA.Data;
 record GenericDistrict "District network design parameters"
   extends Modelica.Icons.Record;
-  parameter Integer nBui = 3
+  parameter Integer nBui
     "Number of served buildings"
     annotation(Evaluate=true);
+  parameter String filNam[nBui]
+    "Library paths of the files with thermal loads as time series";
   parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=
     sum(mCon_flow_nominal)
     "Nominal mass flow rate of main distribution pump";

@@ -3,17 +3,12 @@ model SinglePlant
   "Different implementation of SinglePlant to work around Dymola bug"
   extends Modelica.Icons.Example;
 
-  parameter String filNam[nBui]={
-    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All.mos"}
-    "Library paths of the files with thermal loads as time series";
   parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
     "Pipe diameter (without insulation)";
   parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
   parameter Modelica.Units.SI.Radius thiGroLay=0.5
     "Dynamic ground layer thickness";
   package Medium = Buildings.Media.Water "Medium model";
-  constant Real facMul = 1
-    "Building loads multiplier factor";
   parameter Real dpDis_length_nominal(final unit="Pa/m") = 250
     "Pressure drop per pipe length at nominal flow rate - Distribution line";
   parameter Real dpCon_length_nominal(final unit="Pa/m") = 250
@@ -31,6 +26,7 @@ model SinglePlant
     annotation (Evaluate=true);
   inner parameter ThermalGridJBA.Data.GenericDistrict datDis(
     nBui=1,
+    filNam={"modelica://ThermalGridJBA/Resources/Data/Consumptions/All.mos"},
     mCon_flow_nominal=bui.ets.hex.m1_flow_nominal,
     lDis={1242,4627})
     "Parameters for the district network"
@@ -123,8 +119,8 @@ model SinglePlant
         origin={-80,-40})));
   ThermalGridJBA.Hubs.ConnectedETS
     bui[nBui](
-    final filNam = filNam,
-    bui(each final facMul=facMul),
+    final filNam = datDis.filNam,
+    bui(each final facMul=1),
     redeclare each final package MediumBui = Medium,
     redeclare each final package MediumSer = Medium,
     each final allowFlowReversalBui=allowFlowReversalBui,
