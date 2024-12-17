@@ -21,7 +21,7 @@ model SinglePlant
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
   parameter Modelica.Units.SI.Length dhPla(fixed=false,start=0.05,min=0.01)
     "Hydraulic diameter of the distribution pipe before each connection";
-  final parameter Integer nBui =datDis.nBui
+  final parameter Integer nBui=datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
   inner parameter ThermalGridJBA.Data.Districts.SingleHub datDis(
@@ -125,7 +125,7 @@ model SinglePlant
     each final TDisWatMin=datDis.TLooMin,
     each final TDisWatMax=datDis.TLooMax) "Building and ETS"
     annotation (Placement(transformation(extent={{-10,170},{10,190}})));
- Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)
     "ETS pump power"
     annotation (Placement(transformation(extent={{140,190},{160,210}})));
   Modelica.Blocks.Continuous.Integrator EPumETS(
@@ -139,17 +139,17 @@ model SinglePlant
   Modelica.Blocks.Continuous.Integrator EPumPla(initType=Modelica.Blocks.Types.Init.InitialState)
     "Plant pump electric energy"
     annotation (Placement(transformation(extent={{220,30},{240,50}})));
- Buildings.Controls.OBC.CDL.Reals.MultiSum EPum(nin=3)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum EPum(nin=3)
     "Total pump electric energy"
     annotation (Placement(transformation(extent={{280,110},{300,130}})));
- Buildings.Controls.OBC.CDL.Reals.MultiSum PHeaPump(nin=nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PHeaPump(nin=nBui)
     "Heat pump power"
     annotation (Placement(transformation(extent={{140,150},{160,170}})));
   Modelica.Blocks.Continuous.Integrator EHeaPum(
     initType=Modelica.Blocks.Types.Init.InitialState)
     "Heat pump electric energy"
     annotation (Placement(transformation(extent={{220,150},{240,170}})));
- Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=2) "Total electric energy"
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=2) "Total electric energy"
     annotation (Placement(transformation(extent={{320,150},{340,170}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
