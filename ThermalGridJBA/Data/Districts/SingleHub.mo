@@ -13,6 +13,6 @@ record SingleHub
 <p>
 One hub containing combined loads of all in-scope buildings of JBA.
 The location of the combined hub is assumed at
-Malcom Grow Medical Complex (1058-1060).
+Malcolm Grow Medical Complex (1058-1060).
 </html>"));
 end SingleHub;

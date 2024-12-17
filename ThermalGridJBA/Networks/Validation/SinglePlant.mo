@@ -1,6 +1,6 @@
 within ThermalGridJBA.Networks.Validation;
 model SinglePlant
-  "Different implementation of SinglePlant to work around Dymola bug"
+  "District network with a single plant and a single combined hub"
   extends Modelica.Icons.Example;
 
   parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
@@ -24,7 +24,7 @@ model SinglePlant
   final parameter Integer nBui=datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
-  inner parameter ThermalGridJBA.Data.Districts.SingleHub datDis(
+  inner replaceable parameter ThermalGridJBA.Data.Districts.SingleHub datDis(
     mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
@@ -256,9 +256,6 @@ equation
 Adapted from
 <a href=\"modelica://Buildings.DHC.Examples.Combined.BaseClasses.PartialSeries\">
 Buildings.DHC.Examples.Combined.BaseClasses.PartialSeries</a>.
-</p>
-<p>
-Todo: Complete parameterisation of the buried pipes.
 </p>
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
