@@ -1,5 +1,5 @@
 within ThermalGridJBA.Networks.Validation;
-model SinglePlant
+model SinglePlantSingleHub
   "District network with a single plant and a single combined hub"
   extends Modelica.Icons.Example;
 
@@ -245,7 +245,7 @@ equation
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
     __Dymola_Commands(
-  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlant.mos"
+  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
       StartTime=7776000,
@@ -259,4 +259,4 @@ Buildings.DHC.Examples.Combined.BaseClasses.PartialSeries</a>.
 </p>
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
-end SinglePlant;
+end SinglePlantSingleHub;
