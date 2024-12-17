@@ -1,10 +1,10 @@
 removePlots();
-simulateModel("ThermalGridJBA.Networks.Validation.SinglePlant",
+simulateModel("ThermalGridJBA.Networks.Validation.SinglePlantSingleHub",
     method="cvode",
     tolerance=1e-6,
     startTime=7776000,
     stopTime=8640000,
-    resultFile="SinglePlant");
+    resultFile="SinglePlantSingleHub");
 createPlot(id=1, position={324, 3, 614, 567}, y={"ETot.y", "EHeaPum.y", "EPum.y"}, range={90.0, 100.0, -1000000000000.0, 4000000000000.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="d");
 createPlot(id=1, position={324, 3, 614, 567}, y={"EPumETS.y", "EPumPla.y", "EPumDis.y", "EPum.y"}, range={90.0, 100.0, -200000000000.0, 1000000000000.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}, {0,140,72}, {217,67,180}}, timeUnit="d");
 createPlot(id=2, position={282, 42, 658, 576}, y={"datDis.mPumDis_flow_nominal", "pumDis.m_flow"}, range={90.0, 100.0, 0.0, 500.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}}, timeUnit="d", displayUnits={"kg/s", "kg/s"});
