@@ -76,10 +76,10 @@ equation
     Documentation(info="<html>
 <p>
 Validation model for a single building without DHW integration in the ETS.
-The model can load any building record even if the record has
-<code>have_hotWat=true</code>.
-This Boolean switch would be overriden to <code>false</code> and any DHW
-load would be ignored.
+The model itself does not impose that DHW integration is not present.
+This information is determined from the load profile.
+The following buildings do not have DHW load and are suitable for this model:
+1045, 1345, 1349, 1359, 1500, 1560, 1569, 1676.
 </p>
 </html>"));
 end ConnectedETSNoDHW;

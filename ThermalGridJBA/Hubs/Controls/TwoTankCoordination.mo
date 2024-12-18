@@ -134,5 +134,67 @@ equation
   connect(withoutDHW.y, y) annotation (Line(points={{12,-50},{70,-50},{70,0},{120,
           0}}, color={255,0,255}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
-        coordinateSystem(preserveAspectRatio=false)));
+        coordinateSystem(preserveAspectRatio=false)),
+Documentation(info="
+<html>
+<p>
+This block routes the connectors on the evaporator side of the ETS
+depending on whether DHW integration is present.
+It also sends a signal to open the diversion valve when there is HHW or DHW
+load present. If the DHW integration is present, this block also controls
+the mixing valve which directs the condenser water to the HHW or DHW tanks,
+sometimes both.
+</p>
+<p>
+When DHW integration is present:
+</p>
+<table><thead>
+  <tr>
+    <th colspan=\"2\">Input: load present</th>
+    <th colspan=\"4\">Output</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td>DHW</td>
+    <td>HHW</td>
+    <td>yMix</td>
+    <td>yDiv</td>
+    <td>TTop</td>
+    <td>TSet</td>
+  </tr>
+  <tr>
+    <td>T</td>
+    <td>T</td>
+    <td>0.5</td>
+    <td>1</td>
+    <td>The one with higher TSet</td>
+    <td>Max of two</td>
+  </tr>
+  <tr>
+    <td>T</td>
+    <td>F</td>
+    <td>0</td>
+    <td>1</td>
+    <td>DHW</td>
+    <td>DHW</td>
+  </tr>
+  <tr>
+    <td>F</td>
+    <td>T</td>
+    <td>1</td>
+    <td>1</td>
+    <td>HHW</td>
+    <td>HHW</td>
+  </tr>
+  <tr>
+    <td>F</td>
+    <td>F</td>
+    <td>1</td>
+    <td>0</td>
+    <td>HHW</td>
+    <td>HHW</td>
+  </tr>
+</tbody>
+</table>
+</html>"));
 end TwoTankCoordination;
