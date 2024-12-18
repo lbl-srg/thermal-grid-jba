@@ -23,7 +23,8 @@ model ConnectedETS
       TCon_start=if have_hotWat
                  then min(datBuiSet.THeaWatSup_nominal,datBuiSet.THotWatSupTan_nominal)
                  else datBuiSet.THeaWatSup_nominal,
-      TEva_start=datBuiSet.TChiWatSup_nominal));
+      TEva_start=datBuiSet.TChiWatSup_nominal,
+      TConLvgHotSet(final k=datBuiSet.THotWatSupTan_nominal)));
   parameter
     Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
     VTan=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
@@ -50,14 +51,6 @@ model ConnectedETS
     y(final unit="K", displayUnit="degC")) if have_hotWat
                                              "Domestic cold water temperature"
     annotation (Placement(transformation(extent={{-140,-50},{-120,-30}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter loaHotNor(k=1/
-        QHot_flow_nominal) if have_hotWat
-                           "Normalized DHW load"
-    annotation (Placement(transformation(extent={{-140,-200},{-120,-180}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold uHot(final t=0.01, final h=0.005)
-    if have_hotWat
-    "Enable hot water"
-    annotation (Placement(transformation(extent={{-100,-200},{-80,-180}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput dHHeaWat_flow(final unit="W")
     "Heating water distributed energy flow rate"
     annotation (Placement(transformation(extent={{300,-140},{340,-100}}),
@@ -86,13 +79,6 @@ equation
           {-70,-66},{-70,0},{-118,0}}, color={0,0,127}));
   connect(TColWat.y, ets.TColWat) annotation (Line(points={{-118,-40},{-74,-40},
           {-74,-70},{-34,-70}}, color={0,0,127}));
-  connect(loaHotNor.y, uHot.u)
-    annotation (Line(points={{-118,-190},{-102,-190}}, color={0,0,127}));
-  connect(uHot.y,ets.uDHW)  annotation (Line(points={{-78,-190},{-38,-190},{-38,
-          -54},{-34,-54}}, color={255,0,255}));
-  connect(loaHotNor.u, bui.QReqHotWat_flow) annotation (Line(points={{-142,-190},
-          {-150,-190},{-150,-212},{-36,-212},{-36,-146},{84,-146},{84,-2},{28,-2},
-          {28,4}}, color={0,0,127}));
   connect(ets.dHChiWat_flow, dHChiWat_flow) annotation (Line(points={{28,-90},{
           28,-100},{280,-100},{280,-80},{320,-80}}, color={0,0,127}));
   connect(dHHeaWat_flow, ets.dHHeaWat_flow) annotation (Line(points={{320,-120},

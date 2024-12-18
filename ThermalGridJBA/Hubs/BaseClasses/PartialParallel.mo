@@ -77,10 +77,6 @@ model PartialParallel
     annotation (Dialog(group="Buffer Tank"));
 
   // IO VARIABLES
-  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uHea
-    "Heating enable signal"
-    annotation (Placement(transformation(extent={{-340,80},{-300,120}}),iconTransformation(extent={{-380,60},
-            {-300,140}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uCoo
     "Cooling enable signal"
     annotation (Placement(transformation(extent={{-340,40},{-300,80}}),iconTransformation(extent={{-380,20},
@@ -268,8 +264,7 @@ equation
     Documentation(
       info="<html>
 <p>
-Revised from Buildings with the connectors in the icon moved
-to make space for more connectors.
+Revised from Buildings.DHC.ETS.Combined.BaseClasses.PartialParallel.
 </p>
 </html>"));
 end PartialParallel;

@@ -152,11 +152,6 @@ model ChillerThreeUtilities
         extent={{-10,-10},{10,10}},
         rotation=180,
         origin={-130,130})));
-  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uDHW if have_hotWat
-    "DHW production enable signal"
-    annotation (Placement(transformation(extent={{-340,0},{-300,40}}),
-                                     iconTransformation(extent={{-380,-20},{-300,
-            60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THotWatSupSet(final unit="K",
       displayUnit="degC") if have_hotWat
     "Domestic hot water temperature set point for supply to fixtures"
@@ -188,8 +183,8 @@ model ChillerThreeUtilities
         rotation=0,
         origin={-340,-180})));
 
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TConLvgHotSet(final k=50 +
-        273.15) if have_hotWat
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TConLvgHotSet(k=50 + 273.15)
+                if have_hotWat
     "Condenser leaving temperature set point for DHW"
     annotation (Placement(transformation(extent={{-220,270},{-200,290}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput dHHotWat_flow(final unit="W")
@@ -490,5 +485,31 @@ equation
           smooth=Smooth.None,
           fillColor={255,255,255},
           fillPattern=FillPattern.Solid),
-        Rectangle(extent={{-262,140},{258,-142}}, lineColor={95,95,95})}));
+        Rectangle(extent={{-262,140},{258,-142}}, lineColor={95,95,95})}),
+Documentation(info="
+<html>
+<p>
+Adapted from Buildings.DHC.ETS.Combined.ChillerBorefield with the following
+modifications, with some at the parent level:
+</p>
+<ul>
+<li>
+Added a domestic hot water component and related hydraulic components
+and controls blocks. The DHW consumption is computed within this model
+instead of via external connectors.
+</li>
+<li>
+Replaced the water tank components with a component that includes a charge
+command Boolean signal. This is currently done only with the HHW side.
+The same modification is planned for the CHW side.
+</li>
+<li>
+The supervisory controller heating input signal <code>uHea</code> now comes
+from the tank(s) instead of coming externally. This is because the synthetic
+hourly DHW load profile from calibrated simulation is always positive,
+effectively keeping the heating enabled at all times.
+The same modification is planeed for the CHW side.
+</li>
+</ul>
+</html>"));
 end ChillerThreeUtilities;

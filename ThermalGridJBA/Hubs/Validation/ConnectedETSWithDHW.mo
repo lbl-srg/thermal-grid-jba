@@ -15,10 +15,10 @@ annotation(
 Documentation(info="<html>
 <p>
 Validation model for a single building with DHW integration in the ETS.
-The model can load any building record even if the record has
-<code>have_hotWat=false</code>.
-This Boolean switch would be overriden to <code>true</code> and the DHW
-subsystem would be present without any load.
+The model itself does not impose that DHW integration is present.
+This information is determined from the load profile.
+The following buildings have DHW load and are suitable for this model:
+1058x1060, 1065, 1380, 1631, 1657, 1690, 1691, 1692, 1800.
 </p>
 </html>"));
 end ConnectedETSWithDHW;
