@@ -124,6 +124,60 @@ def plot_box_whisker(data):
     plt.tight_layout()
     plt.show()
 
+def plot_distribution_comparison(data, methods):
+    """Creates a figure with two subplots: KDE and horizontal box-whisker plots."""
+    # Filter data for specified methods
+    filtered_data = data[data['Method'].isin(methods)]
+    filtered_data['Method'] = filtered_data['Method'].cat.remove_unused_categories()  
+    
+    # Create a figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 4), sharex=True)
+    
+    # Plot KDE for each method on the top subplot
+    palette = sns.color_palette('Set2', len(filtered_data['Method'].unique()))
+    for i, method in enumerate(filtered_data['Method'].unique()):
+        method_data = filtered_data[filtered_data['Method'] == method]['DryBulbTemp']
+        sns.kdeplot(method_data, ax=ax1, label=method, fill=True, color=palette[i])
+    #ax1.set_title('Kernel Density Estimation of Dry-Bulb Temperature')
+    ax1.set_ylabel('')
+    ax1.legend(loc='upper left')
+    
+    # Remove y-axis ticks and labels
+    ax1.yaxis.set_ticks([])
+    ax1.yaxis.set_ticklabels([])
+    
+    # Plot horizontal box-whisker plots for each method on the bottom subplot
+    sns.boxplot(x='DryBulbTemp', y='Method', data=filtered_data, ax=ax2, palette=palette)
+    #ax2.set_title('Horizontal Box-and-Whisker Plot of Dry-Bulb Temperature')
+    ax2.set_xlabel('Dry-Bulb Temperature (°C)')
+    ax2.set_ylabel('')
+    
+    # Remove y-axis ticks and labels
+    ax2.yaxis.set_ticks([])
+    ax2.yaxis.set_ticklabels([])
+    
+    # Add a secondary x-axis for Fahrenheit
+    def celsius_to_fahrenheit(celsius):
+        return (celsius * 9/5) + 32
+
+    secax = ax2.secondary_xaxis('top', functions=(celsius_to_fahrenheit, lambda f: (f - 32) * 5/9))
+    secax.set_xlabel('Dry-Bulb Temperature (°F)')
+    
+    # Annotate the median values
+    for i, method in enumerate(filtered_data['Method'].unique()):
+        median_value = filtered_data[filtered_data['Method'] == method]['DryBulbTemp'].median()
+        ax2.text(median_value, i, f'{median_value:.1f} C\n{(median_value * 9/5 + 32):.1f} F', 
+                 horizontalalignment='center', verticalalignment='center', color='black', fontsize=10, weight='bold')
+    
+    # Create a legend for the boxplot
+    handles = [plt.Line2D([], [], marker='s', color='w', label=method, markerfacecolor=palette[i], markersize=10) for i, method in enumerate(filtered_data['Method'].unique())]
+    ax2.legend(handles=handles, loc='lower left')
+    
+    # Adjust layout
+    plt.tight_layout()
+    #plt.savefig(os.path.join('/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Weather/compare-distribution.pdf'), bbox_inches = 'tight')
+    plt.show()
+
 # Main execution
 if __name__ == "__main__":
     # Read the EPW files and get the data
@@ -134,3 +188,6 @@ if __name__ == "__main__":
     
     # Plot the box-and-whisker plots
     plot_box_whisker(weather_data)
+    
+    # Plot the TMY3 and NORESM2 comparison
+    plot_distribution_comparison(weather_data, ['TMY3', 'NORESM2'])
