@@ -77,10 +77,6 @@ model PartialParallel
     annotation (Dialog(group="Buffer Tank"));
 
   // IO VARIABLES
-  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uCoo
-    "Cooling enable signal"
-    annotation (Placement(transformation(extent={{-340,40},{-300,80}}),iconTransformation(extent={{-380,20},
-            {-300,100}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaWatSupSet(
     final unit="K",
     displayUnit="degC")
@@ -128,22 +124,24 @@ model PartialParallel
     final spePum1Min=spePum1HexMin,
     final spePum2Min=spePum2HexMin) "District heat exchanger"
     annotation (Placement(transformation(extent={{-10,-244},{10,-264}})));
-  Buildings.DHC.ETS.BaseClasses.StratifiedTank tanChiWat(
+  ThermalGridJBA.Hubs.BaseClasses.StratifiedTankWithCommand tanChiWat(
     redeclare final package Medium = MediumBui,
+    final isHotTank=false,
     final m_flow_nominal=colChiWat.mDis_flow_nominal,
     final VTan=VTanChiWat,
     final hTan=hTanChiWat,
     final dIns=dInsTanChiWat,
     final nSeg=nSegTan) "Chilled water tank"
-    annotation (Placement(transformation(extent={{180,96},{200,116}})));
+    annotation (Placement(transformation(extent={{180,100},{200,120}})));
   ThermalGridJBA.Hubs.BaseClasses.StratifiedTankWithCommand tanHeaWat(
     redeclare final package Medium = MediumBui,
+    final isHotTank=true,
     final m_flow_nominal=colHeaWat.mDis_flow_nominal,
     final VTan=VTanHeaWat,
     final hTan=hTanHeaWat,
     final dIns=dInsTanHeaWat,
     final nSeg=nSegTan) "Heating hot water tank"
-    annotation (Placement(transformation(extent={{-200,94},{-180,114}})));
+    annotation (Placement(transformation(extent={{-200,100},{-180,120}})));
   Buildings.DHC.ETS.BaseClasses.CollectorDistributor colChiWat(
     redeclare final package Medium = MediumBui,
     final nCon=1 + nSysCoo,
@@ -198,8 +196,8 @@ equation
   connect(hex.PPum,totPPum.u[1])
     annotation (Line(points={{12,-254},{36,-254},{36,-60},{258,-60}},color={0,0,127}));
   connect(tanChiWat.TBot,conSup.TChiWatBot)
-    annotation (Line(points={{201,97},{206,97},{206,0},{-274,0},{-274,19},{-262,
-          19}},                                                                        color={0,0,127}));
+    annotation (Line(points={{201,101},{206,101},{206,0},{-274,0},{-274,19},{
+          -262,19}},                                                                   color={0,0,127}));
   connect(hex.port_b2,colAmbWat.ports_aCon[1])
     annotation (Line(points={{-10,-248},{-20,-248},{-20,-160},{12,-160},{12,-116}},color={0,127,255}));
   connect(hex.port_a2,colAmbWat.ports_bCon[1])
@@ -219,8 +217,6 @@ equation
     annotation (Line(points={{-50,-120},{-30,-120},{-30,-106},{-20,-106}},color={0,127,255}));
   connect(TChiWatSupSet,conSup.TChiWatSupPreSet)
     annotation (Line(points={{-320,-60},{-290,-60},{-290,21},{-262,21}},color={0,0,127}));
-  connect(uCoo,conSup.uCoo)
-    annotation (Line(points={{-320,60},{-292,60},{-292,29},{-262,29}},color={255,0,255}));
   connect(valIsoEva.port_a,colChiWat.ports_aCon[1])
     annotation (Line(points={{70,-120},{90,-120},{90,-24},{108,-24}},
                                                              color={0,127,255}));
@@ -247,6 +243,12 @@ equation
                                                 color={0,0,127}));
   connect(bou.ports[1], colChiWat.port_aDisSup)
     annotation (Line(points={{180,-34},{140,-34}},            color={0,127,255}));
+  connect(tanChiWat.charge, conSup.uCoo) annotation (Line(points={{202,108},{
+          206,108},{206,130},{-264,130},{-264,30},{-262,30},{-262,29}}, color={
+          255,0,255}));
+  connect(TChiWatSupSet, tanChiWat.TTanSet) annotation (Line(points={{-320,-60},
+          {-290,-60},{-290,72},{-266,72},{-266,128},{170,128},{170,119},{179,
+          119}}, color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(

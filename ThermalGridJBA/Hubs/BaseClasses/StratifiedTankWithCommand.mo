@@ -22,6 +22,8 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
   parameter Medium.Temperature T_start=Medium.T_default
     "Temperature start value"
     annotation(Dialog(tab = "Initialization"));
+  parameter Boolean isHotTank
+    "True if the tank supplies hot water, False for chilled water";
 
   // IO CONNECTORS
   Modelica.Fluid.Interfaces.FluidPort_a port_aTop(
@@ -114,20 +116,23 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
     "Tank top temperature"
     annotation (Placement(transformation(extent={{30,30},{50,50}})));
   ThermalGridJBA.Hubs.Controls.TankChargingController tanCha(
-    hysTop=-1,
-    hysBot=-1)
+    hysTop=if isHotTank then -1 else -0.3,
+    hysBot=if isHotTank then -1 else -0.3,
+    final isHotTank=isHotTank)
     "Tank charging command"
     annotation (Placement(transformation(extent={{70,-40},{90,-20}})));
-  Modelica.Blocks.Interfaces.RealInput TTanTopSet(final unit="K", displayUnit=
-        "degC")
-    "Temperature setpoint for top section of hot water tank" annotation (
-      Placement(transformation(extent={{-140,70},{-100,110}}),
+  Modelica.Blocks.Interfaces.RealInput TTanSet(
+    final unit="K",
+    displayUnit="degC")
+    "Tank temperature set point, top for hot tank and bottom for cold tank"
+    annotation (Placement(transformation(extent={{-140,70},{-100,110}}),
         iconTransformation(extent={{-120,80},{-100,100}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput charge
     "Outputs true if tank should be charged" annotation (Placement(
         transformation(extent={{100,-50},{140,-10}}),iconTransformation(extent={{100,-50},
             {140,-10}})));
-  Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(p=-2) "Offset"
+  Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(
+    p=if isHotTank then -2 else 0.5) "Offset"
     annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
 protected
   Modelica.Thermal.HeatTransfer.Components.ThermalCollector theCol(
@@ -169,9 +174,9 @@ equation
           {60,-38},{68,-38}}, color={0,0,127}));
   connect(tanCha.charge, charge)
     annotation (Line(points={{92,-30},{120,-30}}, color={255,0,255}));
-  connect(tanCha.TTanTopSet, dTOff.y) annotation (Line(points={{69,-22},{24,-22},
-          {24,90},{-58,90}}, color={0,0,127}));
-  connect(dTOff.u, TTanTopSet)
+  connect(tanCha.TTanSet, dTOff.y) annotation (Line(points={{69,-22},{24,-22},{
+          24,90},{-58,90}}, color={0,0,127}));
+  connect(dTOff.u, TTanSet)
     annotation (Line(points={{-82,90},{-120,90}}, color={0,0,127}));
   annotation (
     Icon(
