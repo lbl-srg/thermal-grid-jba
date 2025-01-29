@@ -4,7 +4,7 @@ block TankChargingController
 
   parameter Real hysTop = -5 "Hysteresis for tank top";
   parameter Real hysBot = -5 "Hysteresis for tank bottom";
-  parameter Boolean isHotTank
+  parameter Boolean isHotWat
     "True if the tank supplies hot water, False for chilled water";
 
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TTanTop(
@@ -73,9 +73,9 @@ equation
   connect(TBot_in, TBot_out)
     annotation (Line(points={{-120,-60},{120,-60}}, color={0,0,127}));
 end Routing;
-  Routing rouHot if isHotTank "Routing block for hot tank"
+  Routing rouHot if isHotWat "Routing block for hot tank"
     annotation (Placement(transformation(extent={{-80,20},{-60,40}})));
-  Routing rouCol if not isHotTank "Routing block for cold tank"
+  Routing rouCol if not isHotWat "Routing block for cold tank"
     annotation (Placement(transformation(extent={{-80,-60},{-60,-40}})));
 protected
   Buildings.Controls.OBC.CDL.Reals.Hysteresis cha(uLow=hysTop, uHigh=0)

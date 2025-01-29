@@ -223,7 +223,7 @@ model ChillerThreeUtilities
   ThermalGridJBA.Hubs.Controls.TwoTankCoordination twoTankCoordination(
     final have_hotWat=have_hotWat)
     annotation (Placement(transformation(extent={{-140,170},{-120,190}})));
-  ThermalGridJBA.Hubs.Controls.DiversionLock locDivCon
+  ThermalGridJBA.Hubs.Controls.DiversionLock locDivCon(final isHotWat=true)
     "Condenser-side diversion valve lock off"
     annotation (Placement(transformation(extent={{-190,48},{-170,68}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TConOut(
@@ -242,7 +242,7 @@ model ChillerThreeUtilities
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     val(from_dp=false)) "Diversion valve on evaporator side"
     annotation (Placement(transformation(extent={{176,40},{156,60}})));
-  ThermalGridJBA.Hubs.Controls.DiversionLock locDivEva
+  ThermalGridJBA.Hubs.Controls.DiversionLock locDivEva(final isHotWat=false)
     "Evaporator-side diversion valve lock off"
     annotation (Placement(transformation(extent={{120,60},{140,80}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TEvaOut(

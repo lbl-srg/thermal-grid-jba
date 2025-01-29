@@ -22,7 +22,7 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
   parameter Medium.Temperature T_start=Medium.T_default
     "Temperature start value"
     annotation(Dialog(tab = "Initialization"));
-  parameter Boolean isHotTank
+  parameter Boolean isHotWat
     "True if the tank supplies hot water, False for chilled water";
 
   // IO CONNECTORS
@@ -116,9 +116,9 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
     "Tank top temperature"
     annotation (Placement(transformation(extent={{30,30},{50,50}})));
   ThermalGridJBA.Hubs.Controls.TankChargingController tanCha(
-    hysTop=if isHotTank then -1 else -0.3,
-    hysBot=if isHotTank then -1 else -0.3,
-    final isHotTank=isHotTank)
+    hysTop=if isHotWat then -1 else -0.3,
+    hysBot=if isHotWat then -1 else -0.3,
+    final isHotWat=isHotWat)
     "Tank charging command"
     annotation (Placement(transformation(extent={{70,-40},{90,-20}})));
   Modelica.Blocks.Interfaces.RealInput TTanSet(
@@ -132,7 +132,7 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
         transformation(extent={{100,-50},{140,-10}}),iconTransformation(extent={{100,-50},
             {140,-10}})));
   Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(
-    p=if isHotTank then -2 else 0.5) "Offset"
+    p=if isHotWat then -2 else 0.5) "Offset"
     annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
 protected
   Modelica.Thermal.HeatTransfer.Components.ThermalCollector theCol(

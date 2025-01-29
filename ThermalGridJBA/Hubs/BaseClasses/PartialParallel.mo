@@ -126,7 +126,7 @@ model PartialParallel
     annotation (Placement(transformation(extent={{-10,-244},{10,-264}})));
   ThermalGridJBA.Hubs.BaseClasses.StratifiedTankWithCommand tanChiWat(
     redeclare final package Medium = MediumBui,
-    final isHotTank=false,
+    final isHotWat=false,
     final m_flow_nominal=colChiWat.mDis_flow_nominal,
     final VTan=VTanChiWat,
     final hTan=hTanChiWat,
@@ -135,7 +135,7 @@ model PartialParallel
     annotation (Placement(transformation(extent={{180,100},{200,120}})));
   ThermalGridJBA.Hubs.BaseClasses.StratifiedTankWithCommand tanHeaWat(
     redeclare final package Medium = MediumBui,
-    final isHotTank=true,
+    final isHotWat=true,
     final m_flow_nominal=colHeaWat.mDis_flow_nominal,
     final VTan=VTanHeaWat,
     final hTan=hTanHeaWat,
