@@ -115,5 +115,27 @@ annotation (defaultComponentName="looPumSpe",
         fillPattern=FillPattern.Solid),
        Text(extent={{-100,140},{100,100}},
           textString="%name",
-          textColor={0,0,255})}), Diagram(coordinateSystem(preserveAspectRatio=false)));
+          textColor={0,0,255})}), Diagram(coordinateSystem(preserveAspectRatio=false)),
+Documentation(info="
+<html>
+<p>
+It resets the district loop pump speed as the plot below.
+</p>
+<p align=\"center\">
+<img src=\"modelica://ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png\"
+     alt=\"districtPumpControl.png\" />
+</p>
+<p>
+In the plot, the <code>TLow</code> and <code>TUpp</code> are the lower and upper
+bound temperature setpoints. The <code>dTSlo</code> is the temperature difference
+for lineary adjusting the pump speed.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>
+January 31, 2025, by Jianjun Hu:<br/>
+First implementation.
+</li>
+</ul>
+</html>"));
 end DistrictLoopPump;

@@ -1,9 +1,17 @@
 within ThermalGridJBA.Networks.Controls;
 model HeatPump "Sequence for controlling heat pump, its pumps and valves"
 
-  parameter Modelica.Units.SI.MassFlowRate mWat_flow_nominal
+  parameter Real mWat_flow_nominal(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
     "Nominal water mass flow rate";
-  parameter Modelica.Units.SI.MassFlowRate mHpGly_flow_nominal
+  parameter Real mWat_flow_min(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
+    "Heat pump minimum water mass flow rate";
+  parameter Real mHpGly_flow_nominal(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
     "Nominal glycol mass flow rate for heat pump";
   parameter Real TDisLooMin(
     final quantity="ThermodynamicTemperature",
@@ -114,7 +122,7 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     final max=1,
     final unit="1")
     "District loop pump speed setpoint"
-    annotation (Placement(transformation(extent={{-340,-160},{-300,-120}}),
+    annotation (Placement(transformation(extent={{-340,-140},{-300,-100}}),
         iconTransformation(extent={{-140,-80},{-100,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TGlyIn(
     final quantity="ThermodynamicTemperature",
@@ -344,8 +352,7 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     "Minimum condenser inlet temperature"
     annotation (Placement(transformation(extent={{40,-242},{60,-222}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant maxEvaInlTem(
-    final k=TEvaInMax)
-    "Maximum evaporator inlet temperature"
+    final k=TEvaInMax) "Maximum evaporator inlet temperature"
     annotation (Placement(transformation(extent={{40,-190},{60,-170}})));
   Buildings.Controls.OBC.CDL.Reals.Switch thrWayVal
     "Heat pump glycol side 3-way valve"
@@ -367,11 +374,18 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(
     final k=mWat_flow_nominal)
     "Convert mass flow rate"
-    annotation (Placement(transformation(extent={{258,-140},{278,-120}})));
+    annotation (Placement(transformation(extent={{-240,-130},{-220,-110}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai3(
     final k=mHpGly_flow_nominal)
     "Convert mass flow rate"
     annotation (Placement(transformation(extent={{260,-10},{280,10}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant minWatRat(
+    final k=mWat_flow_min)
+    "Minimum water flow through heat pump"
+    annotation (Placement(transformation(extent={{-240,-180},{-220,-160}})));
+  Buildings.Controls.OBC.CDL.Reals.Max max1
+    "Ensure minimum flow through heat pump"
+    annotation (Placement(transformation(extent={{-140,-150},{-120,-130}})));
 
 equation
   connect(higRat.y, higRatMod.u1)
@@ -510,8 +524,6 @@ equation
           -138},{198,-138}}, color={0,0,127}));
   connect(enaHeaPum.y, pumSpe1.u2) annotation (Line(points={{62,60},{84,60},{84,
           -160},{138,-160}}, color={255,0,255}));
-  connect(uDisPum, pumSpe1.u1) annotation (Line(points={{-320,-140},{130,-140},{
-          130,-152},{138,-152}}, color={0,0,127}));
   connect(zer1.y, pumSpe1.u3) annotation (Line(points={{62,-30},{100,-30},{100,-168},
           {138,-168}}, color={0,0,127}));
   connect(sub1.y, swi5.u1) annotation (Line(points={{82,-330},{90,-330},{90,-342},
@@ -572,14 +584,20 @@ equation
           198,52}}, color={255,0,255}));
   connect(and2.y, y1On)
     annotation (Line(points={{222,60},{320,60}}, color={255,0,255}));
-  connect(swi3.y, gai2.u)
-    annotation (Line(points={{222,-130},{256,-130}}, color={0,0,127}));
-  connect(gai2.y, yPum)
-    annotation (Line(points={{280,-130},{320,-130}}, color={0,0,127}));
   connect(swi4.y, gai3.u) annotation (Line(points={{222,-60},{230,-60},{230,0},{
           258,0}}, color={0,0,127}));
   connect(gai3.y, yPumGly)
     annotation (Line(points={{282,0},{320,0}}, color={0,0,127}));
+  connect(uDisPum, gai2.u)
+    annotation (Line(points={{-320,-120},{-242,-120}}, color={0,0,127}));
+  connect(gai2.y, max1.u1) annotation (Line(points={{-218,-120},{-180,-120},{-180,
+          -134},{-142,-134}}, color={0,0,127}));
+  connect(minWatRat.y, max1.u2) annotation (Line(points={{-218,-170},{-180,-170},
+          {-180,-146},{-142,-146}}, color={0,0,127}));
+  connect(max1.y, pumSpe1.u1) annotation (Line(points={{-118,-140},{120,-140},{120,
+          -152},{138,-152}}, color={0,0,127}));
+  connect(swi3.y, yPum)
+    annotation (Line(points={{222,-130},{320,-130}}, color={0,0,127}));
   annotation (defaultComponentName="heaPumCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
@@ -595,12 +613,79 @@ Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}})
 Documentation(info="
 <html>
 <p>
-FIXME:
+The table below shows when the heat pump will be enabled. It also shows how to control
+each related equipment when the heat pump is enabled.
+</p>
+<table summary=\"summary\" border=\"1\">
+<tr>
+<th>Electricity rate (<code>uEleRat</code>)</th>
+<th>District load (<code>uSt</code>)</th>
+<th>Season (<code>uGen</code>)</th>
+<th>Preferred condition</th>
+<th>Mode <code>y1Mod</code></th>
+<th>Heat pump compressor <code>yHeaPum</code></th>
+<th>Waterside valve <code>yVal</code></th>
+<th>Waterside pump <code>yPum</code></th>
+<th>Glycol side pump <code>yPumGly</code></th>
+<th>Glycol side bypass valve <code>yValByp</code></th>
+</tr>
+<tr>
+<td>1 (high)</td>
+<td>3 (high)</td>
+<td>x</td>
+<td><code>TMixAve &lt; (TDisLooMin+TDisLooMax)/2</code></td>
+<td>true (heating)</td>
+<td>track <code>TWatOut = THeaSet</code></td>
+<td>1</td>
+<td><code>uDisPum</code></td>
+<td>1</td>
+<td>track <code>TGlyIn = TEvaInMax</code></td>
+</tr>
+<tr>
+<td>1 (high)</td>
+<td>3 (high)</td>
+<td>x</td>
+<td><code>TMixAve &gt; (TDisLooMin+TDisLooMax)/2</code></td>
+<td>false (cooling)</td>
+<td>track <code>TWatOut = TCooSet</code></td>
+<td>1</td>
+<td><code>uDisPum</code></td>
+<td>1</td>
+<td>track <code>TGlyIn = TConInMin</code></td>
+</tr>
+<tr>
+<td>0 (normal)</td>
+<td>x</td>
+<td>1 (winter)</td>
+<td>x</td>
+<td>true (heating)</td>
+<td>track <code>TWatOut = THeaSet</code></td>
+<td>1</td>
+<td><code>uDisPum</code></td>
+<td>1</td>
+<td>track <code>TGlyIn = TEvaInMax</code></td>
+</tr>
+<tr>
+<td>0 (normal)</td>
+<td>x</td>
+<td>3 (summer)</td>
+<td>x</td>
+<td>false (cooling)</td>
+<td>track <code>TWatOut = TCooSet</code></td>
+<td>1</td>
+<td><code>uDisPum</code></td>
+<td>1</td>
+<td>track <code>TGlyIn = TConInMin</code></td>
+</tr>
+</table>
+<p>
+Note that if the heat pump operates below 20% of the full compressor speed,
+switch it off, and keep it off for 12 hours (<code>offTim</code>, adjustable)
 </p>
 </html>", revisions="<html>
 <ul>
 <li>
-February 3, 2025, by Jianjun Hu:<br/>
+January 31, 2025, by Jianjun Hu:<br/>
 First implementation.
 </li>
 </ul>

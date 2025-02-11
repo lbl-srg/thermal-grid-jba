@@ -2,9 +2,13 @@ within ThermalGridJBA.Networks.Controls;
 model DryCoolerHex
   "Sequence for control dry cooler and heat exchanger"
 
-  parameter Modelica.Units.SI.MassFlowRate mHexGly_flow_nominal
+  parameter Real mHexGly_flow_nominal(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
     "Nominal glycol mass flow rate for heat exchanger";
-  parameter Modelica.Units.SI.MassFlowRate mDryCoo_flow_nominal
+  parameter Real mDryCoo_flow_nominal(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
     "Nominal glycol mass flow rate for dry cooler";
   parameter Real TAppSet(
     final quantity="TemperatureDifference",

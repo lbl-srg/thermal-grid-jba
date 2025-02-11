@@ -251,5 +251,71 @@ annotation (defaultComponentName="ind",
           textString="%name",
           textColor={0,0,255})}),
                           Diagram(coordinateSystem(preserveAspectRatio=false,
-          extent={{-140,-260},{140,280}})));
+          extent={{-140,-260},{140,280}})),
+Documentation(info="
+<html>
+<p>
+It outputs the indicators for current district loop load <code>ySt</code>, electricity
+rate <code>yEleRat</code>, and heating or cooling season <code>yGen</code>.
+</p>
+<h4>Electricity rate indicator</h4>
+<p>
+Based on the current electricity rate, the electricity rate indicator is either set
+to normal rates or high rates.
+</p>
+<p>
+It assumes that in the hour between <code>peaHouSta</code> and <code>peaHouEnd</code>,
+the electricity rate is high and it is normal in other hours.
+</p>
+<h4>District loop load indicator</h4>
+<p>
+Based on the control signal of the district loop pump <code>uDisPum</code>, the
+district loop load indicator <code>ySt</code> is:
+</p>
+<ul>
+<li>
+If <code>uDisPum</code> &ge; 0 and <code>uDisPum</code> &lt; 1/3,
+then <code>ySt</code> = 1;
+</li>
+<li>
+Else if <code>uDisPum</code> &ge; 1/3 and <code>uDisPum</code> &lt; 2/3,
+then <code>ySt</code> = 2;
+</li>
+<li>
+Else, <code>ySt</code> = 3.
+</li>
+</ul>
+<p>
+The district loop pump speed is sampled with frequency specified by
+<code>samplePeriod</code>.
+</p>
+<h4>Seanson indicator</h4>
+<p>
+Based on the week of the year, the plant is either in heating, shoulder or cooling
+mode. The season indicator is used to determine whether the generation should add
+heat or cold to the system if the electrical rates are normal.
+</p>
+<ul>
+<li>
+If current week is later than the winter start week <code>winStaWee</code>, or earlier
+than winter end week <code>winEndWee</code>, it is in the winter senson. Thus,
+<code>yGen</code> = 1.
+</li>
+<li>
+Else if current week is later than the summer start week <code>sumStaWee</code> and
+earlier than summer end week <code>sumEndWee</code>, it is in the summer senson. Thus,
+<code>yGen</code> = 3.
+</li>
+<li>
+Else, it is in the shoulder season. Thus, <code>yGen</code> = 2.
+</li>
+</ul>
+</html>", revisions="<html>
+<ul>
+<li>
+January 31, 2025, by Jianjun Hu:<br/>
+First implementation.
+</li>
+</ul>
+</html>"));
 end Indicators;
