@@ -89,7 +89,7 @@ model ChillerThreeUtilities
 
 
   replaceable
-    Buildings.DHC.ETS.Combined.Subsystems.Chiller
+    ThermalGridJBA.Hubs.BaseClasses.Chiller
     chi(
     redeclare final package Medium = MediumBui,
     final dpCon_nominal=dpCon_nominal,
