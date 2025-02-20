@@ -54,7 +54,7 @@ model DistrictLoopPump
     final k=1)
     "Maximum pump speed"
     annotation (Placement(transformation(extent={{-20,-10},{0,10}})));
-  Buildings.Controls.OBC.CDL.Reals.Line desSpe
+  Buildings.Controls.OBC.CDL.Reals.Line decSpe
     "Decrease pump speed from the maximum to the minimum"
     annotation (Placement(transformation(extent={{20,-70},{40,-50}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant uppSta(
@@ -83,27 +83,26 @@ equation
           {18,64}}, color={0,0,127}));
   connect(maxSpe.y, incSpe.f2)
     annotation (Line(points={{2,0},{10,0},{10,52},{18,52}}, color={0,0,127}));
-  connect(minSpe.y, desSpe.f2) annotation (Line(points={{-38,0},{-30,0},{-30,-68},
+  connect(minSpe.y,decSpe. f2) annotation (Line(points={{-38,0},{-30,0},{-30,-68},
           {18,-68}}, color={0,0,127}));
-  connect(maxSpe.y, desSpe.f1) annotation (Line(points={{2,0},{10,0},{10,-56},{18,
+  connect(maxSpe.y,decSpe. f1) annotation (Line(points={{2,0},{10,0},{10,-56},{18,
           -56}}, color={0,0,127}));
-  connect(TMixMin, desSpe.u)
+  connect(TMixMin,decSpe. u)
     annotation (Line(points={{-120,-60},{18,-60}}, color={0,0,127}));
   connect(TMixMax, incSpe.u)
     annotation (Line(points={{-120,60},{18,60}}, color={0,0,127}));
   connect(incSpe.y, pumSpe.u1)
     annotation (Line(points={{42,60},{50,60},{50,6},{58,6}}, color={0,0,127}));
-  connect(desSpe.y, pumSpe.u2) annotation (Line(points={{42,-60},{50,-60},{50,-6},
+  connect(decSpe.y, pumSpe.u2) annotation (Line(points={{42,-60},{50,-60},{50,-6},
           {58,-6}}, color={0,0,127}));
   connect(uppSta.y, incSpe.x1) annotation (Line(points={{-38,80},{0,80},{0,68},{
           18,68}}, color={0,0,127}));
   connect(uppEnd.y, incSpe.x2) annotation (Line(points={{-38,40},{0,40},{0,56},{
           18,56}}, color={0,0,127}));
-  connect(lowSta.y, desSpe.x1) annotation (Line(points={{-38,-40},{0,-40},{0,-52},
+  connect(lowSta.y,decSpe. x1) annotation (Line(points={{-38,-40},{0,-40},{0,-52},
           {18,-52}}, color={0,0,127}));
-  connect(lowEnd.y, desSpe.x2) annotation (Line(points={{-38,-80},{0,-80},{0,-64},
+  connect(lowEnd.y,decSpe. x2) annotation (Line(points={{-38,-80},{0,-80},{0,-64},
           {18,-64}}, color={0,0,127}));
-
   connect(pumSpe.y, yDisPum)
     annotation (Line(points={{82,0},{120,0}}, color={0,0,127}));
 annotation (defaultComponentName="looPumSpe",

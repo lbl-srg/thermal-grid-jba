@@ -33,34 +33,104 @@ model Generations
     "Nominal glycol mass flow rate for dry cooler";
   parameter Real dpHex_nominal(
     final quantity="PressureDifference",
-    displayUnit="Pa")=10000
+    final unit="Pa")=10000
     "Pressure difference across heat exchanger";
   parameter Real dpValve_nominal(
     final quantity="PressureDifference",
-    displayUnit="Pa")=6000
+    final unit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve";
   parameter Real dpDryCoo_nominal(
     final quantity="PressureDifference",
-    displayUnit="Pa")=10000
+    final unit="Pa")=10000
     "Nominal pressure drop of fully open 2-way valve";
+
+  parameter Real samplePeriod(
+    final quantity="Time",
+    final unit="s")=7200 "Sample period of district loop pump speed"
+    annotation (Dialog(tab="Controls", group="Indicators"));
+  parameter Real TAppSet(
+    final quantity="TemperatureDifference",
+    final unit="K")=2
+    "Dry cooler approch setpoint"
+    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Real TApp(
+    final quantity="TemperatureDifference",
+    final unit="K")=4
+    "Approach temperature for checking if the dry cooler should be enabled"
+    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Real minFanSpe=0.1
+    "Minimum dry cooler fan speed"
+    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Buildings.Controls.OBC.CDL.Types.SimpleController fanConTyp=
+      Buildings.Controls.OBC.CDL.Types.SimpleController.PI
+    "Type of dry cooler fan controller"
+    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Real kFan=1 "Gain of controller"
+    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Real TiFan=0.5 "Time constant of integrator block"
+    annotation (Dialog(tab="Controls", group="Dry cooler",
+      enable=fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PI
+          or fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
+  parameter Real TdFan=0.1 "Time constant of derivative block"
+    annotation (Dialog(tab="Controls", group="Dry cooler",
+      enable=fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PD
+          or fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
   parameter Real TCooSet(
-    unit="K",
+    final unit="K",
     displayUnit="degC")=TDisLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
-    annotation (Dialog(tab="Heat Pump"));
+    annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real THeaSet(
-    unit="K",
+    final unit="K",
     displayUnit="degC")=TDisLooMax
     "Heat pump tracking temperature setpoint in heating mode"
-    annotation (Dialog(tab="Heat Pump"));
+    annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(
     unit="K",
-    displayUnit="degC") "Minimum condenser inlet temperature"
-    annotation (Dialog(tab="Heat Pump"));
+    displayUnit="degC")
+    "Minimum condenser inlet temperature"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TEvaInMax(
     unit="K",
-    displayUnit="degC") "Maximum evaporator inlet temperature"
-    annotation (Dialog(tab="Heat Pump"));
+    displayUnit="degC")
+    "Maximum evaporator inlet temperature"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real offTim(
+    final quantity="Time",
+    final unit="s")=12*3600
+    "Heat pump off time"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real minComSpe=0.2
+    "Minimum heat pump compressor speed"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Buildings.Controls.OBC.CDL.Types.SimpleController heaPumConTyp=
+      Buildings.Controls.OBC.CDL.Types.SimpleController.PI
+    "Heat pump controller type"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real kHeaPum=1 "Gain of controller"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real TiHeaPum=0.5 "Time constant of integrator block"
+    annotation (Dialog(tab="Controls", group="Heat pump",
+      enable=heaPumConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PI
+          or heaPumConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
+  parameter Real TdHeaPum=0.1 "Time constant of derivative block"
+    annotation (Dialog(tab="Controls", group="Heat pump",
+      enable=fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PD
+          or fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
+  parameter Buildings.Controls.OBC.CDL.Types.SimpleController thrWayValConTyp=
+      Buildings.Controls.OBC.CDL.Types.SimpleController.PI
+    "Three-way valve controller type"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real kVal=1 "Gain of controller"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real TiVal=0.5 "Time constant of integrator block"
+    annotation (Dialog(tab="Controls", group="Heat pump",
+      enable=thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PI
+          or thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
+  parameter Real TdVal=0.1 "Time constant of derivative block"
+    annotation (Dialog(tab="Controls", group="Heat pump",
+      enable=thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PD
+          or thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
 
   Buildings.Controls.OBC.CDL.Interfaces.RealInput uDisPum
     "District loop pump speed"
@@ -90,44 +160,48 @@ model Generations
     "Ambient wet bulb temperature"
     annotation (Placement(transformation(extent={{-340,90},{-300,130}}),
         iconTransformation(extent={{-140,-110},{-100,-70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFan_dryCoo(
-    quantity="Power",
-    final unit="W")
-    "Electric power consumed by fan"
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
+    "Current electricity rate, cent per kWh"
     annotation (Placement(transformation(extent={{300,250},{340,290}}),
         iconTransformation(extent={{100,70},{140,110}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFan_dryCoo(
+    final quantity="Power",
+    final unit="W")
+    "Electric power consumed by fan"
+    annotation (Placement(transformation(extent={{300,210},{340,250}}),
+        iconTransformation(extent={{100,50},{140,90}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_dryCoo(
-    quantity="Power",
+    final quantity="Power",
     final unit="W")
     "Electrical power consumed by dry cool pump"
-    annotation (Placement(transformation(extent={{300,220},{340,260}}),
-        iconTransformation(extent={{100,50},{140,90}})));
+    annotation (Placement(transformation(extent={{300,180},{340,220}}),
+        iconTransformation(extent={{100,30},{140,70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_hexGly(
-    quantity="Power",
+    final quantity="Power",
     final unit="W")
     "Electrical power consumed by the glycol pump of HEX"
-    annotation (Placement(transformation(extent={{300,190},{340,230}}),
-        iconTransformation(extent={{100,30},{140,70}})));
+    annotation (Placement(transformation(extent={{300,150},{340,190}}),
+        iconTransformation(extent={{100,10},{140,50}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_heaPumGly(
-    quantity="Power",
+    final quantity="Power",
     final unit="W")
     "Electrical power consumed by glycol pump of heat pump"
-    annotation (Placement(transformation(extent={{300,160},{340,200}}),
-        iconTransformation(extent={{100,10},{140,50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput P_heaPum(
-    quantity="Power",
+    annotation (Placement(transformation(extent={{300,120},{340,160}}),
+        iconTransformation(extent={{100,-50},{140,-10}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PCom(
+    final quantity="Power",
     final unit="W")
     "Electric power consumed by compressor"
     annotation (Placement(transformation(extent={{300,-70},{340,-30}}),
-        iconTransformation(extent={{100,-60},{140,-20}})));
+        iconTransformation(extent={{100,-70},{140,-30}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_heaPumWat(
-    quantity="Power",
+    final quantity="Power",
     final unit="W")
     "Electrical power consumed by heat pump waterside pump"
-    annotation (Placement(transformation(extent={{300,-150},{340,-110}}),
+    annotation (Placement(transformation(extent={{300,-160},{340,-120}}),
         iconTransformation(extent={{100,-90},{140,-50}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_cirPum(
-    quantity="Power",
+    final quantity="Power",
     final unit="W")
     "Electrical power consumed by circulation pump"
     annotation (Placement(transformation(extent={{300,-230},{340,-190}}),
@@ -159,43 +233,44 @@ model Generations
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
-    use_inputFilter=false) "Heat exchanger valve" annotation (Placement(
-        transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=90,
-        origin={-100,-100})));
+    use_inputFilter=false)
+    "Heat exchanger valve"
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=90, origin={-100,-100})));
   Buildings.Fluid.HeatExchangers.ConstantEffectiveness hex(
     redeclare final package Medium1 = MediumG,
     redeclare final package Medium2 = MediumW,
     final m1_flow_nominal=mHexGly_flow_nominal,
     final m2_flow_nominal=mWat_flow_nominal,
     final dp1_nominal=dpHex_nominal,
-    final dp2_nominal=dpHex_nominal) "Economizer"
+    final dp2_nominal=dpHex_nominal)
+    "Economizer"
     annotation (Placement(transformation(extent={{-60,-40},{-80,-20}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHeaPum(
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
-    use_inputFilter=false) "Heat pump water loop valve" annotation (Placement(
-        transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=90,
-        origin={120,-120})));
-  Buildings.Fluid.HeatPumps.ModularReversible.Modular modular(
+    use_inputFilter=false)
+    "Heat pump water loop valve"
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=90, origin={120,-120})));
+  Buildings.Fluid.HeatPumps.ModularReversible.Modular heaPum(
     redeclare package MediumCon = MediumG,
     redeclare package MediumEva = MediumW,
     use_rev=true)
+    "Reversible heat pump"
     annotation (Placement(transformation(extent={{180,-40},{160,-20}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumWat(
     redeclare final package Medium = MediumW,
     final addPowerToMedium=false,
     use_inputFilter=false,
-    final m_flow_nominal=mWat_flow_nominal) "Pump for heat pump waterside loop"
+    final m_flow_nominal=mWat_flow_nominal)
+    "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={120,-80})));
-  Buildings.Fluid.HeatExchangers.CoolingTowers.YorkCalc      dryCoo(
-    redeclare final package Medium = MediumG, final m_flow_nominal=
-        mDryCoo_flow_nominal,
+  Buildings.Fluid.HeatExchangers.CoolingTowers.YorkCalc dryCoo(
+    redeclare final package Medium = MediumG,
+    final m_flow_nominal=mDryCoo_flow_nominal,
     final dp_nominal=dpDryCoo_nominal,
     TApp_nominal=2)
     "Dry cooler"
@@ -205,24 +280,24 @@ model Generations
     final addPowerToMedium=false,
     final use_inputFilter=false,
     final m_flow_nominal=mDryCoo_flow_nominal)
-                                            "Dry cooler pump"
+    "Dry cooler pump"
     annotation (Placement(transformation(extent={{-60,120},{-40,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumGly(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
     final use_inputFilter=false,
     final m_flow_nominal=mHpGly_flow_nominal)
-                                            "Pump for heat pump glycol loop"
+    "Pump for heat pump glycol loop"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={200,0})));
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valHeaPumByp(
-      redeclare final package Medium = MediumG, final use_inputFilter=false,
+    redeclare final package Medium = MediumG,
+    final use_inputFilter=false,
     final m_flow_nominal=mHpGly_flow_nominal,
     final dpValve_nominal=dpValve_nominal)
-    "Heat pump bypass valve" annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=-90,
-        origin={200,60})));
+    "Heat pump bypass valve"
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=-90, origin={200,60})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTem(
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal)
@@ -235,8 +310,8 @@ model Generations
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={200,-100})));
   Buildings.Fluid.Sensors.TemperatureTwoPort heaPumGlyIn(
-    redeclare final package Medium = MediumG, final m_flow_nominal=
-        mHpGly_flow_nominal)
+    redeclare final package Medium = MediumG,
+    final m_flow_nominal=mHpGly_flow_nominal)
     "Temperature of glycol entering heat pump"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={200,30})));
@@ -246,12 +321,23 @@ model Generations
     "Boundary pressure condition representing the expansion vessel"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},
         rotation=180, origin={-124,-24})));
-  Controls.Indicators ind
+  ThermalGridJBA.Networks.Controls.Indicators ind(
+    final samplePeriod=samplePeriod)
+    "Indicators for district load, electricity rate and season"
     annotation (Placement(transformation(extent={{-260,250},{-240,270}})));
-  Controls.DryCoolerHex dryCooHexCon(final mHexGly_flow_nominal=
-        mHexGly_flow_nominal, final mDryCoo_flow_nominal=mDryCoo_flow_nominal)
+  ThermalGridJBA.Networks.Controls.DryCoolerHex dryCooHexCon(
+    final mHexGly_flow_nominal=mHexGly_flow_nominal,
+    final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
+    final TAppSet=TAppSet,
+    final TApp=TApp,
+    final minFanSpe=minFanSpe,
+    final fanConTyp=fanConTyp,
+    final kFan=kFan,
+    final TiFan=TiFan,
+    final TdFan=TdFan)
+     "Control of dry cooler and heat exchanger"
     annotation (Placement(transformation(extent={{-80,200},{-60,220}})));
-  Controls.HeatPump heaPumCon(
+  ThermalGridJBA.Networks.Controls.HeatPump heaPumCon(
     final mWat_flow_nominal=mWat_flow_nominal,
     final mWat_flow_min=mWat_flow_min,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
@@ -260,52 +346,76 @@ model Generations
     final TCooSet=TCooSet,
     final THeaSet=THeaSet,
     final TConInMin=TConInMin,
-    final TEvaInMax=TEvaInMax)
+    final TEvaInMax=TEvaInMax,
+    final minComSpe=minComSpe,
+    final offTim=offTim,
+    final heaPumConTyp=heaPumConTyp,
+    final kHeaPum=kHeaPum,
+    final TiHeaPum=TiHeaPum,
+    final TdHeaPum=TdHeaPum,
+    final thrWayValConTyp=thrWayValConTyp,
+    final kVal=kVal,
+    final TiVal=TiVal,
+    final TdVal=TdVal)
+    "Control of heat pump and the corresponed pumps and valves"
     annotation (Placement(transformation(extent={{-180,160},{-160,180}})));
 
-  Buildings.Fluid.Sensors.TemperatureTwoPort dryCooOut(redeclare final package
-      Medium = MediumG, final m_flow_nominal=mDryCoo_flow_nominal)
-    "Temperature of dry cooler outlet" annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=0,
-        origin={130,130})));
+  Buildings.Fluid.Sensors.TemperatureTwoPort dryCooOut(
+    redeclare final package Medium = MediumG,
+    final m_flow_nominal=mDryCoo_flow_nominal)
+    "Temperature of dry cooler outlet"
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=0, origin={130,130})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo1(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
     final use_inputFilter=false,
     final m_flow_nominal=mHexGly_flow_nominal)
-                                            "Dry cooler pump"
+    "Dry cooler pump"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
-        rotation=-90,
-        origin={-20,40})));
-
-
+        rotation=-90, origin={-20,40})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(
     final k=mWat_flow_nominal)
     "Convert mass flow rate"
     annotation (Placement(transformation(extent={{-200,10},{-180,30}})));
-  Buildings.Fluid.Delays.DelayFirstOrder del1(
-    redeclare final package Medium = MediumW,
-    final m_flow_nominal=mWat_flow_nominal,
-    nPorts=3)
-    annotation (Placement(transformation(extent={{-110,-160},{-90,-180}})));
-  Buildings.Fluid.Delays.DelayFirstOrder del2(
-    redeclare final package Medium = MediumW,
-    final m_flow_nominal=mWat_flow_nominal,
-    nPorts=5)
-    annotation (Placement(transformation(extent={{-30,-160},{-10,-180}})));
   Buildings.Fluid.Delays.DelayFirstOrder del3(
     redeclare final package Medium = MediumG,
     final m_flow_nominal=mDryCoo_flow_nominal,
     nPorts=5)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=-90, origin={-110,60})));
-  Buildings.Fluid.Delays.DelayFirstOrder del4(
+  Buildings.Fluid.FixedResistances.Junction jun(
+    redeclare final package Medium = MediumW,
+    m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
+    dp_nominal={0,0,0})
+    annotation (Placement(transformation(extent={{-110,-150},{-90,-170}})));
+  Buildings.Fluid.FixedResistances.Junction jun1(
+    redeclare final package Medium = MediumW,
+    m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
+    dp_nominal={0,0,0})
+    annotation (Placement(transformation(extent={{-30,-150},{-10,-170}})));
+  Buildings.Fluid.FixedResistances.Junction jun2(
+    redeclare final package Medium = MediumW,
+    m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
+    dp_nominal={0,0,0})
+    annotation (Placement(transformation(extent={{110,-150},{130,-170}})));
+  Buildings.Fluid.FixedResistances.Junction jun3(
+    redeclare final package Medium = MediumW,
+    m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
+    dp_nominal={0,0,0})
+    annotation (Placement(transformation(extent={{190,-150},{210,-170}})));
+  Buildings.Fluid.FixedResistances.Junction jun4(
     redeclare final package Medium = MediumG,
-    final m_flow_nominal=mDryCoo_flow_nominal,
-    nPorts=4)
-    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
-        rotation=-90, origin={210,100})));
+    m_flow_nominal={mDryCoo_flow_nominal,-mDryCoo_flow_nominal,-mHpGly_flow_nominal},
+    dp_nominal={0,0,0})
+    annotation (Placement(transformation(extent={{-10,10},{10,-10}},
+        rotation=180, origin={200,90})));
+  Buildings.Fluid.FixedResistances.Junction jun5(
+    redeclare final package Medium = MediumG,
+    m_flow_nominal={mDryCoo_flow_nominal,-mDryCoo_flow_nominal,-mHexGly_flow_nominal},
+    dp_nominal={0,0,0})
+    annotation (Placement(transformation(extent={{-10,10},{10,-10}},
+        rotation=180, origin={-20,90})));
 
 equation
   connect(valHex.port_b, hex.port_a2) annotation (Line(
@@ -316,7 +426,7 @@ equation
       points={{120,-110},{120,-90}},
       color={0,127,255},
       thickness=0.5));
-  connect(pumHeaPumWat.port_b, modular.port_a2) annotation (Line(
+  connect(pumHeaPumWat.port_b, heaPum.port_a2) annotation (Line(
       points={{120,-70},{120,-36},{160,-36}},
       color={0,127,255},
       thickness=0.5));
@@ -324,7 +434,7 @@ equation
       points={{-40,130},{40,130}},
       color={0,127,255},
       thickness=0.5));
-  connect(modular.port_a1, pumHeaPumGly.port_b) annotation (Line(
+  connect(heaPum.port_a1, pumHeaPumGly.port_b) annotation (Line(
       points={{180,-24},{200,-24},{200,-10}},
       color={0,127,255},
       thickness=0.5));
@@ -336,7 +446,7 @@ equation
       points={{-250,-160},{-170,-160}},
       color={0,127,255},
       thickness=0.5));
-  connect(modular.port_b2, heaPumLea.port_a) annotation (Line(
+  connect(heaPum.port_b2, heaPumLea.port_a) annotation (Line(
       points={{180,-36},{200,-36},{200,-90}},
       color={0,127,255},
       thickness=0.5));
@@ -356,10 +466,10 @@ equation
           {-290,264},{-262,264}}, color={0,0,127}));
   connect(uSolTim, ind.uSolTim) annotation (Line(points={{-320,230},{-270,230},
           {-270,256},{-262,256}}, color={0,0,127}));
-  connect(ind.yEleRat, heaPumCon.uEleRat) annotation (Line(points={{-238,260},{
-          -220,260},{-220,179},{-182,179}}, color={255,127,0}));
-  connect(ind.yEleRat, dryCooHexCon.uEleRat) annotation (Line(points={{-238,260},
-          {-220,260},{-220,219},{-82,219}}, color={255,127,0}));
+  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-238,261},{-220,
+          261},{-220,179},{-182,179}}, color={255,127,0}));
+  connect(ind.yEle, dryCooHexCon.uEleRat) annotation (Line(points={{-238,261},{-220,
+          261},{-220,219},{-82,219}}, color={255,127,0}));
   connect(ind.ySt, dryCooHexCon.uSt) annotation (Line(points={{-238,266},{-212,266},
           {-212,217},{-82,217}},      color={255,127,0}));
   connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-238,266},{-212,266},
@@ -387,7 +497,7 @@ equation
     annotation (Line(points={{60,130},{120,130}}, color={0,127,255},
       thickness=0.5));
   connect(dryCooOut.T, dryCooHexCon.TDryCooOut) annotation (Line(points={{130,141},
-          {130,180},{-100,180},{-100,201},{-82,201}},      color={0,0,127}));
+          {130,190},{-100,190},{-100,201},{-82,201}},      color={0,0,127}));
   connect(dryCooHexCon.yValHex, valHex.y) annotation (Line(points={{-58,217},{-40,
           217},{-40,150},{-140,150},{-140,-100},{-112,-100}},     color={0,0,
           127}));
@@ -401,7 +511,7 @@ equation
           202},{20,138},{38,138}}, color={0,0,127}));
   connect(TWetBul, dryCoo.TAir) annotation (Line(points={{-320,110},{20,110},{20,
           134},{38,134}}, color={0,0,127}));
-  connect(heaPumCon.ySet, modular.ySet) annotation (Line(points={{-158,174},{240,
+  connect(heaPumCon.ySet, heaPum.ySet) annotation (Line(points={{-158,174},{240,
           174},{240,-28.1},{181.1,-28.1}}, color={0,0,127}));
   connect(heaPumCon.yVal, valHeaPum.y) annotation (Line(points={{-158,165},{80,165},
           {80,-120},{108,-120}}, color={0,0,127}));
@@ -419,38 +529,6 @@ equation
           20},{-160,-148}}, color={0,0,127}));
   connect(uDisPum, gai2.u) annotation (Line(points={{-320,260},{-290,260},{-290,
           20},{-202,20}}, color={0,0,127}));
-  connect(pumCenPla.port_b, del1.ports[1]) annotation (Line(
-      points={{-150,-160},{-101.333,-160}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(del1.ports[2], valHexByp.port_a) annotation (Line(
-      points={{-100,-160},{-70,-160}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(del1.ports[3], valHex.port_a) annotation (Line(
-      points={{-98.6667,-160},{-100,-156},{-100,-110}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(valHexByp.port_b, del2.ports[1]) annotation (Line(
-      points={{-50,-160},{-21.6,-160}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(hex.port_b2, del2.ports[2]) annotation (Line(
-      points={{-60,-36},{-20.8,-36},{-20.8,-160}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(del2.ports[3], valHeaPum.port_a) annotation (Line(
-      points={{-20,-160},{120,-160},{120,-130}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(del2.ports[4], heaPumLea.port_b) annotation (Line(
-      points={{-19.2,-160},{200,-160},{200,-110}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(del2.ports[5], port_b) annotation (Line(
-      points={{-18.4,-160},{280,-160},{280,0},{300,0}},
-      color={0,127,255},
-      thickness=0.5));
   connect(pumDryCoo.port_a, del3.ports[1]) annotation (Line(
       points={{-60,130},{-100,130},{-100,61.6}},
       color={0,127,255},
@@ -463,43 +541,86 @@ equation
       points={{-100,60},{-100,0},{120,0},{120,60},{190,60}},
       color={0,127,255},
       thickness=0.5));
-  connect(dryCooOut.port_b, del4.ports[1]) annotation (Line(
-      points={{140,130},{200,130},{200,101.5}},
+  connect(heaPum.port_b1, del3.ports[4]) annotation (Line(
+      points={{160,-24},{120,-24},{120,0},{-100,0},{-100,59.2}},
       color={0,127,255},
       thickness=0.5));
-  connect(del4.ports[2], valHeaPumByp.port_1) annotation (Line(
-      points={{200,100.5},{200,70}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(pumDryCoo1.port_a, del4.ports[3]) annotation (Line(
-      points={{-20,50},{-20,80},{200,80},{200,99.5}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(del3.ports[4], del4.ports[4]) annotation (Line(
-      points={{-100,59.2},{-80,59.2},{-80,98.5},{200,98.5}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(modular.port_b1, del3.ports[5]) annotation (Line(
-      points={{160,-24},{120,-24},{120,0},{-100,0},{-100,58.4}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(heaPumCon.y1Mod, modular.hea) annotation (Line(points={{-158,179},{252,
+  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{-158,179},{252,
           179},{252,-32.1},{181.1,-32.1}}, color={255,0,255}));
   connect(dryCoo.PFan, PFan_dryCoo) annotation (Line(points={{61,138},{100,138},
-          {100,270},{320,270}}, color={0,0,127}));
+          {100,230},{320,230}}, color={0,0,127}));
   connect(pumDryCoo.P, PPum_dryCoo) annotation (Line(points={{-39,139},{-20,139},
-          {-20,240},{320,240}}, color={0,0,127}));
+          {-20,200},{320,200}}, color={0,0,127}));
   connect(pumDryCoo1.P, PPum_hexGly) annotation (Line(points={{-11,29},{-11,20},
-          {110,20},{110,210},{320,210}}, color={0,0,127}));
+          {110,20},{110,170},{320,170}}, color={0,0,127}));
   connect(pumHeaPumGly.P, PPum_heaPumGly) annotation (Line(points={{209,-11},{209,
-          -20},{260,-20},{260,180},{320,180}}, color={0,0,127}));
-  connect(modular.P, P_heaPum) annotation (Line(points={{159,-30},{140,-30},{140,
-          -50},{320,-50}}, color={0,0,127}));
-  connect(pumHeaPumWat.P, PPum_heaPumWat) annotation (Line(points={{111,-69},{111,
-          -60},{60,-60},{60,-130},{320,-130}}, color={0,0,127}));
+          -20},{260,-20},{260,140},{320,140}}, color={0,0,127}));
+  connect(heaPum.P, PCom) annotation (Line(points={{159,-30},{140,-30},{140,-50},
+          {320,-50}}, color={0,0,127}));
+  connect(pumHeaPumWat.P, PPum_heaPumWat) annotation (Line(points={{111,-69},{
+          111,-60},{60,-60},{60,-140},{320,-140}},
+                                               color={0,0,127}));
   connect(pumCenPla.P, PPum_cirPum) annotation (Line(points={{-149,-151},{-140,-151},
           {-140,-210},{320,-210}}, color={0,0,127}));
-  annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+  connect(ind.yEleRat, yEleRat) annotation (Line(points={{-238,259},{20,259},{20,
+          270},{320,270}}, color={0,0,127}));
+  connect(pumCenPla.port_b, jun.port_1)
+    annotation (Line(points={{-150,-160},{-110,-160}}, color={0,127,255},
+      thickness=0.5));
+  connect(jun.port_2, valHexByp.port_a)
+    annotation (Line(points={{-90,-160},{-70,-160}}, color={0,127,255},
+      thickness=0.5));
+  connect(jun.port_3, valHex.port_a)
+    annotation (Line(points={{-100,-150},{-100,-110}}, color={0,127,255},
+      thickness=0.5));
+  connect(valHexByp.port_b, jun1.port_1) annotation (Line(
+      points={{-50,-160},{-30,-160}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(hex.port_b2, jun1.port_3) annotation (Line(
+      points={{-60,-36},{-20,-36},{-20,-150},{-20,-150}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun1.port_2, jun2.port_1) annotation (Line(
+      points={{-10,-160},{110,-160}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun2.port_3, valHeaPum.port_a) annotation (Line(
+      points={{120,-150},{120,-130}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun2.port_2, jun3.port_1) annotation (Line(
+      points={{130,-160},{190,-160}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun3.port_3, heaPumLea.port_b) annotation (Line(
+      points={{200,-150},{200,-110}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun3.port_2, port_b) annotation (Line(
+      points={{210,-160},{280,-160},{280,0},{300,0}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun5.port_3, pumDryCoo1.port_a)
+    annotation (Line(points={{-20,80},{-20,50}}, color={0,127,255},
+      thickness=0.5));
+  connect(jun5.port_2, del3.ports[5]) annotation (Line(points={{-30,90},{-80,90},
+          {-80,58.4},{-100,58.4}}, color={0,127,255},
+      thickness=0.5));
+  connect(dryCooOut.port_b, jun4.port_1) annotation (Line(
+      points={{140,130},{220,130},{220,90},{210,90}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun4.port_2, jun5.port_1) annotation (Line(
+      points={{190,90},{-10,90}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun4.port_3, valHeaPumByp.port_1) annotation (Line(
+      points={{200,80},{200,70}},
+      color={0,127,255},
+      thickness=0.5));
+  annotation (defaultComponentName="gen",
+  Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={
                                 Rectangle(
         extent={{-100,-100},{100,100}},
