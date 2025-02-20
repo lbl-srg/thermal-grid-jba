@@ -11,6 +11,9 @@ model Chiller "Chiller controller"
     final unit="K",
     displayUnit="degC")
     "Maximum value of evaporator water entering temperature";
+  parameter Real PLRMax(min=0) "Maximum part load ratio";
+  parameter Real PLRMin(min=0) "Minimum part load ratio";
+
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uCoo
     "Cooling enable signal"
     annotation (Placement(transformation(extent={{-200,40},{-160,80}}),
@@ -98,6 +101,7 @@ model Chiller "Chiller controller"
     final controllerType=Modelica.Blocks.Types.SimpleController.PI,
     final yMax=1,
     final yMin=0,
+    k=0.01,
     y_reset=0,
     Ti(displayUnit="s"),
     final reverseActing=true) "Chiller compressor speed control"

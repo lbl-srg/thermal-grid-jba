@@ -9,7 +9,7 @@ model Chiller "Base subsystem with heat recovery chiller"
   parameter Boolean allowFlowReversal=false
     "= true to allow flow reversal, false restricts to design direction (port_a -> port_b)"
     annotation (Dialog(tab="Assumptions"),Evaluate=true);
-  replaceable parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic dat
+  replaceable parameter ThermalGridJBA.Data.Chiller dat
     "Chiller performance data"
     annotation (choicesAllMatching=true,Placement(transformation(extent={{60,160},{80,180}})));
   parameter Modelica.Units.SI.PressureDifference dpCon_nominal(displayUnit="Pa")
@@ -25,10 +25,11 @@ model Chiller "Base subsystem with heat recovery chiller"
     "Nominal pressure drop accross control valve on evaporator side"
     annotation (Dialog(group="Nominal condition"));
   parameter Modelica.Units.SI.Temperature TConWatEntMin(displayUnit="degC")=
-    dat.TConEntMin "Minimum value of condenser water entering temperature"
+    dat.TConEntMin
+    "Minimum value of condenser water entering temperature"
     annotation (Dialog(group="Controls"));
   parameter Modelica.Units.SI.Temperature TEvaWatEntMax(displayUnit="degC")=
-    dat.TEvaLvgMax - dat.QEva_flow_nominal/cp_default/dat.mEva_flow_nominal
+    dat.TEvaEntMax
     "Maximum value of evaporator water entering temperature"
     annotation (Dialog(group="Controls"));
   // IO CONNECTORS
@@ -116,9 +117,11 @@ model Chiller "Base subsystem with heat recovery chiller"
     Buildings.Fluid.HeatPumps.ModularReversible.LargeScaleWaterToWater chi(
     allowDifferentDeviceIdentifiers=true,
     use_intSafCtr=false,
-    final QHea_flow_nominal=-dat.QEva_flow_nominal*1.5,
-    TConHea_nominal=333.15,
-    TEvaHea_nominal=279.85,
+    final dTCon_nominal=dat.dTCon_nominal,
+    final dTEva_nominal=dat.dTEva_nominal,
+    final QHea_flow_nominal=-dat.QCoo_flow_nominal*1.5,
+    TConHea_nominal=dat.TConLvg_nominal,
+    TEvaHea_nominal=dat.TEvaLvg_nominal,
     redeclare
       Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.EN14511.WAMAK_WaterToWater_220kW
       datTabHea,
@@ -127,10 +130,10 @@ model Chiller "Base subsystem with heat recovery chiller"
       datTabCoo,
     redeclare package MediumCon = Medium,
     redeclare package MediumEva = Medium,
-    final QCoo_flow_nominal=dat.QEva_flow_nominal,
-    TConCoo_nominal=333.15,
+    final QCoo_flow_nominal=dat.QCoo_flow_nominal,
+    TConCoo_nominal=dat.TConLvg_nominal,
     final dpCon_nominal(displayUnit="Pa") = dpCon_nominal,
-    TEvaCoo_nominal=279.85,
+    TEvaCoo_nominal=dat.TEvaLvg_nominal,
     final dpEva_nominal(displayUnit="Pa") = dpEva_nominal,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial)
     "Heat recovery chiller"
@@ -151,7 +154,9 @@ model Chiller "Base subsystem with heat recovery chiller"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=0,origin={-100,-60})));
   ThermalGridJBA.Hubs.Controls.Chiller con(
     final TConWatEntMin=TConWatEntMin,
-    final TEvaWatEntMax=TEvaWatEntMax)
+    final TEvaWatEntMax=TEvaWatEntMax,
+    final PLRMax=dat.PLRMax,
+    final PLRMin=dat.PLRMin)
     "Controller"
     annotation (Placement(transformation(extent={{-70,130},{-50,150}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTConLvg(
@@ -232,7 +237,7 @@ model Chiller "Base subsystem with heat recovery chiller"
 protected
   Modelica.Blocks.Sources.BooleanConstant hea(final k=true)
     "Use the heating mode to use the heat pump performance map"
-    annotation (Placement(transformation(extent={{-100,-180},{-80,-160}})));
+    annotation (Placement(transformation(extent={{-80,-120},{-60,-100}})));
 protected
   final parameter Medium.ThermodynamicState sta_default=Medium.setState_pTX(
     T=Medium.T_default,
@@ -252,8 +257,7 @@ equation
   connect(splEva.port_3,valEva.port_3)
     annotation (Line(points={{-140,-70},{-140,-80},{120,-80},{120,-70}},color={0,127,255}));
   connect(con.yValEva,valEva.y)
-    annotation (Line(points={{-48,138},{-32,138},{-32,120},{160,120},{160,-40},
-          {120,-40},{120,-48}},                                                                     color={0,0,127}));
+    annotation (Line(points={{-48,138},{160,138},{160,-40},{120,-40},{120,-48}},                    color={0,0,127}));
   connect(con.yValCon,valCon.y)
     annotation (Line(points={{-48,134},{-44,134},{-44,90},{-160,90},{-160,40},{
           -140,40},{-140,48}},                                                                     color={0,0,127}));
@@ -294,9 +298,9 @@ equation
   connect(add2.y,PPum)
     annotation (Line(points={{182,-140},{220,-140}},color={0,0,127}));
   connect(pumEva.P,add2.u2)
-    annotation (Line(points={{-111,-51},{-120,-51},{-120,-140},{140,-140},{140,-146},{158,-146}},color={0,0,127}));
+    annotation (Line(points={{-111,-51},{-120,-51},{-120,-146},{158,-146}},                      color={0,0,127}));
   connect(pumCon.P,add2.u1)
-    annotation (Line(points={{-89,69},{-60,69},{-60,-134},{158,-134}},color={0,0,127}));
+    annotation (Line(points={{-89,69},{80,69},{80,-134},{158,-134}},  color={0,0,127}));
   connect(con.yPum,booToRea.u)
     annotation (Line(points={{-48,146},{-36,146},{-36,180},{-58,180}},color={255,0,255}));
   connect(booToRea.y,gai2.u)
@@ -307,8 +311,9 @@ equation
     annotation (Line(points={{-100,102},{-100,72}},color={0,0,127}));
   connect(booToRea.y,gai1.u)
     annotation (Line(points={{-82,180},{-100,180},{-100,126}},color={0,0,127}));
-  connect(hea.y, chi.hea) annotation (Line(points={{-79,-170},{-40,-170},{-40,
-          -2.1},{-11.1,-2.1}}, color={255,0,255}));
+  connect(hea.y, chi.hea) annotation (Line(points={{-59,-110},{-40,-110},{-40,
+          -2},{-26,-2},{-26,-2.1},{-11.1,-2.1}},
+                               color={255,0,255}));
   connect(con.TChiWatSupSet, TChiWatSupSet) annotation (Line(points={{-72,142},
           {-186,142},{-186,140},{-220,140}}, color={0,0,127}));
   connect(con.TEvaWatLvg, senTEvaLvg.T) annotation (Line(points={{-72,138},{-82,

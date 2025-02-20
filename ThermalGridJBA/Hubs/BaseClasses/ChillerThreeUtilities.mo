@@ -33,7 +33,7 @@ model ChillerThreeUtilities
     tanHeaWat(final T_start=TCon_start),
     tanChiWat(final T_start=TEva_start));
 
-  replaceable parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic datChi
+  replaceable parameter ThermalGridJBA.Data.Chiller datChi
     "Chiller performance data" annotation (
     Dialog(group="Chiller"),
     choicesAllMatching=true,
