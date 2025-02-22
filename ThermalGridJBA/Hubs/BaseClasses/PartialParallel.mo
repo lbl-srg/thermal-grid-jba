@@ -122,7 +122,8 @@ model PartialParallel
     final T_a2_nominal=T_a2Hex_nominal,
     final T_b2_nominal=T_b2Hex_nominal,
     final spePum1Min=spePum1HexMin,
-    final spePum2Min=spePum2HexMin) "District heat exchanger"
+    final spePum2Min=spePum2HexMin,
+    pum2(dpMax=Modelica.Constants.inf)) "District heat exchanger"
     annotation (Placement(transformation(extent={{-10,-244},{10,-264}})));
   ThermalGridJBA.Hubs.BaseClasses.StratifiedTankWithCommand tanChiWat(
     redeclare final package Medium = MediumBui,
@@ -243,8 +244,8 @@ equation
                                                 color={0,0,127}));
   connect(bou.ports[1], colChiWat.port_aDisSup)
     annotation (Line(points={{180,-34},{140,-34}},            color={0,127,255}));
-  connect(tanChiWat.charge, conSup.uCoo) annotation (Line(points={{202,108},{
-          206,108},{206,130},{-264,130},{-264,30},{-262,30},{-262,29}}, color={
+  connect(tanChiWat.charge, conSup.uCoo) annotation (Line(points={{202,107},{206,
+          107},{206,130},{-264,130},{-264,30},{-262,30},{-262,29}},     color={
           255,0,255}));
   connect(TChiWatSupSet, tanChiWat.TTanSet) annotation (Line(points={{-320,-60},
           {-290,-60},{-290,72},{-266,72},{-266,128},{170,128},{170,119},{179,

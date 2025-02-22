@@ -142,7 +142,8 @@ model Chiller "Base subsystem with heat recovery chiller"
     redeclare final package Medium=Medium,
     final allowFlowReversal=allowFlowReversal,
     final m_flow_nominal=dat.mCon_flow_nominal,
-    final dp_nominal=dpCon_nominal+dpValCon_nominal)
+    final dp_nominal=dpCon_nominal+dpValCon_nominal,
+    dpMax=Modelica.Constants.inf)
     "Condenser pump"
     annotation (Placement(transformation(extent={{-110,50},{-90,70}})));
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumEva(
