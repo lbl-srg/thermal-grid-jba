@@ -1,0 +1,6 @@
+removePlots(true)
+simulateModel("ThermalGridJBA.Networks.Validation.MultiHub", tolerance=1e-6, startTime=7776000, stopTime=8640000, method="CVode", resultFile="MultiHub");
+createPlot(id=1, position={27, 2, 991, 447}, y={"senTPlaEnt.T", "senTPlaLvg.T"}, range={7750000.0, 8650000.0, 10.0, 25.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"degC", "degC"});
+createPlot(id=1, position={27, 2, 991, 447}, y={"dis.TOut[1]", "dis.TOut[2]", "dis.TOut[3]"}, range={7750000.0, 8650000.0, 10.0, 25.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="s", displayUnits={"degC", "degC", "degC"});
+createPlot(id=1, position={27, 2, 991, 447}, y={"pla.QHea_flow", "pla.QCoo_fllow"}, range={7750000.0, 8650000.0, -2000000.0, 1000000.0}, grid=true, subPlot=103, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"W", "W"});
+

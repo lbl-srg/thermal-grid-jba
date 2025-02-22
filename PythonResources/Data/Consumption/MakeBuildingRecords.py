@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+!!! No longer useful !!!
+
 This file creates Modelica records
     for building load profile file name and set points.
 
