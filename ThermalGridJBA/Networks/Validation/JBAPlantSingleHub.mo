@@ -2,16 +2,16 @@ within ThermalGridJBA.Networks.Validation;
 model JBAPlantSingleHub
   "District network with the JBA plant and a single combined hub"
   extends Modelica.Icons.Example;
+  package Medium = Buildings.Media.Water "Medium model";
 
   parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
     "Pipe diameter (without insulation)";
   parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
   parameter Modelica.Units.SI.Radius thiGroLay=0.5
     "Dynamic ground layer thickness";
-  package Medium = Buildings.Media.Water "Medium model";
-  parameter Real dpDis_length_nominal(final unit="Pa/m") = 250
+  parameter Real dpDis_length_nominal(unit="Pa/m")=250
     "Pressure drop per pipe length at nominal flow rate - Distribution line";
-  parameter Real dpCon_length_nominal(final unit="Pa/m") = 250
+  parameter Real dpCon_length_nominal(unit="Pa/m")=250
     "Pressure drop per pipe length at nominal flow rate - Connection line";
   parameter Boolean allowFlowReversalSer = true
     "Set to true to allow flow reversal in the service lines"
@@ -19,8 +19,42 @@ model JBAPlantSingleHub
   parameter Boolean allowFlowReversalBui = false
     "Set to true to allow flow reversal for in-building systems"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
-  parameter Modelica.Units.SI.Length dhPla(fixed=false,start=0.05,min=0.01)
+  parameter Modelica.Units.SI.Length dhPla(
+    fixed=false,
+    min=0.01,
+    start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
+  parameter Integer nMod=2 "Total number of central plant modules"
+    annotation (Dialog(tab="Central plant"));
+  parameter Real samplePeriod=7200
+    "Sample period of district loop pump speed"
+    annotation (Dialog(tab="Central plant"));
+  parameter Real TAppSet(unit="K")=2
+                "Dry cooler approch setpoint"
+    annotation (Dialog(tab="Central plant", group="Dry cooler control"));
+  parameter Real TApp(unit="K")=4
+    "Approach temperature for checking if the dry cooler should be enabled"
+    annotation (Dialog(tab="Central plant", group="Dry cooler control"));
+  parameter Real TCooSet(unit="K")=datDis.TLooMin
+    "Heat pump tracking temperature setpoint in cooling mode"
+    annotation (Dialog(tab="Central plant", group="Heat pump control"));
+  parameter Real THeaSet(unit="K")=datDis.TLooMin
+    "Heat pump tracking temperature setpoint in heating mode"
+    annotation (Dialog(tab="Central plant", group="Heat pump control"));
+  parameter Real offTim(unit="s")=12*3600
+                      "Heat pump off time"
+    annotation (Dialog(tab="Central plant", group="Heat pump control"));
+  parameter Real TUpp=datDis.TLooMax
+                                  "Upper bound temperature"
+    annotation (Dialog(tab="District pump"));
+  parameter Real TLow=datDis.TLooMin
+                                    "Lower bound temperature"
+    annotation (Dialog(tab="District pump"));
+  parameter Real dTSlo=2 "Temperature deadband for changing pump speed"
+    annotation (Dialog(tab="District pump"));
+  parameter Real yDisPumMin=0.1 "District loop pump minimum speed"
+    annotation (Dialog(tab="District pump"));
+
   final parameter Integer nBui=datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
@@ -38,7 +72,7 @@ model JBAPlantSingleHub
       each k=2.3,
       each c=1000,
       each d=2600))
-    annotation (Placement(transformation(extent={{-10,100},{12,80}})));
+    annotation (Placement(transformation(extent={{-10,160},{12,140}})));
 
   Buildings.DHC.Networks.Distribution1PipePlugFlow_v dis(
     nCon=nBui,
@@ -51,7 +85,7 @@ model JBAPlantSingleHub
     lEnd=datDis.lDis[end],
     dIns=0.02,
     kIns=0.2)
-    annotation (Placement(transformation(extent={{-20,132},{20,152}})));
+    annotation (Placement(transformation(extent={{-20,190},{20,210}})));
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumDis(
     redeclare final package Medium = Medium,
     final m_flow_nominal=datDis.mPumDis_flow_nominal,
@@ -61,7 +95,7 @@ model JBAPlantSingleHub
     annotation (Placement(transformation(
       extent={{10,-10},{-10,10}},
       rotation=90,
-      origin={80,-60})));
+      origin={90,-60})));
   Buildings.Fluid.Sources.Boundary_pT bou(
     redeclare final package Medium=Medium, nPorts=1)
     "Boundary pressure condition representing the expansion vessel"
@@ -72,7 +106,7 @@ model JBAPlantSingleHub
   Buildings.DHC.Networks.Connections.Connection1Pipe_R conPla(
     redeclare final package Medium = Medium,
     final mDis_flow_nominal=datDis.mPipDis_flow_nominal,
-    final mCon_flow_nominal=pla.m_flow_nominal,
+    final mCon_flow_nominal=sum(datDis.mCon_flow_nominal),
     lDis=50,
     final allowFlowReversal=allowFlowReversalSer,
     dhDis=dhPla)
@@ -86,13 +120,13 @@ model JBAPlantSingleHub
     "District water supply temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
-        origin={-80,20})));
+        origin={-80,150})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet(redeclare final package
       Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water return temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
-        origin={-80,-40})));
+        origin={-80,-80})));
   ThermalGridJBA.Hubs.ConnectedETS
     bui[nBui](
     final filNam = datDis.filNam,
@@ -103,104 +137,250 @@ model JBAPlantSingleHub
     each final allowFlowReversalSer=allowFlowReversalSer,
     each final TDisWatMin=datDis.TLooMin,
     each final TDisWatMax=datDis.TLooMax) "Building and ETS"
-    annotation (Placement(transformation(extent={{-10,170},{10,190}})));
+    annotation (Placement(transformation(extent={{-10,230},{10,250}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)
     "ETS pump power"
-    annotation (Placement(transformation(extent={{140,190},{160,210}})));
+    annotation (Placement(transformation(extent={{180,230},{200,250}})));
   Modelica.Blocks.Continuous.Integrator EPumETS(
     initType=Modelica.Blocks.Types.Init.InitialState)
     "ETS pump electric energy"
-    annotation (Placement(transformation(extent={{220,190},{240,210}})));
+    annotation (Placement(transformation(extent={{240,230},{260,250}})));
   Modelica.Blocks.Continuous.Integrator EPumDis(
     initType=Modelica.Blocks.Types.Init.InitialState)
     "Distribution pump electric energy"
     annotation (Placement(transformation(extent={{220,-90},{240,-70}})));
-  Modelica.Blocks.Continuous.Integrator EPumPla(initType=Modelica.Blocks.Types.Init.InitialState)
-    "Plant pump electric energy"
-    annotation (Placement(transformation(extent={{220,30},{240,50}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum EPum(nin=3)
     "Total pump electric energy"
-    annotation (Placement(transformation(extent={{280,110},{300,130}})));
+    annotation (Placement(transformation(extent={{300,150},{320,170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PHeaPump(nin=nBui)
     "Heat pump power"
-    annotation (Placement(transformation(extent={{140,150},{160,170}})));
+    annotation (Placement(transformation(extent={{180,190},{200,210}})));
   Modelica.Blocks.Continuous.Integrator EHeaPum(
     initType=Modelica.Blocks.Types.Init.InitialState)
     "Heat pump electric energy"
-    annotation (Placement(transformation(extent={{220,150},{240,170}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=2) "Total electric energy"
-    annotation (Placement(transformation(extent={{320,150},{340,170}})));
+    annotation (Placement(transformation(extent={{240,190},{260,210}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=4) "Total electric energy"
+    annotation (Placement(transformation(extent={{362,90},{382,110}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
     final uMax(final unit="K", displayUnit="degC")=datDis.TLooMax,
     final nu=2,
     u(each final unit="K", each displayUnit="degC"))
     "Check if loop temperatures are within given range"
-    annotation (Placement(transformation(extent={{320,10},{340,30}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant mPumPla_flow_set(
-    final k=pla.m_flow_nominal,
-    y(quantity="MassFlowRate"))
-    "Plant pump flow rate"
-    annotation (Placement(transformation(extent={{-240,20},{-220,40}})));
-  BaseClasses.CentralPlant centralPlant
+    annotation (Placement(transformation(extent={{320,-130},{340,-110}})));
+  BaseClasses.CentralPlant cenPla(
+    final nMod=nMod,
+    TLooMin=datDis.TLooMin,
+    TLooMax=datDis.TLooMax,
+    mWat_flow_nominal=sum(datDis.mCon_flow_nominal)/nMod,
+    samplePeriod=samplePeriod,
+    TAppSet=TAppSet,
+    TApp=TApp,
+    TCooSet=TCooSet,
+    THeaSet=THeaSet,
+    offTim=offTim) "Central plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
-  Controls.DistrictLoopPump looPumSpe
+  Controls.DistrictLoopPump looPumSpe(
+    final TUpp=TUpp,
+    final TLow=TLow,
+    final dTSlo=dTSlo,
+    final yMin=yDisPumMin)
+    annotation (Placement(transformation(extent={{-60,-160},{-40,-140}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(final k=datDis.mPumDis_flow_nominal)
+    "District pump speed"
     annotation (Placement(transformation(extent={{0,-160},{20,-140}})));
+  Buildings.BoundaryConditions.WeatherData.ReaderTMY3 weaDat(filNam=
+        ModelicaServices.ExternalReferences.loadResource("modelica://ThermalGridJBA/Resources/Data/BoundaryConditions/USA_MD_Andrews.AFB.745940_TMY3.mos"),
+      computeWetBulbTemperature=true)  "Weather data reader"
+    annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
+  Buildings.BoundaryConditions.WeatherData.Bus weaBus annotation (Placement(
+        transformation(extent={{-320,-40},{-280,0}}), iconTransformation(extent
+          ={{-364,-80},{-344,-60}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PFanDryCoo(nin=2)
+    "Dry cooler fan power"
+    annotation (Placement(transformation(extent={{-60,110},{-40,130}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumDryCoo(nin=2)
+    "Dry cooler pump power"
+    annotation (Placement(transformation(extent={{-20,90},{0,110}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHeaPumGly(nin=2)
+    "Heat pump glycol side pump power"
+    annotation (Placement(transformation(extent={{60,50},{80,70}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHexGly(nin=2)
+    "Heat exchanger glycol side pump power"
+    annotation (Placement(transformation(extent={{20,70},{40,90}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumCirPum(nin=2)
+    "Circulation pump power"
+    annotation (Placement(transformation(extent={{140,-40},{160,-20}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHeaPumWat(nin=2)
+    "Heat pump water side pump power"
+    annotation (Placement(transformation(extent={{140,0},{160,20}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PCom(nin=2)
+    "Heat pump compressor power"
+    annotation (Placement(transformation(extent={{100,20},{120,40}})));
+  Modelica.Blocks.Continuous.Integrator EFunDryCoo(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Dry cooler fan electric energy"
+    annotation (Placement(transformation(extent={{240,110},{260,130}})));
+  Modelica.Blocks.Continuous.Integrator EPumDryCoo(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Dry cooler pump electric energy"
+    annotation (Placement(transformation(extent={{100,90},{120,110}})));
+  Modelica.Blocks.Continuous.Integrator EPumHeaPumGly(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Heat pump glycol side pump electric energy"
+    annotation (Placement(transformation(extent={{180,50},{200,70}})));
+  Modelica.Blocks.Continuous.Integrator EPumHexGly(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Heat exchanger glycol side pump electric energy"
+    annotation (Placement(transformation(extent={{140,70},{160,90}})));
+  Modelica.Blocks.Continuous.Integrator EComPla(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Plant heat pumps compressor electric energy"
+    annotation (Placement(transformation(extent={{240,20},{260,40}})));
+  Modelica.Blocks.Continuous.Integrator EPumHeaPumWat(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Heat pump water side pump electric energy"
+    annotation (Placement(transformation(extent={{180,0},{200,20}})));
+  Modelica.Blocks.Continuous.Integrator EPumCirPum(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Circulation pump electric energy"
+    annotation (Placement(transformation(extent={{180,-40},{200,-20}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum EPumPla(nin=5)
+    "Plant pumps electricity energy"
+    annotation (Placement(transformation(extent={{240,60},{260,80}})));
+
 equation
-  connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,152},
-          {-14,152},{-14,180},{-10,180}},color={0,127,255}));
-  connect(dis.ports_aCon, bui.port_bSerAmb) annotation (Line(points={{12,152},{
-          16,152},{16,180},{10,180}},
+  connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
+          {-14,210},{-14,240},{-10,240}},color={0,127,255}));
+  connect(dis.ports_aCon, bui.port_bSerAmb) annotation (Line(points={{12,210},{
+          16,210},{16,240},{10,240}},
                                    color={0,127,255}));
   connect(pipeGroundCouplingMulti[1:(nBui+1)].heatPorts[1], dis.heatPorts)
-    annotation (Line(points={{1,95},{1,96},{0.4,96},{0.4,139.8}},
+    annotation (Line(points={{1,155},{1,156},{0.4,156},{0.4,197.8}},
         color={127,0,0}));
   connect(conPla.port_bDis, TDisWatSup.port_a)
-    annotation (Line(points={{-80,0},{-80,10}}, color={0,127,255}));
+    annotation (Line(points={{-80,0},{-80,140}},color={0,127,255},
+      thickness=0.5));
   connect(TDisWatRet.port_b, conPla.port_aDis)
-    annotation (Line(points={{-80,-30},{-80,-20}}, color={0,127,255}));
+    annotation (Line(points={{-80,-70},{-80,-20}}, color={0,127,255},
+      thickness=0.5));
   connect(PPumETS.y, EPumETS.u)
-    annotation (Line(points={{162,200},{218,200}}, color={0,0,127}));
+    annotation (Line(points={{202,240},{238,240}}, color={0,0,127}));
   connect(pumDis.P, EPumDis.u)
-    annotation (Line(points={{71,-71},{71,-80},{218,-80}}, color={0,0,127}));
-  connect(EPumETS.y, EPum.u[1]) annotation (Line(points={{241,200},{260,200},{
-          260,119.333},{278,119.333}},
+    annotation (Line(points={{81,-71},{81,-80},{218,-80}}, color={0,0,127}));
+  connect(EPumETS.y, EPum.u[1]) annotation (Line(points={{261,240},{286,240},{
+          286,159.333},{298,159.333}},
                                color={0,0,127}));
-  connect(EPumPla.y, EPum.u[2]) annotation (Line(points={{241,40},{260,40},{260,
-          120},{278,120}},     color={0,0,127}));
-  connect(EPumDis.y, EPum.u[3]) annotation (Line(points={{241,-80},{262,-80},{
-          262,120.667},{278,120.667}},
-                               color={0,0,127}));
+  connect(EPumDis.y, EPum.u[2]) annotation (Line(points={{241,-80},{286,-80},{
+          286,160},{298,160}}, color={0,0,127}));
   connect(PHeaPump.y, EHeaPum.u)
-    annotation (Line(points={{162,160},{218,160}}, color={0,0,127}));
-  connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{241,160},{300,160},{
-          300,159.5},{318,159.5}},
+    annotation (Line(points={{202,200},{238,200}}, color={0,0,127}));
+  connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{261,200},{350,200},{
+          350,99.25},{360,99.25}},
                                color={0,0,127}));
-  connect(EPum.y, ETot.u[2]) annotation (Line(points={{302,120},{310,120},{310,
-          160.5},{318,160.5}},
+  connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,160},{340,160},{340,
+          99.75},{360,99.75}},
                            color={0,0,127}));
-  connect(TDisWatSup.T, conVio.u[1]) annotation (Line(points={{-91,20},{-100,20},
-          {-100,12},{-60,12},{-60,19.5},{318,19.5}},       color={0,0,127}));
-  connect(TDisWatRet.T, conVio.u[2]) annotation (Line(points={{-91,-40},{-100,-40},
-          {-100,-30},{-60,-30},{-60,-40},{300,-40},{300,20.5},{318,20.5}},
+  connect(TDisWatSup.T, conVio.u[1]) annotation (Line(points={{-91,150},{-220,
+          150},{-220,-122},{50,-122},{50,-120.5},{318,-120.5}},
+                                                           color={0,0,127}));
+  connect(TDisWatRet.T, conVio.u[2]) annotation (Line(points={{-91,-80},{-100,
+          -80},{-100,-119.5},{318,-119.5}},
         color={0,0,127}));
-  connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-50},{
-          -80,-100},{80,-100},{80,-70}}, color={0,127,255}));
-  connect(bui.PPum, PPumETS.u) annotation (Line(points={{12,183},{128,183},{128,
-          200},{138,200}}, color={0,0,127}));
-  connect(bui.PCoo, PHeaPump.u) annotation (Line(points={{12,187},{120,187},{120,
-          160},{138,160}}, color={0,0,127}));
-  connect(dis.port_aDisSup, TDisWatSup.port_b) annotation (Line(points={{-20,142},
-          {-80,142},{-80,30}}, color={0,127,255}));
+  connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-90},
+          {-80,-100},{90,-100},{90,-70}},color={0,127,255},
+      thickness=0.5));
+  connect(bui.PPum, PPumETS.u) annotation (Line(points={{12,243},{128,243},{128,
+          240},{178,240}}, color={0,0,127}));
+  connect(bui.PCoo, PHeaPump.u) annotation (Line(points={{12,247},{120,247},{
+          120,200},{178,200}},
+                           color={0,0,127}));
+  connect(dis.port_aDisSup, TDisWatSup.port_b) annotation (Line(points={{-20,200},
+          {-80,200},{-80,160}},color={0,127,255},
+      thickness=0.5));
   connect(dis.port_bDisSup, pumDis.port_a)
-    annotation (Line(points={{20,142},{80,142},{80,-50}}, color={0,127,255}));
-  connect(pumDis.port_a, bou.ports[1]) annotation (Line(points={{80,-50},{80,
-          -44},{128,-44},{128,-60},{140,-60}}, color={0,127,255}));
-  connect(conPla.port_bCon, centralPlant.port_a) annotation (Line(points={{-90,
-          -10},{-100,-10},{-100,-20},{-200,-20},{-200,0},{-160,0}}, color={0,
-          127,255}));
-  connect(conPla.port_aCon, centralPlant.port_b) annotation (Line(points={{-90,
-          -4},{-100,-4},{-100,0},{-140,0}}, color={0,127,255}));
+    annotation (Line(points={{20,200},{90,200},{90,-50}}, color={0,127,255},
+      thickness=0.5));
+  connect(pumDis.port_a, bou.ports[1]) annotation (Line(points={{90,-50},{90,
+          -44},{128,-44},{128,-60},{140,-60}}, color={0,127,255},
+      thickness=0.5));
+  connect(conPla.port_bCon, cenPla.port_a) annotation (Line(points={{-90,-10},{-100,
+          -10},{-100,-20},{-200,-20},{-200,0},{-160,0}}, color={0,127,255}));
+  connect(conPla.port_aCon, cenPla.port_b) annotation (Line(points={{-90,-4},{-100,
+          -4},{-100,0},{-140,0}}, color={0,127,255}));
+  connect(looPumSpe.yDisPum, gai.u)
+    annotation (Line(points={{-38,-150},{-2,-150}}, color={0,0,127}));
+  connect(gai.y, pumDis.m_flow_in) annotation (Line(points={{22,-150},{40,-150},
+          {40,-60},{78,-60}}, color={0,0,127}));
+  connect(TDisWatRet.T, looPumSpe.TMixMax) annotation (Line(points={{-91,-80},{
+          -100,-80},{-100,-144},{-62,-144}}, color={0,0,127}));
+  connect(TDisWatRet.T, looPumSpe.TMixMin) annotation (Line(points={{-91,-80},{
+          -100,-80},{-100,-156},{-62,-156}}, color={0,0,127}));
+  connect(looPumSpe.yDisPum, cenPla.uDisPum) annotation (Line(points={{-38,-150},
+          {-20,-150},{-20,-180},{-180,-180},{-180,9},{-162,9}}, color={0,0,127}));
+  connect(TDisWatRet.T, cenPla.TMixAve) annotation (Line(points={{-91,-80},{-174,
+          -80},{-174,3},{-162,3}}, color={0,0,127}));
+  connect(weaBus.solTim, cenPla.uSolTim) annotation (Line(
+      points={{-299.9,-19.9},{-260,-19.9},{-260,7},{-162,7}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
+      points={{-299.9,-19.9},{-260,-19.9},{-260,-7},{-162,-7}},
+      color={255,204,51},
+      thickness=0.5));
+  connect(weaBus.TWetBul, cenPla.TWetBul) annotation (Line(
+      points={{-299.9,-19.9},{-260,-19.9},{-260,-9},{-162,-9}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaDat.weaBus, weaBus) annotation (Line(
+      points={{-360,-20},{-300,-20}},
+      color={255,204,51},
+      thickness=0.5));
+  connect(cenPla.PFanDryCoo, PFanDryCoo.u[1:2]) annotation (Line(points={{-138,7},
+          {-132,7},{-132,120.5},{-62,120.5}}, color={0,0,127}));
+  connect(cenPla.PPumDryCoo, PPumDryCoo.u[1:2]) annotation (Line(points={{-138,5},
+          {-128,5},{-128,100.5},{-22,100.5}}, color={0,0,127}));
+  connect(cenPla.PPumHexGly, PPumHexGly.u[1:2]) annotation (Line(points={{-138,3},
+          {-124,3},{-124,80.5},{18,80.5}}, color={0,0,127}));
+  connect(cenPla.PPumHeaPumGly, PPumHeaPumGly.u[1:2]) annotation (Line(points={{
+          -138,-3},{-120,-3},{-120,60.5},{58,60.5}}, color={0,0,127}));
+  connect(cenPla.PCom, PCom.u[1:2]) annotation (Line(points={{-138,-5},{-116,-5},
+          {-116,30.5},{98,30.5}}, color={0,0,127}));
+  connect(cenPla.PPumHeaPumWat, PPumHeaPumWat.u[1:2]) annotation (Line(points={{
+          -138,-7},{-112,-7},{-112,10.5},{138,10.5}}, color={0,0,127}));
+  connect(cenPla.PPumCirPum, PPumCirPum.u[1:2]) annotation (Line(points={{-138,-9},
+          {-124,-9},{-124,-30},{138,-30},{138,-29.5}}, color={0,0,127}));
+  connect(PFanDryCoo.y, EFunDryCoo.u)
+    annotation (Line(points={{-38,120},{238,120}}, color={0,0,127}));
+  connect(PPumDryCoo.y, EPumDryCoo.u)
+    annotation (Line(points={{2,100},{98,100}}, color={0,0,127}));
+  connect(PPumHexGly.y, EPumHexGly.u)
+    annotation (Line(points={{42,80},{138,80}}, color={0,0,127}));
+  connect(PPumHeaPumGly.y, EPumHeaPumGly.u)
+    annotation (Line(points={{82,60},{178,60}}, color={0,0,127}));
+  connect(PCom.y, EComPla.u)
+    annotation (Line(points={{122,30},{238,30}}, color={0,0,127}));
+  connect(PPumHeaPumWat.y, EPumHeaPumWat.u)
+    annotation (Line(points={{162,10},{178,10}}, color={0,0,127}));
+  connect(PPumCirPum.y, EPumCirPum.u)
+    annotation (Line(points={{162,-30},{178,-30}}, color={0,0,127}));
+  connect(EPumDryCoo.y, EPumPla.u[1]) annotation (Line(points={{121,100},{230,
+          100},{230,69.2},{238,69.2}}, color={0,0,127}));
+  connect(EPumHexGly.y, EPumPla.u[2]) annotation (Line(points={{161,80},{220,80},
+          {220,69.6},{238,69.6}}, color={0,0,127}));
+  connect(EPumHeaPumGly.y, EPumPla.u[3]) annotation (Line(points={{201,60},{220,
+          60},{220,70},{238,70}}, color={0,0,127}));
+  connect(EPumHeaPumWat.y, EPumPla.u[4]) annotation (Line(points={{201,10},{228,
+          10},{228,70},{238,70},{238,70.4}}, color={0,0,127}));
+  connect(EPumCirPum.y, EPumPla.u[5]) annotation (Line(points={{201,-30},{226,
+          -30},{226,70.8},{238,70.8}}, color={0,0,127}));
+  connect(EPumPla.y, EPum.u[3]) annotation (Line(points={{262,70},{282,70},{282,
+          160.667},{298,160.667}}, color={0,0,127}));
+  connect(EFunDryCoo.y, ETot.u[3]) annotation (Line(points={{261,120},{332,120},
+          {332,100.25},{360,100.25}}, color={0,0,127}));
+  connect(EComPla.y, ETot.u[4]) annotation (Line(points={{261,30},{320,30},{320,
+          100.75},{360,100.75}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),

@@ -2,11 +2,11 @@ within ThermalGridJBA.Networks.BaseClasses;
 model CentralPlantModule "Central plant module, each includes the generation equipments and one borefield module"
 
   package MediumW = Buildings.Media.Water "Water";
-  parameter Real TDisLooMin(
+  parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
     "Design minimum district loop temperature";
-  parameter Real TDisLooMax(
+  parameter Real TLooMax(
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
@@ -68,12 +68,12 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real TCooSet(
     unit="K",
-    displayUnit="degC")=TDisLooMin
+    displayUnit="degC")=TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real THeaSet(
     unit="K",
-    displayUnit="degC")=TDisLooMax
+    displayUnit="degC")=TLooMax
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(
@@ -92,26 +92,61 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
 
-  final parameter ThermalGridJBA.Networks.Data.Borefield.Validation borFieDat(
+//   final parameter ThermalGridJBA.Networks.Data.Borefield.Validation borFieDat(
+//     filDat=filDat,
+//     soiDat=soiDat,
+//     conDat=conDat)
+//     "Borefield data"
+//     annotation (Placement(transformation(extent={{-60,60},{-40,80}})));
+//   final parameter ThermalGridJBA.Networks.Data.Configuration.Validation conDat(
+//     final mBor_flow_nominal=mBor_flow_nominal,
+//     final dp_nominal=dp_nominal)
+//     "Borefield configuration data"
+//     annotation (Placement(transformation(extent={{-60,-40},{-40,-20}})));
+//   final parameter ThermalGridJBA.Networks.Data.Filling.Bentonite filDat
+//     "Borehole filling data"
+//     annotation (Placement(transformation(extent={{-60,-60},{-40,-40}})));
+//   final parameter ThermalGridJBA.Networks.Data.Soil.SandStone soiDat
+//     "Soil data"
+//     annotation (Placement(transformation(extent={{-60,-80},{-40,-60}})));
+
+  parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Borefield.Template borFieDat(
     filDat=filDat,
     soiDat=soiDat,
-    conDat=conDat)
-    "Borefield data"
+    conDat=conDat) "Borefield data"
     annotation (Placement(transformation(extent={{-60,60},{-40,80}})));
-  final parameter ThermalGridJBA.Networks.Data.Configuration.Validation conDat(
-    final mBor_flow_nominal=mBor_flow_nominal,
-    final dp_nominal=dp_nominal)
-    "Borefield configuration data"
-    annotation (Placement(transformation(extent={{-60,-40},{-40,-20}})));
-  final parameter ThermalGridJBA.Networks.Data.Filling.Bentonite filDat
+  parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template conDat(
+    borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
+    mBor_flow_nominal=mBor_flow_nominal,
+    dp_nominal=dp_nominal,
+    hBor=85,
+    rBor=0.075,
+    dBor=0.5,
+    nZon=2,
+    iZon={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2},
+    cooBor={{3,1.5},{6,1.5},{9,1.5},{12,1.5},{1.5,4.5},{4.5,4.5},{7.5,4.5},{10.5,
+        4.5},{3,7.5},{6,7.5},{9,7.5},{12,7.5},{1.5,10.5},{4.5,10.5},{7.5,10.5},{
+        10.5,10.5},{3,13.5},{6,13.5},{9,13.5},{12,13.5},{1.5,16.5},{4.5,16.5},{7.5,
+        16.5},{10.5,16.5},{5.4,22.5},{10.8,22.5},{2.7,28.5},{8.1,28.5}},
+    rTub=0.016,
+    kTub=0.42,
+    eTub=0.0029,
+    xC=(2*((0.04/2)^2))^(1/2)) "Construction data"
+    annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
+  parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Filling.Bentonite filDat(
+    kFil=1.0)
     "Borehole filling data"
-    annotation (Placement(transformation(extent={{-60,-60},{-40,-40}})));
-  final parameter ThermalGridJBA.Networks.Data.Soil.SandStone soiDat
-    "Soil data"
+    annotation (Placement(transformation(extent={{-60,-40},{-40,-20}})));
+  parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Soil.SandStone soiDat(
+    kSoi=1.1,
+    cSoi=1.4E6/1800,
+    dSoi=1800) "Soil data"
     annotation (Placement(transformation(extent={{-60,-80},{-40,-60}})));
-  final parameter Integer nZon=conDat.nZon
+  parameter Modelica.Units.SI.Temperature T_start=286.65
+    "Initial temperature of the soil";
+  final parameter Integer nZon=borFieDat.conDat.nZon
     "Total number of independent bore field zones";
-  final parameter Integer nBor=size(conDat.iZon, 1)
+  final parameter Integer nBor=size(borFieDat.conDat.iZon, 1)
     "Total number of boreholes";
 
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TWetBul(
@@ -142,25 +177,25 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     "District loop pump speed"
     annotation (Placement(transformation(extent={{-140,70},{-100,110}}),
         iconTransformation(extent={{-140,70},{-100,110}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFan_dryCoo(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo(
     quantity="Power",
     final unit="W")
     "Electric power consumed by fan"
     annotation (Placement(transformation(extent={{100,50},{140,90}}),
         iconTransformation(extent={{100,50},{140,90}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_dryCoo(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo(
     quantity="Power",
     final unit="W")
     "Electrical power consumed by dry cool pump"
     annotation (Placement(transformation(extent={{100,30},{140,70}}),
         iconTransformation(extent={{100,30},{140,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_hexGly(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHexGly(
     quantity="Power",
     final unit="W")
     "Electrical power consumed by the glycol pump of HEX"
     annotation (Placement(transformation(extent={{100,10},{140,50}}),
         iconTransformation(extent={{100,10},{140,50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_heaPumGly(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly(
     quantity="Power",
     final unit="W")
     "Electrical power consumed by glycol pump of heat pump"
@@ -172,13 +207,13 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     "Electric power consumed by compressor"
     annotation (Placement(transformation(extent={{100,-70},{140,-30}}),
         iconTransformation(extent={{100,-70},{140,-30}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_heaPumWat(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat(
     quantity="Power",
     final unit="W")
     "Electrical power consumed by heat pump waterside pump"
     annotation (Placement(transformation(extent={{100,-90},{140,-50}}),
         iconTransformation(extent={{100,-90},{140,-50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_cirPum(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(
     quantity="Power",
     final unit="W")
     "Electrical power consumed by circulation pump"
@@ -197,8 +232,8 @@ model CentralPlantModule "Central plant module, each includes the generation equ
       iconTransformation(extent={{90,-10},{110,10}})));
 
   ThermalGridJBA.Networks.BaseClasses.Generations gen(
-    final TDisLooMin=TDisLooMin,
-    final TDisLooMax=TDisLooMax,
+    final TLooMin=TLooMin,
+    final TLooMax=TLooMax,
     final mWat_flow_nominal=mWat_flow_nominal,
     final mWat_flow_min=mWat_flow_min,
     final mHexGly_flow_nominal=mHexGly_flow_nominal,
@@ -220,7 +255,12 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     "Cooling and heating generation devices"
     annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
   Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie(
-    redeclare final package Medium = MediumW)
+    redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    TExt0_start=T_start,
+    borFieDat=borFieDat,
+    dT_dz=0)
     annotation (Placement(transformation(extent={{20,-10},{40,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del3(
     redeclare final package Medium = MediumW,
@@ -270,20 +310,20 @@ equation
           3},{-62,3}}, color={0,0,127}));
   connect(TDryBul, gen.TDryBul) annotation (Line(points={{-120,-50},{-80,-50},{-80,
           -7},{-62,-7}}, color={0,0,127}));
-  connect(gen.PFan_dryCoo, PFan_dryCoo) annotation (Line(points={{-38,7},{-24,7},
-          {-24,70},{120,70}}, color={0,0,127}));
-  connect(gen.PPum_dryCoo, PPum_dryCoo) annotation (Line(points={{-38,5},{-20,5},
-          {-20,50},{120,50}}, color={0,0,127}));
-  connect(gen.PPum_hexGly, PPum_hexGly) annotation (Line(points={{-38,3},{-16,3},
-          {-16,30},{120,30}}, color={0,0,127}));
-  connect(gen.PPum_heaPumGly, PPum_heaPumGly) annotation (Line(points={{-38,-3},
-          {-16,-3},{-16,-30},{120,-30}}, color={0,0,127}));
+  connect(gen.PFanDryCoo, PFanDryCoo) annotation (Line(points={{-38,7},{-24,7},{
+          -24,70},{120,70}}, color={0,0,127}));
+  connect(gen.PPumDryCoo, PPumDryCoo) annotation (Line(points={{-38,5},{-20,5},{
+          -20,50},{120,50}}, color={0,0,127}));
+  connect(gen.PPumHexGly, PPumHexGly) annotation (Line(points={{-38,3},{-16,3},{
+          -16,30},{120,30}}, color={0,0,127}));
+  connect(gen.PPumHeaPumGly, PPumHeaPumGly) annotation (Line(points={{-38,-3},{-16,
+          -3},{-16,-30},{120,-30}}, color={0,0,127}));
   connect(gen.PCom, PCom) annotation (Line(points={{-38,-5},{-20,-5},{-20,-50},
           {120,-50}}, color={0,0,127}));
-  connect(gen.PPum_heaPumWat, PPum_heaPumWat) annotation (Line(points={{-38,-7},
-          {-24,-7},{-24,-70},{120,-70}}, color={0,0,127}));
-  connect(gen.PPum_cirPum, PPum_cirPum) annotation (Line(points={{-38,-9},{-28,
-          -9},{-28,-90},{120,-90}}, color={0,0,127}));
+  connect(gen.PPumHeaPumWat, PPumHeaPumWat) annotation (Line(points={{-38,-7},{-24,
+          -7},{-24,-70},{120,-70}}, color={0,0,127}));
+  connect(gen.PPumCirPum, PPumCirPum) annotation (Line(points={{-38,-9},{-28,-9},
+          {-28,-90},{120,-90}}, color={0,0,127}));
   connect(gen.yEleRat, yEleRat) annotation (Line(points={{-38,9},{-28,9},{-28,
           90},{120,90}}, color={0,0,127}));
   annotation (defaultComponentName="plaMod",

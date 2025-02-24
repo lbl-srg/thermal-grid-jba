@@ -2,21 +2,18 @@ within ThermalGridJBA.Networks.Controls;
 model DistrictLoopPump
   "Sequence for the control of district loop pump"
   parameter Real TUpp(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")=273.15+24
+    unit="K",
+    displayUnit="degC")=273.15 + 24
     "Upper bound temperature";
   parameter Real TLow(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")=273.15+10.5
+    unit="K",
+    displayUnit="degC")=273.15 + 10.5
     "Lower bound temperature";
   parameter Real dTSlo(
     unit="K",
     displayUnit="K")=2
     "Temperature deadband for changing pump speed";
-  parameter Real yMin(
-    unit="1")
+  parameter Real yMin(unit="1")=0.1
     "Minimum pump speed";
 
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TMixMax(

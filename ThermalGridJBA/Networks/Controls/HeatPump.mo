@@ -13,12 +13,12 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Nominal glycol mass flow rate for heat pump";
-  parameter Real TDisLooMin(
+  parameter Real TLooMin(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")=283.65
     "Design minimum district loop temperature";
-  parameter Real TDisLooMax(
+  parameter Real TLooMax(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")=297.15
@@ -26,12 +26,12 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
   parameter Real TCooSet(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC")=TDisLooMin
+    displayUnit="degC")=TLooMin
     "Heat pump tracking temperature setpoint in cooling mode";
   parameter Real THeaSet(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC")=TDisLooMax
+    displayUnit="degC")=TLooMax
     "Heat pump tracking temperature setpoint in heating mode";
   parameter Real TConInMin(
     final quantity="ThermodynamicTemperature",
@@ -198,11 +198,11 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     "High electricity rate and high district load"
     annotation (Placement(transformation(extent={{-160,430},{-140,450}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desMinDisTem(
-    final k=TDisLooMin)
+    final k=TLooMin)
     "Design minimum district loop temperature"
     annotation (Placement(transformation(extent={{-280,290},{-260,310}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desMaxDisTem(
-    final k=TDisLooMax)
+    final k=TLooMax)
     "Design maximum district loop temperature"
     annotation (Placement(transformation(extent={{-280,250},{-260,270}})));
   Buildings.Controls.OBC.CDL.Reals.Average ave
@@ -633,7 +633,7 @@ each related equipment when the heat pump is enabled.
 <td>1 (high)</td>
 <td>3 (high)</td>
 <td>x</td>
-<td><code>TMixAve &lt; (TDisLooMin+TDisLooMax)/2</code></td>
+<td><code>TMixAve &lt; (TLooMin+TLooMax)/2</code></td>
 <td>true (heating)</td>
 <td>track <code>TWatOut = THeaSet</code></td>
 <td>1</td>
@@ -645,7 +645,7 @@ each related equipment when the heat pump is enabled.
 <td>1 (high)</td>
 <td>3 (high)</td>
 <td>x</td>
-<td><code>TMixAve &gt; (TDisLooMin+TDisLooMax)/2</code></td>
+<td><code>TMixAve &gt; (TLooMin+TLooMax)/2</code></td>
 <td>false (cooling)</td>
 <td>track <code>TWatOut = TCooSet</code></td>
 <td>1</td>

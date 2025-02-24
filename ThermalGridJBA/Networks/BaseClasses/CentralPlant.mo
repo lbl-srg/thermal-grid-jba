@@ -5,44 +5,38 @@ model CentralPlant "Central plant"
   parameter Integer nMod=2
     "Total number of modules";
 
-  parameter Real TDisLooMin(
+  parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
     "Design minimum district loop temperature";
-  parameter Real TDisLooMax(
+  parameter Real TLooMax(
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
-  parameter Real mWat_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each module";
-  parameter Real mWat_flow_min(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mWat_flow_min(unit="kg/s")=mWat_flow_nominal*0.2
     "Heat pump minimum water mass flow rate";
-  parameter Real mHexGly_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mHexGly_flow_nominal(unit="kg/s")=mWat_flow_nominal*0.6
     "Nominal glycol mass flow rate for heat exchanger";
-  parameter Real mHpGly_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mHpGly_flow_nominal(unit="kg/s")=mWat_flow_nominal*0.6
     "Nominal glycol mass flow rate for heat pump";
-  parameter Real mDryCoo_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")=mHexGly_flow_nominal+mHpGly_flow_nominal
+  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mHexGly_flow_nominal +
+    mHpGly_flow_nominal
     "Nominal glycol mass flow rate for dry cooler";
   parameter Real dpHex_nominal(
     final quantity="PressureDifference",
+    unit="Pa",
     displayUnit="Pa")=10000
     "Pressure difference across heat exchanger";
   parameter Real dpValve_nominal(
     final quantity="PressureDifference",
+    unit="Pa",
     displayUnit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve";
   parameter Real dpDryCoo_nominal(
     final quantity="PressureDifference",
+    unit="Pa",
     displayUnit="Pa")=10000
     "Nominal pressure drop of fully open 2-way valve";
 
@@ -55,40 +49,28 @@ model CentralPlant "Central plant"
 //     final quantity=fill("Pressure", nZon))={5e4,2e4}
 //     "Pressure losses for each zone of the borefield";
 
-  parameter Real samplePeriod(
-    final unit="s",
-    final quantity="Time")=7200
+  parameter Real samplePeriod(unit="s")=7200
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Controls", group="Indicators"));
-  parameter Real TAppSet=2
+  parameter Real TAppSet(unit="K")=2
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TApp=4
+  parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TCooSet(
-    unit="K",
-    displayUnit="degC")=TDisLooMin
+  parameter Real TCooSet(unit="K")=TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real THeaSet(
-    unit="K",
-    displayUnit="degC")=TDisLooMax
+  parameter Real THeaSet(unit="K")=TLooMax
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TConInMin(
-    unit="K",
-    displayUnit="degC")
+  parameter Real TConInMin(unit="K")=TLooMax - TApp - TAppSet
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TEvaInMax(
-    unit="K",
-    displayUnit="degC")
+  parameter Real TEvaInMax(unit="K")=TLooMin + TApp + TAppSet
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real offTim(
-    final unit="s",
-    final quantity="Time")=12*3600
+  parameter Real offTim(unit="s")=12*3600
     "Heat pump off time"
     annotation (Dialog(tab="Controls", group="Heat pump"));
 
@@ -124,25 +106,25 @@ model CentralPlant "Central plant"
     "Current electricity rate, cent per kWh"
     annotation (Placement(transformation(extent={{100,70},{140,110}}),
         iconTransformation(extent={{100,70},{140,110}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFan_dryCoo[nMod](
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo[nMod](
     quantity=fill("Power", nMod),
     final unit=fill("W", nMod))
     "Electric power consumed by fan"
     annotation (Placement(transformation(extent={{100,50},{140,90}}),
         iconTransformation(extent={{100,50},{140,90}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_dryCoo[nMod](
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo[nMod](
     quantity=fill("Power", nMod),
     final unit=fill("W", nMod))
     "Electrical power consumed by dry cool pump"
     annotation (Placement(transformation(extent={{100,30},{140,70}}),
         iconTransformation(extent={{100,30},{140,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_hexGly[nMod](
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHexGly[nMod](
     quantity=fill("Power", nMod),
     final unit=fill("W", nMod))
     "Electrical power consumed by the glycol pump of HEX"
     annotation (Placement(transformation(extent={{100,10},{140,50}}),
         iconTransformation(extent={{100,10},{140,50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_heaPumGly[nMod](
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly[nMod](
     quantity=fill("Power", nMod),
     final unit=fill("W", nMod))
     "Electrical power consumed by glycol pump of heat pump"
@@ -154,13 +136,13 @@ model CentralPlant "Central plant"
     "Electric power consumed by compressor"
     annotation (Placement(transformation(extent={{100,-70},{140,-30}}),
         iconTransformation(extent={{100,-70},{140,-30}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_heaPumWat[nMod](
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat[nMod](
     quantity=fill("Power", nMod),
     final unit=fill("W", nMod))
     "Electrical power consumed by heat pump waterside pump"
     annotation (Placement(transformation(extent={{100,-90},{140,-50}}),
         iconTransformation(extent={{100,-90},{140,-50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_cirPum[nMod](
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum[nMod](
     quantity=fill("Power", nMod),
     final unit=fill("W", nMod))
     "Electrical power consumed by circulation pump"
@@ -168,10 +150,10 @@ model CentralPlant "Central plant"
         iconTransformation(extent={{100,-110},{140,-70}})));
 
   ThermalGridJBA.Networks.BaseClasses.CentralPlantModule plaMod[nMod](
-    final TDisLooMin=fill(TDisLooMin, nMod),
-    final TDisLooMax=fill(TDisLooMax, nMod),
+    final TLooMin=fill(TLooMin, nMod),
+    final TLooMax=fill(TLooMax, nMod),
     final mWat_flow_nominal=fill(mWat_flow_nominal, nMod),
-    final mWat_flow_min=fill(nWat_flow_min, nMod),
+    final mWat_flow_min=fill(mWat_flow_min, nMod),
     final mHexGly_flow_nominal=fill(mHexGly_flow_nominal, nMod),
     final mHpGly_flow_nominal=fill(mHpGly_flow_nominal, nMod),
     final mDryCoo_flow_nominal=fill(mDryCoo_flow_nominal, nMod),
@@ -261,23 +243,24 @@ equation
           -40},{-20,-7},{18,-7}}, color={0,0,127}));
   connect(reaScaRep4.y, plaMod.TWetBul) annotation (Line(points={{-58,-80},{-10,
           -80},{-10,-9},{18,-9}}, color={0,0,127}));
-  connect(plaMod.PPum_heaPumGly, PPum_heaPumGly) annotation (Line(points={{42,-3},
+  connect(plaMod.PPumHeaPumGly, PPumHeaPumGly) annotation (Line(points={{42,-3},
           {60,-3},{60,-30},{120,-30}}, color={0,0,127}));
   connect(plaMod.PCom, PCom) annotation (Line(points={{42,-5},{56,-5},{56,-50},{
           120,-50}}, color={0,0,127}));
-  connect(plaMod.PPum_heaPumWat, PPum_heaPumWat) annotation (Line(points={{42,-7},
+  connect(plaMod.PPumHeaPumWat, PPumHeaPumWat) annotation (Line(points={{42,-7},
           {52,-7},{52,-70},{120,-70}}, color={0,0,127}));
-  connect(plaMod.PPum_cirPum, PPum_cirPum) annotation (Line(points={{42,-9},{48,
-          -9},{48,-90},{120,-90}}, color={0,0,127}));
-  connect(plaMod.PPum_hexGly, PPum_hexGly) annotation (Line(points={{42,3},{56,3},
+  connect(plaMod.PPumCirPum, PPumCirPum) annotation (Line(points={{42,-9},{48,-9},
+          {48,-90},{120,-90}}, color={0,0,127}));
+  connect(plaMod.PPumHexGly, PPumHexGly) annotation (Line(points={{42,3},{56,3},
           {56,30},{120,30}}, color={0,0,127}));
-  connect(plaMod.PPum_dryCoo, PPum_dryCoo) annotation (Line(points={{42,5},{52,5},
+  connect(plaMod.PPumDryCoo, PPumDryCoo) annotation (Line(points={{42,5},{52,5},
           {52,50},{120,50}}, color={0,0,127}));
-  connect(plaMod.PFan_dryCoo, PFan_dryCoo) annotation (Line(points={{42,7},{48,7},
+  connect(plaMod.PFanDryCoo, PFanDryCoo) annotation (Line(points={{42,7},{48,7},
           {48,70},{120,70}}, color={0,0,127}));
   connect(plaMod.yEleRat, yEleRat) annotation (Line(points={{42,9},{44,9},{44,90},
           {120,90}}, color={0,0,127}));
-  annotation (Icon(coordinateSystem(preserveAspectRatio=false), graphics={
+  annotation (defaultComponentName="cenPla",
+  Icon(coordinateSystem(preserveAspectRatio=false), graphics={
                                 Rectangle(
         extent={{-100,-100},{100,100}},
         lineColor={0,0,127},
@@ -291,15 +274,13 @@ equation
           lineColor={0,0,255},
           pattern=LinePattern.None,
           fillColor={0,255,255},
-          fillPattern=FillPattern.Solid,
-          visible=have_serAmb),
+          fillPattern=FillPattern.Solid),
         Rectangle(
           extent={{0,-8},{100,8}},
           lineColor={0,0,255},
           pattern=LinePattern.None,
           fillColor={0,255,255},
-          fillPattern=FillPattern.Solid,
-          visible=have_serAmb),
+          fillPattern=FillPattern.Solid),
         Rectangle(
           extent={{-40,-40},{40,40}},
           lineColor={27,0,55},

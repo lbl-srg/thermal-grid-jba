@@ -3,59 +3,39 @@ model Generations
   "Cooling and heating generation from the heat pump and heat exchanger"
   package MediumW = Buildings.Media.Water "Water";
   package MediumG = Modelica.Media.Incompressible.Examples.Glycol47 "Glycol";
-  parameter Real TDisLooMin(
+  parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
     "Design minimum district loop temperature";
-  parameter Real TDisLooMax(
+  parameter Real TLooMax(
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
-  parameter Real mWat_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate";
-  parameter Real mWat_flow_min(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mWat_flow_min(unit="kg/s")
     "Heat pump minimum water mass flow rate";
-  parameter Real mHexGly_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mHexGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat exchanger";
-  parameter Real mHpGly_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mHpGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump";
-  parameter Real mDryCoo_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")=mHexGly_flow_nominal+mHpGly_flow_nominal
+  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mHexGly_flow_nominal +
+    mHpGly_flow_nominal
     "Nominal glycol mass flow rate for dry cooler";
-  parameter Real dpHex_nominal(
-    final quantity="PressureDifference",
-    final unit="Pa")=10000
+  parameter Real dpHex_nominal(unit="Pa")=10000
     "Pressure difference across heat exchanger";
-  parameter Real dpValve_nominal(
-    final quantity="PressureDifference",
-    final unit="Pa")=6000
+  parameter Real dpValve_nominal(unit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve";
-  parameter Real dpDryCoo_nominal(
-    final quantity="PressureDifference",
-    final unit="Pa")=10000
+  parameter Real dpDryCoo_nominal(unit="Pa")=10000
     "Nominal pressure drop of fully open 2-way valve";
 
-  parameter Real samplePeriod(
-    final quantity="Time",
-    final unit="s")=7200 "Sample period of district loop pump speed"
+  parameter Real samplePeriod(unit="s")=7200
+                         "Sample period of district loop pump speed"
     annotation (Dialog(tab="Controls", group="Indicators"));
-  parameter Real TAppSet(
-    final quantity="TemperatureDifference",
-    final unit="K")=2
+  parameter Real TAppSet(unit="K")=2
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TApp(
-    final quantity="TemperatureDifference",
-    final unit="K")=4
+  parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real minFanSpe=0.1
@@ -75,29 +55,23 @@ model Generations
     annotation (Dialog(tab="Controls", group="Dry cooler",
       enable=fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PD
           or fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
-  parameter Real TCooSet(
-    final unit="K",
-    displayUnit="degC")=TDisLooMin
+  parameter Real TCooSet(unit="K")=TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real THeaSet(
-    final unit="K",
-    displayUnit="degC")=TDisLooMax
+  parameter Real THeaSet(unit="K")=TLooMax
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(
     unit="K",
-    displayUnit="degC")
+    displayUnit="degC")=TLooMax - TApp - TAppSet
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TEvaInMax(
     unit="K",
-    displayUnit="degC")
+    displayUnit="degC")=TLooMin + TApp + TAppSet
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real offTim(
-    final quantity="Time",
-    final unit="s")=12*3600
+  parameter Real offTim(unit="s")=12*3600
     "Heat pump off time"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real minComSpe=0.2
@@ -132,6 +106,23 @@ model Generations
       enable=thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PD
           or thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
 
+  final parameter Real cpWat(
+    final quantity="SpecificHeatCapacity",
+    final unit="J/(kg.K)")= 4184
+    "Water specific heat capacity";
+  final parameter Real rhoWat(
+    final quantity="Density",
+    final unit="kg/m3")=1000
+    "Water density";
+  final parameter Real cpGly(
+    final quantity="SpecificHeatCapacity",
+    final unit="J/(kg.K)")= 3620
+    "Glycol specific heat capacity at 20 degC";
+  final parameter Real rhoGly(
+    final quantity="Density",
+    final unit="kg/m3")=1044
+    "Glycol density at 20 degC";
+
   Buildings.Controls.OBC.CDL.Interfaces.RealInput uDisPum
     "District loop pump speed"
     annotation (Placement(transformation(extent={{-340,240},{-300,280}}),
@@ -164,25 +155,25 @@ model Generations
     "Current electricity rate, cent per kWh"
     annotation (Placement(transformation(extent={{300,250},{340,290}}),
         iconTransformation(extent={{100,70},{140,110}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFan_dryCoo(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo(
     final quantity="Power",
     final unit="W")
     "Electric power consumed by fan"
     annotation (Placement(transformation(extent={{300,210},{340,250}}),
         iconTransformation(extent={{100,50},{140,90}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_dryCoo(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo(
     final quantity="Power",
     final unit="W")
     "Electrical power consumed by dry cool pump"
     annotation (Placement(transformation(extent={{300,180},{340,220}}),
         iconTransformation(extent={{100,30},{140,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_hexGly(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHexGly(
     final quantity="Power",
     final unit="W")
     "Electrical power consumed by the glycol pump of HEX"
     annotation (Placement(transformation(extent={{300,150},{340,190}}),
         iconTransformation(extent={{100,10},{140,50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_heaPumGly(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly(
     final quantity="Power",
     final unit="W")
     "Electrical power consumed by glycol pump of heat pump"
@@ -192,15 +183,15 @@ model Generations
     final quantity="Power",
     final unit="W")
     "Electric power consumed by compressor"
-    annotation (Placement(transformation(extent={{300,-70},{340,-30}}),
+    annotation (Placement(transformation(extent={{300,-50},{340,-10}}),
         iconTransformation(extent={{100,-70},{140,-30}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_heaPumWat(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat(
     final quantity="Power",
     final unit="W")
     "Electrical power consumed by heat pump waterside pump"
     annotation (Placement(transformation(extent={{300,-160},{340,-120}}),
         iconTransformation(extent={{100,-90},{140,-50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPum_cirPum(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(
     final quantity="Power",
     final unit="W")
     "Electrical power consumed by circulation pump"
@@ -254,12 +245,6 @@ model Generations
     "Heat pump water loop valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={120,-120})));
-  Buildings.Fluid.HeatPumps.ModularReversible.Modular heaPum(
-    redeclare package MediumCon = MediumG,
-    redeclare package MediumEva = MediumW,
-    use_rev=true)
-    "Reversible heat pump"
-    annotation (Placement(transformation(extent={{180,-40},{160,-20}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumWat(
     redeclare final package Medium = MediumW,
     final addPowerToMedium=false,
@@ -341,8 +326,8 @@ model Generations
     final mWat_flow_nominal=mWat_flow_nominal,
     final mWat_flow_min=mWat_flow_min,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
-    final TDisLooMin=TDisLooMin,
-    final TDisLooMax=TDisLooMax,
+    final TLooMin=TLooMin,
+    final TLooMax=TLooMax,
     final TCooSet=TCooSet,
     final THeaSet=THeaSet,
     final TConInMin=TConInMin,
@@ -359,7 +344,6 @@ model Generations
     final TdVal=TdVal)
     "Control of heat pump and the corresponed pumps and valves"
     annotation (Placement(transformation(extent={{-180,160},{-160,180}})));
-
   Buildings.Fluid.Sensors.TemperatureTwoPort dryCooOut(
     redeclare final package Medium = MediumG,
     final m_flow_nominal=mDryCoo_flow_nominal)
@@ -416,7 +400,26 @@ model Generations
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={-20,90})));
-
+  Buildings.Fluid.HeatPumps.ModularReversible.LargeScaleWaterToWater heaPum(
+    redeclare final package MediumCon = MediumW,
+    redeclare final package MediumEva = MediumG,
+    redeclare
+      Buildings.Fluid.HeatPumps.ModularReversible.Controls.Safety.Data.Wuellhorst2021
+      safCtrPar,
+    final QHea_flow_nominal=cpWat*mWat_flow_nominal*TApp,
+    final QCoo_flow_nominal=-cpWat*mWat_flow_nominal*TApp,
+    final TConHea_nominal=TLooMin,
+    final TEvaHea_nominal=TLooMin + TApp,
+    final TConCoo_nominal=TLooMax,
+    final TEvaCoo_nominal=TLooMax - TApp,
+    redeclare
+      Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.EN14511.WAMAK_WaterToWater_220kW
+      datTabHea,
+    redeclare
+      Buildings.Fluid.Chillers.ModularReversible.Data.TableData2D.EN14511.Carrier30XWP1012_1MW
+      datTabCoo)
+    "Reversible heat pump"
+    annotation (Placement(transformation(extent={{140,-20},{160,-40}})));
 equation
   connect(valHex.port_b, hex.port_a2) annotation (Line(
       points={{-100,-90},{-100,-36},{-80,-36}},
@@ -426,16 +429,8 @@ equation
       points={{120,-110},{120,-90}},
       color={0,127,255},
       thickness=0.5));
-  connect(pumHeaPumWat.port_b, heaPum.port_a2) annotation (Line(
-      points={{120,-70},{120,-36},{160,-36}},
-      color={0,127,255},
-      thickness=0.5));
   connect(pumDryCoo.port_b, dryCoo.port_a) annotation (Line(
       points={{-40,130},{40,130}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(heaPum.port_a1, pumHeaPumGly.port_b) annotation (Line(
-      points={{180,-24},{200,-24},{200,-10}},
       color={0,127,255},
       thickness=0.5));
   connect(port_a, senTem.port_a) annotation (Line(
@@ -444,10 +439,6 @@ equation
       thickness=0.5));
   connect(senTem.port_b, pumCenPla.port_a) annotation (Line(
       points={{-250,-160},{-170,-160}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(heaPum.port_b2, heaPumLea.port_a) annotation (Line(
-      points={{180,-36},{200,-36},{200,-90}},
       color={0,127,255},
       thickness=0.5));
   connect(pumHeaPumGly.port_a, heaPumGlyIn.port_b) annotation (Line(
@@ -489,8 +480,8 @@ equation
           260},{-290,164},{-182,164}}, color={0,0,127}));
   connect(heaPumGlyIn.T, heaPumCon.TGlyIn) annotation (Line(points={{211,30},{
           226,30},{226,-206},{-226,-206},{-226,161},{-182,161}}, color={0,0,127}));
-  connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-320,190},{-160,
-          190},{-160,208},{-82,208}},      color={0,0,127}));
+  connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-320,190},{-280,
+          190},{-280,208},{-82,208}},      color={0,0,127}));
   connect(senTem.T, dryCooHexCon.TGenIn) annotation (Line(points={{-260,-149},{-260,
           211},{-82,211}},      color={0,0,127}));
   connect(dryCoo.port_b, dryCooOut.port_a)
@@ -511,8 +502,6 @@ equation
           202},{20,138},{38,138}}, color={0,0,127}));
   connect(TWetBul, dryCoo.TAir) annotation (Line(points={{-320,110},{20,110},{20,
           134},{38,134}}, color={0,0,127}));
-  connect(heaPumCon.ySet, heaPum.ySet) annotation (Line(points={{-158,174},{240,
-          174},{240,-28.1},{181.1,-28.1}}, color={0,0,127}));
   connect(heaPumCon.yVal, valHeaPum.y) annotation (Line(points={{-158,165},{80,165},
           {80,-120},{108,-120}}, color={0,0,127}));
   connect(heaPumCon.yValByp, valHeaPumByp.y) annotation (Line(points={{-158,161},
@@ -541,26 +530,17 @@ equation
       points={{-100,60},{-100,0},{120,0},{120,60},{190,60}},
       color={0,127,255},
       thickness=0.5));
-  connect(heaPum.port_b1, del3.ports[4]) annotation (Line(
-      points={{160,-24},{120,-24},{120,0},{-100,0},{-100,59.2}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{-158,179},{252,
-          179},{252,-32.1},{181.1,-32.1}}, color={255,0,255}));
-  connect(dryCoo.PFan, PFan_dryCoo) annotation (Line(points={{61,138},{100,138},
-          {100,230},{320,230}}, color={0,0,127}));
-  connect(pumDryCoo.P, PPum_dryCoo) annotation (Line(points={{-39,139},{-20,139},
+  connect(dryCoo.PFan, PFanDryCoo) annotation (Line(points={{61,138},{100,138},{
+          100,230},{320,230}}, color={0,0,127}));
+  connect(pumDryCoo.P, PPumDryCoo) annotation (Line(points={{-39,139},{-20,139},
           {-20,200},{320,200}}, color={0,0,127}));
-  connect(pumDryCoo1.P, PPum_hexGly) annotation (Line(points={{-11,29},{-11,20},
-          {110,20},{110,170},{320,170}}, color={0,0,127}));
-  connect(pumHeaPumGly.P, PPum_heaPumGly) annotation (Line(points={{209,-11},{209,
+  connect(pumDryCoo1.P, PPumHexGly) annotation (Line(points={{-11,29},{-11,20},{
+          110,20},{110,170},{320,170}}, color={0,0,127}));
+  connect(pumHeaPumGly.P, PPumHeaPumGly) annotation (Line(points={{209,-11},{209,
           -20},{260,-20},{260,140},{320,140}}, color={0,0,127}));
-  connect(heaPum.P, PCom) annotation (Line(points={{159,-30},{140,-30},{140,-50},
-          {320,-50}}, color={0,0,127}));
-  connect(pumHeaPumWat.P, PPum_heaPumWat) annotation (Line(points={{111,-69},{
-          111,-60},{60,-60},{60,-140},{320,-140}},
-                                               color={0,0,127}));
-  connect(pumCenPla.P, PPum_cirPum) annotation (Line(points={{-149,-151},{-140,-151},
+  connect(pumHeaPumWat.P, PPumHeaPumWat) annotation (Line(points={{111,-69},{111,
+          -60},{60,-60},{60,-140},{320,-140}}, color={0,0,127}));
+  connect(pumCenPla.P, PPumCirPum) annotation (Line(points={{-149,-151},{-140,-151},
           {-140,-210},{320,-210}}, color={0,0,127}));
   connect(ind.yEleRat, yEleRat) annotation (Line(points={{-238,259},{20,259},{20,
           270},{320,270}}, color={0,0,127}));
@@ -604,8 +584,8 @@ equation
   connect(jun5.port_3, pumDryCoo1.port_a)
     annotation (Line(points={{-20,80},{-20,50}}, color={0,127,255},
       thickness=0.5));
-  connect(jun5.port_2, del3.ports[5]) annotation (Line(points={{-30,90},{-80,90},
-          {-80,58.4},{-100,58.4}}, color={0,127,255},
+  connect(jun5.port_2, del3.ports[4]) annotation (Line(points={{-30,90},{-80,90},
+          {-80,59.2},{-100,59.2}}, color={0,127,255},
       thickness=0.5));
   connect(dryCooOut.port_b, jun4.port_1) annotation (Line(
       points={{140,130},{220,130},{220,90},{210,90}},
@@ -619,6 +599,32 @@ equation
       points={{200,80},{200,70}},
       color={0,127,255},
       thickness=0.5));
+  connect(pumHeaPumWat.port_b, heaPum.port_a1) annotation (Line(
+      points={{120,-70},{120,-36},{140,-36}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(heaPum.port_b1, heaPumLea.port_a) annotation (Line(
+      points={{160,-36},{200,-36},{200,-90}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(pumHeaPumGly.port_b, heaPum.port_a2) annotation (Line(
+      points={{200,-10},{200,-24},{160,-24}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(heaPum.port_b2, valHeaPumByp.port_3) annotation (Line(
+      points={{140,-24},{120,-24},{120,60},{190,60}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(heaPum.port_b2, del3.ports[5]) annotation (Line(
+      points={{140,-24},{120,-24},{120,0},{-100,0},{-100,58.4}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{-158,179},{96,179},
+          {96,-27.9},{138.9,-27.9}}, color={255,0,255}));
+  connect(heaPumCon.ySet, heaPum.ySet) annotation (Line(points={{-158,174},{92,174},
+          {92,-31.9},{138.9,-31.9}}, color={0,0,127}));
+  connect(heaPum.P, PCom)
+    annotation (Line(points={{161,-30},{320,-30}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={
