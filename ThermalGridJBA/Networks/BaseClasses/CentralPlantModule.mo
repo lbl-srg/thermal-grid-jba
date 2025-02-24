@@ -14,42 +14,105 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Nominal water mass flow rate";
-  parameter Real mWat_flow_min(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
-    "Heat pump minimum water mass flow rate";
-  parameter Real mHexGly_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
-    "Nominal glycol mass flow rate for heat exchanger";
-  parameter Real mHpGly_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
-    "Nominal glycol mass flow rate for heat pump";
-  parameter Real mDryCoo_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")=mHexGly_flow_nominal+mHpGly_flow_nominal
-    "Nominal glycol mass flow rate for dry cooler";
-  parameter Real dpHex_nominal(
-    final quantity="PressureDifference",
-    unit="Pa")=10000
-    "Pressure difference across heat exchanger";
   parameter Real dpValve_nominal(
     final quantity="PressureDifference",
     unit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve";
-  parameter Real dpDryCoo_nominal(
-    final quantity="PressureDifference",
-    unit="Pa")=10000
-    "Nominal pressure drop of fully open 2-way valve";
+
+  // Heat exchanger parameters
+  parameter Real dpHex_nominal(unit="Pa")=10000
+    "Pressure difference across heat exchanger"
+    annotation (Dialog(group="Heat exchanger"));
+  parameter Real mHexGly_flow_nominal(unit="kg/s")
+    "Nominal glycol mass flow rate for heat exchanger"
+    annotation (Dialog(group="Heat exchanger"));
+  // Heat exchanger parameters
+  parameter Real dpDryCoo_nominal(unit="Pa")=10000
+    "Nominal pressure drop of dry cooler"
+    annotation (Dialog(group="Dry cooler"));
+  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mHexGly_flow_nominal +
+    mHpGly_flow_nominal
+    "Nominal glycol mass flow rate for dry cooler"
+    annotation (Dialog(group="Dry cooler"));
+  // Heat pump parameters
+  parameter Real mWat_flow_min(unit="kg/s")
+    "Heat pump minimum water mass flow rate"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real mHpGly_flow_nominal(unit="kg/s")
+    "Nominal glycol mass flow rate for heat pump"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real QHeaPumHea_flow_nominal(
+    final unit="W",
+    final quantity="HeatFlowRate")
+    "Nominal heating capacity"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real TConHea_nominal(
+    final unit="K",
+    displayUnit="degC")=TLooMin
+    "Nominal temperature of the heated fluid in heating mode"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real TEvaHea_nominal(
+    final unit="K",
+    displayUnit="degC")=TLooMin + TApp
+    "Nominal temperature of the cooled fluid in heating mode"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real QHeaPumCoo_flow_nominal(
+    final unit="W",
+    final quantity="HeatFlowRate")
+    "Nominal cooling capacity"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real TConCoo_nominal(
+    final unit="K",
+    displayUnit="degC")=TLooMax
+    "Nominal temperature of the cooled fluid in cooling mode"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real TEvaCoo_nominal(
+    final unit="K",
+    displayUnit="degC")=TLooMax - TApp
+    "Nominal temperature of the heated fluid in cooling mode"
+    annotation (Dialog(group="Heat pump"));
   parameter Real mBor_flow_nominal[nZon](
     final quantity=fill("MassFlowRate",nZon),
     final unit=fill("kg/s",nZon))=fill(mWat_flow_nominal/nBor, nZon)
-    "Nominal mass flow rate per borehole in each zone";
+    "Nominal mass flow rate per borehole in each zone"
+    annotation (Dialog(group="Borefield"));
   parameter Real dp_nominal[nZon](
     final quantity=fill("Pressure", nZon),
     final unit=fill("Pa", nZon))={5e4,2e4}
-    "Pressure losses for each zone of the borefield";
+    "Pressure losses for each zone of the borefield"
+    annotation (Dialog(group="Borefield"));
+
+
+
+//   parameter Real mWat_flow_min(
+//     final quantity="MassFlowRate",
+//     final unit="kg/s")
+//     "Heat pump minimum water mass flow rate";
+//   parameter Real mHexGly_flow_nominal(
+//     final quantity="MassFlowRate",
+//     final unit="kg/s")
+//     "Nominal glycol mass flow rate for heat exchanger";
+//   parameter Real mHpGly_flow_nominal(
+//     final quantity="MassFlowRate",
+//     final unit="kg/s")
+//     "Nominal glycol mass flow rate for heat pump";
+//   parameter Real mDryCoo_flow_nominal(
+//     final quantity="MassFlowRate",
+//     final unit="kg/s")=mHexGly_flow_nominal+mHpGly_flow_nominal
+//     "Nominal glycol mass flow rate for dry cooler";
+//   parameter Real dpHex_nominal(
+//     final quantity="PressureDifference",
+//     unit="Pa")=10000
+//     "Pressure difference across heat exchanger";
+//   parameter Real dpValve_nominal(
+//     final quantity="PressureDifference",
+//     unit="Pa")=6000
+//     "Nominal pressure drop of fully open 2-way valve";
+//   parameter Real dpDryCoo_nominal(
+//     final quantity="PressureDifference",
+//     unit="Pa")=10000
+//     "Nominal pressure drop of fully open 2-way valve";
+
   parameter Real samplePeriod(
     final quantity="Time",
     final unit="s")=7200 "Sample period of district loop pump speed"
@@ -63,7 +126,8 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     final unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real minFanSpe=0.1
+  parameter Real minFanSpe(
+    unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real TCooSet(
@@ -88,7 +152,8 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     final quantity="Time",
     final unit="s")=12*3600 "Heat pump off time"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real minComSpe=0.2
+  parameter Real minComSpe(
+    unit="1")=0.2
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
 
@@ -110,12 +175,12 @@ model CentralPlantModule "Central plant module, each includes the generation equ
 //     "Soil data"
 //     annotation (Placement(transformation(extent={{-60,-80},{-40,-60}})));
 
-  parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Borefield.Template borFieDat(
+  final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Borefield.Template borFieDat(
     filDat=filDat,
     soiDat=soiDat,
     conDat=conDat) "Borefield data"
     annotation (Placement(transformation(extent={{-60,60},{-40,80}})));
-  parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template conDat(
+  final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template conDat(
     borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
     mBor_flow_nominal=mBor_flow_nominal,
     dp_nominal=dp_nominal,
@@ -133,16 +198,16 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     eTub=0.0029,
     xC=(2*((0.04/2)^2))^(1/2)) "Construction data"
     annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
-  parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Filling.Bentonite filDat(
+  final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Filling.Bentonite filDat(
     kFil=1.0)
     "Borehole filling data"
     annotation (Placement(transformation(extent={{-60,-40},{-40,-20}})));
-  parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Soil.SandStone soiDat(
+  final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Soil.SandStone soiDat(
     kSoi=1.1,
     cSoi=1.4E6/1800,
     dSoi=1800) "Soil data"
     annotation (Placement(transformation(extent={{-60,-80},{-40,-60}})));
-  parameter Modelica.Units.SI.Temperature T_start=286.65
+  final parameter Modelica.Units.SI.Temperature T_start=286.65
     "Initial temperature of the soil";
   final parameter Integer nZon=borFieDat.conDat.nZon
     "Total number of independent bore field zones";
@@ -242,6 +307,12 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     final dpHex_nominal=dpHex_nominal,
     final dpValve_nominal=dpValve_nominal,
     final dpDryCoo_nominal=dpDryCoo_nominal,
+    final QHeaPumHea_flow_nominal=QHeaPumHea_flow_nominal,
+    final TConHea_nominal=TConHea_nominal,
+    final TEvaHea_nominal=TEvaHea_nominal,
+    final QHeaPumCoo_flow_nominal=QHeaPumCoo_flow_nominal,
+    final TConCoo_nominal=TConCoo_nominal,
+    final TEvaCoo_nominal=TEvaCoo_nominal,
     final samplePeriod=samplePeriod,
     final TAppSet=TAppSet,
     final TApp=TApp,

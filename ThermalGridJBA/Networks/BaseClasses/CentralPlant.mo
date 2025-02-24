@@ -15,39 +15,64 @@ model CentralPlant "Central plant"
     "Design maximum district loop temperature";
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each module";
-  parameter Real mWat_flow_min(unit="kg/s")=mWat_flow_nominal*0.2
-    "Heat pump minimum water mass flow rate";
-  parameter Real mHexGly_flow_nominal(unit="kg/s")=mWat_flow_nominal*0.6
-    "Nominal glycol mass flow rate for heat exchanger";
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=mWat_flow_nominal*0.6
-    "Nominal glycol mass flow rate for heat pump";
-  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mHexGly_flow_nominal +
-    mHpGly_flow_nominal
-    "Nominal glycol mass flow rate for dry cooler";
-  parameter Real dpHex_nominal(
-    final quantity="PressureDifference",
-    unit="Pa",
-    displayUnit="Pa")=10000
-    "Pressure difference across heat exchanger";
   parameter Real dpValve_nominal(
     final quantity="PressureDifference",
     unit="Pa",
     displayUnit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve";
-  parameter Real dpDryCoo_nominal(
-    final quantity="PressureDifference",
-    unit="Pa",
-    displayUnit="Pa")=10000
-    "Nominal pressure drop of fully open 2-way valve";
 
-//   parameter Real mBor_flow_nominal[nZon](
-//     final unit=fill("kg/s", nZon),
-//     final quantity=fill("MassFlowRate", nZon))={0.5,0.3}
-//     "Nominal mass flow rate per borehole in each zone";
-//   parameter Real dp_nominal[nZon](
-//     final unit=fill("Pa", nZon),
-//     final quantity=fill("Pressure", nZon))={5e4,2e4}
-//     "Pressure losses for each zone of the borefield";
+  // Heat exchanger parameters
+  parameter Real dpHex_nominal(unit="Pa")=10000
+    "Pressure difference across heat exchanger"
+    annotation (Dialog(group="Heat exchanger"));
+  parameter Real mHexGly_flow_nominal(unit="kg/s")=mWat_flow_nominal*0.6
+    "Nominal glycol mass flow rate for heat exchanger"
+    annotation (Dialog(group="Heat exchanger"));
+  // Heat exchanger parameters
+  parameter Real dpDryCoo_nominal(unit="Pa")=10000
+    "Nominal pressure drop of dry cooler"
+    annotation (Dialog(group="Dry cooler"));
+  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mHexGly_flow_nominal +
+    mHpGly_flow_nominal
+    "Nominal glycol mass flow rate for dry cooler"
+    annotation (Dialog(group="Dry cooler"));
+  // Heat pump parameters
+  parameter Real mWat_flow_min(unit="kg/s")=0.2*mWat_flow_nominal
+    "Heat pump minimum water mass flow rate"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real mHpGly_flow_nominal(unit="kg/s")=mWat_flow_nominal*0.6
+    "Nominal glycol mass flow rate for heat pump"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real QHeaPumHea_flow_nominal(
+    final unit="W",
+    final quantity="HeatFlowRate")
+    "Nominal heating capacity"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real TConHea_nominal(
+    final unit="K",
+    displayUnit="degC")=TLooMin
+    "Nominal temperature of the heated fluid in heating mode"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real TEvaHea_nominal(
+    final unit="K",
+    displayUnit="degC")=TLooMin + TApp
+    "Nominal temperature of the cooled fluid in heating mode"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real QHeaPumCoo_flow_nominal(
+    final unit="W",
+    final quantity="HeatFlowRate")
+    "Nominal cooling capacity"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real TConCoo_nominal(
+    final unit="K",
+    displayUnit="degC")=TLooMax
+    "Nominal temperature of the cooled fluid in cooling mode"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real TEvaCoo_nominal(
+    final unit="K",
+    displayUnit="degC")=TLooMax - TApp
+    "Nominal temperature of the heated fluid in cooling mode"
+    annotation (Dialog(group="Heat pump"));
 
   parameter Real samplePeriod(unit="s")=7200
     "Sample period of district loop pump speed"
@@ -57,6 +82,10 @@ model CentralPlant "Central plant"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
+    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Real minFanSpe(
+    unit="1")=0.1
+    "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real TCooSet(unit="K")=TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
@@ -72,6 +101,9 @@ model CentralPlant "Central plant"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
     "Heat pump off time"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real minComSpe(unit="1")=0.2
+    "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
 
   Buildings.Controls.OBC.CDL.Interfaces.RealInput uDisPum
@@ -160,14 +192,22 @@ model CentralPlant "Central plant"
     final dpHex_nominal=fill(dpHex_nominal, nMod),
     final dpValve_nominal=fill(dpValve_nominal, nMod),
     final dpDryCoo_nominal=fill(dpDryCoo_nominal, nMod),
+    QHeaPumHea_flow_nominal=fill(QHeaPumHea_flow_nominal, nMod),
+    final TConHea_nominal=fill(TConHea_nominal, nMod),
+    TEvaHea_nominal=fill(TEvaHea_nominal, nMod),
+    QHeaPumCoo_flow_nominal=fill(QHeaPumCoo_flow_nominal, nMod),
+    TConCoo_nominal=fill(TConCoo_nominal, nMod),
+    TEvaCoo_nominal=fill(TEvaCoo_nominal, nMod),
     final samplePeriod=fill(samplePeriod, nMod),
     final TAppSet=fill(TAppSet, nMod),
     final TApp=fill(TApp, nMod),
+    final minFanSpe=fill(minFanSpe, nMod),
     final TCooSet=fill(TCooSet, nMod),
     final THeaSet=fill(THeaSet, nMod),
     final TConInMin=fill(TConInMin, nMod),
     final TEvaInMax=fill(TEvaInMax, nMod),
-    final offTim=fill(offTim, nMod))
+    final offTim=fill(offTim, nMod),
+    final minComSpe=fill(minComSpe, nMod))
     "Central plant module"
     annotation (Placement(transformation(extent={{20,-10},{40,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del1(

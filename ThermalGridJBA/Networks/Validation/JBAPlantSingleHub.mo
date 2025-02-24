@@ -24,35 +24,139 @@ model JBAPlantSingleHub
     min=0.01,
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
+  // Central plant
   parameter Integer nMod=2 "Total number of central plant modules"
     annotation (Dialog(tab="Central plant"));
-  parameter Real samplePeriod=7200
+  parameter Real samplePeriod(
+    unit="s")=7200
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TAppSet(unit="K")=2
-                "Dry cooler approch setpoint"
-    annotation (Dialog(tab="Central plant", group="Dry cooler control"));
-  parameter Real TApp(unit="K")=4
+  parameter Real mPlaWat_flow_nominal(
+    quantity="MassFlowRate",
+    unit="kg/s")=sum(datDis.mCon_flow_nominal)/nMod
+    "Nominal water mass flow rate to each module"
+    annotation (Dialog(tab="Central plant"));
+  parameter Real dpPlaValve_nominal(
+    unit="Pa")=6000
+    "Nominal pressure drop of fully open 2-way valve"
+    annotation (Dialog(tab="Central plant"));
+  // Central plant: heat exchangers
+  parameter Real dpPlaHex_nominal(
+    unit="Pa")=10000
+    "Pressure difference across heat exchanger"
+    annotation (Dialog(tab="Central plant", group="Heat exchanger"));
+  parameter Real mPlaHexGly_flow_nominal(
+    quantity="MassFlowRate",
+    unit="kg/s")=mPlaWat_flow_nominal*0.6
+    "Nominal glycol mass flow rate for heat exchanger"
+    annotation (Dialog(tab="Central plant", group="Heat exchanger"));
+  // Central plant: dry coolers
+  parameter Real dpDryCoo_nominal(
+    unit="Pa")=10000 "Nominal pressure drop of dry cooler"
+    annotation (Dialog(tab="Central plant", group="Dry cooler"));
+  parameter Real mDryCoo_flow_nominal(
+    quantity="MassFlowRate",
+    unit="kg/s")=mPlaHexGly_flow_nominal + mHpGly_flow_nominal
+    "Nominal glycol mass flow rate for dry cooler"
+    annotation (Dialog(tab="Central plant", group="Dry cooler"));
+  parameter Real TAppSet(
+    unit="K")=2
+    "Dry cooler approch setpoint"
+    annotation (Dialog(tab="Central plant", group="Dry cooler"));
+  parameter Real TApp(
+    unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
-    annotation (Dialog(tab="Central plant", group="Dry cooler control"));
-  parameter Real TCooSet(unit="K")=datDis.TLooMin
+    annotation (Dialog(tab="Central plant", group="Dry cooler"));
+  parameter Real minFanSpe(
+    unit="1")=0.1
+    "Minimum dry cooler fan speed"
+    annotation (Dialog(tab="Central plant", group="Dry cooler"));
+  // Central plant: heat pumps
+  parameter Real mPlaHeaPumWat_flow_min(
+    quantity="MassFlowRate",
+    unit="kg/s")=0.2*mPlaWat_flow_nominal
+    "Heat pump minimum water mass flow rate"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real mHpGly_flow_nominal(
+    quantity="MassFlowRate",
+    unit="kg/s")=mPlaWat_flow_nominal*0.6
+    "Nominal glycol mass flow rate for heat pump"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real QPlaHeaPumHea_flow_nominal(
+    unit="W",
+    quantity="HeatFlowRate")
+    "Nominal heating capacity"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real TPlaConHea_nominal(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMin
+    "Nominal temperature of the heated fluid in heating mode"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real TPlaEvaHea_nominal(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMin + TApp
+    "Nominal temperature of the cooled fluid in heating mode"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real QPlaHeaPumCoo_flow_nominal(
+    unit="W",
+    quantity="HeatFlowRate")
+    "Nominal cooling capacity"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real TPlaConCoo_nominal(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMax
+    "Nominal temperature of the cooled fluid in cooling mode"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real TPlaEvaCoo_nominal(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMax - TApp
+    "Nominal temperature of the heated fluid in cooling mode"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real TPlaConInMin(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMax - TApp - TAppSet
+    "Minimum condenser inlet temperature"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real TPlaEvaInMax(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMin + TApp + TAppSet
+    "Maximum evaporator inlet temperature"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real minPlaComSpe(
+    unit="1")=0.2
+    "Minimum heat pump compressor speed"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real TCooSet(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
-    annotation (Dialog(tab="Central plant", group="Heat pump control"));
-  parameter Real THeaSet(unit="K")=datDis.TLooMin
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real THeaSet(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMin
     "Heat pump tracking temperature setpoint in heating mode"
-    annotation (Dialog(tab="Central plant", group="Heat pump control"));
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
-                      "Heat pump off time"
-    annotation (Dialog(tab="Central plant", group="Heat pump control"));
-  parameter Real TUpp=datDis.TLooMax
-                                  "Upper bound temperature"
+    "Heat pump off time"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  // District pump
+  parameter Real TUpp(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMax
+    "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real TLow=datDis.TLooMin
-                                    "Lower bound temperature"
+  parameter Real TLow(
+    unit="K",
+    displayUnit="degC")=datDis.TLooMin
+    "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real dTSlo=2 "Temperature deadband for changing pump speed"
+  parameter Real dTSlo(
+    unit="K")=2
+    "Temperature deadband for changing pump speed"
     annotation (Dialog(tab="District pump"));
-  parameter Real yDisPumMin=0.1 "District loop pump minimum speed"
+  parameter Real yDisPumMin(
+    unit="1")=0.1
+    "District loop pump minimum speed"
     annotation (Dialog(tab="District pump"));
 
   final parameter Integer nBui=datDis.nBui
@@ -170,21 +274,39 @@ model JBAPlantSingleHub
     annotation (Placement(transformation(extent={{320,-130},{340,-110}})));
   BaseClasses.CentralPlant cenPla(
     final nMod=nMod,
-    TLooMin=datDis.TLooMin,
-    TLooMax=datDis.TLooMax,
-    mWat_flow_nominal=sum(datDis.mCon_flow_nominal)/nMod,
-    samplePeriod=samplePeriod,
-    TAppSet=TAppSet,
-    TApp=TApp,
-    TCooSet=TCooSet,
-    THeaSet=THeaSet,
-    offTim=offTim) "Central plant"
+    final TLooMin=datDis.TLooMin,
+    final TLooMax=datDis.TLooMax,
+    final mWat_flow_nominal=mPlaWat_flow_nominal,
+    final dpValve_nominal=dpPlaValve_nominal,
+    final dpHex_nominal=dpPlaHex_nominal,
+    final mHexGly_flow_nominal=mPlaHexGly_flow_nominal,
+    final dpDryCoo_nominal=dpDryCoo_nominal,
+    final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
+    final mWat_flow_min=mPlaHeaPumWat_flow_min,
+    final mHpGly_flow_nominal=mHpGly_flow_nominal,
+    final QHeaPumHea_flow_nominal=QPlaHeaPumHea_flow_nominal,
+    final TConHea_nominal=TPlaConHea_nominal,
+    final TEvaHea_nominal=TPlaEvaHea_nominal,
+    final QHeaPumCoo_flow_nominal=QPlaHeaPumCoo_flow_nominal,
+    final TConCoo_nominal=TPlaConCoo_nominal,
+    final TEvaCoo_nominal=TPlaEvaCoo_nominal,
+    final samplePeriod=samplePeriod,
+    final TAppSet=TAppSet,
+    final TApp=TApp,
+    final minFanSpe=minFanSpe,
+    final TCooSet=TCooSet,
+    final THeaSet=THeaSet,
+    final TConInMin=TPlaConInMin,
+    final TEvaInMax=TPlaEvaInMax,
+    final offTim=offTim,
+    final minComSpe=minPlaComSpe)
+     "Central plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
     final TLow=TLow,
     final dTSlo=dTSlo,
-    final yMin=yDisPumMin)
+    final yMin=yDisPumMin) "District loop pump control"
     annotation (Placement(transformation(extent={{-60,-160},{-40,-140}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(final k=datDis.mPumDis_flow_nominal)
     "District pump speed"
@@ -241,6 +363,7 @@ model JBAPlantSingleHub
   Buildings.Controls.OBC.CDL.Reals.MultiSum EPumPla(nin=5)
     "Plant pumps electricity energy"
     annotation (Placement(transformation(extent={{240,60},{260,80}})));
+
 
 equation
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
