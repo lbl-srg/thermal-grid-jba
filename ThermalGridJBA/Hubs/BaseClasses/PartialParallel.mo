@@ -102,14 +102,13 @@ model PartialParallel
   Buildings.Fluid.Actuators.Valves.TwoWayLinear valIsoEva(
     redeclare final package Medium = MediumBui,
     final dpValve_nominal=dpValIso_nominal,
-    final m_flow_nominal=colAmbWat.mDis_flow_nominal,
-    use_strokeTime=false) "Evaporator to ambient loop isolation valve"
+    final m_flow_nominal=colAmbWat.mDis_flow_nominal)
+                          "Evaporator to ambient loop isolation valve"
     annotation (Placement(transformation(extent={{70,-130},{50,-110}})));
   Buildings.Fluid.Actuators.Valves.TwoWayLinear valIsoCon(
     redeclare final package Medium = MediumBui,
     final dpValve_nominal=dpValIso_nominal,
-    final m_flow_nominal=colAmbWat.mDis_flow_nominal,
-    use_strokeTime=false)
+    final m_flow_nominal=colAmbWat.mDis_flow_nominal)
                          "Condenser to ambient loop isolation valve"
     annotation (Placement(transformation(extent={{-70,-130},{-50,-110}})));
   Buildings.DHC.ETS.Combined.Subsystems.HeatExchanger hex(
