@@ -3,7 +3,7 @@ def get_cases(how : str):
 
         how (case insensitive):
           handwrite = explictly written in cases.handwrite_cases()
-          construct = use cases.construct_cases() to construct a batch of cases
+          construct = use cases.construct_buildings() to construct a batch of cases
     '''
     # import copy
     
@@ -11,8 +11,10 @@ def get_cases(how : str):
     cases = list()
     if hup == 'HANDWRITE':
         cases = handwrite_cases()
-    elif hup == 'CONSTRUCT':
-        cases = construct_cases()
+    elif hup == 'EACHBUILDING':
+        cases = construct_buildings()
+    elif hup == 'EACHCLUSTER':
+        cases = construct_clusters()
 
     return cases
 
@@ -41,8 +43,9 @@ def handwrite_cases():
     
     return cases
 
-def construct_cases():
-    """ Construct a batch of cases
+def construct_buildings():
+    """ Construct a batch running each building,
+            differentiating buildings with or without DHW integration
     """
 
     cases = list()
@@ -81,6 +84,28 @@ def construct_cases():
               "start_time": 90*24*3600,
               "stop_time":  100*24*3600,
               "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})    
+    
+    return cases
+
+def construct_clusters():
+    """ Construct a batch of cases for each cluster, all with DHW integration
+    """
+
+    cases = list()
+
+    clusters = ['A',
+                'B',
+                'C',
+                'D',
+                'E'] # list of all DHW-integrated building numbers
+    for buil in clusters:
+        cases.append( \
+            {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
+              "name": f"cluster_{buil}_transit",
+              "building": buil,
+              "start_time": 90*24*3600,
+              "stop_time":  100*24*3600,
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}.mos"}})    
     
     return cases
 

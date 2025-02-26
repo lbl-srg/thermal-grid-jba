@@ -7,10 +7,11 @@ import os
 BRANCH="master"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
-CASE_LIST = 'construct'
+CASE_LIST = 'eachcluster'
 """ case lists (case insensitive), see `cases.py`:
         handwrite: explicitly listed cases
-        construct: rule-constructed list of cases
+        eachbuilding: each building, differentiating with or without DHW
+        eachcluster: each of the five clusters, all with DHW
 """
 KEEP_MAT_FILES = False # Set false to delete result mat files to save space
 

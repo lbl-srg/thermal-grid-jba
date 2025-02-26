@@ -83,14 +83,6 @@ partial model PartialConnectedETS
   parameter Real COPHotWat_nominal(final unit="1") = 2.3
     "COP of heat pump for hot water production";
 
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter loaCooNor(
-    k=1/QCoo_flow_nominal) "Normalized cooling load"
-    annotation (Placement(transformation(extent={{-140,-170},{-120,-150}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold uCoo(
-    final t=0.01,
-    final h=0.005)
-    "Enable cooling"
-    annotation (Placement(transformation(extent={{-100,-170},{-80,-150}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(
     final k=datBuiSet.THeaWatSup_nominal,
     y(final unit="K", displayUnit="degC"))
@@ -102,13 +94,6 @@ partial model PartialConnectedETS
     "Chilled water supply temperature set point"
     annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));
 equation
-  connect(loaCooNor.y, uCoo.u)
-    annotation (Line(points={{-118,-160},{-102,-160}}, color={0,0,127}));
-  connect(uCoo.y, ets.uCoo) annotation (Line(points={{-78,-160},{-40,-160},{-40,
-          -50},{-34,-50}}, color={255,0,255}));
-  connect(loaCooNor.u, bui.QReqCoo_flow) annotation (Line(points={{-142,-160},{
-          -150,-160},{-150,-142},{80,-142},{80,-4},{24,-4},{24,4}}, color={0,0,
-          127}));
   connect(THeaWatSupSet.y, ets.THeaWatSupSet) annotation (Line(points={{-78,-20},
           {-64,-20},{-64,-58},{-34,-58}}, color={0,0,127}));
   connect(ets.TChiWatSupSet, TChiWatSupSet.y) annotation (Line(points={{-34,-62},

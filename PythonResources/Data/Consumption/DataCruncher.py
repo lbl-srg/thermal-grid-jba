@@ -62,7 +62,7 @@ def runBuildings(listBui,
             """
             # set symmetric around y = 0
             low, high = ax.get_ylim()
-            bound = max(abs(low), abs(high))
+            bound = max(abs(low), abs(high))*1.3
             ax.set_ylim(-bound, bound)
             
             # set labels
@@ -93,7 +93,7 @@ def runBuildings(listBui,
                                           sharey='row',
                                           figsize=(9,5))
         
-        for stag in stags:
+        for stag in ['post', 'futu']:
             ele = hourly.sel(stag=stag,util='ele')
             coo = hourly.sel(stag=stag,util='coo')
             hea = hourly.sel(stag=stag,util='hea')
@@ -105,21 +105,21 @@ def runBuildings(listBui,
             if hasDhw:
                 dhwPea = monthly.peak.sel(stag=stag,util='dhw',buil=builcoord)
             
-            if stag == stags[0]:
+            if stag == 'post':
                 ax1 = ax11
                 ax2 = ax21
                 ax3 = ax31
-            elif stag == stags[1]:
+            elif stag == 'futu':
                 ax1 = ax12
                 ax2 = ax22
                 ax3 = ax32
             
-            if stag == stags[0]:
-                ax1.set_title('Baseline',
+            if stag == 'post':
+                ax1.set_title('TMY3',
                               loc = 'right',
                               fontsize = 12)
-            elif stag == stags[1]:
-                ax1.set_title('Post-ECM',
+            elif stag == 'futu':
+                ax1.set_title('fTMY',
                               loc = 'left',
                               fontsize = 12)
             h1, = ax1.plot(t_hoy, hea,
@@ -129,9 +129,9 @@ def runBuildings(listBui,
             if hasDhw:
                 h1, = ax1.plot(t_hoy, dhw,
                               'm', linewidth = linewidth)
-            if stag == stags[0]:
+            if stag == 'post':
                 setPrimaryY(ax1,'Hourly Use\n(kWh/h)')
-            if stag == stags[1]:
+            if stag == 'futu':
                 setSecondY(ax1,'(kBtu/hr)')
             ax1.grid()
             ax1.axhline(color = 'k', linewidth = linewidth*0.8)
@@ -152,29 +152,29 @@ def runBuildings(listBui,
                 h1 = ax2.bar(_t_ms_shift, dhwPea,
                             color = 'm',
                             width = 10)
-            if stag == stags[0]:
+            if stag == 'post':
                 setPrimaryY(ax2,'Monthly Peak\n(kW)')
-            elif stag == stags[1]:
+            elif stag == 'futu':
                 setSecondY(ax2,'(kBtu/hr)')
             ax2.grid()
             ax2.axhline(color = 'k', linewidth = linewidth*0.8)
             
             h1, = ax3.plot(t_hoy, np.cumsum(hea)/1000,
                           'r', linewidth = linewidth,
-                          label = 'heating' if stag==stags[0] else '')
+                          label = 'heating' if stag=='post' else '')
             h1, = ax3.plot(t_hoy, - np.cumsum(coo)/1000,
                           'b', linewidth = linewidth,
-                          label = 'cooling'  if stag==stags[0] else '')
+                          label = 'cooling'  if stag=='post' else '')
             if hasDhw:
                 h1, = ax3.plot(t_hoy, np.cumsum(dhw)/1000,
                               'm', linewidth = linewidth,
-                              label = 'dom. hot water' if stag==stags[0] else '')
+                              label = 'dom. hot water' if stag=='post' else '')
             h1, = ax3.plot(t_hoy, np.cumsum(net)/1000,
                           'k', linewidth = linewidth * 2,
-                          label = 'net energy' if stag==stags[0] else '')
-            if stag == stags[0]:
+                          label = 'net energy' if stag=='post' else '')
+            if stag == 'post':
                 setPrimaryY(ax3,'Cumulative Use\n(MWh)')
-            elif stag == stags[1]:
+            elif stag == 'futu':
                 setSecondY(ax3,'(MMBtu)')
             
             # Format the x-axis
@@ -327,8 +327,8 @@ elif mode == 'each':
     saveTablesMode = 'w'
     saveTablesHeader = True
 elif mode == 'all':
-    # Combine buildings but exclude 5300 & 5301 which are east of the runway
-    listBui = west
+    # Combine all buildings
+    listBui = buil_nos
     figtitle = f'All Combined'
     filename = f'all.pdf'
     builcoord = 'all'
@@ -349,8 +349,8 @@ if saveTables:
     for stag, util in [(stag, util) for stag in stags for util in utils]:
         if util == 'dhw' and not hasDhw:
             continue
-        dfPea = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
-        dfTot = pd.DataFrame(columns = ['building', 'Annual'] + calendar.month_name[1:13])
+        dfPea = pd.DataFrame(columns = ['[kW]', 'Annual'] + calendar.month_name[1:13])
+        dfTot = pd.DataFrame(columns = ['[MWh]', 'Annual'] + calendar.month_name[1:13])
         for rowname in monthly.coords['buil'].values:
             _row_mon = monthly.peak.sel(stag=stag,util=util,buil=rowname).values.tolist()
             dfPea.loc[len(dfPea.index) + 1] = [rowname, np.max(_row_mon)] + _row_mon
