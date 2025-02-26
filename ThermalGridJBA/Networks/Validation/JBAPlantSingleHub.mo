@@ -25,137 +25,98 @@ model JBAPlantSingleHub
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
   // Central plant
-  parameter Integer nMod=2 "Total number of central plant modules"
+  parameter Integer nMod=1 "Total number of central plant modules"
     annotation (Dialog(tab="Central plant"));
-  parameter Real samplePeriod(
-    unit="s")=7200
+  parameter Real samplePeriod(unit="s")=7200
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));
-  parameter Real mPlaWat_flow_nominal(
-    quantity="MassFlowRate",
-    unit="kg/s")=sum(datDis.mCon_flow_nominal)/nMod
+  parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(datDis.mCon_flow_nominal)
+    /nMod
     "Nominal water mass flow rate to each module"
     annotation (Dialog(tab="Central plant"));
-  parameter Real dpPlaValve_nominal(
-    unit="Pa")=6000
+  parameter Real dpPlaValve_nominal(unit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve"
     annotation (Dialog(tab="Central plant"));
   // Central plant: heat exchangers
-  parameter Real dpPlaHex_nominal(
-    unit="Pa")=10000
+  parameter Real dpPlaHex_nominal(unit="Pa")=10000
     "Pressure difference across heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
-  parameter Real mPlaHexGly_flow_nominal(
-    quantity="MassFlowRate",
-    unit="kg/s")=mPlaWat_flow_nominal*0.6
+  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.6
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
-  parameter Real dpDryCoo_nominal(
-    unit="Pa")=10000 "Nominal pressure drop of dry cooler"
+  parameter Real dpDryCoo_nominal(unit="Pa")=10000
+                     "Nominal pressure drop of dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real mDryCoo_flow_nominal(
-    quantity="MassFlowRate",
-    unit="kg/s")=mPlaHexGly_flow_nominal + mHpGly_flow_nominal
+  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mPlaHexGly_flow_nominal +
+    mHpGly_flow_nominal
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TAppSet(
-    unit="K")=2
+  parameter Real TAppSet(unit="K")=2
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TApp(
-    unit="K")=4
+  parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real minFanSpe(
-    unit="1")=0.1
+  parameter Real minFanSpe(unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   // Central plant: heat pumps
-  parameter Real mPlaHeaPumWat_flow_min(
-    quantity="MassFlowRate",
-    unit="kg/s")=0.2*mPlaWat_flow_nominal
+  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=0.2*mPlaWat_flow_nominal
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(
-    quantity="MassFlowRate",
-    unit="kg/s")=mPlaWat_flow_nominal*0.6
+  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.6
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumHea_flow_nominal(
-    unit="W",
-    quantity="HeatFlowRate")
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186*
+    TApp
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConHea_nominal(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMin
+  parameter Real TPlaConHea_nominal(unit="K")=datDis.TLooMin
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaHea_nominal(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMin + TApp
+  parameter Real TPlaEvaHea_nominal(unit="K")=datDis.TLooMin + TApp
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumCoo_flow_nominal(
-    unit="W",
-    quantity="HeatFlowRate")
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-0.6*
+    QPlaHeaPumHea_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConCoo_nominal(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMax
+  parameter Real TPlaConCoo_nominal(unit="K")=datDis.TLooMax
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaCoo_nominal(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMax - TApp
+  parameter Real TPlaEvaCoo_nominal(unit="K")=datDis.TLooMax - TApp
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConInMin(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMax - TApp - TAppSet
+  parameter Real TPlaConInMin(unit="K")=datDis.TLooMax - TApp - TAppSet
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaInMax(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMin + TApp + TAppSet
+  parameter Real TPlaEvaInMax(unit="K")=datDis.TLooMin + TApp + TAppSet
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real minPlaComSpe(
-    unit="1")=0.2
+  parameter Real minPlaComSpe(unit="1")=0.2
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TCooSet(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMin
+  parameter Real TCooSet(unit="K")=datDis.TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real THeaSet(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMin
+  parameter Real THeaSet(unit="K")=datDis.TLooMin
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
     "Heat pump off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
-  parameter Real TUpp(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMax
+  parameter Real TUpp(unit="K")=datDis.TLooMax
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real TLow(
-    unit="K",
-    displayUnit="degC")=datDis.TLooMin
+  parameter Real TLow(unit="K")=datDis.TLooMin
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real dTSlo(
-    unit="K")=2
+  parameter Real dTSlo(unit="K")=2
     "Temperature deadband for changing pump speed"
     annotation (Dialog(tab="District pump"));
-  parameter Real yDisPumMin(
-    unit="1")=0.1
+  parameter Real yDisPumMin(unit="1")=0.1
     "District loop pump minimum speed"
     annotation (Dialog(tab="District pump"));
 
@@ -318,25 +279,25 @@ model JBAPlantSingleHub
   Buildings.BoundaryConditions.WeatherData.Bus weaBus annotation (Placement(
         transformation(extent={{-320,-40},{-280,0}}), iconTransformation(extent
           ={{-364,-80},{-344,-60}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PFanDryCoo(nin=2)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PFanDryCoo(nin=nMod)
     "Dry cooler fan power"
     annotation (Placement(transformation(extent={{-60,110},{-40,130}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumDryCoo(nin=2)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumDryCoo(nin=nMod)
     "Dry cooler pump power"
     annotation (Placement(transformation(extent={{-20,90},{0,110}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHeaPumGly(nin=2)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHeaPumGly(nin=nMod)
     "Heat pump glycol side pump power"
     annotation (Placement(transformation(extent={{60,50},{80,70}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHexGly(nin=2)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHexGly(nin=nMod)
     "Heat exchanger glycol side pump power"
     annotation (Placement(transformation(extent={{20,70},{40,90}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumCirPum(nin=2)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumCirPum(nin=nMod)
     "Circulation pump power"
     annotation (Placement(transformation(extent={{140,-40},{160,-20}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHeaPumWat(nin=2)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumHeaPumWat(nin=nMod)
     "Heat pump water side pump power"
     annotation (Placement(transformation(extent={{140,0},{160,20}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PCom(nin=2)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PCom(nin=nMod)
     "Heat pump compressor power"
     annotation (Placement(transformation(extent={{100,20},{120,40}})));
   Modelica.Blocks.Continuous.Integrator EFunDryCoo(initType=Modelica.Blocks.Types.Init.InitialState)
@@ -460,20 +421,20 @@ equation
       points={{-360,-20},{-300,-20}},
       color={255,204,51},
       thickness=0.5));
-  connect(cenPla.PFanDryCoo, PFanDryCoo.u[1:2]) annotation (Line(points={{-138,7},
-          {-132,7},{-132,120.5},{-62,120.5}}, color={0,0,127}));
-  connect(cenPla.PPumDryCoo, PPumDryCoo.u[1:2]) annotation (Line(points={{-138,5},
-          {-128,5},{-128,100.5},{-22,100.5}}, color={0,0,127}));
-  connect(cenPla.PPumHexGly, PPumHexGly.u[1:2]) annotation (Line(points={{-138,3},
-          {-124,3},{-124,80.5},{18,80.5}}, color={0,0,127}));
-  connect(cenPla.PPumHeaPumGly, PPumHeaPumGly.u[1:2]) annotation (Line(points={{
-          -138,-3},{-120,-3},{-120,60.5},{58,60.5}}, color={0,0,127}));
-  connect(cenPla.PCom, PCom.u[1:2]) annotation (Line(points={{-138,-5},{-116,-5},
-          {-116,30.5},{98,30.5}}, color={0,0,127}));
-  connect(cenPla.PPumHeaPumWat, PPumHeaPumWat.u[1:2]) annotation (Line(points={{
-          -138,-7},{-112,-7},{-112,10.5},{138,10.5}}, color={0,0,127}));
-  connect(cenPla.PPumCirPum, PPumCirPum.u[1:2]) annotation (Line(points={{-138,-9},
-          {-124,-9},{-124,-30},{138,-30},{138,-29.5}}, color={0,0,127}));
+  connect(cenPla.PFanDryCoo, PFanDryCoo.u) annotation (Line(points={{-138,7},
+          {-132,7},{-132,120},{-62,120}},     color={0,0,127}));
+  connect(cenPla.PPumDryCoo, PPumDryCoo.u) annotation (Line(points={{-138,5},
+          {-128,5},{-128,100},{-22,100}},     color={0,0,127}));
+  connect(cenPla.PPumHexGly, PPumHexGly.u) annotation (Line(points={{-138,3},
+          {-124,3},{-124,80},{18,80}},     color={0,0,127}));
+  connect(cenPla.PPumHeaPumGly, PPumHeaPumGly.u) annotation (Line(points={{-138,-3},
+          {-120,-3},{-120,60},{58,60}},              color={0,0,127}));
+  connect(cenPla.PCom, PCom.u) annotation (Line(points={{-138,-5},{-116,-5},
+          {-116,30},{98,30}},     color={0,0,127}));
+  connect(cenPla.PPumHeaPumWat, PPumHeaPumWat.u) annotation (Line(points={{-138,-7},
+          {-112,-7},{-112,10},{138,10}},              color={0,0,127}));
+  connect(cenPla.PPumCirPum, PPumCirPum.u) annotation (Line(points={{-138,-9},
+          {-124,-9},{-124,-30},{138,-30},{138,-30}},   color={0,0,127}));
   connect(PFanDryCoo.y, EFunDryCoo.u)
     annotation (Line(points={{-38,120},{238,120}}, color={0,0,127}));
   connect(PPumDryCoo.y, EPumDryCoo.u)

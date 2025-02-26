@@ -250,20 +250,20 @@ model Generations
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPla(
     redeclare final package Medium = MediumW,
     addPowerToMedium=false,
-    use_inputFilter=false,
+    use_riseTime=false,
     m_flow_nominal=mWat_flow_nominal) "Pump for the whole central plant"
     annotation (Placement(transformation(extent={{-170,-170},{-150,-150}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHexByp(
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
-    use_inputFilter=false) "Bypass heat exchanger valve"
+    use_strokeTime=false)  "Bypass heat exchanger valve"
     annotation (Placement(transformation(extent={{-70,-170},{-50,-150}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHex(
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
-    use_inputFilter=false)
+    use_strokeTime=false)
     "Heat exchanger valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={-100,-100})));
@@ -280,14 +280,14 @@ model Generations
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
-    use_inputFilter=false)
+    use_strokeTime=false)
     "Heat pump water loop valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={120,-120})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumWat(
     redeclare final package Medium = MediumW,
     final addPowerToMedium=false,
-    use_inputFilter=false,
+    use_riseTime=false,
     final m_flow_nominal=mWat_flow_nominal)
     "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -302,21 +302,21 @@ model Generations
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
-    final use_inputFilter=false,
+    use_riseTime=false,
     final m_flow_nominal=mDryCoo_flow_nominal)
     "Dry cooler pump"
     annotation (Placement(transformation(extent={{-60,120},{-40,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumGly(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
-    final use_inputFilter=false,
+    use_riseTime=false,
     final m_flow_nominal=mHpGly_flow_nominal)
     "Pump for heat pump glycol loop"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={200,0})));
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valHeaPumByp(
     redeclare final package Medium = MediumG,
-    final use_inputFilter=false,
+    use_strokeTime=false,
     final m_flow_nominal=mHpGly_flow_nominal,
     final dpValve_nominal=dpValve_nominal)
     "Heat pump bypass valve"
@@ -392,7 +392,7 @@ model Generations
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo1(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
-    final use_inputFilter=false,
+    use_riseTime=false,
     final m_flow_nominal=mHexGly_flow_nominal)
     "Dry cooler pump"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -437,6 +437,7 @@ model Generations
   Buildings.Fluid.HeatPumps.ModularReversible.LargeScaleWaterToWater heaPum(
     redeclare final package MediumCon = MediumW,
     redeclare final package MediumEva = MediumG,
+    allowDifferentDeviceIdentifiers=true,
     redeclare
       Buildings.Fluid.HeatPumps.ModularReversible.Controls.Safety.Data.Wuellhorst2021
       safCtrPar,

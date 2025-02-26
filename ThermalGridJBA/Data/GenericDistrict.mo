@@ -25,7 +25,7 @@ record GenericDistrict "District network design parameters"
     "Length of each connection pipe (supply only, not counting return line)";
 
   // Central plant
-  parameter Integer nMod=2 "Total number of central plant modules"
+  parameter Integer nMod=1 "Total number of central plant modules"
     annotation (Dialog(tab="Central plant"));
   parameter Real samplePeriod(
     unit="s")=7200
@@ -85,7 +85,7 @@ record GenericDistrict "District network design parameters"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumHea_flow_nominal(
     unit="W",
-    quantity="HeatFlowRate")
+    quantity="HeatFlowRate")=mPlaWat_flow_nominal*4186*TApp
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConHea_nominal(
@@ -100,7 +100,7 @@ record GenericDistrict "District network design parameters"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumCoo_flow_nominal(
     unit="W",
-    quantity="HeatFlowRate")
+    quantity="HeatFlowRate")=QPlaHeaPumHea_flow_nominal*0.6
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConCoo_nominal(
