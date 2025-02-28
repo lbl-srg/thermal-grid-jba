@@ -41,7 +41,7 @@ model JBAPlantSingleHub
   parameter Real dpPlaHex_nominal(unit="Pa")=10000
     "Pressure difference across heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
-  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.6
+  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.3
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
@@ -62,14 +62,14 @@ model JBAPlantSingleHub
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   // Central plant: heat pumps
-  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=0.2*mPlaWat_flow_nominal
+  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=0.05*mPlaWat_flow_nominal
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.6
+  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.3
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186*
-    TApp
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=0.5*mPlaWat_flow_nominal*
+    4186*TApp
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConHea_nominal(unit="K")=datDis.TLooMin

@@ -275,7 +275,7 @@ model Generations
     final dp1_nominal=dpHex_nominal,
     final dp2_nominal=dpHex_nominal)
     "Economizer"
-    annotation (Placement(transformation(extent={{-60,-40},{-80,-20}})));
+    annotation (Placement(transformation(extent={{-60,-60},{-80,-40}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHeaPum(
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal,
@@ -292,11 +292,12 @@ model Generations
     "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={120,-80})));
-  Buildings.Fluid.HeatExchangers.CoolingTowers.YorkCalc dryCoo(
+  Buildings.Fluid.HeatExchangers.CoolingTowers.Merkel   dryCoo(
     redeclare final package Medium = MediumG,
     final m_flow_nominal=mDryCoo_flow_nominal,
     final dp_nominal=dpDryCoo_nominal,
-    TApp_nominal=2)
+    TWatIn_nominal=273.15 + 30.55,
+    TWatOut_nominal=273.15 + 27.55)
     "Dry cooler"
     annotation (Placement(transformation(extent={{40,120},{60,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo(
@@ -344,7 +345,7 @@ model Generations
     nPorts=1)
     "Boundary pressure condition representing the expansion vessel"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},
-        rotation=180, origin={-124,-24})));
+        rotation=180, origin={-124,-44})));
   ThermalGridJBA.Networks.Controls.Indicators ind(
     final samplePeriod=samplePeriod)
     "Indicators for district load, electricity rate and season"
@@ -434,25 +435,42 @@ model Generations
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={-20,90})));
-  Buildings.Fluid.HeatPumps.ModularReversible.LargeScaleWaterToWater heaPum(
+  Buildings.Fluid.HeatPumps.ModularReversible.Modular heaPum(
     redeclare final package MediumCon = MediumW,
     redeclare final package MediumEva = MediumG,
+    use_rev=true,
     allowDifferentDeviceIdentifiers=true,
     redeclare
       Buildings.Fluid.HeatPumps.ModularReversible.Controls.Safety.Data.Wuellhorst2021
       safCtrPar,
+    dTCon_nominal=TApp,
+    dpCon_nominal=30000,
+    use_conCap=false,
+    CCon=3000,
+    GConOut=100,
+    GConIns=1000,
+    dTEva_nominal=TApp,
+    dpEva_nominal=30000,
+    use_evaCap=false,
+    calEff=false,
     final QHea_flow_nominal=QHeaPumHea_flow_nominal,
     final QCoo_flow_nominal=QHeaPumCoo_flow_nominal,
+    redeclare model RefrigerantCycleHeatPumpHeating =
+        Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness(
+          redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
+            iceFacCal,
+          TAppCon_nominal=0,
+          TAppEva_nominal=0),
+    redeclare model RefrigerantCycleHeatPumpCooling =
+        Buildings.Fluid.Chillers.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness(
+          redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
+            iceFacCal,
+          TAppCon_nominal=0,
+          TAppEva_nominal=0),
     final TConHea_nominal=TConHea_nominal,
     final TEvaHea_nominal=TEvaHea_nominal,
     final TConCoo_nominal=TConCoo_nominal,
-    final TEvaCoo_nominal=TEvaCoo_nominal,
-    redeclare
-      Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.EN14511.WAMAK_WaterToWater_220kW
-      datTabHea,
-    redeclare
-      Buildings.Fluid.Chillers.ModularReversible.Data.TableData2D.EN14511.Carrier30XWP1012_1MW
-      datTabCoo)
+    final TEvaCoo_nominal=TEvaCoo_nominal)
     "Reversible heat pump"
     annotation (Placement(transformation(extent={{140,-20},{160,-40}})));
 
@@ -479,7 +497,7 @@ model Generations
         rotation=180, origin={120,60})));
 equation
   connect(valHex.port_b, hex.port_a2) annotation (Line(
-      points={{-100,-90},{-100,-36},{-80,-36}},
+      points={{-100,-90},{-100,-56},{-80,-56}},
       color={0,127,255},
       thickness=0.5));
   connect(valHeaPum.port_b, pumHeaPumWat.port_a) annotation (Line(
@@ -507,7 +525,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(hex.port_b1, bou.ports[1]) annotation (Line(
-      points={{-80,-24},{-114,-24}},
+      points={{-80,-44},{-114,-44}},
       color={0,127,255},
       thickness=0.5));
   connect(uDisPum, ind.uDisPum) annotation (Line(points={{-320,260},{-290,260},
@@ -537,8 +555,8 @@ equation
           260},{-290,164},{-182,164}}, color={0,0,127}));
   connect(heaPumGlyIn.T, heaPumCon.TGlyIn) annotation (Line(points={{211,30},{
           226,30},{226,-206},{-226,-206},{-226,161},{-182,161}}, color={0,0,127}));
-  connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-320,190},{-280,
-          190},{-280,208},{-82,208}},      color={0,0,127}));
+  connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-320,190},{
+          -270,190},{-270,208},{-82,208}}, color={0,0,127}));
   connect(senTem.T, dryCooHexCon.TGenIn) annotation (Line(points={{-260,-149},{-260,
           211},{-82,211}},      color={0,0,127}));
   connect(dryCoo.port_b, dryCooOut.port_a)
@@ -552,7 +570,7 @@ equation
   connect(dryCooHexCon.yValHexByp, valHexByp.y) annotation (Line(points={{-58,219},
           {10,219},{10,-120},{-60,-120},{-60,-148}},        color={0,0,127}));
   connect(hex.port_a1, pumDryCoo1.port_b) annotation (Line(
-      points={{-60,-24},{-20,-24},{-20,10}},
+      points={{-60,-44},{-20,-44},{-20,10}},
       color={0,127,255},
       thickness=0.5));
   connect(dryCooHexCon.yDryCoo, dryCoo.y) annotation (Line(points={{-58,202},{20,
@@ -603,7 +621,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(hex.port_b2, jun1.port_3) annotation (Line(
-      points={{-60,-36},{-20,-36},{-20,-150},{-20,-150}},
+      points={{-60,-56},{-20,-56},{-20,-150}},
       color={0,127,255},
       thickness=0.5));
   connect(jun1.port_2, jun2.port_1) annotation (Line(
@@ -660,7 +678,7 @@ equation
   connect(heaPum.P, PCom)
     annotation (Line(points={{161,-30},{320,-30}}, color={0,0,127}));
   connect(jun6.port_1, hex.port_b1) annotation (Line(
-      points={{-100,50},{-100,-24},{-80,-24}},
+      points={{-100,50},{-100,-44},{-80,-44}},
       color={0,127,255},
       thickness=0.5));
   connect(jun6.port_2, jun7.port_1) annotation (Line(
