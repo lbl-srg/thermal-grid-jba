@@ -317,12 +317,18 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     final TAppSet=TAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
+    kFan=0.1,
+    TiFan=200,
     final TCooSet=TCooSet,
     final THeaSet=THeaSet,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,
-    final minComSpe=minComSpe)
+    final minComSpe=minComSpe,
+    kHeaPum=0.1,
+    TiHeaPum=200,
+    kVal=0.1,
+    TiVal=200)
     "Cooling and heating generation devices"
     annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
   Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie(

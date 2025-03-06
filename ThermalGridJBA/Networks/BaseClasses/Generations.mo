@@ -251,7 +251,8 @@ model Generations
     redeclare final package Medium = MediumW,
     addPowerToMedium=false,
     use_riseTime=false,
-    m_flow_nominal=mWat_flow_nominal) "Pump for the whole central plant"
+    m_flow_nominal=mWat_flow_nominal,
+    dpMax=Modelica.Constants.inf)     "Pump for the whole central plant"
     annotation (Placement(transformation(extent={{-170,-170},{-150,-150}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHexByp(
     redeclare final package Medium = MediumW,
@@ -272,6 +273,7 @@ model Generations
     redeclare final package Medium2 = MediumW,
     final m1_flow_nominal=mHexGly_flow_nominal,
     final m2_flow_nominal=mWat_flow_nominal,
+    show_T=true,
     final dp1_nominal=dpHex_nominal,
     final dp2_nominal=dpHex_nominal)
     "Economizer"
@@ -288,7 +290,8 @@ model Generations
     redeclare final package Medium = MediumW,
     final addPowerToMedium=false,
     use_riseTime=false,
-    final m_flow_nominal=mWat_flow_nominal)
+    final m_flow_nominal=mWat_flow_nominal,
+    dpMax=Modelica.Constants.inf)
     "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={120,-80})));
@@ -304,14 +307,16 @@ model Generations
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
     use_riseTime=false,
-    final m_flow_nominal=mDryCoo_flow_nominal)
+    final m_flow_nominal=mDryCoo_flow_nominal,
+    dpMax=Modelica.Constants.inf)
     "Dry cooler pump"
     annotation (Placement(transformation(extent={{-60,120},{-40,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumGly(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
     use_riseTime=false,
-    final m_flow_nominal=mHpGly_flow_nominal)
+    final m_flow_nominal=mHpGly_flow_nominal,
+    dpMax=Modelica.Constants.inf)
     "Pump for heat pump glycol loop"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={200,0})));
@@ -394,7 +399,8 @@ model Generations
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
     use_riseTime=false,
-    final m_flow_nominal=mHexGly_flow_nominal)
+    final m_flow_nominal=mHexGly_flow_nominal,
+    dpMax=Modelica.Constants.inf)
     "Dry cooler pump"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={-20,20})));
