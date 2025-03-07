@@ -4,7 +4,7 @@ model ChillerThreeUtilities
   extends ThermalGridJBA.Hubs.BaseClasses.PartialParallel   (
     final have_eleCoo=true,
     final have_fan=false,
-    redeclare ThermalGridJBA.Hubs.Controls.Supervisory conSup(
+    redeclare Buildings.DHC.ETS.Combined.Controls.Supervisory conSup(
         final controllerType=controllerType,
         final kHot=kHot,
         final kCol=kCol,
@@ -222,15 +222,6 @@ model ChillerThreeUtilities
   ThermalGridJBA.Hubs.Controls.TwoTankCoordination twoTankCoordination(
     final have_hotWat=have_hotWat)
     annotation (Placement(transformation(extent={{-140,170},{-120,190}})));
-  ThermalGridJBA.Hubs.Controls.DiversionLock locDivCon(final isHotWat=true)
-    "Condenser-side diversion valve lock off"
-    annotation (Placement(transformation(extent={{-190,48},{-170,68}})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort TConOut(
-    redeclare final package Medium = MediumBui,
-    m_flow_nominal=datChi.mCon_flow_nominal,
-    tau=0,
-    T_start=TCon_start) "Fluid temperature out of the condenser"
-    annotation (Placement(transformation(extent={{-160,-50},{-180,-30}})));
   Buildings.Fluid.HydronicConfigurations.ActiveNetworks.Diversion valDivEva(
     redeclare final package Medium = MediumBui,
     m2_flow_nominal=datChi.mEva_flow_nominal,
@@ -241,15 +232,6 @@ model ChillerThreeUtilities
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     val(from_dp=false)) "Diversion valve on evaporator side"
     annotation (Placement(transformation(extent={{176,40},{156,60}})));
-  ThermalGridJBA.Hubs.Controls.DiversionLock locDivEva(final isHotWat=false)
-    "Evaporator-side diversion valve lock off"
-    annotation (Placement(transformation(extent={{120,60},{140,80}})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort TEvaOut(
-    redeclare final package Medium = MediumBui,
-    m_flow_nominal=datChi.mEva_flow_nominal,
-    tau=0,
-    T_start=TEva_start) "Fluid temperature out of the evaporator"
-    annotation (Placement(transformation(extent={{176,-60},{156,-40}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal booToRea(
     realTrue=1,
     realFalse=0)
@@ -344,7 +326,7 @@ equation
   connect(tanHeaWat.TTop, twoTankCoordination.TTopHea) annotation (Line(points={{-179,
           119},{-156,119},{-156,174},{-142,174}},        color={0,0,127}));
   connect(tanHeaWat.charge, twoTankCoordination.uHea) annotation (Line(points={{-178,
-          108},{-160,108},{-160,178},{-142,178}},       color={255,0,255}));
+          107},{-160,107},{-160,178},{-142,178}},       color={255,0,255}));
   connect(THeaWatSupSet, twoTankCoordination.TSetHea) annotation (Line(points={
           {-320,-20},{-208,-20},{-208,170},{-142,170}}, color={0,0,127}));
   connect(twoTankCoordination.yMix, valMixHea.y) annotation (Line(points={{-118,
@@ -363,20 +345,6 @@ equation
   connect(valMixHea.port_1, tanHeaWat.port_bBot) annotation (Line(points={{-100,
           110},{-140,110},{-140,104},{-180,104}},
                                                 color={0,127,255}));
-  connect(twoTankCoordination.yDiv, locDivCon.u) annotation (Line(points={{-118,
-          184},{-40,184},{-40,34},{-202,34},{-202,64},{-191,64}}, color={0,0,
-          127}));
-  connect(twoTankCoordination.TSet, locDivCon.TSet) annotation (Line(points={{-119,
-          172},{-48,172},{-48,40},{-194,40},{-194,52},{-191,52}}, color={0,0,
-          127}));
-  connect(colHeaWat.port_bDisRet, TConOut.port_a)
-    annotation (Line(points={{-140,-40},{-160,-40}}, color={0,127,255}));
-  connect(TConOut.port_b, valDivCon.port_a1) annotation (Line(points={{-180,-40},
-          {-186,-40},{-186,-20},{-156,-20},{-156,48}}, color={0,127,255}));
-  connect(TConOut.T, locDivCon.T) annotation (Line(points={{-170,-29},{-170,-16},
-          {-198,-16},{-198,58},{-191,58}}, color={0,0,127}));
-  connect(locDivCon.y, valDivCon.yVal)
-    annotation (Line(points={{-168,58},{-162,58}}, color={0,0,127}));
   connect(dhw.dHFlo, dHHotWat_flow) annotation (Line(points={{-179,234},{-170,
           234},{-170,300},{318,300}}, color={0,0,127}));
   connect(dhw.port_b, valMixHea.port_3) annotation (Line(points={{-180,230},{
@@ -390,21 +358,17 @@ equation
           {160,116},{180,116}},     color={0,127,255}));
   connect(valDivEva.port_b2, tanChiWat.port_aBot) annotation (Line(points={{172,60},
           {172,104},{180,104}},     color={0,127,255}));
-  connect(locDivEva.y, valDivEva.yVal) annotation (Line(points={{142,70},{192,
-          70},{192,50},{178,50}}, color={0,0,127}));
-  connect(colChiWat.port_bDisRet, TEvaOut.port_b) annotation (Line(points={{140,
-          -40},{144,-40},{144,-50},{156,-50}}, color={0,127,255}));
-  connect(TEvaOut.port_a, valDivEva.port_a1) annotation (Line(points={{176,-50},
-          {176,-40},{172,-40},{172,40}}, color={0,127,255}));
-  connect(TEvaOut.T, locDivEva.T) annotation (Line(points={{166,-39},{166,4},{
-          106,4},{106,70},{119,70}}, color={0,0,127}));
-  connect(TChiWatSupSet, locDivEva.TSet) annotation (Line(points={{-320,-60},{
-          -290,-60},{-290,-6},{-192,-6},{-192,26},{112,26},{112,64},{119,64}},
-        color={0,0,127}));
-  connect(booToRea.y, locDivEva.u) annotation (Line(points={{102,80},{112,80},{
-          112,76},{119,76}}, color={0,0,127}));
-  connect(tanChiWat.charge, booToRea.u) annotation (Line(points={{202,108},{206,
-          108},{206,130},{70,130},{70,80},{78,80}}, color={255,0,255}));
+  connect(tanChiWat.charge, booToRea.u) annotation (Line(points={{202,107},{206,
+          107},{206,130},{70,130},{70,80},{78,80}}, color={255,0,255}));
+  connect(valDivCon.port_a1, colHeaWat.port_bDisRet) annotation (Line(points={{
+          -156,48},{-156,-40},{-140,-40}}, color={0,127,255}));
+  connect(twoTankCoordination.yDiv, valDivCon.yVal) annotation (Line(points={{
+          -118,184},{-40,184},{-40,34},{-172,34},{-172,58},{-162,58}}, color={0,
+          0,127}));
+  connect(colChiWat.port_bDisRet, valDivEva.port_a1) annotation (Line(points={{
+          140,-40},{172,-40},{172,40}}, color={0,127,255}));
+  connect(booToRea.y, valDivEva.yVal) annotation (Line(points={{102,80},{190,80},
+          {190,50},{178,50}}, color={0,0,127}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},
@@ -551,11 +515,11 @@ command Boolean signal. This is currently done only with the HHW side.
 The same modification is planned for the CHW side.
 </li>
 <li>
-The supervisory controller heating input signal <code>uHea</code> now comes
-from the tank(s) instead of coming externally. This is because the synthetic
+The supervisory controller heating input signal <code>uHea</code> and
+cooling input signal <code>uCoo</code> now come from the tank(s) instead of
+coming externally. This change was made because the synthetic
 hourly DHW load profile from calibrated simulation is always positive,
 effectively keeping the heating enabled at all times.
-The same modification is planeed for the CHW side.
 </li>
 </ul>
 </html>"));
