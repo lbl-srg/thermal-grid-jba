@@ -16,6 +16,20 @@ partial model PartialConnectedETS
   parameter ThermalGridJBA.Data.BuildingSetPoints datBuiSet
     "Building set points" annotation (Placement(
       transformation(extent={{20,140},{40,160}})));
+  parameter ThermalGridJBA.Data.Chiller datChi(
+    PLRMin=0,
+    QHea_flow_nominal=max(QHea_flow_nominal, QCoo_flow_nominal*1.5),
+    QCoo_flow_nominal=QCoo_flow_nominal,
+    TConEntMin=313.15,
+    TEvaEntMax=293.15,
+    TEvaLvgMin=277.15,
+    TEvaLvgMax=288.15,
+    dTCon_nominal=datBuiSet.dTHeaWat_nominal,
+    dTEva_nominal=datBuiSet.dTChiWat_nominal,
+    TConLvg_nominal=max(datBuiSet.TChiWatSup_nominal, datBuiSet.THotWatSupTan_nominal),
+    TEvaLvg_nominal=datBuiSet.TChiWatSup_nominal)
+    "Heat recovery chiller parameters"
+    annotation (Placement(transformation(extent={{20,180},{40,200}})));
 
   parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(
     max=-Modelica.Constants.eps)=
@@ -31,25 +45,6 @@ partial model PartialConnectedETS
         filNam=Modelica.Utilities.Files.loadResource(filNam))
     "Design heating heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
-  parameter Buildings.Fluid.Chillers.Data.ElectricEIR.Generic datChi(
-    QEva_flow_nominal=QCoo_flow_nominal,
-    COP_nominal=3,
-    PLRMax=1,
-    PLRMinUnl=0.3,
-    PLRMin=0.3,
-    etaMotor=1,
-    mEva_flow_nominal=abs(QCoo_flow_nominal)/5/4186,
-    mCon_flow_nominal=QHea_flow_nominal/5/4186,
-    TEvaLvg_nominal=datBuiSet.TChiWatSup_nominal,
-    capFunT={1.72,0.02,0,-0.02,0,0},
-    EIRFunT={0.28,-0.02,0,0.02,0,0},
-    EIRFunPLR={0.1,0.9,0},
-    TEvaLvgMin=277.15,
-    TEvaLvgMax=288.15,
-    TConEnt_nominal=313.15,
-    TConEntMin=298.15,
-    TConEntMax=328.15) "Chiller performance data"
-    annotation (Placement(transformation(extent={{20,180},{40,200}})));
   final parameter Modelica.Units.SI.Temperature TChiWatRet_nominal=
       datBuiSet.TChiWatRet_nominal "Chilled water return temperature";
   final parameter Modelica.Units.SI.Temperature THeaWatRet_nominal=
