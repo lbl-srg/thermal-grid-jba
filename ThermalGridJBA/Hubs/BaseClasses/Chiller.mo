@@ -149,7 +149,6 @@ model Chiller "Base subsystem with heat recovery chiller"
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumEva(
     redeclare final package Medium=Medium,
     final allowFlowReversal=allowFlowReversal,
-    use_riseTime=true,
     final m_flow_nominal=dat.mEva_flow_nominal,
     final dp_nominal=dpEva_nominal+dpValEva_nominal)
     "Evaporator pump"
