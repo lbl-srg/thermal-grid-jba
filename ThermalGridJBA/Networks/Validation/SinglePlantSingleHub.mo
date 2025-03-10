@@ -123,7 +123,8 @@ model SinglePlantSingleHub
     each final allowFlowReversalBui=allowFlowReversalBui,
     each final allowFlowReversalSer=allowFlowReversalSer,
     each final TDisWatMin=datDis.TLooMin,
-    each final TDisWatMax=datDis.TLooMax) "Building and ETS"
+    each final TDisWatMax=datDis.TLooMax,
+    ets(chi(pumEva(each use_riseTime=true)))) "Building and ETS"
     annotation (Placement(transformation(extent={{-10,170},{10,190}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)
     "ETS pump power"
@@ -168,27 +169,25 @@ equation
     annotation (Line(points={{68,-60},{60,-60},{60,-180},{46,-180}},
                                                  color={0,0,127}));
   connect(conPum.y, gai.u)
-    annotation (Line(points={{-26.1538,-180},{22,-180}},
+    annotation (Line(points={{-25.6,-180},{22,-180}},
                                                  color={0,0,127}));
-  connect(TDisWatRet.T, conPum.TSouIn[1]) annotation (Line(points={{-91,-40},{
-          -100,-40},{-100,-174.6},{-54.0308,-174.6}},
-                                                 color={0,0,127}));
-  connect(TDisWatSup.T, conPum.TSouOut[1]) annotation (Line(points={{-91,20},{
-          -102,20},{-102,-183.6},{-54.0308,-183.6}},
-                                                   color={0,0,127}));
+  connect(TDisWatRet.T, conPum.TSouIn[1]) annotation (Line(points={{-91,-40},{-100,
+          -40},{-100,-172.8},{-54.4,-172.8}},    color={0,0,127}));
+  connect(TDisWatSup.T, conPum.TSouOut[1]) annotation (Line(points={{-91,20},{-102,
+          20},{-102,-187.2},{-54.4,-187.2}},       color={0,0,127}));
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,152},
           {-14,152},{-14,180},{-10,180}},color={0,127,255}));
   connect(dis.ports_aCon, bui.port_bSerAmb) annotation (Line(points={{12,152},{
           16,152},{16,180},{10,180}},
                                    color={0,127,255}));
   connect(dis.TOut, conPum.TMix) annotation (Line(points={{22,136},{34,136},{34,
-          156},{-380,156},{-380,-168},{-54.0308,-168},{-54.0308,-167.4}},
+          156},{-380,156},{-380,-168},{-54.4,-168},{-54.4,-165.6}},
                                                     color={0,0,127}));
   connect(pipeGroundCouplingMulti[1:(nBui+1)].heatPorts[1], dis.heatPorts)
     annotation (Line(points={{1,95},{1,96},{0.4,96},{0.4,139.8}},
         color={127,0,0}));
-  connect(bui.QCoo_flow, conPum.QCoo_flow) annotation (Line(points={{7,168},{7,
-          160},{-388,160},{-388,-190.8},{-54.0308,-190.8}},
+  connect(bui.QCoo_flow, conPum.QCoo_flow) annotation (Line(points={{7,168},{7,160},
+          {-388,160},{-388,-194.4},{-54.4,-194.4}},
         color={0,0,127}));
   connect(conPla.port_bDis, TDisWatSup.port_a)
     annotation (Line(points={{-80,0},{-80,10}}, color={0,127,255}));

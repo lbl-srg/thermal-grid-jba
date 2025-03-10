@@ -2,7 +2,8 @@ within ThermalGridJBA.Networks.Validation;
 model SinglePlantFiveHubs "District with five hubs"
   extends ThermalGridJBA.Networks.Validation.SinglePlantSingleHub(
     redeclare ThermalGridJBA.Data.Districts.FiveHubs datDis(
-    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal));
+      mCon_flow_nominal=bui.ets.hex.m1_flow_nominal),
+    bui(ets(chi(pumEva(each use_riseTime=false)))));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
