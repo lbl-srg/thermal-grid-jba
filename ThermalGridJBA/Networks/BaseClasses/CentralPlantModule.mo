@@ -71,15 +71,23 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     displayUnit="degC")=TLooMax - TApp
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real mBor_flow_nominal[nZon](
+  parameter Integer nBorMod
+    "Number of borefield modules"
+    annotation (Dialog(group="Borefield"));
+  parameter Real mBorMod_flow_nominual(
+    final quantity="MassFlowRate",
+    final unit="kg/s")=mWat_flow_nominal/nBorMod
+    "Nominal mass flow rate to each borefield module"
+    annotation (Dialog(group="Borefield"));
+  parameter Real mBorHol_flow_nominal[nZon](
     final quantity=fill("MassFlowRate",nZon),
-    final unit=fill("kg/s",nZon))=fill(mWat_flow_nominal/nBor, nZon)
-    "Nominal mass flow rate per borehole in each zone"
+    final unit=fill("kg/s",nZon))=fill(mBorMod_flow_nominual/nBor, nZon)
+    "Nominal mass flow rate per borehole in each zone of borefield module"
     annotation (Dialog(group="Borefield"));
   parameter Real dp_nominal[nZon](
     final quantity=fill("Pressure", nZon),
     final unit=fill("Pa", nZon))={5e4,2e4}
-    "Pressure losses for each zone of the borefield"
+    "Pressure losses for each zone of borefield module"
     annotation (Dialog(group="Borefield"));
 
 
@@ -182,21 +190,31 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     annotation (Placement(transformation(extent={{-60,60},{-40,80}})));
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template conDat(
     borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
-    mBor_flow_nominal=mBor_flow_nominal,
+    mBor_flow_nominal=mBorHol_flow_nominal,
     dp_nominal=dp_nominal,
-    hBor=85,
+    hBor=91,
     rBor=0.075,
     dBor=0.5,
     nZon=2,
-    iZon={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2},
-    cooBor={{3,1.5},{6,1.5},{9,1.5},{12,1.5},{1.5,4.5},{4.5,4.5},{7.5,4.5},{10.5,
-        4.5},{3,7.5},{6,7.5},{9,7.5},{12,7.5},{1.5,10.5},{4.5,10.5},{7.5,10.5},{
-        10.5,10.5},{3,13.5},{6,13.5},{9,13.5},{12,13.5},{1.5,16.5},{4.5,16.5},{7.5,
-        16.5},{10.5,16.5},{5.4,22.5},{10.8,22.5},{2.7,28.5},{8.1,28.5}},
+    iZon={1,1,1,1,1,1,
+          1,1,1,1,1,1,
+          1,1,1,1,1,1,
+          1,1,1,1,1,1,
+          1,1,1,1,1,1,
+          2,2,2,2,2,2},
+    cooBor={{0, 1.5}, {3, 1.5}, {6, 1.5}, {9, 1.5}, {12, 1.5},
+            {1.5, 4.5}, {4.5, 4.5}, {7.5, 4.5}, {10.5, 4.5}, {13.5, 4.5},
+            {0, 7.5}, {3, 7.5}, {6, 7.5}, {9, 7.5}, {12, 7.5},
+            {1.5, 10.5}, {4.5, 10.5}, {7.5, 10.5}, {10.5, 10.5}, {13.5, 10.5},
+            {0, 13.5}, {3, 13.5}, {6, 13.5}, {9, 13.5}, {12, 13.5},
+            {1.5, 16.5}, {4.5, 16.5}, {7.5, 16.5}, {10.5, 16.5}, {13.5, 16.5},
+            {0, 22.5}, {5.4, 22.5}, {10.8, 22.5},
+            {2.7, 28.5}, {8.1, 28.5}, {13.5, 28.5}},
     rTub=0.016,
     kTub=0.42,
     eTub=0.0029,
-    xC=(2*((0.04/2)^2))^(1/2)) "Construction data"
+    xC=(2*((0.04/2)^2))^(1/2))
+    "Construction data: FIXME, the borehole height, boreholes coordinate should be updated"
     annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Filling.Bentonite filDat(
     kFil=1.0)
@@ -210,8 +228,10 @@ model CentralPlantModule "Central plant module, each includes the generation equ
   final parameter Modelica.Units.SI.Temperature T_start=286.65
     "Initial temperature of the soil";
   final parameter Integer nZon=borFieDat.conDat.nZon
-    "Total number of independent bore field zones";
+    "Total number of independent bore field zones in each borefield module";
   final parameter Integer nBor=size(borFieDat.conDat.iZon, 1)
+    "Total number of boreholes in each borefield module";
+  final parameter Integer nBorZon=nZon*nBorMod
     "Total number of boreholes";
 
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TWetBul(
@@ -331,24 +351,23 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     TiVal=200)
     "Cooling and heating generation devices"
     annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
-  Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie(
-    redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
-    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    TExt0_start=T_start,
-    borFieDat=borFieDat,
-    dT_dz=0)
-    annotation (Placement(transformation(extent={{20,-10},{40,10}})));
+  Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie[nBorMod](
+    redeclare each final package Medium = MediumW,
+    each allowFlowReversal=false,
+    each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    each TExt0_start=T_start,
+    each borFieDat=borFieDat,
+    each dT_dz=0) annotation (Placement(transformation(extent={{20,-10},{40,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del3(
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal,
-    nPorts=nZon+1)
+    nPorts=nBorZon+1)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={0,10})));
   Buildings.Fluid.Delays.DelayFirstOrder del1(
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mWat_flow_nominal,
-    nPorts=nZon+1)
+    nPorts=nBorZon+1)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={70,10})));
 
@@ -358,19 +377,20 @@ model CentralPlantModule "Central plant module, each includes the generation equ
         iconTransformation(extent={{100,70},{140,110}})));
 
 equation
-  for i in 1:nZon loop
-    connect(del3.ports[i], borFie.port_a[i])
-      annotation (Line(points={{0,0},{20,0}},   color={0,127,255},
-        thickness=0.5));
-    connect(borFie.port_b[i], del1.ports[i])
-      annotation (Line(points={{40,0},{70,0}}, color={0,127,255},
-        thickness=0.5));
+  for j in 1:nBorMod loop
+    for i in 1:nZon loop
+      connect(del3.ports[(j-1)*nZon+i], borFie[j].port_a[i])
+        annotation (Line(points={{0,0},{20,0}}, color={0,127,255}, thickness=0.5));
+      connect(borFie[j].port_b[i], del1.ports[(j-1)*nZon+i])
+        annotation (Line(points={{40,0},{70,0}}, color={0,127,255}, thickness=0.5));
+    end for;
   end for;
-  connect(gen.port_b, del3.ports[nZon + 1]) annotation (Line(
+
+  connect(gen.port_b, del3.ports[nBorZon + 1]) annotation (Line(
       points={{-40,0},{0,0}},
       color={0,127,255},
       thickness=0.5));
-  connect(del1.ports[nZon+1], port_b)
+  connect(del1.ports[nBorZon+1], port_b)
     annotation (Line(points={{70,0},{100,0}}, color={0,127,255},
       thickness=0.5));
   connect(port_a, gen.port_a) annotation (Line(

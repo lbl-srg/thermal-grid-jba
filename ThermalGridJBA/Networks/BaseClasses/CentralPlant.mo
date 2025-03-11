@@ -2,9 +2,10 @@ within ThermalGridJBA.Networks.BaseClasses;
 model CentralPlant "Central plant"
 
   package MediumW = Buildings.Media.Water "Water";
-  parameter Integer nMod=2
-    "Total number of modules";
-
+  parameter Integer nGenMod=2
+    "Total number of generation modules";
+  parameter Integer nBorMod[nGenMod]
+    "Number of borefield modules to be served by each generation";
   parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
@@ -14,7 +15,7 @@ model CentralPlant "Central plant"
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
   parameter Real mWat_flow_nominal(unit="kg/s")
-    "Nominal water mass flow rate to each module";
+    "Nominal water mass flow rate to each generation module";
   parameter Real dpValve_nominal(
     final quantity="PressureDifference",
     unit="Pa",
@@ -134,92 +135,93 @@ model CentralPlant "Central plant"
     "Ambient wet bulb temperature"
     annotation (Placement(transformation(extent={{-140,-100},{-100,-60}}),
         iconTransformation(extent={{-140,-110},{-100,-70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat[nMod]
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat[nGenMod]
     "Current electricity rate, cent per kWh"
     annotation (Placement(transformation(extent={{100,70},{140,110}}),
         iconTransformation(extent={{100,70},{140,110}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo[nMod](
-    quantity=fill("Power", nMod),
-    final unit=fill("W", nMod))
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo[nGenMod](
+    quantity=fill("Power", nGenMod),
+    final unit=fill("W", nGenMod))
     "Electric power consumed by fan"
     annotation (Placement(transformation(extent={{100,50},{140,90}}),
         iconTransformation(extent={{100,50},{140,90}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo[nMod](
-    quantity=fill("Power", nMod),
-    final unit=fill("W", nMod))
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo[nGenMod](
+    quantity=fill("Power", nGenMod),
+    final unit=fill("W", nGenMod))
     "Electrical power consumed by dry cool pump"
     annotation (Placement(transformation(extent={{100,30},{140,70}}),
         iconTransformation(extent={{100,30},{140,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHexGly[nMod](
-    quantity=fill("Power", nMod),
-    final unit=fill("W", nMod))
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHexGly[nGenMod](
+    quantity=fill("Power", nGenMod),
+    final unit=fill("W", nGenMod))
     "Electrical power consumed by the glycol pump of HEX"
     annotation (Placement(transformation(extent={{100,10},{140,50}}),
         iconTransformation(extent={{100,10},{140,50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly[nMod](
-    quantity=fill("Power", nMod),
-    final unit=fill("W", nMod))
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly[nGenMod](
+    quantity=fill("Power", nGenMod),
+    final unit=fill("W", nGenMod))
     "Electrical power consumed by glycol pump of heat pump"
     annotation (Placement(transformation(extent={{100,-50},{140,-10}}),
         iconTransformation(extent={{100,-50},{140,-10}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PCom[nMod](
-    quantity=fill("Power", nMod),
-    final unit=fill("W", nMod))
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PCom[nGenMod](
+    quantity=fill("Power", nGenMod),
+    final unit=fill("W", nGenMod))
     "Electric power consumed by compressor"
     annotation (Placement(transformation(extent={{100,-70},{140,-30}}),
         iconTransformation(extent={{100,-70},{140,-30}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat[nMod](
-    quantity=fill("Power", nMod),
-    final unit=fill("W", nMod))
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat[nGenMod](
+    quantity=fill("Power", nGenMod),
+    final unit=fill("W", nGenMod))
     "Electrical power consumed by heat pump waterside pump"
     annotation (Placement(transformation(extent={{100,-90},{140,-50}}),
         iconTransformation(extent={{100,-90},{140,-50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum[nMod](
-    quantity=fill("Power", nMod),
-    final unit=fill("W", nMod))
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum[nGenMod](
+    quantity=fill("Power", nGenMod),
+    final unit=fill("W", nGenMod))
     "Electrical power consumed by circulation pump"
     annotation (Placement(transformation(extent={{100,-110},{140,-70}}),
         iconTransformation(extent={{100,-110},{140,-70}})));
 
-  ThermalGridJBA.Networks.BaseClasses.CentralPlantModule plaMod[nMod](
-    final TLooMin=fill(TLooMin, nMod),
-    final TLooMax=fill(TLooMax, nMod),
-    final mWat_flow_nominal=fill(mWat_flow_nominal, nMod),
-    final mWat_flow_min=fill(mWat_flow_min, nMod),
-    final mHexGly_flow_nominal=fill(mHexGly_flow_nominal, nMod),
-    final mHpGly_flow_nominal=fill(mHpGly_flow_nominal, nMod),
-    final mDryCoo_flow_nominal=fill(mDryCoo_flow_nominal, nMod),
-    final dpHex_nominal=fill(dpHex_nominal, nMod),
-    final dpValve_nominal=fill(dpValve_nominal, nMod),
-    final dpDryCoo_nominal=fill(dpDryCoo_nominal, nMod),
-    QHeaPumHea_flow_nominal=fill(QHeaPumHea_flow_nominal, nMod),
-    final TConHea_nominal=fill(TConHea_nominal, nMod),
-    TEvaHea_nominal=fill(TEvaHea_nominal, nMod),
-    QHeaPumCoo_flow_nominal=fill(QHeaPumCoo_flow_nominal, nMod),
-    TConCoo_nominal=fill(TConCoo_nominal, nMod),
-    TEvaCoo_nominal=fill(TEvaCoo_nominal, nMod),
-    final samplePeriod=fill(samplePeriod, nMod),
-    final TAppSet=fill(TAppSet, nMod),
-    final TApp=fill(TApp, nMod),
-    final minFanSpe=fill(minFanSpe, nMod),
-    final TCooSet=fill(TCooSet, nMod),
-    final THeaSet=fill(THeaSet, nMod),
-    final TConInMin=fill(TConInMin, nMod),
-    final TEvaInMax=fill(TEvaInMax, nMod),
-    final offTim=fill(offTim, nMod),
-    final minComSpe=fill(minComSpe, nMod))
+  ThermalGridJBA.Networks.BaseClasses.CentralPlantModule plaMod[nGenMod](
+    final TLooMin=fill(TLooMin, nGenMod),
+    final TLooMax=fill(TLooMax, nGenMod),
+    final mWat_flow_nominal=fill(mWat_flow_nominal, nGenMod),
+    final mWat_flow_min=fill(mWat_flow_min, nGenMod),
+    final mHexGly_flow_nominal=fill(mHexGly_flow_nominal, nGenMod),
+    final mHpGly_flow_nominal=fill(mHpGly_flow_nominal, nGenMod),
+    final mDryCoo_flow_nominal=fill(mDryCoo_flow_nominal, nGenMod),
+    final dpHex_nominal=fill(dpHex_nominal, nGenMod),
+    final dpValve_nominal=fill(dpValve_nominal, nGenMod),
+    final dpDryCoo_nominal=fill(dpDryCoo_nominal, nGenMod),
+    QHeaPumHea_flow_nominal=fill(QHeaPumHea_flow_nominal, nGenMod),
+    final TConHea_nominal=fill(TConHea_nominal, nGenMod),
+    TEvaHea_nominal=fill(TEvaHea_nominal, nGenMod),
+    QHeaPumCoo_flow_nominal=fill(QHeaPumCoo_flow_nominal, nGenMod),
+    TConCoo_nominal=fill(TConCoo_nominal, nGenMod),
+    TEvaCoo_nominal=fill(TEvaCoo_nominal, nGenMod),
+    final nBorMod=nBorMod,
+    final samplePeriod=fill(samplePeriod, nGenMod),
+    final TAppSet=fill(TAppSet, nGenMod),
+    final TApp=fill(TApp, nGenMod),
+    final minFanSpe=fill(minFanSpe, nGenMod),
+    final TCooSet=fill(TCooSet, nGenMod),
+    final THeaSet=fill(THeaSet, nGenMod),
+    final TConInMin=fill(TConInMin, nGenMod),
+    final TEvaInMax=fill(TEvaInMax, nGenMod),
+    final offTim=fill(offTim, nGenMod),
+    final minComSpe=fill(minComSpe, nGenMod))
     "Central plant module"
     annotation (Placement(transformation(extent={{20,-10},{40,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del1(
     redeclare final package Medium = MediumW,
-    final m_flow_nominal=nMod*mWat_flow_nominal,
-    nPorts=nMod+1)
+    final m_flow_nominal=nGenMod*mWat_flow_nominal,
+    nPorts=nGenMod+1)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={-60,10})));
   Buildings.Fluid.Delays.DelayFirstOrder del2(
     redeclare final package Medium = MediumW,
-    final m_flow_nominal=nMod*mWat_flow_nominal,
-    nPorts=nMod+1)
+    final m_flow_nominal=nGenMod*mWat_flow_nominal,
+    nPorts=nGenMod+1)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={70,10})));
   Modelica.Fluid.Interfaces.FluidPort_a port_a(
@@ -233,23 +235,23 @@ model CentralPlant "Central plant"
     annotation (Placement(transformation(extent={{90,-10},{110,10}}),
       iconTransformation(extent={{90,-10},{110,10}})));
   Buildings.Controls.OBC.CDL.Routing.RealScalarReplicator reaScaRep(
-    final nout=nMod)
+    final nout=nGenMod)
     annotation (Placement(transformation(extent={{-80,70},{-60,90}})));
   Buildings.Controls.OBC.CDL.Routing.RealScalarReplicator reaScaRep1(
-    final nout=nMod)
+    final nout=nGenMod)
     annotation (Placement(transformation(extent={{-40,50},{-20,70}})));
   Buildings.Controls.OBC.CDL.Routing.RealScalarReplicator reaScaRep2(
-    final nout=nMod)
+    final nout=nGenMod)
     annotation (Placement(transformation(extent={{-80,30},{-60,50}})));
   Buildings.Controls.OBC.CDL.Routing.RealScalarReplicator reaScaRep3(
-    final nout=nMod)
+    final nout=nGenMod)
     annotation (Placement(transformation(extent={{-80,-50},{-60,-30}})));
   Buildings.Controls.OBC.CDL.Routing.RealScalarReplicator reaScaRep4(
-    final nout=nMod)
+    final nout=nGenMod)
     annotation (Placement(transformation(extent={{-80,-90},{-60,-70}})));
 
 equation
-  for i in 1:nMod loop
+  for i in 1:nGenMod loop
     connect(del1.ports[i], plaMod[i].port_a) annotation (Line(
         points={{-60,0},{20,0}},
         color={0,127,255},
@@ -259,9 +261,9 @@ equation
         color={0,127,255},
         thickness=0.5));
   end for;
-  connect(del1.ports[nMod+1], port_a)
+  connect(del1.ports[nGenMod+1], port_a)
     annotation (Line(points={{-60,0},{-100,0}}, color={0,127,255}, thickness=0.5));
-  connect(del2.ports[nMod+1], port_b)
+  connect(del2.ports[nGenMod+1], port_b)
     annotation (Line(points={{70,0},{100,0}}, color={0,127,255}, thickness=0.5));
   connect(TWetBul, reaScaRep4.u)
     annotation (Line(points={{-120,-80},{-82,-80}}, color={0,0,127}));
