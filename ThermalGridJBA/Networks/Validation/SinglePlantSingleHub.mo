@@ -29,6 +29,9 @@ model SinglePlantSingleHub
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
+  ThermalGridJBA.BoundaryConditions.WeatherDataFTMY wea[nBui] "fTMY weather data reader"
+    annotation (Placement(transformation(extent={{-40,220},{-20,240}})));
+
   Buildings.DHC.Networks.Controls.MainPump1Pipe conPum(
     nMix=nBui,
     nSou=1,
@@ -240,6 +243,10 @@ equation
     annotation (Line(points={{20,142},{80,142},{80,-50}}, color={0,127,255}));
   connect(pumDis.port_a, bou.ports[1]) annotation (Line(points={{80,-50},{80,
           -44},{128,-44},{128,-60},{140,-60}}, color={0,127,255}));
+  connect(wea.weaBus, bui.weaBus) annotation (Line(
+      points={{-20,230},{0,230},{0,190}},
+      color={255,204,51},
+      thickness=0.5));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),

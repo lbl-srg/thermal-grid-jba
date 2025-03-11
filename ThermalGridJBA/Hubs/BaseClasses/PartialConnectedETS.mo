@@ -78,21 +78,6 @@ partial model PartialConnectedETS
   parameter Real COPHotWat_nominal(final unit="1") = 2.3
     "COP of heat pump for hot water production";
 
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant THeaWatSupSet(
-    final k=datBuiSet.THeaWatSup_nominal,
-    y(final unit="K", displayUnit="degC"))
-    "Heating water supply temperature set point"
-    annotation (Placement(transformation(extent={{-100,-30},{-80,-10}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant TChiWatSupSet(
-    final k=datBuiSet.TChiWatSup_nominal,
-    y(final unit="K", displayUnit="degC"))
-    "Chilled water supply temperature set point"
-    annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));
-equation
-  connect(THeaWatSupSet.y, ets.THeaWatSupSet) annotation (Line(points={{-78,-20},
-          {-64,-20},{-64,-58},{-34,-58}}, color={0,0,127}));
-  connect(ets.TChiWatSupSet, TChiWatSupSet.y) annotation (Line(points={{-34,-62},
-          {-68,-62},{-68,-60},{-78,-60}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
         defaultComponentName = "bui");

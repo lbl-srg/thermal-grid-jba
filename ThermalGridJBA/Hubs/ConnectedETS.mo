@@ -4,6 +4,7 @@ model ConnectedETS
   extends ThermalGridJBA.Hubs.BaseClasses.PartialConnectedETS(redeclare
       ThermalGridJBA.Hubs.BaseClasses.ChillerThreeUtilities ets(
       final have_hotWat= QHotWat_flow_nominal > Modelica.Constants.eps,
+      have_weaBus=true,
       QChiWat_flow_nominal=QCoo_flow_nominal,
       QHeaWat_flow_nominal=QHea_flow_nominal,
       QHotWat_flow_nominal=QHot_flow_nominal,
@@ -41,16 +42,28 @@ model ConnectedETS
           filNam=Modelica.Utilities.Files.loadResource(filNam))
     "Design heating heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
+  Buildings.Controls.SetPoints.Table THeaWatSupSet(
+    final table=datBuiSet.tabHeaWatRes,
+    final offset=0,
+    final constantExtrapolation=true)
+    "Heating water supply temperature set point"
+    annotation (Placement(transformation(extent={{-140,60},{-120,80}})));
+  Buildings.Controls.SetPoints.Table TChiWatSupSet(
+    final table=datBuiSet.tabChiWatRes,
+    final offset=0,
+    final constantExtrapolation=true)
+    "Chilled water supply temperature set point"
+    annotation (Placement(transformation(extent={{-140,20},{-120,40}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant THotWatSupSet(
     final k=datBuiSet.THotWatSupFix_nominal,
     y(final unit="K", displayUnit="degC")) if have_hotWat
     "Domestic hot water supply temperature set point"
-    annotation (Placement(transformation(extent={{-140,-10},{-120,10}})));
+    annotation (Placement(transformation(extent={{-140,-20},{-120,0}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant TColWat(
     final k=datBuiSet.TColWat_nominal,
     y(final unit="K", displayUnit="degC")) if have_hotWat
                                              "Domestic cold water temperature"
-    annotation (Placement(transformation(extent={{-140,-50},{-120,-30}})));
+    annotation (Placement(transformation(extent={{-140,-60},{-120,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput dHHeaWat_flow(final unit="W")
     "Heating water distributed energy flow rate"
     annotation (Placement(transformation(extent={{300,-140},{340,-100}}),
@@ -76,15 +89,36 @@ equation
           {-36,-74},{-36,-146},{84,-146},{84,-2},{28,-2},{28,4}},      color={0,
           0,127}));
   connect(ets.THotWatSupSet, THotWatSupSet.y) annotation (Line(points={{-34,-66},
-          {-70,-66},{-70,0},{-118,0}}, color={0,0,127}));
-  connect(TColWat.y, ets.TColWat) annotation (Line(points={{-118,-40},{-74,-40},
-          {-74,-70},{-34,-70}}, color={0,0,127}));
+          {-72,-66},{-72,-10},{-118,-10}},
+                                       color={0,0,127}));
+  connect(TColWat.y, ets.TColWat) annotation (Line(points={{-118,-50},{-76,-50},
+          {-76,-70},{-34,-70}}, color={0,0,127}));
   connect(ets.dHChiWat_flow, dHChiWat_flow) annotation (Line(points={{28,-90},{
           28,-100},{280,-100},{280,-80},{320,-80}}, color={0,0,127}));
   connect(dHHeaWat_flow, ets.dHHeaWat_flow) annotation (Line(points={{320,-120},
           {280,-120},{280,-106},{24,-106},{24,-90}}, color={0,0,127}));
   connect(ets.dHHotWat_flow, dHHotWat_flow) annotation (Line(points={{20,-90},{
           20,-112},{276,-112},{276,-160},{320,-160}}, color={0,0,127}));
+  connect(THeaWatSupSet.y, ets.THeaWatSupSet) annotation (Line(points={{-119,70},
+          {-64,70},{-64,-58},{-34,-58}}, color={0,0,127}));
+  connect(weaBus.TDryBul, THeaWatSupSet.u) annotation (Line(
+      points={{0.1,280.1},{-152,280.1},{-152,70},{-142,70}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-3,6},{-3,6}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(TChiWatSupSet.y, ets.TChiWatSupSet) annotation (Line(points={{-119,30},
+          {-68,30},{-68,-62},{-34,-62}}, color={0,0,127}));
+  connect(weaBus.TDryBul, TChiWatSupSet.u) annotation (Line(
+      points={{0.1,280.1},{-152,280.1},{-152,30},{-142,30}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-3,6},{-3,6}},
+      horizontalAlignment=TextAlignment.Right));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
         defaultComponentName = "bui");
