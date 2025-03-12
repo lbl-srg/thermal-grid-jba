@@ -28,7 +28,7 @@ model JBAPlantFiveHubs
   parameter Integer nGenMod=4
     "Total number of generation modules in central plant"
     annotation (Dialog(tab="Central plant"));
-  parameter Integer nBorMod[nGenMod]={2,2,2,2}
+  parameter Integer nBorMod[nGenMod]={7,7,7,7}
     "Number of borefield modules to be served by each generation module"
     annotation (Dialog(tab="Central plant"));
   parameter Real samplePeriod(unit="s")=7200

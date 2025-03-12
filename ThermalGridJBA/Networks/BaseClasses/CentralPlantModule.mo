@@ -10,13 +10,9 @@ model CentralPlantModule "Central plant module, each includes the generation equ
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
-  parameter Real mWat_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
+  parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate";
-  parameter Real dpValve_nominal(
-    final quantity="PressureDifference",
-    unit="Pa")=6000
+  parameter Real dpValve_nominal(unit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve";
 
   // Heat exchanger parameters
@@ -41,52 +37,35 @@ model CentralPlantModule "Central plant module, each includes the generation equ
   parameter Real mHpGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumHea_flow_nominal(
-    final unit="W",
-    final quantity="HeatFlowRate")
+  parameter Real QHeaPumHea_flow_nominal(unit="W")
     "Nominal heating capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConHea_nominal(
-    final unit="K",
-    displayUnit="degC")=TLooMin
+  parameter Real TConHea_nominal(unit="K")=TLooMin
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaHea_nominal(
-    final unit="K",
-    displayUnit="degC")=TLooMin + TApp
+  parameter Real TEvaHea_nominal(unit="K")=TLooMin + TApp
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumCoo_flow_nominal(
-    final unit="W",
-    final quantity="HeatFlowRate")
+  parameter Real QHeaPumCoo_flow_nominal(unit="W")
     "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConCoo_nominal(
-    final unit="K",
-    displayUnit="degC")=TLooMax
+  parameter Real TConCoo_nominal(unit="K")=TLooMax
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaCoo_nominal(
-    final unit="K",
-    displayUnit="degC")=TLooMax - TApp
+  parameter Real TEvaCoo_nominal(unit="K")=TLooMax - TApp
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Integer nBorMod
+  parameter Integer nBorMod=1
     "Number of borefield modules"
     annotation (Dialog(group="Borefield"));
-  parameter Real mBorMod_flow_nominual(
-    final quantity="MassFlowRate",
-    final unit="kg/s")=mWat_flow_nominal/nBorMod
+  parameter Real mBorMod_flow_nominual(unit="kg/s")=mWat_flow_nominal/nBorMod
     "Nominal mass flow rate to each borefield module"
     annotation (Dialog(group="Borefield"));
-  parameter Real mBorHol_flow_nominal[nZon](
-    final quantity=fill("MassFlowRate",nZon),
-    final unit=fill("kg/s",nZon))=fill(mBorMod_flow_nominual/nBor, nZon)
+  parameter Real mBorHol_flow_nominal[nZon](unit=fill("kg/s", nZon))=fill(
+    mBorMod_flow_nominual/nBor, nZon)
     "Nominal mass flow rate per borehole in each zone of borefield module"
     annotation (Dialog(group="Borefield"));
-  parameter Real dp_nominal[nZon](
-    final quantity=fill("Pressure", nZon),
-    final unit=fill("Pa", nZon))={5e4,2e4}
+  parameter Real dp_nominal[nZon](unit=fill("Pa", nZon))={5e4,2e4}
     "Pressure losses for each zone of borefield module"
     annotation (Dialog(group="Borefield"));
 
@@ -121,47 +100,34 @@ model CentralPlantModule "Central plant module, each includes the generation equ
 //     unit="Pa")=10000
 //     "Nominal pressure drop of fully open 2-way valve";
 
-  parameter Real samplePeriod(
-    final quantity="Time",
-    final unit="s")=7200 "Sample period of district loop pump speed"
+  parameter Real samplePeriod(unit="s")=7200
+                         "Sample period of district loop pump speed"
     annotation (Dialog(tab="Controls", group="Indicators"));
-  parameter Real TAppSet(
-    final quantity="TemperatureDifference",
-    final unit="K")=2 "Dry cooler approch setpoint"
+  parameter Real TAppSet(unit="K")=2
+                      "Dry cooler approch setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TApp(
-    final quantity="TemperatureDifference",
-    final unit="K")=4
+  parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real minFanSpe(
-    unit="1")=0.1
+  parameter Real minFanSpe(unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TCooSet(
-    unit="K",
-    displayUnit="degC")=TLooMin
+  parameter Real TCooSet(unit="K")=TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real THeaSet(
-    unit="K",
-    displayUnit="degC")=TLooMax
+  parameter Real THeaSet(unit="K")=TLooMax
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TConInMin(
-    unit="K",
-    displayUnit="degC") "Minimum condenser inlet temperature"
+  parameter Real TConInMin(unit="K", displayUnit="degC")
+                        "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TEvaInMax(
-    unit="K",
-    displayUnit="degC") "Maximum evaporator inlet temperature"
+  parameter Real TEvaInMax(unit="K", displayUnit="degC")
+                        "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real offTim(
-    final quantity="Time",
-    final unit="s")=12*3600 "Heat pump off time"
+  parameter Real offTim(unit="s")=12*3600
+                            "Heat pump off time"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real minComSpe(
-    unit="1")=0.2
+  parameter Real minComSpe(unit="1")=0.2
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
 
@@ -354,6 +320,8 @@ model CentralPlantModule "Central plant module, each includes the generation equ
   Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie[nBorMod](
     redeclare each final package Medium = MediumW,
     each allowFlowReversal=false,
+    nCel=fill(2, nBorMod),
+    nSeg=fill(2, nBorMod),
     each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     each TExt0_start=T_start,
     each borFieDat=borFieDat,
