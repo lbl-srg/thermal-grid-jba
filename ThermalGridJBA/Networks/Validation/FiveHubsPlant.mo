@@ -1,6 +1,5 @@
 within ThermalGridJBA.Networks.Validation;
-model JBAPlantFiveHubs
-  "District network with the JBA plant and five hubs"
+model FiveHubsPlant "District network with the JBA plant and five hubs"
   extends Modelica.Icons.Example;
   package Medium = Buildings.Media.Water "Medium model";
 
@@ -530,4 +529,4 @@ The pressurisation point of the loop is moved to upstream the main pump.
 </ul>
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
-end JBAPlantFiveHubs;
+end FiveHubsPlant;
