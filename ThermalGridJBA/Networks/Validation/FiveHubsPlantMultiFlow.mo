@@ -73,20 +73,20 @@ model FiveHubsPlantMultiFlow
     4186*TApp
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConHea_nominal(unit="K")=datDis.TLooMin
+  parameter Real TPlaConHea_nominal(unit="K")=datDis.TLooMin + TApp
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaHea_nominal(unit="K")=datDis.TLooMin + TApp
+  parameter Real TPlaEvaHea_nominal(unit="K")=datDis.TLooMin
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-0.6*
     QPlaHeaPumHea_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConCoo_nominal(unit="K")=datDis.TLooMax
+  parameter Real TPlaConCoo_nominal(unit="K")=datDis.TLooMax - TApp
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaCoo_nominal(unit="K")=datDis.TLooMax - TApp
+  parameter Real TPlaEvaCoo_nominal(unit="K")=datDis.TLooMax
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConInMin(unit="K")=datDis.TLooMax - TApp - TAppSet

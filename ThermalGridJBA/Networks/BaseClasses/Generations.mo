@@ -37,34 +37,22 @@ model Generations
   parameter Real mHpGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumHea_flow_nominal(
-    final unit="W",
-    final quantity="HeatFlowRate")=cpWat*
-      mWat_flow_nominal*TApp "Nominal heating capacity"
+  parameter Real QHeaPumHea_flow_nominal(unit="W")=cpWat*mWat_flow_nominal*TApp
+                             "Nominal heating capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConHea_nominal(
-    final unit="K",
-    displayUnit="degC")=TLooMin
+  parameter Real TConHea_nominal(unit="K")=TLooMin + TApp
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaHea_nominal(
-    final unit="K",
-    displayUnit="degC")=TLooMin + TApp
+  parameter Real TEvaHea_nominal(unit="K")=TLooMin
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumCoo_flow_nominal(
-    final unit="W",
-    final quantity="HeatFlowRate")=-cpWat*
-      mWat_flow_nominal*TApp "Nominal cooling capacity"
+  parameter Real QHeaPumCoo_flow_nominal(unit="W")=-cpWat*mWat_flow_nominal*
+    TApp                     "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConCoo_nominal(
-    final unit="K",
-    displayUnit="degC")=TLooMax
+  parameter Real TConCoo_nominal(unit="K")=TLooMax - TApp
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaCoo_nominal(
-    final unit="K",
-    displayUnit="degC")=TLooMax - TApp
+  parameter Real TEvaCoo_nominal(unit="K")=TLooMax
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
 
@@ -100,14 +88,10 @@ model Generations
   parameter Real THeaSet(unit="K")=TLooMax
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TConInMin(
-    unit="K",
-    displayUnit="degC")=TLooMax - TApp - TAppSet
+  parameter Real TConInMin(unit="K")=TLooMax - TApp - TAppSet
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TEvaInMax(
-    unit="K",
-    displayUnit="degC")=TLooMin + TApp + TAppSet
+  parameter Real TEvaInMax(unit="K")=TLooMin + TApp + TAppSet
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
@@ -445,6 +429,7 @@ model Generations
     redeclare final package MediumEva = MediumG,
     use_rev=true,
     allowDifferentDeviceIdentifiers=true,
+    use_intSafCtr=true,
     redeclare
       Buildings.Fluid.HeatPumps.ModularReversible.Controls.Safety.Data.Wuellhorst2021
       safCtrPar,
@@ -457,7 +442,6 @@ model Generations
     dTEva_nominal=TApp,
     dpEva_nominal=30000,
     use_evaCap=false,
-    calEff=false,
     final QHea_flow_nominal=QHeaPumHea_flow_nominal,
     final QCoo_flow_nominal=QHeaPumCoo_flow_nominal,
     redeclare model RefrigerantCycleHeatPumpHeating =
