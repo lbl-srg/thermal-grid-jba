@@ -8,6 +8,8 @@ model ConnectedETSNoDHW
   parameter String filNam =
     "modelica://ThermalGridJBA/Resources/Data/Consumptions/B1500.mos";
 
+  ThermalGridJBA.BoundaryConditions.WeatherDataFTMY wea "fTMY weather data reader"
+    annotation (Placement(transformation(extent={{-20,60},{0,80}})));
   Buildings.Fluid.Sources.Boundary_pT supAmbWat(
     redeclare package Medium = Medium,
     p(displayUnit="bar"),
@@ -60,6 +62,10 @@ equation
           -40},{20,-40},{20,80},{38,80}}, color={0,0,127}));
   connect(bui.dHHotWat_flow, dHHotWat.u) annotation (Line(points={{44,-22},{44,-36},
           {24,-36},{24,20},{38,20}}, color={0,0,127}));
+  connect(wea.weaBus, bui.weaBus) annotation (Line(
+      points={{0,70},{10,70},{10,4},{50,4},{50,0}},
+      color={255,204,51},
+      thickness=0.5));
   annotation (
     Icon(
       coordinateSystem(
