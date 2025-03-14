@@ -328,10 +328,9 @@ model Generations
     "Heat pump bypass valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={200,60})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort senTem(
-    redeclare final package Medium = MediumW,
-    final m_flow_nominal=mWat_flow_nominal)
-    "Temperature of waterflow from district"
+  Buildings.Fluid.Sensors.TemperatureTwoPort entGenTem(redeclare final package
+      Medium = MediumW, final m_flow_nominal=mWat_flow_nominal)
+    "Temperature of waterflow entering the generation module"
     annotation (Placement(transformation(extent={{-270,-170},{-250,-150}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort heaPumLea(
     redeclare final package Medium = MediumW,
@@ -501,6 +500,13 @@ model Generations
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={120,60})));
+  Buildings.Fluid.Sensors.TemperatureTwoPort leaGenTem(redeclare final package
+      Medium = MediumW, final m_flow_nominal=mWat_flow_nominal)
+    "Temperature of waterflow leave the generation module" annotation (
+      Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=0,
+        origin={252,-160})));
 equation
   connect(valHex.port_b, hex.port_a2) annotation (Line(
       points={{-100,-90},{-100,-56},{-80,-56}},
@@ -514,11 +520,11 @@ equation
       points={{-40,130},{40,130}},
       color={0,127,255},
       thickness=0.5));
-  connect(port_a, senTem.port_a) annotation (Line(
+  connect(port_a, entGenTem.port_a) annotation (Line(
       points={{-300,0},{-280,0},{-280,-160},{-270,-160}},
       color={0,127,255},
       thickness=0.5));
-  connect(senTem.port_b, pumCenPla.port_a) annotation (Line(
+  connect(entGenTem.port_b, pumCenPla.port_a) annotation (Line(
       points={{-250,-160},{-170,-160}},
       color={0,127,255},
       thickness=0.5));
@@ -563,8 +569,8 @@ equation
           226,30},{226,-206},{-226,-206},{-226,161},{-182,161}}, color={0,0,127}));
   connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-320,190},{
           -270,190},{-270,208},{-82,208}}, color={0,0,127}));
-  connect(senTem.T, dryCooHexCon.TGenIn) annotation (Line(points={{-260,-149},{-260,
-          211},{-82,211}},      color={0,0,127}));
+  connect(entGenTem.T, dryCooHexCon.TGenIn) annotation (Line(points={{-260,-149},
+          {-260,211},{-82,211}}, color={0,0,127}));
   connect(dryCoo.port_b, dryCooOut.port_a)
     annotation (Line(points={{60,130},{120,130}}, color={0,127,255},
       thickness=0.5));
@@ -646,10 +652,6 @@ equation
       points={{200,-150},{200,-110}},
       color={0,127,255},
       thickness=0.5));
-  connect(jun3.port_2, port_b) annotation (Line(
-      points={{210,-160},{280,-160},{280,0},{300,0}},
-      color={0,127,255},
-      thickness=0.5));
   connect(jun5.port_3, pumDryCoo1.port_a)
     annotation (Line(points={{-20,80},{-20,30}}, color={0,127,255},
       thickness=0.5));
@@ -709,6 +711,14 @@ equation
       thickness=0.5));
   connect(jun8.port_2, jun6.port_3) annotation (Line(
       points={{110,60},{-90,60}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(jun3.port_2, leaGenTem.port_a) annotation (Line(
+      points={{210,-160},{242,-160}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(leaGenTem.port_b, port_b) annotation (Line(
+      points={{262,-160},{280,-160},{280,0},{300,0}},
       color={0,127,255},
       thickness=0.5));
   annotation (defaultComponentName="gen",
