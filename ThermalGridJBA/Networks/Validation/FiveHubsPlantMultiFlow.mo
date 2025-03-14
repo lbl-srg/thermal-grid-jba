@@ -42,7 +42,7 @@ model FiveHubsPlantMultiFlow
   parameter Real dpPlaHex_nominal(unit="Pa")=10000
     "Pressure difference across heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
-  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.3
+  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.75
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
@@ -63,14 +63,14 @@ model FiveHubsPlantMultiFlow
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   // Central plant: heat pumps
-  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=0.05*mPlaWat_flow_nominal
+  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=0.1*mPlaWat_flow_nominal
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.3
+  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*07.5
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=0.5*mPlaWat_flow_nominal*
-    4186*TApp
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186
+    *TApp
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConHea_nominal(unit="K")=datDis.TLooMin + TApp
@@ -101,7 +101,7 @@ model FiveHubsPlantMultiFlow
   parameter Real TCooSet(unit="K")=datDis.TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=datDis.TLooMin
+  parameter Real THeaSet(unit="K")=datDis.TLooMax
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
@@ -127,7 +127,7 @@ model FiveHubsPlantMultiFlow
   inner replaceable parameter ThermalGridJBA.Data.Districts.FiveHubs datDis(
     mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
     "Parameters for the district network"
-    annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
+    annotation (Placement(transformation(extent={{-380,180},{-360,200}})));
 
   Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 1](
     lPip=datDis.lDis,
@@ -273,9 +273,8 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(final k=datDis.mPumDis_flow_nominal)
     "District pump speed"
     annotation (Placement(transformation(extent={{0,-170},{20,-150}})));
-  Buildings.BoundaryConditions.WeatherData.ReaderTMY3 weaDat(filNam=
-        ModelicaServices.ExternalReferences.loadResource("modelica://ThermalGridJBA/Resources/Data/BoundaryConditions/USA_MD_Andrews.AFB.745940_TMY3.mos"),
-      computeWetBulbTemperature=true)  "Weather data reader"
+  BoundaryConditions.WeatherDataTMY3 weaDat[nBui](computeWetBulbTemperature=
+        fill(true, nBui)) "Weather data reader"
     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
   Buildings.BoundaryConditions.WeatherData.Bus weaBus annotation (Placement(
         transformation(extent={{-320,-40},{-280,0}}), iconTransformation(extent
@@ -304,9 +303,11 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiSum EPumPla(nin=5)
     "Plant pumps electricity energy"
     annotation (Placement(transformation(extent={{240,60},{260,80}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiMax mulMax(nin=nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiMax mulMax(nin=nBui, y(unit="K",
+        displayUnit="degC"))
     annotation (Placement(transformation(extent={{-300,-150},{-280,-130}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiMin mulMin(nin=nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiMin mulMin(nin=nBui, y(unit="K",
+        displayUnit="degC"))
     annotation (Placement(transformation(extent={{-300,-190},{-280,-170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum mulSum(nin=nBui)
     annotation (Placement(transformation(extent={{-300,50},{-280,70}})));
@@ -392,7 +393,7 @@ equation
       index=-1,
       extent={{-6,3},{-6,3}},
       horizontalAlignment=TextAlignment.Right));
-  connect(weaDat.weaBus, weaBus) annotation (Line(
+  connect(weaDat[1].weaBus, weaBus) annotation (Line(
       points={{-360,-20},{-300,-20}},
       color={255,204,51},
       thickness=0.5));
@@ -440,6 +441,10 @@ equation
           -7},{-112,-7},{-112,10},{178,10}}, color={0,0,127}));
   connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-138,-9},{-120,
           -9},{-120,-30},{178,-30}}, color={0,0,127}));
+  connect(weaDat.weaBus, bui.weaBus) annotation (Line(
+      points={{-360,-20},{-340,-20},{-340,250},{0,250}},
+      color={255,204,51},
+      thickness=0.5));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
