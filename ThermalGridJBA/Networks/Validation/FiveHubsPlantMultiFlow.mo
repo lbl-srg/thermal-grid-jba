@@ -452,9 +452,10 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      Interval=3600.00288,
+      StopTime=31536000,
+      Interval=3600,
       Tolerance=1e-06,
-      __Dymola_Algorithm="Cvode"),
+      __Dymola_Algorithm="Radau"),
     Documentation(info="<html>
 <p>
 Adapted from
