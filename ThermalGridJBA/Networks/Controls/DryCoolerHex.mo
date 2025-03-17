@@ -279,7 +279,7 @@ model DryCoolerHex
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(
     final k=mDryCoo_flow_nominal)
     "Convert to the mass flow rate"
-    annotation (Placement(transformation(extent={{282,110},{302,130}})));
+    annotation (Placement(transformation(extent={{280,110},{300,130}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(
     final k=mHexGly_flow_nominal)
     "Convert to the mass flow rate"
@@ -466,9 +466,9 @@ equation
   connect(hexPumByaVal.y, yValHexByp)
     annotation (Line(points={{262,300},{340,300}}, color={0,0,127}));
   connect(dryCooPum.y, gai1.u)
-    annotation (Line(points={{262,120},{280,120}}, color={0,0,127}));
+    annotation (Line(points={{262,120},{278,120}}, color={0,0,127}));
   connect(gai1.y, yPumDryCoo)
-    annotation (Line(points={{304,120},{340,120}}, color={0,0,127}));
+    annotation (Line(points={{302,120},{340,120}}, color={0,0,127}));
   connect(hexPumVal.y, gai2.u)
     annotation (Line(points={{262,220},{278,220}}, color={0,0,127}));
   connect(gai2.y, yPumHex)
