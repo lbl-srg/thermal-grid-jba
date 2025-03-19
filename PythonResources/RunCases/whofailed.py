@@ -11,47 +11,67 @@ import re
 
 from collections import Counter
 
-def extract_warnings(filepath):
+def extract_messages(filepath):
     """
     Extracts warning messages from dslog.txt.
     """
+    messages = []
+    block = {}
+    started = False
+    iswarning = False
+    iserror = False
+    patternerror = r'  In (.*?):'
     
-    def reset_dict():
+    def closeoff():
         """
-        Resets values of the warning dict
-        """
-        r = {'warning' : "",
-             'time' : -99.0,
-             'tag' : ""
-             }
-        return r
-    
-    warnings = []
-    started = False # Flag to track if "Integration started" has been found
+        Closes off 
 
+        """
+        
+    
     try:
         with open(filepath, 'r') as f:
             for line in f:
                 if (not started) and ("Integration started" in line):
                     started = True
-                    block = reset_dict()
 
                 if started:
-                    # sequence of if blocks are reverse of how they would appear in the file
-                    if block['time'] > -98.0: # if time already saved
-                        block['tag'] = line.split(':',1)[1].strip()
-                        warnings.append(block)
-                        block = reset_dict()
-                    if block['warning']: # if warning message already saved
-                        block['time'] = float(line.split(':',1)[1].strip())
-                    if "Warning: " in line: # detect the warning message
-                        block['warning'] = line.split(':',1)[1].strip()
+                    if "Warning:" in line: # detect the warning message
+                        block['type'] = 'warning'
+                        iswarning = True
+                        # warning messages have the sequence:
+                        #   type, message; time; tag
+                        block['message'] = line.split(':')[1].strip()
+                    if "Error:" in line: # detect the error message
+                        block['type'] = 'error'
+                        iserror = True
+                        # error messages have the sequence:
+                        #   type, time; var; message (multiline); condition
+                        block['time'] = block['time'] = float(line.split(':')[2].strip())
+                    
+                    if iswarning:
+                        if 'Time:' in line:
+                            block['time'] = float(line.split(':')[1].strip())
+                        if 'Tag:' in line:
+                            block['tag'] = line.split(':')[1].strip()
+                            messages.append(block)
+                            block = {}
+                            iswarning = False
+                    if iserror:
+                        match = re.search(patternerror, line)
+                        if match:
+                            block['var'] = match.group(1)
+                        if 'Failed condition:' in line:
+                            block['failed condition'] = line.split(':')[1].strip()
+                            messages.append(block)
+                            block = {}
+                            iserror = False
 
     except FileNotFoundError:
         print(f"Error: File not found at {filepath}")
         return []
 
-    return warnings
+    return messages
 
 def find_nonlinear(filepath, tags):
     """
@@ -100,12 +120,14 @@ FILE_DSLOG = "whofailed/dslog.txt"
 FILE_DSMODELC = "whofailed/dsmodel.c"
 
 #%% process dslog.txt to find the nonlinear system tags
-warnings = extract_warnings(FILE_DSLOG)
-tag_counts = dict(Counter(item['tag'] for item in warnings))
+messages = extract_messages(FILE_DSLOG)
+tag_counts = dict(Counter(item['tag'] for item in [item for item in messages if item.get('type') == 'warning']))
+var_counts = dict(Counter(item['var'] for item in [item for item in messages if item.get('type') == 'error']))
+print(var_counts)
 
 #%% process dsmodel.c to find the variables involved in the nonlinear systems
 blocks = find_nonlinear(FILE_DSMODELC, list(tag_counts.keys()))
 blocks = [{**block, 'occurrence': tag_counts[block['tag']]} for block in blocks]
-print(json.dumps(blocks, indent = 4))
+#print(json.dumps(blocks, indent = 4))
 
 
