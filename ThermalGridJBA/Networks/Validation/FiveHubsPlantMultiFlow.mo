@@ -273,7 +273,7 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(final k=datDis.mPumDis_flow_nominal)
     "District pump speed"
     annotation (Placement(transformation(extent={{0,-170},{20,-150}})));
-  BoundaryConditions.WeatherDataTMY3 weaDat[nBui](computeWetBulbTemperature=
+  BoundaryConditions.WeatherDataFTMY weaDat[nBui](computeWetBulbTemperature=
         fill(true, nBui)) "Weather data reader"
     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
   Buildings.BoundaryConditions.WeatherData.Bus weaBus annotation (Placement(
