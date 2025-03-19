@@ -667,7 +667,8 @@ each related equipment when the heat pump is enabled.
 </tr>
 </table>
 <p>
-Note that if the heat pump operates below 20% of the full compressor speed,
+Note that if the heat pump operates below the minimum speed 20%(<code>minComSpe</code>,
+adjustable) for 2 minutes (<code>del</code>, adjustable),
 switch it off, and keep it off for 12 hours (<code>offTim</code>, adjustable)
 </p>
 </html>", revisions="<html>
