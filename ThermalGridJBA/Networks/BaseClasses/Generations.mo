@@ -440,8 +440,6 @@ model Generations
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{190,-150},{210,-170}})));
   Buildings.Fluid.HeatPumps.ModularReversible.Modular heaPum(
-    allowFlowReversal1=false,
-    allowFlowReversal2=false,
     redeclare final package MediumCon = MediumW,
     redeclare final package MediumEva = MediumG,
     use_rev=true,
@@ -682,18 +680,18 @@ equation
           {-70,130},{-70,90.4},{-78,90.4}}, color={0,127,255}));
   connect(hex.port_b1, delRet.ports[2]) annotation (Line(points={{-80,-44},{-78,
           -44},{-78,91.2},{-78,91.2}}, color={0,127,255}));
-  connect(heaPum.port_b2, delRet.ports[3]) annotation (Line(points={{140,-24},{
-          120,-24},{120,92},{-78,92}}, color={0,127,255}));
+  connect(heaPum.port_b2, delRet.ports[3]) annotation (Line(points={{140,-24},{120,
+          -24},{120,92},{-78,92}}, color={0,127,255}));
   connect(delSup.ports[1], delRet.ports[4]) annotation (Line(points={{206,93.5},
           {64,93.5},{64,92.8},{-78,92.8}}, color={0,127,255}));
-  connect(valHeaPumByp.port_1, delSup.ports[2]) annotation (Line(points={{200,
-          70},{202,70},{202,92.5},{206,92.5}}, color={0,127,255}));
+  connect(valHeaPumByp.port_1, delSup.ports[2]) annotation (Line(points={{200,70},
+          {202,70},{202,92.5},{206,92.5}}, color={0,127,255}));
   connect(pumDryCoo1.port_a, delSup.ports[3]) annotation (Line(points={{-20,30},
           {-20,91.5},{206,91.5}}, color={0,127,255}));
   connect(dryCooOut.port_b, delSup.ports[4]) annotation (Line(points={{140,130},
           {200,130},{200,90},{204,90},{204,90.5},{206,90.5}}, color={0,127,255}));
-  connect(valHeaPumByp.port_3, delRet.ports[5]) annotation (Line(points={{190,
-          60},{120,60},{120,93.6},{-78,93.6}}, color={0,127,255}));
+  connect(valHeaPumByp.port_3, delRet.ports[5]) annotation (Line(points={{190,60},
+          {120,60},{120,93.6},{-78,93.6}}, color={0,127,255}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={
