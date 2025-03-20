@@ -233,6 +233,7 @@ model Generations
       iconTransformation(extent={{90,-10},{110,10}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPla(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     addPowerToMedium=false,
     use_riseTime=false,
     m_flow_nominal=mWat_flow_nominal,
@@ -240,12 +241,14 @@ model Generations
     annotation (Placement(transformation(extent={{-170,-170},{-150,-150}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHexByp(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
     use_strokeTime=false)  "Bypass heat exchanger valve"
     annotation (Placement(transformation(extent={{-70,-170},{-50,-150}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHex(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
     use_strokeTime=false)
@@ -253,6 +256,8 @@ model Generations
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={-100,-100})));
   Buildings.Fluid.HeatExchangers.ConstantEffectiveness hex(
+    allowFlowReversal1=false,
+    allowFlowReversal2=false,
     redeclare final package Medium1 = MediumG,
     redeclare final package Medium2 = MediumW,
     final m1_flow_nominal=mHexGly_flow_nominal,
@@ -264,6 +269,7 @@ model Generations
     annotation (Placement(transformation(extent={{-60,-60},{-80,-40}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHeaPum(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
     use_strokeTime=false)
@@ -272,6 +278,7 @@ model Generations
         rotation=90, origin={120,-120})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumWat(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=false,
     final m_flow_nominal=mWat_flow_nominal,
@@ -281,6 +288,7 @@ model Generations
         rotation=90, origin={120,-80})));
   Buildings.Fluid.HeatExchangers.CoolingTowers.Merkel   dryCoo(
     redeclare final package Medium = MediumG,
+    allowFlowReversal=false,
     final m_flow_nominal=mDryCoo_flow_nominal,
     final dp_nominal=dpDryCoo_nominal,
     TWatIn_nominal=273.15 + 30.55,
@@ -289,6 +297,7 @@ model Generations
     annotation (Placement(transformation(extent={{40,120},{60,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo(
     redeclare final package Medium = MediumG,
+    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=false,
     final m_flow_nominal=mDryCoo_flow_nominal,
@@ -297,6 +306,7 @@ model Generations
     annotation (Placement(transformation(extent={{-60,120},{-40,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumGly(
     redeclare final package Medium = MediumG,
+    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=false,
     final m_flow_nominal=mHpGly_flow_nominal,
@@ -313,17 +323,21 @@ model Generations
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={200,60})));
   Buildings.Fluid.Sensors.TemperatureTwoPort entGenTem(redeclare final package
-      Medium = MediumW, final m_flow_nominal=mWat_flow_nominal)
+      Medium = MediumW,
+    allowFlowReversal=false,
+                        final m_flow_nominal=mWat_flow_nominal)
     "Temperature of waterflow entering the generation module"
     annotation (Placement(transformation(extent={{-270,-170},{-250,-150}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort heaPumLea(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     final m_flow_nominal=mWat_flow_nominal)
     "Temperature of waterflow leave heat pump"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=-90, origin={200,-100})));
   Buildings.Fluid.Sensors.TemperatureTwoPort heaPumGlyIn(
     redeclare final package Medium = MediumG,
+    allowFlowReversal=false,
     final m_flow_nominal=mHpGly_flow_nominal)
     "Temperature of glycol entering heat pump"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -374,12 +388,14 @@ model Generations
     annotation (Placement(transformation(extent={{-180,160},{-160,180}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort dryCooOut(
     redeclare final package Medium = MediumG,
+    allowFlowReversal=false,
     final m_flow_nominal=mDryCoo_flow_nominal)
     "Temperature of dry cooler outlet"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=0, origin={130,130})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo1(
     redeclare final package Medium = MediumG,
+    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=false,
     final m_flow_nominal=mHexGly_flow_nominal,
@@ -393,25 +409,39 @@ model Generations
     annotation (Placement(transformation(extent={{-200,10},{-180,30}})));
   Buildings.Fluid.FixedResistances.Junction jun(
     redeclare final package Medium = MediumW,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{-110,-150},{-90,-170}})));
   Buildings.Fluid.FixedResistances.Junction jun1(
     redeclare final package Medium = MediumW,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{-30,-150},{-10,-170}})));
   Buildings.Fluid.FixedResistances.Junction jun2(
     redeclare final package Medium = MediumW,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{110,-150},{130,-170}})));
   Buildings.Fluid.FixedResistances.Junction jun3(
     redeclare final package Medium = MediumW,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{190,-150},{210,-170}})));
   Buildings.Fluid.HeatPumps.ModularReversible.Modular heaPum(
+    allowFlowReversal1=false,
+    allowFlowReversal2=false,
     redeclare final package MediumCon = MediumW,
     redeclare final package MediumEva = MediumG,
     use_rev=true,
@@ -451,7 +481,9 @@ model Generations
     annotation (Placement(transformation(extent={{140,-20},{160,-40}})));
 
   Buildings.Fluid.Sensors.TemperatureTwoPort leaGenTem(redeclare final package
-      Medium = MediumW, final m_flow_nominal=mWat_flow_nominal)
+      Medium = MediumW,
+    allowFlowReversal=false,
+                        final m_flow_nominal=mWat_flow_nominal)
     "Temperature of waterflow leave the generation module" annotation (
       Placement(transformation(
         extent={{-10,-10},{10,10}},
