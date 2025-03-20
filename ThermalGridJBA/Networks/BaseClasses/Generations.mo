@@ -411,19 +411,6 @@ model Generations
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{190,-150},{210,-170}})));
-  Buildings.Fluid.FixedResistances.Junction jun4(
-    redeclare final package Medium = MediumG,
-    m_flow_nominal={mDryCoo_flow_nominal,-mDryCoo_flow_nominal,-mHpGly_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{-10,10},{10,-10}},
-        rotation=180, origin={200,90})));
-  Buildings.Fluid.FixedResistances.Junction jun5(
-    redeclare final package Medium = MediumG,
-    m_flow_nominal={mDryCoo_flow_nominal,-mDryCoo_flow_nominal,-
-        mHexGly_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{-10,10},{10,-10}},
-        rotation=180, origin={-20,90})));
   Buildings.Fluid.HeatPumps.ModularReversible.Modular heaPum(
     redeclare final package MediumCon = MediumW,
     redeclare final package MediumEva = MediumG,
@@ -463,27 +450,6 @@ model Generations
     "Reversible heat pump"
     annotation (Placement(transformation(extent={{140,-20},{160,-40}})));
 
-  Buildings.Fluid.FixedResistances.Junction jun6(
-    redeclare final package Medium = MediumG,
-    m_flow_nominal={mHexGly_flow_nominal,-mDryCoo_flow_nominal,
-        mHpGly_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{10,10},{-10,-10}},
-        rotation=-90, origin={-100,60})));
-  Buildings.Fluid.FixedResistances.Junction jun7(
-    redeclare final package Medium = MediumG,
-    m_flow_nominal={mDryCoo_flow_nominal,-mDryCoo_flow_nominal,
-        mDryCoo_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{10,10},{-10,-10}},
-        rotation=-90, origin={-100,90})));
-  Buildings.Fluid.FixedResistances.Junction jun8(
-    redeclare final package Medium = MediumG,
-    m_flow_nominal={-mHpGly_flow_nominal,-mHpGly_flow_nominal,
-        mHpGly_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{-10,10},{10,-10}},
-        rotation=180, origin={120,60})));
   Buildings.Fluid.Sensors.TemperatureTwoPort leaGenTem(redeclare final package
       Medium = MediumW, final m_flow_nominal=mWat_flow_nominal)
     "Temperature of waterflow leave the generation module" annotation (
@@ -491,6 +457,24 @@ model Generations
         extent={{-10,-10},{10,10}},
         rotation=0,
         origin={252,-160})));
+  Buildings.Fluid.Delays.DelayFirstOrder delRet(
+    redeclare package Medium = MediumG,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    m_flow_nominal=mDryCoo_flow_nominal,
+    nPorts=5) "Control volume to mix all returns" annotation (Placement(
+        transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=90,
+        origin={-88,92})));
+  Buildings.Fluid.Delays.DelayFirstOrder delSup(
+    redeclare package Medium = MediumG,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    m_flow_nominal=mDryCoo_flow_nominal,
+    nPorts=4) "Control volume for all supplies" annotation (Placement(
+        transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=270,
+        origin={216,92})));
 equation
   connect(valHex.port_b, hex.port_a2) annotation (Line(
       points={{-100,-90},{-100,-56},{-80,-56}},
@@ -636,21 +620,6 @@ equation
       points={{200,-150},{200,-110}},
       color={0,127,255},
       thickness=0.5));
-  connect(jun5.port_3, pumDryCoo1.port_a)
-    annotation (Line(points={{-20,80},{-20,30}}, color={0,127,255},
-      thickness=0.5));
-  connect(dryCooOut.port_b, jun4.port_1) annotation (Line(
-      points={{140,130},{220,130},{220,90},{210,90}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(jun4.port_2, jun5.port_1) annotation (Line(
-      points={{190,90},{-10,90}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(jun4.port_3, valHeaPumByp.port_1) annotation (Line(
-      points={{200,80},{200,70}},
-      color={0,127,255},
-      thickness=0.5));
   connect(pumHeaPumWat.port_b, heaPum.port_a1) annotation (Line(
       points={{120,-70},{120,-36},{140,-36}},
       color={0,127,255},
@@ -669,34 +638,6 @@ equation
           {92,-31.9},{138.9,-31.9}}, color={0,0,127}));
   connect(heaPum.P, PCom)
     annotation (Line(points={{161,-30},{320,-30}}, color={0,0,127}));
-  connect(jun6.port_1, hex.port_b1) annotation (Line(
-      points={{-100,50},{-100,-44},{-80,-44}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(jun6.port_2, jun7.port_1) annotation (Line(
-      points={{-100,70},{-100,80}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(jun7.port_2, pumDryCoo.port_a) annotation (Line(
-      points={{-100,100},{-100,130},{-60,130}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(jun5.port_2, jun7.port_3) annotation (Line(
-      points={{-30,90},{-90,90}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(heaPum.port_b2, jun8.port_3) annotation (Line(
-      points={{140,-24},{120,-24},{120,50}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(jun8.port_1, valHeaPumByp.port_3) annotation (Line(
-      points={{130,60},{190,60}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(jun8.port_2, jun6.port_3) annotation (Line(
-      points={{110,60},{-90,60}},
-      color={0,127,255},
-      thickness=0.5));
   connect(jun3.port_2, leaGenTem.port_a) annotation (Line(
       points={{210,-160},{242,-160}},
       color={0,127,255},
@@ -705,6 +646,22 @@ equation
       points={{262,-160},{280,-160},{280,0},{300,0}},
       color={0,127,255},
       thickness=0.5));
+  connect(pumDryCoo.port_a, delRet.ports[1]) annotation (Line(points={{-60,130},
+          {-70,130},{-70,90.4},{-78,90.4}}, color={0,127,255}));
+  connect(hex.port_b1, delRet.ports[2]) annotation (Line(points={{-80,-44},{-78,
+          -44},{-78,91.2},{-78,91.2}}, color={0,127,255}));
+  connect(heaPum.port_b2, delRet.ports[3]) annotation (Line(points={{140,-24},{
+          120,-24},{120,92},{-78,92}}, color={0,127,255}));
+  connect(delSup.ports[1], delRet.ports[4]) annotation (Line(points={{206,93.5},
+          {64,93.5},{64,92.8},{-78,92.8}}, color={0,127,255}));
+  connect(valHeaPumByp.port_1, delSup.ports[2]) annotation (Line(points={{200,
+          70},{202,70},{202,92.5},{206,92.5}}, color={0,127,255}));
+  connect(pumDryCoo1.port_a, delSup.ports[3]) annotation (Line(points={{-20,30},
+          {-20,91.5},{206,91.5}}, color={0,127,255}));
+  connect(dryCooOut.port_b, delSup.ports[4]) annotation (Line(points={{140,130},
+          {200,130},{200,90},{204,90},{204,90.5},{206,90.5}}, color={0,127,255}));
+  connect(valHeaPumByp.port_3, delRet.ports[5]) annotation (Line(points={{190,
+          60},{120,60},{120,93.6},{-78,93.6}}, color={0,127,255}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={
