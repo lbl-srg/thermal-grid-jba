@@ -1,5 +1,6 @@
 # Ignore Dymola output, log and temporary files (in alphabetical order)
 #######################################################################
+Modelica.Math.Matrices.LAPACK.dgelsy_vec
 *.bak-mo
 *.mat
 *.mof
