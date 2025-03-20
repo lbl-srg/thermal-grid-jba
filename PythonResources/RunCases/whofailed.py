@@ -4,6 +4,9 @@
 Created on Tue Mar 18 13:42:35 2025
 
 @author: casper
+
+Todo:
+    - Support "Warning: accepted imprecise solution", time & tag format different
 """
 
 import json
@@ -23,7 +26,7 @@ def extract_messages(filepath):
     # iserror = False
     # patternerror = r'  In (.*?):'
     buffer = ""
-    starters = ['Warning:', 'Error:', 'Simulation terminated']
+    starters = ['Warning:', 'Error:', 'Integration terminated']
     patterns = {
         'time' : r'Time:\s*([\d.]+)',
         'tag'  : r'Tag: (.*?)\n',
@@ -156,6 +159,6 @@ print(var_counts)
 #%% process dsmodel.c to find the variables involved in the nonlinear systems
 blocks = find_nonlinear(FILE_DSMODELC, list(tag_counts.keys()))
 blocks = [{**block, 'occurrence': tag_counts[block['tag']]} for block in blocks]
-#print(json.dumps(blocks, indent = 4))
+print(json.dumps(blocks, indent = 4))
 
 
