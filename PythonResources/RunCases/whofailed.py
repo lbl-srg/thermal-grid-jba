@@ -19,21 +19,26 @@ def extract_messages(filepath):
     Extracts warning messages from dslog.txt.
     """
     messages = []
-    # block = {}
     msg = {}
     started = False
-    # iswarning = False
-    # iserror = False
-    # patternerror = r'  In (.*?):'
     buffer = ""
-    starters = ['Warning:', 'Error:', 'Integration terminated']
+    patternmsg = r'^[A-Z].*:.*$' # pattern that starts a msg
     patterns = {
-        'time' : r'Time:\s*([\d.]+)',
-        'tag'  : r'Tag: (.*?)\n',
-        'var'  : r'In (.*?):'
-        }
-        # strings that start a new msg
-            
+        'warning1' : re.compile(
+                        r"Warning: Failed to solve nonlinear system using Newton solver\.\n"
+                        r"\s*Time:\s*(\d+\.\d+)\n"
+                        r"\s*Tag:\s*(\S+)"
+                        ),
+        'warning2' : re.compile(
+                        r"Warning: Nonlinear solver accepted imprecise solution \(within integrator tolerance\) when solving\n"
+                        r"\s*Tag:\s*(\S+)\s+during event iteration at time\s*(\d+)\."
+                        ),
+        'error'    : re.compile(
+                        r"Error: The following error was detected at time:\s*(?P<time>\d+\.\d+).*?\n\s*In\s+(?P<var>\S+):",
+                        re.DOTALL
+                        )
+            }
+        
     try:
         with open(filepath, 'r') as f:
             for line in f:
@@ -41,61 +46,41 @@ def extract_messages(filepath):
                     started = True
 
                 if started:
-                    if any(elem in line for elem in starters):
-                        # Whenever the trigger string appears,
-                        #   close up the current msg from buffer
-                        if any(elem in buffer for elem in starters):
-                            msg['type'] = buffer.split(':')[0].strip()
-                            match = re.search(patterns['time'], buffer, re.IGNORECASE)
-                            if match:
-                                msg['time'] = float(match.group(1))
-                            match = re.search(patterns['tag'], buffer)
-                            if match:
-                                msg['tag'] = match.group(1)
-                            match = re.search(patterns['var'], buffer)
-                            if match:
-                                msg['var'] = match.group(1)
-                            if (msg['type'] == 'Warning') and (not all(elem in msg.keys() for elem in ['time', 'tag'])):
-                                msg['type'] = 'Warning-nonstandard'
-                            if (msg['type'] == 'Error') and (not all(elem in msg.keys() for elem in ['time', 'var'])):
-                                msg['type'] = 'Error-nonstandard'
+                        
+                    match = re.match(patternmsg, line)
+                    if match:
+                        match = patterns['warning1'].search(buffer)
+                        if match:
+                            msg = {
+                                'type' : 'Warning',
+                                'time' : match.groups()[0],
+                                'tag'  : match.groups()[1]
+                                }
+                        match = patterns['warning2'].search(buffer)
+                        if match:
+                            msg = {
+                                'type' : 'Warning',
+                                'time' : match.groups()[1],
+                                'tag'  : match.groups()[0]
+                                }
+                        match = patterns['error'].search(buffer)
+                        if match:
+                            msg = {
+                                'type' : 'Error',
+                                'time' : match.group('time'),
+                                'var'  : match.group('var')
+                                }
+                        if not msg:
+                            msg = {
+                                'type' : 'Unaccounted',
+                                'msg'  : buffer
+                                }
+                        if buffer and (not "Integration started" in buffer):
                             messages.append(msg)
+                    
                         msg = {}
                         buffer = ""
-                    buffer += line                    
-                    
-                    # if "Warning:" in line: # detect the warning message
-                    #     block['type'] = 'warning'
-                    #     iswarning = True
-                        
-                    #     # warning messages have the sequence:
-                    #     #   type, message; time; tag
-                    #     #block['message'] = line.split(':')[1].strip()
-                        
-                    # if "Error:" in line: # detect the error message
-                    #     block['type'] = 'error'
-                    #     iserror = True
-                    #     # error messages have the sequence:
-                    #     #   type, time; var; message (multiline); condition
-                    #     block['time'] = block['time'] = float(line.split(':')[2].strip())
-                    
-                    # if iswarning:
-                    #     if 'Time:' in line:
-                    #         block['time'] = float(line.split(':')[1].strip())
-                    #     if 'Tag:' in line:
-                    #         block['tag'] = line.split(':')[1].strip()
-                    #         messages.append(block)
-                    #         block = {}
-                    #         iswarning = False
-                    # if iserror:
-                    #     match = re.search(patternerror, line)
-                    #     if match:
-                    #         block['var'] = match.group(1)
-                    #     if 'Failed condition:' in line:
-                    #         block['failed condition'] = line.split(':')[1].strip()
-                    #         messages.append(block)
-                    #         block = {}
-                    #         iserror = False
+                    buffer += line
 
     except FileNotFoundError:
         print(f"Error: File not found at {filepath}")
@@ -159,6 +144,6 @@ print(var_counts)
 #%% process dsmodel.c to find the variables involved in the nonlinear systems
 blocks = find_nonlinear(FILE_DSMODELC, list(tag_counts.keys()))
 blocks = [{**block, 'occurrence': tag_counts[block['tag']]} for block in blocks]
-print(json.dumps(blocks, indent = 4))
+#print(json.dumps(blocks, indent = 4))
 
 
