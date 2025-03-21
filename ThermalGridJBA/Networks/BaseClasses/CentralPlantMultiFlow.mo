@@ -264,21 +264,25 @@ model CentralPlantMultiFlow
     annotation (Placement(transformation(extent={{60,40},{80,60}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMul(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     k=1/nGenMod)
     "Split mass flow to single generation module"
     annotation (Placement(transformation(extent={{-220,-10},{-200,10}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMul1(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     k=nGenMod)
     "Sum the mass flow from single generation module to total flow"
     annotation (Placement(transformation(extent={{-100,-10},{-80,10}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMul2(
     redeclare final package Medium = MediumW,
+    allowFlowReversal=false,
     k=3/33)
     "Split total flow"
     annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del3(
     redeclare final package Medium = MediumW,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final m_flow_nominal=nGenMod*mWat_flow_nominal,
     nPorts=2*nZon*3+1)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
@@ -301,10 +305,12 @@ model CentralPlantMultiFlow
     annotation (Placement(transformation(extent={{60,-60},{80,-40}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier massFlowRateMultiplier3[2*nZon](
     redeclare each final package Medium = MediumW,
+    each allowFlowReversal=false,
     k=fill(31, 2*nZon))
     annotation (Placement(transformation(extent={{100,-10},{120,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del1(
     redeclare final package Medium = MediumW,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final m_flow_nominal=nGenMod*mWat_flow_nominal,
     nPorts=2*nZon*3+1)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
@@ -324,14 +330,18 @@ model CentralPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai6(k=nGenMod)
     annotation (Placement(transformation(extent={{-100,-180},{-80,-160}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort leaBorTem(redeclare final package
-      Medium = MediumW, final m_flow_nominal=nGenMod*mWat_flow_nominal)
+      Medium = MediumW,
+    allowFlowReversal=false,
+                        final m_flow_nominal=nGenMod*mWat_flow_nominal)
     "Temperature of waterflow leaving borefield"           annotation (
       Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=0,
         origin={210,0})));
   Buildings.Fluid.Sensors.TemperatureTwoPort entBorTem(redeclare final package
-      Medium = MediumW, final m_flow_nominal=nGenMod*mWat_flow_nominal)
+      Medium = MediumW,
+    allowFlowReversal=false,
+                        final m_flow_nominal=nGenMod*mWat_flow_nominal)
     "Temperature of waterflow entering borefield" annotation (Placement(
         transformation(
         extent={{-10,-10},{10,10}},
