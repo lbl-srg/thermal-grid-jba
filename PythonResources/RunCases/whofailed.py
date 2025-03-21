@@ -144,16 +144,33 @@ def find_nonlinear(filepath, tags):
 FILE_DSLOG = "whofailed/dslog.txt"
 FILE_DSMODELC = "whofailed/dsmodel.c"
 
+# dslog.txt
+PRINT_WARNING_TAGS = True
+PRINT_ERROR_VARS = True
+PRINT_UNACCOUNTED = True
+
+# dsmodel.c
+PRINT_WARNING_BLOCKS = False
+
 #%% process dslog.txt to find the nonlinear system tags
 messages = extract_messages(FILE_DSLOG)
 tag_counts = dict(Counter(item['tag'] for item in [item for item in messages if item.get('type') == 'Warning']))
 var_counts = dict(Counter(item['var'] for item in [item for item in messages if item.get('type') == 'Error']))
-print(tag_counts)
-print(var_counts)
+
+if PRINT_WARNING_TAGS:
+    print("*** Tags in warnings ***")
+    print(json.dumps(tag_counts, indent = 4))
+if PRINT_ERROR_VARS:
+    print("*** Vars in errors ***")
+    print(json.dumps(var_counts, indent = 4))
+if PRINT_UNACCOUNTED:
+    print("*** The following messages are not accounted for ***")
+    for msg in (m['msg'] for m in messages if m['type'] == 'Unaccounted'):
+        print(msg)
 
 #%% process dsmodel.c to find the variables involved in the nonlinear systems
 blocks = find_nonlinear(FILE_DSMODELC, list(tag_counts.keys()))
 blocks = [{**block, 'occurrence': tag_counts[block['tag']]} for block in blocks]
-#print(json.dumps(blocks, indent = 4))
-
-
+if PRINT_WARNING_BLOCKS:
+    print("*** Blocks in warnings ***")
+    print(json.dumps(blocks, indent = 4))
