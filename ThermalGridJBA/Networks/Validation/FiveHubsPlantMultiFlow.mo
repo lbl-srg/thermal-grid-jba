@@ -13,7 +13,7 @@ model FiveHubsPlantMultiFlow
     "Pressure drop per pipe length at nominal flow rate - Distribution line";
   parameter Real dpCon_length_nominal(unit="Pa/m")=250
     "Pressure drop per pipe length at nominal flow rate - Connection line";
-  parameter Boolean allowFlowReversalSer = true
+  parameter Boolean allowFlowReversalSer = false
     "Set to true to allow flow reversal in the service lines"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
   parameter Boolean allowFlowReversalBui = false
@@ -155,7 +155,7 @@ model FiveHubsPlantMultiFlow
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumDis(
     redeclare final package Medium = Medium,
     final m_flow_nominal=datDis.mPumDis_flow_nominal,
-    final allowFlowReversal=allowFlowReversalSer,
+    allowFlowReversal=false,
     final dp_nominal=sum(dis.con.pipDis.res.dp_nominal) + dis.pipEnd.res.dp_nominal)
     "Distribution pump"
     annotation (Placement(transformation(
@@ -182,13 +182,17 @@ model FiveHubsPlantMultiFlow
         rotation=90,
         origin={-80,-10})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup(redeclare final package
-      Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
+      Medium = Medium,
+    allowFlowReversal=false,
+                       final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water supply temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,150})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet(redeclare final package
-      Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
+      Medium = Medium,
+    allowFlowReversal=false,
+                       final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water return temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
@@ -452,10 +456,10 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
-      Interval=3600.00288,
+      StopTime=3703608,
+      Interval=3600,
       Tolerance=1e-06,
-      __Dymola_Algorithm="Radau"),
+      __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
 <p>
 Adapted from
