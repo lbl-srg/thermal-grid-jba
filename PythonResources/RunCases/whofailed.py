@@ -6,7 +6,8 @@ Created on Tue Mar 18 13:42:35 2025
 @author: casper
 
 Todo:
-    - Support "Warning: accepted imprecise solution", time & tag format different
+    - Store specific warning & error messages.
+    - Other misc cases.
 """
 
 import json
@@ -36,6 +37,9 @@ def extract_messages(filepath):
         'error'    : re.compile(
                         r"Error: The following error was detected at time:\s*(?P<time>\d+\.\d+).*?\n\s*In\s+(?P<var>\S+):",
                         re.DOTALL
+                        ),
+        'sundials' : re.compile(
+                        r"SUNDIALS: CVODE CVode At t\s*=\s*([-+]?\d+(\.\d+)?([eE][-+]?\d+)?), mxstep steps taken before reaching tout."
                         )
             }
         
@@ -69,6 +73,12 @@ def extract_messages(filepath):
                                 'type' : 'Error',
                                 'time' : match.group('time'),
                                 'var'  : match.group('var')
+                                }
+                        match = patterns['sundials'].search(buffer)
+                        if match:
+                            msg = {
+                                'type' : 'SUNDIALS',
+                                'time' : match.group(1)
                                 }
                         if not msg:
                             msg = {
