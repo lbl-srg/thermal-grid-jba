@@ -42,7 +42,7 @@ model FiveHubsPlantMultiFlow
   parameter Real dpPlaHex_nominal(unit="Pa")=10000
     "Pressure difference across heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
-  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.75
+  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
@@ -66,7 +66,7 @@ model FiveHubsPlantMultiFlow
   parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=0.1*mPlaWat_flow_nominal
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*07.5
+  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186
@@ -79,7 +79,7 @@ model FiveHubsPlantMultiFlow
   parameter Real TPlaEvaHea_nominal(unit="K")=datDis.TLooMin
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-0.6*
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-1*
     QPlaHeaPumHea_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
@@ -456,8 +456,8 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=3703608,
-      Interval=3600,
+      StopTime=31536000,
+      Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
