@@ -47,7 +47,7 @@ record GenericDistrict "District network design parameters"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   parameter Real mPlaHexGly_flow_nominal(
     quantity="MassFlowRate",
-    unit="kg/s")=mPlaWat_flow_nominal*0.6
+    unit="kg/s")=mPlaWat_flow_nominal
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
@@ -75,12 +75,12 @@ record GenericDistrict "District network design parameters"
   // Central plant: heat pumps
   parameter Real mPlaHeaPumWat_flow_min(
     quantity="MassFlowRate",
-    unit="kg/s")=0.2*mPlaWat_flow_nominal
+    unit="kg/s")=0.1*mPlaWat_flow_nominal
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real mHpGly_flow_nominal(
     quantity="MassFlowRate",
-    unit="kg/s")=mPlaWat_flow_nominal*0.6
+    unit="kg/s")=mPlaWat_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumHea_flow_nominal(
@@ -100,7 +100,7 @@ record GenericDistrict "District network design parameters"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumCoo_flow_nominal(
     unit="W",
-    quantity="HeatFlowRate")=QPlaHeaPumHea_flow_nominal*0.6
+    quantity="HeatFlowRate")=QPlaHeaPumHea_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConCoo_nominal(
