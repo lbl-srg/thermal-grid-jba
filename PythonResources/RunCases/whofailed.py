@@ -148,33 +148,43 @@ def main(file_dslog="whofailed/dslog.txt",
          output_unaccounted=False, 
          output_warning_blocks=True):
     
-    output = ""
-    
     # process dslog.txt to find the nonlinear system tags
     messages = extract_messages(file_dslog)
     tag_counts = dict(Counter(item['tag'] for item in [item for item in messages if item.get('type') == 'Warning']))
     var_counts = dict(Counter(item['var'] for item in [item for item in messages if item.get('type') == 'Error']))
     
     if output_warning_tags:
-        output = "\n".join([output, "*** Tags in warnings ***",
-                            json.dumps(tag_counts, indent = 4)])
+        print("*** Tags in warnings ***")
+        if tag_counts:
+            print(json.dumps(tag_counts, indent = 4))
+        else:
+            print("  None")
     if output_error_vars:
-        output = "\n".join([output, "*** Vars in errors ***",
-                            json.dumps(var_counts, indent = 4)])
+        print("*** Vars in errors ***")
+        if var_counts:
+            print(json.dumps(var_counts, indent = 4))
+        else:
+            print("  None")
     if output_unaccounted:
-        output = "\n".join([output,
-                            "*** The following messages are not accounted for ***",
-                            ("="*10+"\n").join(m['msg'] for m in messages if m['type'] == 'Unaccounted')])
+        print("*** The following messages are not accounted for ***")
+        unaccounted = [m['msg'] for m in messages if m['type'] == 'Unaccounted']
+        if unaccounted:
+            print(("="*10+"\n").join(unaccounted))
+        else:
+            print("  None")
     
     # process dsmodel.c to find the variables involved in the nonlinear systems
     blocks = find_nonlinear(file_dsmodelc, list(tag_counts.keys()))
     blocks = [{**block, 'occurrence': tag_counts[block['tag']]} for block in blocks]
     if output_warning_blocks:
-        output = "\n".join([output, "*** Blocks in warnings ***", json.dumps(blocks, indent = 4)])
-    
-    return output
+        # output = "\n".join([output, "*** Blocks in warnings ***", json.dumps(blocks, indent = 4)])
+        print("*** Blocks in warnings ***")
+        if blocks:
+            print(json.dumps(blocks, indent = 4))
+        else:
+            print("  None")
+
 
 #%% Main process
 if __name__ == '__main__':
     output = main()
-    print(output)

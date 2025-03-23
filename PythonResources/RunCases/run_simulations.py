@@ -195,16 +195,16 @@ def check_logs(CHECK_LOG_FILES,
         print("Checking log files")
         directory = os.path.join(CWD, "simulations")
         for cas in cases:
+            print("="*5 + f" Case: {cas}")
             path_dslog = os.path.join(directory, cas, "dslog.txt")
             path_dsmodelc = os.path.join(directory, cas, "dsmodel.c")
-            output = whofailed.main(path_dslog,
-                                    path_dsmodelc,
-                                    output_warning_tags, 
-                                    output_error_vars, 
-                                    output_unaccounted, 
-                                    output_warning_blocks)
-            print("="*5 + f" Case: {cas}")
-            print(output)
+            whofailed.main(path_dslog,
+                           path_dsmodelc,
+                           output_warning_tags, 
+                           output_error_vars, 
+                           output_unaccounted, 
+                           output_warning_blocks)
+            
     
     else:
         print("="*30)
@@ -248,8 +248,8 @@ if __name__=='__main__':
     # Delete the checked out repository
     shutil.rmtree(lib_dir)
     
+    print("="*10 + "TEST SUMMARY" + "="*10)
     summarise_tests(success)
-    
     if CHECK_LOG_FILES.upper() in ['ALL', 'FAILED']:
         check_logs(CHECK_LOG_FILES, success)
     
