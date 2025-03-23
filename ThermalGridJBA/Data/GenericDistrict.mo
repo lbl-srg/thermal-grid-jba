@@ -25,7 +25,8 @@ record GenericDistrict "District network design parameters"
     "Length of each connection pipe (supply only, not counting return line)";
 
   // Central plant
-  parameter Integer nMod=1 "Total number of central plant modules"
+  parameter Integer nGenMod=4
+    "Total number of generation modules in central plant"
     annotation (Dialog(tab="Central plant"));
   parameter Real samplePeriod(
     unit="s")=7200
@@ -33,7 +34,7 @@ record GenericDistrict "District network design parameters"
     annotation (Dialog(tab="Central plant"));
   parameter Real mPlaWat_flow_nominal(
     quantity="MassFlowRate",
-    unit="kg/s")=sum(mCon_flow_nominal)/nMod
+    unit="kg/s")=sum(mCon_flow_nominal)/nGenMod
     "Nominal water mass flow rate to each module"
     annotation (Dialog(tab="Central plant"));
   parameter Real dpPlaValve_nominal(
@@ -90,27 +91,27 @@ record GenericDistrict "District network design parameters"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConHea_nominal(
     unit="K",
-    displayUnit="degC")=TLooMin
+    displayUnit="degC")=TLooMin + TApp
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaEvaHea_nominal(
     unit="K",
-    displayUnit="degC")=TLooMin + TApp
+    displayUnit="degC")=TLooMin
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumCoo_flow_nominal(
     unit="W",
-    quantity="HeatFlowRate")=QPlaHeaPumHea_flow_nominal
+    quantity="HeatFlowRate")=-QPlaHeaPumHea_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConCoo_nominal(
     unit="K",
-    displayUnit="degC")=TLooMax
+    displayUnit="degC")=TLooMax - TApp
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaEvaCoo_nominal(
     unit="K",
-    displayUnit="degC")=TLooMax - TApp
+    displayUnit="degC")=TLooMax
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConInMin(

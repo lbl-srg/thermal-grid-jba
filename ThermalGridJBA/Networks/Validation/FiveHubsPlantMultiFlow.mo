@@ -25,99 +25,95 @@ model FiveHubsPlantMultiFlow
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
   // Central plant
-  parameter Integer nGenMod=4
+  parameter Integer nGenMod=datDis.nGenMod
     "Total number of generation modules in central plant"
     annotation (Dialog(tab="Central plant"));
-  parameter Real samplePeriod(unit="s")=7200
+  parameter Real samplePeriod(unit="s")=datDis.samplePeriod
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));
-  parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(datDis.mCon_flow_nominal)
-    /nGenMod
+  parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
     annotation (Dialog(tab="Central plant"));
-  parameter Real dpPlaValve_nominal(unit="Pa")=6000
+  parameter Real dpPlaValve_nominal(unit="Pa")=datDis.dpPlaValve_nominal
     "Nominal pressure drop of fully open 2-way valve"
     annotation (Dialog(tab="Central plant"));
   // Central plant: heat exchangers
-  parameter Real dpPlaHex_nominal(unit="Pa")=10000
+  parameter Real dpPlaHex_nominal(unit="Pa")=datDis.dpPlaHex_nominal
     "Pressure difference across heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
-  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
+  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=datDis.mPlaHexGly_flow_nominal
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
-  parameter Real dpDryCoo_nominal(unit="Pa")=10000
+  parameter Real dpDryCoo_nominal(unit="Pa")=datDis.dpDryCoo_nominal
     "Nominal pressure drop of dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mPlaHexGly_flow_nominal +
-    mHpGly_flow_nominal
+  parameter Real mDryCoo_flow_nominal(unit="kg/s")=datDis.mDryCoo_flow_nominal
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TAppSet(unit="K")=2
+  parameter Real TAppSet(unit="K")=datDis.TAppSet
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TApp(unit="K")=4
+  parameter Real TApp(unit="K")=datDis.TApp
     "Approach temperature for checking if the dry cooler should be enabled"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real minFanSpe(unit="1")=0.1
+  parameter Real minFanSpe(unit="1")=datDis.minFanSpe
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   // Central plant: heat pumps
-  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=0.1*mPlaWat_flow_nominal
+  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=datDis.mPlaHeaPumWat_flow_min
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
+  parameter Real mHpGly_flow_nominal(unit="kg/s")=datDis.mHpGly_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186
-    *TApp
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=datDis.QPlaHeaPumHea_flow_nominal
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConHea_nominal(unit="K")=datDis.TLooMin + TApp
+  parameter Real TPlaConHea_nominal(unit="K")=datDis.TPlaConHea_nominal
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaHea_nominal(unit="K")=datDis.TLooMin
+  parameter Real TPlaEvaHea_nominal(unit="K")=datDis.TPlaEvaHea_nominal
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-1*
-    QPlaHeaPumHea_flow_nominal
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=datDis.QPlaHeaPumCoo_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConCoo_nominal(unit="K")=datDis.TLooMax - TApp
+  parameter Real TPlaConCoo_nominal(unit="K")=datDis.TPlaConCoo_nominal
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaCoo_nominal(unit="K")=datDis.TLooMax
+  parameter Real TPlaEvaCoo_nominal(unit="K")=datDis.TPlaEvaCoo_nominal
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConInMin(unit="K")=datDis.TLooMax - TApp - TAppSet
+  parameter Real TPlaConInMin(unit="K")=datDis.TPlaConInMin
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaInMax(unit="K")=datDis.TLooMin + TApp + TAppSet
+  parameter Real TPlaEvaInMax(unit="K")=datDis.TPlaEvaInMax
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real minPlaComSpe(unit="1")=0.2
+  parameter Real minPlaComSpe(unit="1")=datDis.minPlaComSpe
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TCooSet(unit="K")=datDis.TLooMin
+  parameter Real TCooSet(unit="K")=datDis.TCooSet
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=datDis.TLooMax
+  parameter Real THeaSet(unit="K")=datDis.THeaSet
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real offTim(unit="s")=12*3600
+  parameter Real offTim(unit="s")=datDis.offTim
     "Heat pump off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
-  parameter Real TUpp(unit="K")=datDis.TLooMax
+  parameter Real TUpp(unit="K")=datDis.TUpp
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real TLow(unit="K")=datDis.TLooMin
+  parameter Real TLow(unit="K")=datDis.TLow
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real dTSlo(unit="K")=2
+  parameter Real dTSlo(unit="K")=datDis.dTSlo
     "Temperature deadband for changing pump speed"
     annotation (Dialog(tab="District pump"));
-  parameter Real yDisPumMin(unit="1")=0.1
+  parameter Real yDisPumMin(unit="1")=datDis.yDisPumMin
     "District loop pump minimum speed"
     annotation (Dialog(tab="District pump"));
 
