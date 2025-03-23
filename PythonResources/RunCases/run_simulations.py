@@ -16,6 +16,7 @@ CASE_LIST = 'eachcluster'
 KEEP_MAT_FILES = False # Set false to delete result mat files to save space
 
 CWD = os.getcwd()
+package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
 
 def sh(cmd, path):
     ''' Run the command ```cmd``` command in the directory ```path```
@@ -101,7 +102,7 @@ def _simulate(spec):
         
     print(out_dir)
     # s=Simulator(spec["model"], packagePath="/home/casper/gitRepo/modelica-buildings/Buildings")
-    s=Simulator(spec["model"], packagePath="/home/casper/gitRepo/thermal-grid-jba/ThermalGridJBA")
+    s=Simulator(spec["model"], packagePath=package_path)
     s.setOutputDirectory(out_dir)
     s.addPreProcessingStatement("OutputCPUtime:= true;")
     s.addPreProcessingStatement("Advanced.ParallelizeCode = false;")
