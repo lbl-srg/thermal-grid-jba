@@ -131,22 +131,22 @@ def _simulate(spec):
         flag = True
     except:
         print(f"Simulation failed: {spec['name']}")
-    if flag:
-        # Copy results back
-        res_des = os.path.join(CWD, "simulations", spec["name"])
-        if os.path.isdir(res_des):
-           shutil.rmtree(res_des)
-        print("Copying results to {}".format(res_des))
-        shutil.move(out_dir, res_des)
+    #if flag:
+    # Copy results back
+    res_des = os.path.join(CWD, "simulations", spec["name"])
+    if os.path.isdir(res_des):
+       shutil.rmtree(res_des)
+    print("Copying results to {}".format(res_des))
+    shutil.move(out_dir, res_des)
+
+    # Delete the working directory
+    shutil.rmtree(wor_dir)
     
-        # Delete the working directory
-        shutil.rmtree(wor_dir)
-        
-        # Delete mat files if asked to
-        if not KEEP_MAT_FILES:
-            pattern = os.path.join(res_des,"*.mat")
-            for f in glob.glob(pattern):
-                os.remove(f)
+    # Delete mat files if asked to
+    if not KEEP_MAT_FILES:
+        pattern = os.path.join(res_des,"*.mat")
+        for f in glob.glob(pattern):
+            os.remove(f)
 
 def check_tests():
     
