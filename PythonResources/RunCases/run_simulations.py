@@ -147,7 +147,26 @@ def _simulate(spec):
         pattern = os.path.join(res_des,"*.mat")
         for f in glob.glob(pattern):
             os.remove(f)
+    
+    success = {'name' : spec["name"], 
+               'flag' : flag}
+    return success
 
+def summarise_tests(success):
+    
+    num_cases = len(list_of_cases)
+    num_success = sum(1 for item in success if item['flag'])
+    print('='*30)
+    if num_success == num_cases:
+        print(f"All {num_cases} cases simulated successfully.")
+    else:
+        print(f"Out of {num_cases} cases, the following {num_cases - num_success} failed:")
+        for cas in success:
+            if not cas['flag']:
+                print(" "*4 + f'The case "{cas["name"]}" failed.')
+                if not os.path.exists(os.path.join(CWD,'simulations',cas['name'],'dslog.txt')):
+                    print(" "*8 + '"dslog.txt" was not generated, indicating the simulation did not initialise.')
+                
 def check_tests():
     
     import os
@@ -213,10 +232,13 @@ if __name__=='__main__':
             case['git'] = d
 
     # Run all cases
-    po.map(_simulate, list_of_cases)
+    success = po.map(_simulate, list_of_cases)
     # Delete the checked out repository
     shutil.rmtree(lib_dir)
-
-    check_tests()
+    
+    summarise_tests(success)
+    
+    #check_tests()
     if not KEEP_MAT_FILES:
+        print("="*30)
         print("All mat files deleted because KEEP_MAT_FILES=False")
