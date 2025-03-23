@@ -13,6 +13,12 @@ CASE_LIST = 'eachcluster'
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
 """
+CHECK_LOG_FILES = 'failed'
+""" options (case insensitive):
+        all: check all log files despite if the case failed or not
+        failed: check failed cases only
+        any other string: skipped
+"""
 KEEP_MAT_FILES = False # Set false to delete result mat files to save space
 
 CWD = os.getcwd()
@@ -167,36 +173,42 @@ def summarise_tests(success):
                 if not os.path.exists(os.path.join(CWD,'simulations',cas['name'],'dslog.txt')):
                     print(" "*8 + '"dslog.txt" was not generated, indicating the simulation did not initialise.')
                 
-def check_tests():
+def check_logs(CHECK_LOG_FILES,
+               success,
+               output_warning_tags=True, 
+               output_error_vars=True, 
+               output_unaccounted=False, 
+               output_warning_blocks=True):
     
-    import os
+    import whofailed
     
-    directory = os.path.join(CWD, "simulations")
-    nfolders = [entry for entry in os.listdir(directory) if os.path.isdir(os.path.join(directory, entry))]
-        # names of folders
-    numcases = len(list_of_cases) # number of cases
-    numfail = 0 # number of failed tests
-    listfail = list()
+    flag = False
+    if CHECK_LOG_FILES.upper() == "ALL":
+        cases = [item['name'] for item in success]
+        flag = len(cases)
+    elif CHECK_LOG_FILES.upper() == "FAILED":
+        cases = [item['name'] for item in success if item['flag'] is False]
+        flag = len(cases)
     
-    print("")
-    print("="*30)
-    for casename in [item['name'] for item in list_of_cases]:
-        if not casename in nfolders:
-            numfail += 1
-            listfail.append([casename])
-        else:
-            with open(os.path.join(directory,casename,"dslog.txt"),'r') as f:
-                for line in f:
-                    if "Warning" in line:
-                        warning_line = line.strip()
-                        print(" "*4+f"There are warnings from {casename}. First occurance:")
-                        print(" "*8+warning_line)
-                        break
-    if numfail == 0:
-        print(f"All {numcases} cases simulated successfully.")
+    if flag:
+        print("="*30)
+        print("Checking log files")
+        directory = os.path.join(CWD, "simulations")
+        for cas in cases:
+            path_dslog = os.path.join(directory, cas, "dslog.txt")
+            path_dsmodelc = os.path.join(directory, cas, "dsmodel.c")
+            output = whofailed.main(path_dslog,
+                                    path_dsmodelc,
+                                    output_warning_tags, 
+                                    output_error_vars, 
+                                    output_unaccounted, 
+                                    output_warning_blocks)
+            print("="*5 + f" Case: {cas}")
+            print(output)
+    
     else:
-        print(f"{numfail} out of {numcases} cases failed. Failed cases:")
-        print(listfail)
+        print("="*30)
+        print("Log file checking is skipped.")
 
 ################################################################################
 if __name__=='__main__':
@@ -238,7 +250,9 @@ if __name__=='__main__':
     
     summarise_tests(success)
     
-    #check_tests()
+    if CHECK_LOG_FILES.upper() in ['ALL', 'FAILED']:
+        check_logs(CHECK_LOG_FILES, success)
+    
     if not KEEP_MAT_FILES:
         print("="*30)
         print("All mat files deleted because KEEP_MAT_FILES=False")
