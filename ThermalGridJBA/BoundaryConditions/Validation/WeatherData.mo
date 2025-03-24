@@ -1,7 +1,11 @@
 within ThermalGridJBA.BoundaryConditions.Validation;
 model WeatherData "Test model for weather data"
   extends Modelica.Icons.Example;
-  ThermalGridJBA.BoundaryConditions.WeatherDataTMY3 weaDat "Weather data reader"
+  ThermalGridJBA.BoundaryConditions.WeatherData weaDat(
+    weaFil = ThermalGridJBA.Hubs.BaseClasses.getWeatherFileName(
+      string="#Weather file name",
+      filNam=Modelica.Utilities.Files.loadResource("modelica://ThermalGridJBA/Resources/Data/Consumptions/CA.mos")))
+    "Weather data reader"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
   annotation (experiment(
       StopTime=31536000,

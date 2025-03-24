@@ -42,6 +42,12 @@ model ConnectedETS
           filNam=Modelica.Utilities.Files.loadResource(filNam))
     "Design heating heat flow rate (>=0)"
     annotation (Dialog(group="Design parameter"));
+  final parameter String weaFil =
+    ThermalGridJBA.Hubs.BaseClasses.getWeatherFileName(
+      string="#Weather file name",
+      filNam=Modelica.Utilities.Files.loadResource(filNam))
+    "Weather file name";
+
   Buildings.Controls.SetPoints.Table THeaWatSupSet(
     final table=datBuiSet.tabHeaWatRes,
     final offset=0,

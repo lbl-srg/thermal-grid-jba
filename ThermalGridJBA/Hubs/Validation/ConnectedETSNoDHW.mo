@@ -6,9 +6,10 @@ model ConnectedETSNoDHW
     "Medium model";
 
   parameter String filNam =
-    "modelica://ThermalGridJBA/Resources/Data/Consumptions/B1500.mos";
+    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA.mos";
 
-  ThermalGridJBA.BoundaryConditions.WeatherDataFTMY wea "fTMY weather data reader"
+  ThermalGridJBA.BoundaryConditions.WeatherData wea(
+    final weaFil = bui.weaFil) "fTMY weather data reader"
     annotation (Placement(transformation(extent={{-20,60},{0,80}})));
   Buildings.Fluid.Sources.Boundary_pT supAmbWat(
     redeclare package Medium = Medium,
