@@ -5,3 +5,4 @@ PartialConnectedETS
 PartialParallel
 StorageTankWithExternalHeatExchanger
 StratifiedTankWithCommand
+getWeatherFileName

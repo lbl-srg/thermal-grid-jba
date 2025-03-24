@@ -8,6 +8,8 @@
 #Peak space cooling load = -841797 Watts
 #Peak space heating load = 382868 Watts
 #Peak water heating load = 71440 Watts
+#
+#Weather file name = "fTMY_Maryland_Prince_George's_NORESM2_2020_2039.mos"
 double tab1(8760,4)
 0,0,307443,22800
 3600,0,283670,15504
