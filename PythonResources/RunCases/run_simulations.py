@@ -8,18 +8,27 @@ BRANCH="master"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
 CASE_LIST = 'eachcluster'
-""" case lists (case insensitive), see `cases.py`:
+""" This parameter determines which model to run and which load files to load.
+    See `cases.py`, case insensitive:
         handwrite: explicitly listed cases
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
 """
+CASE_SPECS = {
+     'start_time' : 90 * 24 * 3600,
+     'stop_time'  : 100* 24 * 3600,
+     'solver'     : 'cvode'}
+""" Sets simulation specifications for all cases,
+        UNLESS such a specification is already in the case constructor,
+        in which case this specification is ignored.
+"""
 CHECK_LOG_FILES = 'failed'
-""" options (case insensitive):
+""" Case insensitive:
         all: check all log files
         failed: check failed cases only
         any other string: skipped
 """
-KEEP_MAT_FILES = False # Set false to delete result mat files to save space
+KEEP_MAT_FILES = True # Set false to delete result mat files to save space
 
 CWD = os.getcwd()
 package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
@@ -217,7 +226,7 @@ if __name__=='__main__':
     import shutil
     import cases
 
-    list_of_cases = cases.get_cases(CASE_LIST)
+    list_of_cases = cases.get_cases(CASE_LIST, CASE_SPECS)
 
     for iEle in range(len(list_of_cases)):
         if ONLY_SHORT_TIME:

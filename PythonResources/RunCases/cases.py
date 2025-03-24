@@ -1,13 +1,13 @@
-def get_cases(how : str):
+def get_cases(case_list : str, case_specs):
     ''' Return the simulation cases to be run.
 
-        how (case insensitive):
+        case_list (case insensitive):
           handwrite = explictly written in cases.handwrite_cases()
           construct = use cases.construct_buildings() to construct a batch of cases
     '''
     # import copy
     
-    hup = how.upper()
+    hup = case_list.upper()
     cases = list()
     if hup == 'HANDWRITE':
         cases = handwrite_cases()
@@ -15,7 +15,10 @@ def get_cases(how : str):
         cases = construct_buildings()
     elif hup == 'EACHCLUSTER':
         cases = construct_clusters()
-
+    
+    for cas in cases:
+        cas.update({key: value for key, value in case_specs.items() if key not in cas})
+    
     return cases
 
 def handwrite_cases():
@@ -28,8 +31,6 @@ def handwrite_cases():
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
           "name": f"no_dhw_{buil}_transit",
           "building": buil,
-          "start_time": 90*24*3600,
-          "stop_time":  100*24*3600,
           "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
          
     buil = '1065'
@@ -37,8 +38,6 @@ def handwrite_cases():
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
           "name": f"wi_dhw_{buil}_transit",
           "building": buil,
-          "start_time": 90*24*3600,
-          "stop_time":  100*24*3600,
           "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
     
     return cases
@@ -63,8 +62,6 @@ def construct_buildings():
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
               "name": f"no_dhw_{buil}_transit",
               "building": buil,
-              "start_time": 90*24*3600,
-              "stop_time":  100*24*3600,
               "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
 
     buil_nos = ['1058x1060',
@@ -81,8 +78,6 @@ def construct_buildings():
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
               "name": f"wi_dhw_{buil}_transit",
               "building": buil,
-              "start_time": 90*24*3600,
-              "stop_time":  100*24*3600,
               "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})    
     
     return cases
@@ -98,8 +93,6 @@ def construct_clusters():
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
               "name": "cluster_A_transit",
               "building": 'A',
-              "start_time": 90*24*3600,
-              "stop_time":  100*24*3600,
               "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA.mos"}})
 
     clusters = ['B',
@@ -111,8 +104,6 @@ def construct_clusters():
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
               "name": f"cluster_{buil}_transit",
               "building": buil,
-              "start_time": 90*24*3600,
-              "stop_time":  100*24*3600,
               "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}.mos"}})
     
     return cases
