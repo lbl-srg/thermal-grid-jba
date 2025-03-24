@@ -13,9 +13,9 @@ CASE_LIST = 'eachcluster'
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
 """
-CHECK_LOG_FILES = 'failed'
+CHECK_LOG_FILES = 'all'
 """ options (case insensitive):
-        all: check all log files despite if the case failed or not
+        all: check all log files
         failed: check failed cases only
         any other string: skipped
 """

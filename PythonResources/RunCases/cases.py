@@ -88,16 +88,24 @@ def construct_buildings():
     return cases
 
 def construct_clusters():
-    """ Construct a batch of cases for each cluster, all with DHW integration
+    """ Construct a batch of cases for each cluster
+        Cluster A does not have DHW. All others do.
     """
 
     cases = list()
+    
+    cases.append( \
+            {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
+              "name": "cluster_A_transit",
+              "building": 'A',
+              "start_time": 90*24*3600,
+              "stop_time":  100*24*3600,
+              "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA.mos"}})
 
-    clusters = ['A',
-                'B',
+    clusters = ['B',
                 'C',
                 'D',
-                'E'] # list of all DHW-integrated building numbers
+                'E']
     for buil in clusters:
         cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
@@ -105,7 +113,7 @@ def construct_clusters():
               "building": buil,
               "start_time": 90*24*3600,
               "stop_time":  100*24*3600,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}.mos"}})    
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}.mos"}})
     
     return cases
 
