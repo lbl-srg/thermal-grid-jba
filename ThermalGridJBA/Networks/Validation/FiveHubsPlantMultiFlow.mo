@@ -273,9 +273,9 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(final k=datDis.mPumDis_flow_nominal)
     "District pump speed"
     annotation (Placement(transformation(extent={{0,-170},{20,-150}})));
-  BoundaryConditions.WeatherDataFTMY weaDat[nBui](computeWetBulbTemperature=
-        fill(true, nBui)) "Weather data reader"
-    annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
+//   BoundaryConditions.WeatherDataFTMY weaDat[nBui](computeWetBulbTemperature=
+//         fill(true, nBui)) "Weather data reader"
+//     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
   Buildings.BoundaryConditions.WeatherData.Bus weaBus annotation (Placement(
         transformation(extent={{-320,-40},{-280,0}}), iconTransformation(extent
           ={{-364,-80},{-344,-60}})));
@@ -313,6 +313,10 @@ model FiveHubsPlantMultiFlow
     annotation (Placement(transformation(extent={{-300,50},{-280,70}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=1/nBui)
     annotation (Placement(transformation(extent={{-260,50},{-240,70}})));
+  BoundaryConditions.WeatherData weaDat[nBui](
+    final weaFil = bui.weaFil)
+    "Weather data reader"
+    annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
 
 equation
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
