@@ -1,7 +1,7 @@
 within ThermalGridJBA.Hubs.Validation;
 model ConnectedETSWithDHW
   extends ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW(
-    filNam="modelica://ThermalGridJBA/Resources/Data/Consumptions/CA.mos");
+    filNam="modelica://ThermalGridJBA/Resources/Data/Consumptions/CE.mos");
 
 equation
 

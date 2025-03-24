@@ -78,7 +78,11 @@ def main(buil_nos, hubname = ''):
         f.write(f'#Peak space cooling load = {min(df["coo"]):.0f} Watts\n')
         f.write(f'#Peak space heating load = {max(df["hea"]):.0f} Watts\n')
         f.write(f'#Peak water heating load = {max(df["dhw"]):.0f} Watts\n')
-
+        
+        # weather file name
+        f.write('#\n')
+        f.write(f'#Weather file name = "{weatherfile["futu"]}"\n')
+        
         # data
         f.write('double tab1(8760,4)\n')
         f.write(df.to_csv(path_or_buf=None,

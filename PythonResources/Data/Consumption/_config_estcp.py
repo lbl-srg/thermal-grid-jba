@@ -9,6 +9,10 @@ import pandas as pd
 stags = ['base', 'post', 'futu']
     # stages:
     #   baseline, post-ECM, future
+weatherfile = {'base' : "USA_MD_Andrews.AFB.745940_TMY3.mos",
+               'post' : "USA_MD_Andrews.AFB.745940_TMY3.mos",
+               'futu' : "fTMY_Maryland_Prince_George's_NORESM2_2020_2039.mos"}
+    # corresponding weather file names
 utils = ['ele', 'coo', 'hea', 'dhw']
     # utility types:
     #   electricity, cooling, heating, domestic hot water
