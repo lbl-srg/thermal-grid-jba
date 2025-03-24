@@ -103,6 +103,13 @@ algorithm
     Documentation(
       info="<html>
 <p>
+ESTCP: Adapted from <code>Buildings.DHC.Loads.BaseClasses.getPeakLoad</code>.
+Instead of a real number, it outputs a string which
+is tied to the load profile. This ensures the correct weather file is used.
+In the future, part of the two functions can be merged for general use.
+The documentation below is not updated.
+</p>      
+<p>
 Function that reads a double value from a text file.
 </p>
 <p>
