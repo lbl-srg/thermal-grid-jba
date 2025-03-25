@@ -352,7 +352,7 @@ model CentralPlantMultiFlow
         rotation=0,
         origin={-60,0})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFlo(
-    redeclare final package Medium = MediumW)
+    redeclare final package Medium = MediumW, allowFlowReversal=false)
     "Water flow rate into borefield"
     annotation (Placement(transformation(extent={{190,-10},{210,10}})));
   Buildings.Controls.OBC.CDL.Reals.Subtract sub
