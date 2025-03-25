@@ -95,7 +95,15 @@ model CentralPlantMultiFlow
                         "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
-                            "Heat pump off time"
+     "Heat pump off time due to the low compressor speed"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real holOnTim(
+    final unit="s")=1800
+    "Heat pump hold on time"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real holOffTim(
+    final unit="s")=1800
+    "Heat pump hold off time"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real minComSpe(unit="1")=0.2
     "Minimum heat pump compressor speed"
@@ -246,6 +254,8 @@ model CentralPlantMultiFlow
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,
+    holOnTim=holOnTim,
+    holOffTim=holOffTim,
     final minComSpe=minComSpe,
     kHeaPum=0.1,
     TiHeaPum=200,
@@ -352,7 +362,7 @@ model CentralPlantMultiFlow
         rotation=0,
         origin={-60,0})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFlo(
-    redeclare final package Medium = MediumW, allowFlowReversal=false)
+    redeclare final package Medium = MediumW)
     "Water flow rate into borefield"
     annotation (Placement(transformation(extent={{190,-10},{210,10}})));
   Buildings.Controls.OBC.CDL.Reals.Subtract sub

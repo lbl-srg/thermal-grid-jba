@@ -15,7 +15,7 @@ record GenericDistrict "District network design parameters"
     "Nominal mass flow rate in each connection line";
   parameter Modelica.Units.SI.Temperature TLooMin=273.15 + 10.5
     "Minimum loop temperature";
-  parameter Modelica.Units.SI.Temperature TLooMax=273.15 + 24
+  parameter Modelica.Units.SI.Temperature TLooMax=273.15 + 23
     "Maximum loop temperature";
   parameter Real dp_length_nominal(final unit="Pa/m") = 250
     "Pressure drop per pipe length at nominal flow rate";
@@ -29,7 +29,7 @@ record GenericDistrict "District network design parameters"
     "Total number of generation modules in central plant"
     annotation (Dialog(tab="Central plant"));
   parameter Real samplePeriod(
-    unit="s")=7200
+    unit="s")=1800
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));
   parameter Real mPlaWat_flow_nominal(
@@ -139,7 +139,15 @@ record GenericDistrict "District network design parameters"
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
-    "Heat pump off time"
+    "Heat pump off time due to the low compressor speed"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real holOnTim(
+    final unit="s")=3600
+    "Heat pump hold on time"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real holOffTim(
+    final unit="s")=1800
+    "Heat pump hold off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
   parameter Real TUpp(

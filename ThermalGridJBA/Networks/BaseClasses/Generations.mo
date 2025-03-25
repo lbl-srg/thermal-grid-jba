@@ -96,7 +96,15 @@ model Generations
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
-    "Heat pump off time"
+     "Heat pump off time due to the low compressor speed"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real holOnTim(
+    final unit="s")=1800
+    "Heat pump hold on time"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real holOffTim(
+    final unit="s")=1800
+    "Heat pump hold off time"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real minComSpe=0.2
     "Minimum heat pump compressor speed"
@@ -379,6 +387,8 @@ model Generations
     final TEvaInMax=TEvaInMax,
     final minComSpe=minComSpe,
     final offTim=offTim,
+    final holOnTim=holOnTim,
+    final holOffTim=holOffTim,
     final heaPumConTyp=heaPumConTyp,
     final kHeaPum=kHeaPum,
     final TiHeaPum=TiHeaPum,
@@ -573,8 +583,8 @@ equation
           260},{-290,164},{-182,164}}, color={0,0,127}));
   connect(heaPumGlyIn.T, heaPumCon.TGlyIn) annotation (Line(points={{191,30},{
           226,30},{226,-206},{-226,-206},{-226,161},{-182,161}}, color={0,0,127}));
-  connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-320,190},{
-          -270,190},{-270,209},{-82,209}}, color={0,0,127}));
+  connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-320,190},{-270,
+          190},{-270,209},{-82,209}},      color={0,0,127}));
   connect(entGenTem.T, dryCooHexCon.TGenIn) annotation (Line(points={{-260,-149},
           {-260,212},{-82,212}}, color={0,0,127}));
   connect(dryCoo.port_b, dryCooOut.port_a)
@@ -712,8 +722,8 @@ equation
   connect(valHeaPumByp.port_3, delRet.ports[5]) annotation (Line(points={{170,60},
           {126,60},{126,91.6},{-100,91.6}},color={0,127,255},
       thickness=0.5));
-  connect(heaPumCon.y1Mod, dryCooHexCon.u1HeaPumMod) annotation (Line(points={{
-          -158,179},{-116,179},{-116,204},{-82,204}}, color={255,0,255}));
+  connect(heaPumCon.y1Mod, dryCooHexCon.u1HeaPumMod) annotation (Line(points={{-158,
+          179},{-116,179},{-116,204},{-82,204}}, color={255,0,255}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={

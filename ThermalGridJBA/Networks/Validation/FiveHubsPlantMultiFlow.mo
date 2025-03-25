@@ -101,7 +101,15 @@ model FiveHubsPlantMultiFlow
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real offTim(unit="s")=datDis.offTim
-    "Heat pump off time"
+    "Heat pump off time due to the low compressor speed"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real holOnTim(
+    final unit="s")=datDis.holOnTim
+    "Heat pump hold on time"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real holOffTim(
+    final unit="s")=datDis.holOffTim
+    "Heat pump hold off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
   parameter Real TUpp(unit="K")=datDis.TUpp
@@ -261,6 +269,8 @@ model FiveHubsPlantMultiFlow
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,
+    final holOnTim=holOnTim,
+    final holOffTim=holOffTim,
     final minComSpe=minPlaComSpe)
      "Central plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
@@ -462,7 +472,8 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StartTime=12960000,
+      StopTime=13824000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
