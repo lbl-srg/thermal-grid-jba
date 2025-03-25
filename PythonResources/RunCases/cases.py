@@ -1,21 +1,43 @@
-def get_cases(case_list : str, case_specs):
+def get_cases(case_list : str,
+              case_specs,
+              case_scenarios = ['futu']):
     ''' Return the simulation cases to be run.
 
-        case_list (case insensitive):
-          handwrite = explictly written in cases.handwrite_cases()
-          construct = use cases.construct_buildings() to construct a batch of cases
+        For inputs see `run_simulations.py`.
     '''
     # import copy
     
     hup = case_list.upper()
-    cases = list()
+    cases_ns = list() # cases without scenarios specified
     if hup == 'HANDWRITE':
-        cases = handwrite_cases()
+        cases_ns = handwrite_cases()
     elif hup == 'EACHBUILDING':
-        cases = construct_buildings()
+        cases_ns = construct_buildings()
     elif hup == 'EACHCLUSTER':
-        cases = construct_clusters()
+        cases_ns = construct_clusters()
+    elif hup == 'FIVEHUBSNOPLANT':
+        cases_ns = fivehubsnoplant()
     
+    cases = list() # cases with scenarios specified
+    for scenario in case_scenarios:
+        cases +=[
+                    {
+                        **cas,
+                        "name": cas["name"].replace('_SCENARIO', f'_{scenario}'),
+                        "parameters": {
+                            **cas["parameters"],
+                            **({
+                                "filNam": cas["parameters"]["filNam"].replace('_SCENARIO', f'_{scenario}')
+                            } if "filNam" in cas["parameters"] and isinstance(cas["parameters"]["filNam"], str) else {}),
+                            **({
+                                "datDis.filNam": [fn.replace('_SCENARIO', f'_{scenario}') for fn in cas["parameters"]["datDis.filNam"]]
+                            } if "datDis.filNam" in cas["parameters"] and isinstance(cas["parameters"]["datDis.filNam"], list) else {})
+                        }
+                    }
+                    for cas in cases_ns
+                ]
+    
+    # add global specifications but does not override any existing ones
     for cas in cases:
         cas.update({key: value for key, value in case_specs.items() if key not in cas})
     
@@ -29,16 +51,34 @@ def handwrite_cases():
     buil = '1045'
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-          "name": f"no_dhw_{buil}_transit",
+          "name": f"nodhw_{buil}_SCENARIO",
           "building": buil,
-          "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
+          "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
          
     buil = '1065'
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-          "name": f"wi_dhw_{buil}_transit",
+          "name": f"widhw_{buil}_SCENARIO",
           "building": buil,
-          "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
+          "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
+    
+    return cases
+
+def fivehubsnoplant():
+    """ Manually write out cases.
+    """
+    
+    cases = list()
+    cases.append( \
+        {"model": "ThermalGridJBA.Networks.Validation.SinglePlantFiveHubs",
+          "name": "fivehubsnoplant_SCENARIO",
+          "building": 'FiveHubs',
+          "parameters": {'datDis.filNam' : [
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_SCENARIO.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_SCENARIO.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_SCENARIO.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_SCENARIO.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_SCENARIO.mos"]}})
     
     return cases
 
@@ -60,9 +100,9 @@ def construct_buildings():
     for buil in buil_nos:
         cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-              "name": f"no_dhw_{buil}_transit",
+              "name": f"nodhw_{buil}_SCENARIO",
               "building": buil,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
 
     buil_nos = ['1058x1060',
                 '1065',
@@ -76,9 +116,9 @@ def construct_buildings():
     for buil in buil_nos:
         cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-              "name": f"wi_dhw_{buil}_transit",
+              "name": f"widhw_{buil}_SCENARIO",
               "building": buil,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}.mos"}})    
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})    
     
     return cases
 
@@ -91,9 +131,9 @@ def construct_clusters():
     
     cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-              "name": "cluster_A_transit",
+              "name": "cluster_A_SCENARIO",
               "building": 'A',
-              "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA.mos"}})
+              "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_SCENARIO.mos"}})
 
     clusters = ['B',
                 'C',
@@ -102,9 +142,9 @@ def construct_clusters():
     for buil in clusters:
         cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-              "name": f"cluster_{buil}_transit",
+              "name": f"cluster_{buil}_SCENARIO",
               "building": buil,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}.mos"}})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}_SCENARIO.mos"}})
     
     return cases
 

@@ -2,17 +2,23 @@
 #
 # Start the script for the directory that contains the package
 # with your model
+#
+# KNOWN ISSUES:
+#   Each run adds an entry to Dymola > Tools > Library Management > Modelica Path,
+#       after a point it may fail to add more and the simulation can't find Buildings.
+#       Manually deleting paths can help.
 #############################################################
 import os
 BRANCH="master"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
-CASE_LIST = 'eachcluster'
+CASE_LIST = 'fivehubsnoplant'
 """ This parameter determines which model to run and which load files to load.
     See `cases.py`, case insensitive:
         handwrite: explicitly listed cases
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
+        fivehubsnoplant: runs ThermalGridJBA.Networks.Validation.SinglePlantFiveHubs
 """
 CASE_SPECS = {
      'start_time' : 90 * 24 * 3600,
@@ -21,6 +27,14 @@ CASE_SPECS = {
 """ Sets simulation specifications for all cases,
         UNLESS such a specification is already in the case constructor,
         in which case this specification is ignored.
+"""
+CASE_SCENARIOS = ['futu']
+#CASE_SCENARIOS = ['futu', 'heat', 'cold']
+""" List of weather scenarios:
+        'base', 'post' : TMY3, also chooses baseline or post-retrofit load files
+        'futu' : fTMY
+        'heat' : heat wave
+        'cold' : cold snap
 """
 CHECK_LOG_FILES = 'failed'
 """ Case insensitive:
@@ -226,7 +240,7 @@ if __name__=='__main__':
     import shutil
     import cases
 
-    list_of_cases = cases.get_cases(CASE_LIST, CASE_SPECS)
+    list_of_cases = cases.get_cases(CASE_LIST, CASE_SPECS, CASE_SCENARIOS)
 
     for iEle in range(len(list_of_cases)):
         if ONLY_SHORT_TIME:
