@@ -180,23 +180,13 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     annotation (Placement(transformation(extent={{300,-410},{340,-370}}),
         iconTransformation(extent={{100,-110},{140,-70}})));
 
-  Buildings.Controls.OBC.CDL.Integers.Sources.Constant higRat(
-    final k=1)
-    "High electricity rate"
-    annotation (Placement(transformation(extent={{-280,430},{-260,450}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant higLoa(
     final k=3)
     "HIgh district load"
     annotation (Placement(transformation(extent={{-280,380},{-260,400}})));
-  Buildings.Controls.OBC.CDL.Integers.Equal higRatMod
-    "Check if it is in high electricity rate mode"
-    annotation (Placement(transformation(extent={{-240,430},{-220,450}})));
   Buildings.Controls.OBC.CDL.Integers.Equal higLoaMod
     "Check if the district load is high"
     annotation (Placement(transformation(extent={{-220,380},{-200,400}})));
-  Buildings.Controls.OBC.CDL.Logical.And higHig
-    "High electricity rate and high district load"
-    annotation (Placement(transformation(extent={{-160,430},{-140,450}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desMinDisTem(
     final k=TLooMin)
     "Design minimum district loop temperature"
@@ -211,12 +201,14 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     final h=THys)
     "Check if the district loop is too cold"
     annotation (Placement(transformation(extent={{-160,320},{-140,340}})));
-  Buildings.Controls.OBC.CDL.Logical.And heaMod "Heat pump in heating mode"
+  Buildings.Controls.OBC.CDL.Logical.And higLoaHeaMod
+    "Heat pump in heating mode when loop load is high"
     annotation (Placement(transformation(extent={{-80,320},{-60,340}})));
   Buildings.Controls.OBC.CDL.Logical.Not hotLoo
     "Check if the district loop is too hot"
     annotation (Placement(transformation(extent={{-120,240},{-100,260}})));
-  Buildings.Controls.OBC.CDL.Logical.And cooMod "Heat pump in cooling mode"
+  Buildings.Controls.OBC.CDL.Logical.And higLoaCooMod
+    "Heat pump in cooling mode when loop load is high"
     annotation (Placement(transformation(extent={{-80,240},{-60,260}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant win(
     final k=1)
@@ -232,8 +224,8 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     final k=0)
     "Normal electricity rate"
     annotation (Placement(transformation(extent={{-280,170},{-260,190}})));
-  Buildings.Controls.OBC.CDL.Logical.And heaMod1
-    "Heat pump in heating mode"
+  Buildings.Controls.OBC.CDL.Logical.And winHeaMod
+    "Heat pump in heating mode when it is in winter and normal rate"
     annotation (Placement(transformation(extent={{-80,170},{-60,190}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant sum1(
     final k=3)
@@ -242,8 +234,8 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
   Buildings.Controls.OBC.CDL.Integers.Equal inSum
     "Check if it is in summer"
     annotation (Placement(transformation(extent={{-200,80},{-180,100}})));
-  Buildings.Controls.OBC.CDL.Logical.And cooMod1
-    "Heat pump in cooling mode"
+  Buildings.Controls.OBC.CDL.Logical.And sumCooMod
+    "Heat pump in cooling mode when it is in summer and normal rate"
     annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
   Buildings.Controls.OBC.CDL.Logical.Or heaMod2
     "Heat pump in heating mode"
@@ -385,18 +377,10 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     annotation (Placement(transformation(extent={{-60,-20},{-40,0}})));
 
 equation
-  connect(higRat.y, higRatMod.u1)
-    annotation (Line(points={{-258,440},{-242,440}}, color={255,127,0}));
-  connect(uEleRat, higRatMod.u2) annotation (Line(points={{-320,420},{-250,420},
-          {-250,432},{-242,432}}, color={255,127,0}));
   connect(higLoa.y, higLoaMod.u1)
     annotation (Line(points={{-258,390},{-222,390}}, color={255,127,0}));
   connect(uSt, higLoaMod.u2) annotation (Line(points={{-320,370},{-240,370},{-240,
           382},{-222,382}}, color={255,127,0}));
-  connect(higRatMod.y, higHig.u1)
-    annotation (Line(points={{-218,440},{-162,440}}, color={255,0,255}));
-  connect(higLoaMod.y, higHig.u2) annotation (Line(points={{-198,390},{-170,390},
-          {-170,432},{-162,432}}, color={255,0,255}));
   connect(desMinDisTem.y, ave.u1) annotation (Line(points={{-258,300},{-220,300},
           {-220,286},{-202,286}}, color={0,0,127}));
   connect(desMaxDisTem.y, ave.u2) annotation (Line(points={{-258,260},{-220,260},
@@ -405,10 +389,8 @@ equation
     annotation (Line(points={{-320,330},{-162,330}}, color={0,0,127}));
   connect(ave.y, colLoo.u2) annotation (Line(points={{-178,280},{-170,280},{-170,
           322},{-162,322}}, color={0,0,127}));
-  connect(colLoo.y, heaMod.u1)
+  connect(colLoo.y, higLoaHeaMod.u1)
     annotation (Line(points={{-138,330},{-82,330}}, color={255,0,255}));
-  connect(higHig.y, heaMod.u2) annotation (Line(points={{-138,440},{-90,440},{-90,
-          322},{-82,322}},   color={255,0,255}));
   connect(colLoo.y, hotLoo.u) annotation (Line(points={{-138,330},{-130,330},{-130,
           250},{-122,250}}, color={255,0,255}));
   connect(win.y, inWin.u1)
@@ -419,34 +401,32 @@ equation
     annotation (Line(points={{-258,180},{-202,180}}, color={255,127,0}));
   connect(uEleRat, norRatMod.u2) annotation (Line(points={{-320,420},{-250,420},
           {-250,172},{-202,172}}, color={255,127,0}));
-  connect(norRatMod.y, heaMod1.u1)
+  connect(norRatMod.y, winHeaMod.u1)
     annotation (Line(points={{-178,180},{-82,180}}, color={255,0,255}));
-  connect(inWin.y, heaMod1.u2) annotation (Line(points={{-178,140},{-120,140},{-120,
-          172},{-82,172}}, color={255,0,255}));
+  connect(inWin.y, winHeaMod.u2) annotation (Line(points={{-178,140},{-120,140},
+          {-120,172},{-82,172}}, color={255,0,255}));
   connect(sum1.y, inSum.u1)
     annotation (Line(points={{-258,90},{-202,90}}, color={255,127,0}));
   connect(uGen, inSum.u2) annotation (Line(points={{-320,120},{-230,120},{-230,82},
           {-202,82}}, color={255,127,0}));
-  connect(inSum.y, cooMod1.u1)
+  connect(inSum.y, sumCooMod.u1)
     annotation (Line(points={{-178,90},{-82,90}}, color={255,0,255}));
-  connect(norRatMod.y, cooMod1.u2) annotation (Line(points={{-178,180},{-140,180},
+  connect(norRatMod.y, sumCooMod.u2) annotation (Line(points={{-178,180},{-140,180},
           {-140,82},{-82,82}}, color={255,0,255}));
-  connect(heaMod.y, heaMod2.u1)
-    annotation (Line(points={{-58,330},{-22,330}},color={255,0,255}));
-  connect(heaMod1.y, heaMod2.u2) annotation (Line(points={{-58,180},{-40,180},{-40,
-          322},{-22,322}},color={255,0,255}));
-  connect(cooMod.y, cooMod2.u1)
-    annotation (Line(points={{-58,250},{-22,250}},color={255,0,255}));
-  connect(cooMod1.y, cooMod2.u2) annotation (Line(points={{-58,90},{-30,90},{-30,
+  connect(higLoaHeaMod.y, heaMod2.u1)
+    annotation (Line(points={{-58,330},{-22,330}}, color={255,0,255}));
+  connect(winHeaMod.y, heaMod2.u2) annotation (Line(points={{-58,180},{-40,180},
+          {-40,322},{-22,322}}, color={255,0,255}));
+  connect(higLoaCooMod.y, cooMod2.u1)
+    annotation (Line(points={{-58,250},{-22,250}}, color={255,0,255}));
+  connect(sumCooMod.y, cooMod2.u2) annotation (Line(points={{-58,90},{-30,90},{-30,
           242},{-22,242}}, color={255,0,255}));
   connect(heaMod2.y, swi.u2)
     annotation (Line(points={{2,330},{118,330}},  color={255,0,255}));
   connect(cooMod2.y, swi1.u2)
     annotation (Line(points={{2,250},{78,250}}, color={255,0,255}));
-  connect(hotLoo.y, cooMod.u1)
+  connect(hotLoo.y, higLoaCooMod.u1)
     annotation (Line(points={{-98,250},{-82,250}}, color={255,0,255}));
-  connect(higHig.y, cooMod.u2) annotation (Line(points={{-138,440},{-90,440},{-90,
-          242},{-82,242}}, color={255,0,255}));
   connect(cooTraTem.y, swi1.u1) annotation (Line(points={{2,290},{20,290},{20,258},
           {78,258}}, color={0,0,127}));
   connect(heaTraTem.y, swi.u1) annotation (Line(points={{2,370},{60,370},{60,338},
@@ -586,6 +566,10 @@ equation
           -390},{218,-390}}, color={255,0,255}));
   connect(and2.y, thrWayValCon.trigger) annotation (Line(points={{142,50},{180,50},
           {180,-440},{104,-440},{104,-422}}, color={255,0,255}));
+  connect(higLoaMod.y, higLoaHeaMod.u2) annotation (Line(points={{-198,390},{-90,
+          390},{-90,322},{-82,322}}, color={255,0,255}));
+  connect(higLoaMod.y, higLoaCooMod.u2) annotation (Line(points={{-198,390},{-90,
+          390},{-90,242},{-82,242}}, color={255,0,255}));
   annotation (defaultComponentName="heaPumCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
@@ -618,30 +602,6 @@ each related equipment when the heat pump is enabled.
 <th>Glycol side bypass valve <code>yValByp</code></th>
 </tr>
 <tr>
-<td>1 (high)</td>
-<td>3 (high)</td>
-<td>x</td>
-<td><code>TMixAve &lt; (TLooMin+TLooMax)/2</code></td>
-<td>true (heating)</td>
-<td>track <code>TWatOut = THeaSet</code></td>
-<td>1</td>
-<td><code>uDisPum</code></td>
-<td>1</td>
-<td>track <code>TGlyIn = TEvaInMax</code></td>
-</tr>
-<tr>
-<td>1 (high)</td>
-<td>3 (high)</td>
-<td>x</td>
-<td><code>TMixAve &gt; (TLooMin+TLooMax)/2</code></td>
-<td>false (cooling)</td>
-<td>track <code>TWatOut = TCooSet</code></td>
-<td>1</td>
-<td><code>uDisPum</code></td>
-<td>1</td>
-<td>track <code>TGlyIn = TConInMin</code></td>
-</tr>
-<tr>
 <td>0 (normal)</td>
 <td>x</td>
 <td>1 (winter)</td>
@@ -665,6 +625,37 @@ each related equipment when the heat pump is enabled.
 <td>1</td>
 <td>track <code>TGlyIn = TConInMin</code></td>
 </tr>
+
+
+<tr>
+<td>x</td>
+<td>3 (high)</td>
+<td>x</td>
+<td><code>TMixAve &lt; (TLooMin+TLooMax)/2</code></td>
+<td>true (heating)</td>
+<td>track <code>TWatOut = THeaSet</code></td>
+<td>1</td>
+<td><code>uDisPum</code></td>
+<td>1</td>
+<td>track <code>TGlyIn = TEvaInMax</code></td>
+</tr>
+<tr>
+<td>x</td>
+<td>3 (high)</td>
+<td>x</td>
+<td><code>TMixAve &gt; (TLooMin+TLooMax)/2</code></td>
+<td>false (cooling)</td>
+<td>track <code>TWatOut = TCooSet</code></td>
+<td>1</td>
+<td><code>uDisPum</code></td>
+<td>1</td>
+<td>track <code>TGlyIn = TConInMin</code></td>
+</tr>
+
+
+
+
+
 </table>
 <p>
 Note that if the heat pump operates below the minimum speed 20%(<code>minComSpe</code>,

@@ -58,24 +58,28 @@ model DryCoolerHex
     displayUnit="degC")
     "Temperature of the water from the district loop"
     annotation (Placement(transformation(extent={{-360,110},{-320,150}}),
-        iconTransformation(extent={{-140,-10},{-100,30}})));
+        iconTransformation(extent={{-140,0},{-100,40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Ambient dry bulb temperature"
     annotation (Placement(transformation(extent={{-360,70},{-320,110}}),
-        iconTransformation(extent={{-140,-40},{-100,0}})));
+        iconTransformation(extent={{-140,-30},{-100,10}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1HeaPum
     "Heat pump commanded on"
-    annotation (Placement(transformation(extent={{-360,-80},{-320,-40}}),
+    annotation (Placement(transformation(extent={{-360,-200},{-320,-160}}),
+        iconTransformation(extent={{-140,-60},{-100,-20}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1HeaPumMod
+    "Heat pump mode: true - heating mode"
+    annotation (Placement(transformation(extent={{-360,-250},{-320,-210}}),
         iconTransformation(extent={{-140,-80},{-100,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryCooOut(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Dry cooler outlet glycol temperature"
-    annotation (Placement(transformation(extent={{-360,-240},{-320,-200}}),
+    annotation (Placement(transformation(extent={{-360,-310},{-320,-270}}),
         iconTransformation(extent={{-140,-110},{-100,-70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yValHexByp(
     final min=0,
@@ -114,7 +118,7 @@ model DryCoolerHex
     annotation (Placement(transformation(extent={{-260,280},{-240,300}})));
   Buildings.Controls.OBC.CDL.Reals.Switch dryCooFan
     "Dry cooler fan speed setpoint"
-    annotation (Placement(transformation(extent={{240,-240},{260,-220}})));
+    annotation (Placement(transformation(extent={{282,-240},{302,-220}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant higRat(
     final k=1)
     "High electricity rate"
@@ -187,49 +191,37 @@ model DryCoolerHex
     annotation (Placement(transformation(extent={{-80,-40},{-60,-20}})));
   Buildings.Controls.OBC.CDL.Logical.And higHigSum
     "High rate, high district load, and in summer preferred condition"
-    annotation (Placement(transformation(extent={{-80,-100},{-60,-80}})));
-  Buildings.Controls.OBC.CDL.Logical.Or higHigWinHeaPum
-    "High rate, high district load, in winter preferred condition, or heat pump is enabled"
-    annotation (Placement(transformation(extent={{-20,-40},{0,-20}})));
-  Buildings.Controls.OBC.CDL.Logical.Or higHigSumHeaPum
-    "High rate, high district load, in summer preferred condition, or heat pump is enabled"
-    annotation (Placement(transformation(extent={{-20,-100},{0,-80}})));
+    annotation (Placement(transformation(extent={{-80,-80},{-60,-60}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant norRat(
     final k=0)
     "Normal electricity rate"
-    annotation (Placement(transformation(extent={{-300,-150},{-280,-130}})));
+    annotation (Placement(transformation(extent={{-300,-120},{-280,-100}})));
   Buildings.Controls.OBC.CDL.Integers.Equal norRatMod
     "Check if it is in normal electricity rate mode"
-    annotation (Placement(transformation(extent={{-260,-150},{-240,-130}})));
-  Buildings.Controls.OBC.CDL.Logical.Or norWinHeaPum
-    "Normal rate in winter preferred condition, or heat pump is enabled"
-    annotation (Placement(transformation(extent={{-20,-150},{0,-130}})));
-  Buildings.Controls.OBC.CDL.Logical.Or norSumHeaPum
-    "Normal rate in summer preferred condition, or heat pump is enabled"
-    annotation (Placement(transformation(extent={{-20,-190},{0,-170}})));
+    annotation (Placement(transformation(extent={{-260,-120},{-240,-100}})));
   Buildings.Controls.OBC.CDL.Logical.Or winOpe
     "Enable the dry cooler in winter"
-    annotation (Placement(transformation(extent={{20,-40},{40,-20}})));
+    annotation (Placement(transformation(extent={{-20,-40},{0,-20}})));
   Buildings.Controls.OBC.CDL.Logical.Or winOpe1
     "Enable the dry cooler in winter"
     annotation (Placement(transformation(extent={{80,110},{100,130}})));
   Buildings.Controls.OBC.CDL.Logical.Or sumOpe
     "Enable the dry cooler in summer"
-    annotation (Placement(transformation(extent={{40,-100},{60,-80}})));
+    annotation (Placement(transformation(extent={{-20,-80},{0,-60}})));
   Buildings.Controls.OBC.CDL.Logical.Or sumOpe1
     "Enable the dry cooler in summer"
     annotation (Placement(transformation(extent={{80,60},{100,80}})));
   Buildings.Controls.OBC.CDL.Reals.Subtract sub
     "Check temperature difference"
-    annotation (Placement(transformation(extent={{-260,-250},{-240,-230}})));
+    annotation (Placement(transformation(extent={{-260,-310},{-240,-290}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(
     final k=-1)
     "Reverse the subtract"
-    annotation (Placement(transformation(extent={{-200,-290},{-180,-270}})));
+    annotation (Placement(transformation(extent={{160,-310},{180,-290}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con1(
     final k=TAppSet)
     "Dry cooler approach temperature setpoint"
-    annotation (Placement(transformation(extent={{120,-220},{140,-200}})));
+    annotation (Placement(transformation(extent={{160,-220},{180,-200}})));
   Buildings.Controls.OBC.CDL.Reals.PIDWithReset fanCon(
     final controllerType=fanConTyp,
     final k=kFan,
@@ -238,28 +230,28 @@ model DryCoolerHex
     final reverseActing=false,
     final y_reset=minFanSpe)
     "Dry cooler fan speed controller"
-    annotation (Placement(transformation(extent={{180,-220},{200,-200}})));
+    annotation (Placement(transformation(extent={{220,-220},{240,-200}})));
   Buildings.Controls.OBC.CDL.Reals.Switch swi1
-    annotation (Placement(transformation(extent={{120,-270},{140,-250}})));
-  Buildings.Controls.OBC.CDL.Logical.Or ope
-    "Enable the dry cooler"
+    annotation (Placement(transformation(extent={{200,-270},{220,-250}})));
+  Buildings.Controls.OBC.CDL.Logical.Or weaEna
+    "Enable the dry cooler based on the weather condition"
     annotation (Placement(transformation(extent={{120,110},{140,130}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant zeo(
     final k=0)
     "Disable fan"
-    annotation (Placement(transformation(extent={{180,-290},{200,-270}})));
+    annotation (Placement(transformation(extent={{220,-310},{240,-290}})));
   Buildings.Controls.OBC.CDL.Reals.Switch dryCooPum
     "Dry cooler pump speed setpoint"
     annotation (Placement(transformation(extent={{240,110},{260,130}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant zeo1(
     final k=0) "Zero"
-    annotation (Placement(transformation(extent={{180,80},{200,100}})));
+    annotation (Placement(transformation(extent={{160,70},{180,90}})));
   Buildings.Controls.OBC.CDL.Logical.And norWin
     "Normal rate, in winter preferred condition"
-    annotation (Placement(transformation(extent={{-80,-150},{-60,-130}})));
+    annotation (Placement(transformation(extent={{-80,-120},{-60,-100}})));
   Buildings.Controls.OBC.CDL.Logical.And norSum
     "Normal rate, in summer preferred condition"
-    annotation (Placement(transformation(extent={{-80,-190},{-60,-170}})));
+    annotation (Placement(transformation(extent={{-80,-160},{-60,-140}})));
   Buildings.Controls.OBC.CDL.Logical.Or enaHex "Enable heat exchanger"
     annotation (Placement(transformation(extent={{-20,10},{0,30}})));
   Buildings.Controls.OBC.CDL.Logical.Or enaHex1 "Enable heat exchanger"
@@ -284,6 +276,17 @@ model DryCoolerHex
     final k=mHexGly_flow_nominal)
     "Convert to the mass flow rate"
     annotation (Placement(transformation(extent={{280,210},{300,230}})));
+  Buildings.Controls.OBC.CDL.Logical.And cooHeaPum
+    "Heat pump in cooling mode"
+    annotation (Placement(transformation(extent={{-80,-270},{-60,-250}})));
+  Buildings.Controls.OBC.CDL.Logical.Not inCooMod "Heat pump in cooling mode"
+    annotation (Placement(transformation(extent={{-260,-240},{-240,-220}})));
+  Buildings.Controls.OBC.CDL.Logical.Or cooWat
+    "Dry cooler should cooling down the water flow"
+    annotation (Placement(transformation(extent={{120,-270},{140,-250}})));
+  Buildings.Controls.OBC.CDL.Logical.Or ena
+    "Enable the dry cooler based on weather condition, or heat pump operation"
+    annotation (Placement(transformation(extent={{160,110},{180,130}})));
 equation
   connect(uEleRat, higRatMod.u2) annotation (Line(points={{-340,270},{-270,270},
           {-270,282},{-262,282}}, color={255,127,0}));
@@ -343,97 +346,65 @@ equation
           {-150,-38},{-142,-38}}, color={255,0,255}));
   connect(higHig.y, higHigWin.u1)
     annotation (Line(points={{-118,-30},{-82,-30}},color={255,0,255}));
-  connect(higHigWin.y, higHigWinHeaPum.u1)
-    annotation (Line(points={{-58,-30},{-22,-30}}, color={255,0,255}));
-  connect(higHigSum.y, higHigSumHeaPum.u1)
-    annotation (Line(points={{-58,-90},{-22,-90}}, color={255,0,255}));
-  connect(u1HeaPum, higHigWinHeaPum.u2) annotation (Line(points={{-340,-60},{-50,
-          -60},{-50,-38},{-22,-38}}, color={255,0,255}));
-  connect(u1HeaPum, higHigSumHeaPum.u2) annotation (Line(points={{-340,-60},{-50,
-          -60},{-50,-98},{-22,-98}}, color={255,0,255}));
   connect(norRat.y, norRatMod.u1)
-    annotation (Line(points={{-278,-140},{-262,-140}}, color={255,127,0}));
+    annotation (Line(points={{-278,-110},{-262,-110}}, color={255,127,0}));
   connect(uEleRat, norRatMod.u2) annotation (Line(points={{-340,270},{-270,270},
-          {-270,-148},{-262,-148}}, color={255,127,0}));
-  connect(higHigWinHeaPum.y, winOpe.u1)
-    annotation (Line(points={{2,-30},{18,-30}},   color={255,0,255}));
-  connect(norWinHeaPum.y, winOpe.u2) annotation (Line(points={{2,-140},{10,-140},
-          {10,-38},{18,-38}}, color={255,0,255}));
+          {-270,-118},{-262,-118}}, color={255,127,0}));
   connect(higMedWin.y, winOpe1.u1)
     annotation (Line(points={{-58,190},{-50,190},{-50,120},{78,120}}, color={255,0,255}));
-  connect(winOpe.y, winOpe1.u2) annotation (Line(points={{42,-30},{50,-30},{50,112},
+  connect(winOpe.y, winOpe1.u2) annotation (Line(points={{2,-30},{50,-30},{50,112},
           {78,112}}, color={255,0,255}));
-  connect(higHigSumHeaPum.y, sumOpe.u1)
-    annotation (Line(points={{2,-90},{38,-90}}, color={255,0,255}));
-  connect(norSumHeaPum.y, sumOpe.u2) annotation (Line(points={{2,-180},{20,-180},
-          {20,-98},{38,-98}}, color={255,0,255}));
   connect(higMedSum.y, sumOpe1.u1)
     annotation (Line(points={{-58,70},{78,70}}, color={255,0,255}));
-  connect(sumOpe.y, sumOpe1.u2) annotation (Line(points={{62,-90},{70,-90},{70,62},
+  connect(sumOpe.y, sumOpe1.u2) annotation (Line(points={{2,-70},{70,-70},{70,62},
           {78,62}}, color={255,0,255}));
-  connect(TDryCooOut, sub.u1) annotation (Line(points={{-340,-220},{-280,-220},{
-          -280,-234},{-262,-234}}, color={0,0,127}));
-  connect(TDryBul, sub.u2) annotation (Line(points={{-340,90},{-310,90},{-310,-246},
-          {-262,-246}}, color={0,0,127}));
-  connect(sub.y, gai.u) annotation (Line(points={{-238,-240},{-220,-240},{-220,-280},
-          {-202,-280}}, color={0,0,127}));
-  connect(sumOpe1.y, swi1.u2) annotation (Line(points={{102,70},{110,70},{110,-260},
-          {118,-260}},color={255,0,255}));
-  connect(sub.y, swi1.u1) annotation (Line(points={{-238,-240},{100,-240},{100,-252},
-          {118,-252}}, color={0,0,127}));
-  connect(gai.y, swi1.u3) annotation (Line(points={{-178,-280},{100,-280},{100,-268},
-          {118,-268}}, color={0,0,127}));
+  connect(TDryCooOut, sub.u1) annotation (Line(points={{-340,-290},{-280,-290},{
+          -280,-294},{-262,-294}}, color={0,0,127}));
+  connect(TDryBul, sub.u2) annotation (Line(points={{-340,90},{-310,90},{-310,-306},
+          {-262,-306}}, color={0,0,127}));
+  connect(sub.y, gai.u) annotation (Line(points={{-238,-300},{158,-300}},
+                        color={0,0,127}));
+  connect(sub.y, swi1.u1) annotation (Line(points={{-238,-300},{150,-300},{150,-252},
+          {198,-252}}, color={0,0,127}));
+  connect(gai.y, swi1.u3) annotation (Line(points={{182,-300},{190,-300},{190,-268},
+          {198,-268}}, color={0,0,127}));
   connect(con1.y, fanCon.u_s)
-    annotation (Line(points={{142,-210},{178,-210}}, color={0,0,127}));
-  connect(swi1.y, fanCon.u_m) annotation (Line(points={{142,-260},{190,-260},{190,
+    annotation (Line(points={{182,-210},{218,-210}}, color={0,0,127}));
+  connect(swi1.y, fanCon.u_m) annotation (Line(points={{222,-260},{230,-260},{230,
           -222}}, color={0,0,127}));
-  connect(winOpe1.y, ope.u1)
-    annotation (Line(points={{102,120},{118,120}},color={255,0,255}));
-  connect(sumOpe1.y, ope.u2) annotation (Line(points={{102,70},{110,70},{110,112},
-          {118,112}}, color={255,0,255}));
-  connect(fanCon.y, dryCooFan.u1) annotation (Line(points={{202,-210},{230,-210},
-          {230,-222},{238,-222}}, color={0,0,127}));
-  connect(ope.y, dryCooFan.u2) annotation (Line(points={{142,120},{220,120},{220,
-          -230},{238,-230}}, color={255,0,255}));
-  connect(zeo.y, dryCooFan.u3) annotation (Line(points={{202,-280},{220,-280},{220,
-          -238},{238,-238}}, color={0,0,127}));
-  connect(ope.y, fanCon.trigger) annotation (Line(points={{142,120},{150,120},{150,
-          -240},{184,-240},{184,-222}}, color={255,0,255}));
+  connect(winOpe1.y, weaEna.u1)
+    annotation (Line(points={{102,120},{118,120}}, color={255,0,255}));
+  connect(sumOpe1.y, weaEna.u2) annotation (Line(points={{102,70},{110,70},{110,
+          112},{118,112}}, color={255,0,255}));
+  connect(fanCon.y, dryCooFan.u1) annotation (Line(points={{242,-210},{260,-210},
+          {260,-222},{280,-222}}, color={0,0,127}));
+  connect(zeo.y, dryCooFan.u3) annotation (Line(points={{242,-300},{260,-300},{260,
+          -238},{280,-238}}, color={0,0,127}));
   connect(con.y, dryCooPum.u1) annotation (Line(points={{202,180},{212,180},{212,
           128},{238,128}}, color={0,0,127}));
-  connect(ope.y, dryCooPum.u2)
-    annotation (Line(points={{142,120},{238,120}}, color={255,0,255}));
-  connect(zeo1.y, dryCooPum.u3) annotation (Line(points={{202,90},{230,90},{230,
+  connect(zeo1.y, dryCooPum.u3) annotation (Line(points={{182,80},{230,80},{230,
           112},{238,112}}, color={0,0,127}));
   connect(dryCooFan.y, yDryCoo)
-    annotation (Line(points={{262,-230},{340,-230}}, color={0,0,127}));
-  connect(norWin.y, norWinHeaPum.u1)
-    annotation (Line(points={{-58,-140},{-22,-140}}, color={255,0,255}));
-  connect(norSum.y, norSumHeaPum.u1)
-    annotation (Line(points={{-58,-180},{-22,-180}}, color={255,0,255}));
-  connect(u1HeaPum, norWinHeaPum.u2) annotation (Line(points={{-340,-60},{-50,-60},
-          {-50,-148},{-22,-148}}, color={255,0,255}));
-  connect(u1HeaPum, norSumHeaPum.u2) annotation (Line(points={{-340,-60},{-50,-60},
-          {-50,-188},{-22,-188}}, color={255,0,255}));
+    annotation (Line(points={{304,-230},{340,-230}}, color={0,0,127}));
   connect(norRatMod.y, norWin.u1)
-    annotation (Line(points={{-238,-140},{-82,-140}}, color={255,0,255}));
-  connect(norRatMod.y, norSum.u1) annotation (Line(points={{-238,-140},{-200,-140},
-          {-200,-180},{-82,-180}}, color={255,0,255}));
+    annotation (Line(points={{-238,-110},{-82,-110}}, color={255,0,255}));
+  connect(norRatMod.y, norSum.u1) annotation (Line(points={{-238,-110},{-200,-110},
+          {-200,-150},{-82,-150}}, color={255,0,255}));
   connect(winPre.y, norWin.u2) annotation (Line(points={{-118,190},{-100,190},{-100,
-          -148},{-82,-148}}, color={255,0,255}));
+          -118},{-82,-118}}, color={255,0,255}));
   connect(sumPre.y, norSum.u2) annotation (Line(points={{-118,70},{-90,70},{-90,
-          -188},{-82,-188}}, color={255,0,255}));
+          -158},{-82,-158}}, color={255,0,255}));
   connect(higHig.y, higHigSum.u1) annotation (Line(points={{-118,-30},{-110,-30},
-          {-110,-90},{-82,-90}}, color={255,0,255}));
+          {-110,-70},{-82,-70}}, color={255,0,255}));
   connect(winPre.y, higHigWin.u2) annotation (Line(points={{-118,190},{-100,190},
           {-100,-38},{-82,-38}}, color={255,0,255}));
   connect(sumPre.y, higHigSum.u2) annotation (Line(points={{-118,70},{-90,70},{-90,
-          -98},{-82,-98}}, color={255,0,255}));
-  connect(norSum.y, enaHex.u2) annotation (Line(points={{-58,-180},{-30,-180},{-30,
+          -78},{-82,-78}}, color={255,0,255}));
+  connect(norSum.y, enaHex.u2) annotation (Line(points={{-58,-150},{-30,-150},{-30,
           12},{-22,12}},color={255,0,255}));
-  connect(norWin.y, enaHex.u1) annotation (Line(points={{-58,-140},{-36,-140},{-36,
+  connect(norWin.y, enaHex.u1) annotation (Line(points={{-58,-110},{-36,-110},{-36,
           20},{-22,20}},color={255,0,255}));
-  connect(higHigSum.y, enaHex1.u2) annotation (Line(points={{-58,-90},{-42,-90},
+  connect(higHigSum.y, enaHex1.u2) annotation (Line(points={{-58,-70},{-42,-70},
           {-42,42},{-22,42}},color={255,0,255}));
   connect(higHigWin.y, enaHex1.u1) annotation (Line(points={{-58,-30},{-50,-30},
           {-50,50},{-22,50}},color={255,0,255}));
@@ -453,11 +424,11 @@ equation
     annotation (Line(points={{102,220},{238,220}}, color={255,0,255}));
   connect(con.y, hexPumVal.u1) annotation (Line(points={{202,180},{212,180},{212,
           228},{238,228}}, color={0,0,127}));
-  connect(zeo1.y, hexPumVal.u3) annotation (Line(points={{202,90},{230,90},{230,
+  connect(zeo1.y, hexPumVal.u3) annotation (Line(points={{182,80},{230,80},{230,
           212},{238,212}}, color={0,0,127}));
   connect(enaHex4.y, hexPumByaVal.u2) annotation (Line(points={{102,220},{140,220},
           {140,300},{238,300}}, color={255,0,255}));
-  connect(zeo1.y, hexPumByaVal.u1) annotation (Line(points={{202,90},{230,90},{230,
+  connect(zeo1.y, hexPumByaVal.u1) annotation (Line(points={{182,80},{230,80},{230,
           308},{238,308}}, color={0,0,127}));
   connect(con.y, hexPumByaVal.u3) annotation (Line(points={{202,180},{212,180},{
           212,292},{238,292}}, color={0,0,127}));
@@ -473,6 +444,36 @@ equation
     annotation (Line(points={{262,220},{278,220}}, color={0,0,127}));
   connect(gai2.y, yPumHex)
     annotation (Line(points={{302,220},{340,220}}, color={0,0,127}));
+  connect(higHigWin.y, winOpe.u1)
+    annotation (Line(points={{-58,-30},{-22,-30}}, color={255,0,255}));
+  connect(higHigSum.y, sumOpe.u1)
+    annotation (Line(points={{-58,-70},{-22,-70}}, color={255,0,255}));
+  connect(norWin.y, winOpe.u2) annotation (Line(points={{-58,-110},{-36,-110},{-36,
+          -38},{-22,-38}}, color={255,0,255}));
+  connect(norSum.y, sumOpe.u2) annotation (Line(points={{-58,-150},{-30,-150},{-30,
+          -78},{-22,-78}}, color={255,0,255}));
+  connect(u1HeaPumMod, inCooMod.u)
+    annotation (Line(points={{-340,-230},{-262,-230}}, color={255,0,255}));
+  connect(inCooMod.y, cooHeaPum.u2) annotation (Line(points={{-238,-230},{-220,-230},
+          {-220,-268},{-82,-268}}, color={255,0,255}));
+  connect(u1HeaPum, cooHeaPum.u1) annotation (Line(points={{-340,-180},{-160,-180},
+          {-160,-260},{-82,-260}}, color={255,0,255}));
+  connect(cooHeaPum.y, cooWat.u1)
+    annotation (Line(points={{-58,-260},{118,-260}}, color={255,0,255}));
+  connect(sumOpe1.y, cooWat.u2) annotation (Line(points={{102,70},{110,70},{110,
+          -268},{118,-268}}, color={255,0,255}));
+  connect(cooWat.y, swi1.u2)
+    annotation (Line(points={{142,-260},{198,-260}}, color={255,0,255}));
+  connect(weaEna.y, ena.u1)
+    annotation (Line(points={{142,120},{158,120}}, color={255,0,255}));
+  connect(u1HeaPum, ena.u2) annotation (Line(points={{-340,-180},{150,-180},{150,
+          112},{158,112}}, color={255,0,255}));
+  connect(ena.y, dryCooPum.u2)
+    annotation (Line(points={{182,120},{238,120}}, color={255,0,255}));
+  connect(ena.y, fanCon.trigger) annotation (Line(points={{182,120},{200,120},{200,
+          -230},{224,-230},{224,-222}}, color={255,0,255}));
+  connect(ena.y, dryCooFan.u2) annotation (Line(points={{182,120},{200,120},{200,
+          -230},{280,-230}}, color={255,0,255}));
 annotation (defaultComponentName="dryCooHexCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
@@ -496,11 +497,11 @@ annotation (defaultComponentName="dryCooHexCon",
           textColor={255,127,0},
           textString="uGen"),
         Text(
-          extent={{-98,18},{-60,2}},
+          extent={{-98,28},{-60,12}},
           textColor={0,0,127},
           textString="TGenIn"),
         Text(
-          extent={{-98,-12},{-60,-28}},
+          extent={{-98,-2},{-60,-18}},
           textColor={0,0,127},
           textString="TDryBul"),
         Text(
@@ -508,7 +509,7 @@ annotation (defaultComponentName="dryCooHexCon",
           textColor={0,0,127},
           textString="TDryCooOut"),
         Text(
-          extent={{-96,-50},{-46,-68}},
+          extent={{-96,-30},{-46,-48}},
           textColor={255,0,255},
           textString="u1HeaPum"),
         Text(
@@ -530,7 +531,11 @@ annotation (defaultComponentName="dryCooHexCon",
         Text(
           extent={{48,50},{98,32}},
           textColor={0,0,127},
-          textString="yPumHex")}),
+          textString="yPumHex"),
+        Text(
+          extent={{-96,-52},{-32,-70}},
+          textColor={255,0,255},
+          textString="u1HeaPumMod")}),
                           Diagram(coordinateSystem(preserveAspectRatio=false,
           extent={{-320,-320},{320,320}})),
 Documentation(info="
