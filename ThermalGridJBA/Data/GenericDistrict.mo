@@ -15,7 +15,7 @@ record GenericDistrict "District network design parameters"
     "Nominal mass flow rate in each connection line";
   parameter Modelica.Units.SI.Temperature TLooMin=273.15 + 10.5
     "Minimum loop temperature";
-  parameter Modelica.Units.SI.Temperature TLooMax=273.15 + 23
+  parameter Modelica.Units.SI.Temperature TLooMax=273.15 + 24
     "Maximum loop temperature";
   parameter Real dp_length_nominal(final unit="Pa/m") = 250
     "Pressure drop per pipe length at nominal flow rate";

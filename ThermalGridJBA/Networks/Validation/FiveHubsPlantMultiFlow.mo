@@ -103,16 +103,14 @@ model FiveHubsPlantMultiFlow
   parameter Real offTim(unit="s")=datDis.offTim
     "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real holOnTim(
-    final unit="s")=datDis.holOnTim
+  parameter Real holOnTim(unit="s")=datDis.holOnTim
     "Heat pump hold on time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real holOffTim(
-    final unit="s")=datDis.holOffTim
+  parameter Real holOffTim(unit="s")=datDis.holOffTim
     "Heat pump hold off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
-  parameter Real TUpp(unit="K")=datDis.TUpp
+  parameter Real TUpp(unit="K")=datDis.TUpp - 1
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
   parameter Real TLow(unit="K")=datDis.TLow
