@@ -318,6 +318,9 @@ model FiveHubsPlantMultiFlow
     "Weather data reader"
     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
 
+  Modelica.Blocks.Continuous.Integrator EBorOut(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Out of borefield energy"
+    annotation (Placement(transformation(extent={{180,-230},{200,-210}})));
 equation
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
           {-14,210},{-14,240},{-10,240}},color={0,127,255}));
@@ -437,18 +440,21 @@ equation
           5},{-128,100},{98,100}}, color={0,0,127}));
   connect(cenPla.PPumHexGly, EPumHexGly.u) annotation (Line(points={{-138,3},{-124,
           3},{-124,80},{138,80}}, color={0,0,127}));
-  connect(cenPla.PPumHeaPumGly, EPumHeaPumGly.u) annotation (Line(points={{-138,
-          -3},{-120,-3},{-120,60},{178,60}}, color={0,0,127}));
-  connect(cenPla.PCom, EComPla.u) annotation (Line(points={{-138,-5},{-116,-5},{
-          -116,30},{238,30}}, color={0,0,127}));
-  connect(cenPla.PPumHeaPumWat, EPumHeaPumWat.u) annotation (Line(points={{-138,
-          -7},{-112,-7},{-112,10},{178,10}}, color={0,0,127}));
-  connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-138,-9},{-120,
-          -9},{-120,-30},{178,-30}}, color={0,0,127}));
+  connect(cenPla.PPumHeaPumGly, EPumHeaPumGly.u) annotation (Line(points={{-138,-2},
+          {-120,-2},{-120,60},{178,60}},     color={0,0,127}));
+  connect(cenPla.PCom, EComPla.u) annotation (Line(points={{-138,-4},{-116,-4},
+          {-116,30},{238,30}},color={0,0,127}));
+  connect(cenPla.PPumHeaPumWat, EPumHeaPumWat.u) annotation (Line(points={{-138,-6},
+          {-112,-6},{-112,10},{178,10}},     color={0,0,127}));
+  connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-138,-8},{
+          -120,-8},{-120,-30},{178,-30}},
+                                     color={0,0,127}));
   connect(weaDat.weaBus, bui.weaBus) annotation (Line(
       points={{-360,-20},{-340,-20},{-340,250},{0,250}},
       color={255,204,51},
       thickness=0.5));
+  connect(cenPla.QBorOut_flow, EBorOut.u) annotation (Line(points={{-138,-10},{
+          -124,-10},{-124,-220},{178,-220}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),

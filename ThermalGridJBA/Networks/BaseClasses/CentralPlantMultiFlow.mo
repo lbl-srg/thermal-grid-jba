@@ -178,22 +178,26 @@ model CentralPlantMultiFlow
       final unit="W")
     "Electrical power consumed by circulation pump"
     annotation (Placement(transformation(extent={{240,-190},{280,-150}}),
-        iconTransformation(extent={{100,-110},{140,-70}})));
+        iconTransformation(extent={{100,-100},{140,-60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat(quantity="Power",
       final unit="W")
     "Electrical power consumed by heat pump waterside pump"
     annotation (Placement(transformation(extent={{240,-160},{280,-120}}),
-        iconTransformation(extent={{100,-90},{140,-50}})));
+        iconTransformation(extent={{100,-80},{140,-40}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorOut_flow(unit="W")
+    "Heat flow from borefield to water"
+    annotation (Placement(transformation(extent={{240,-60},{280,-20}}),
+        iconTransformation(extent={{100,-120},{140,-80}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PCom(quantity="Power",
       final unit="W")
     "Electric power consumed by compressor"
     annotation (Placement(transformation(extent={{240,-130},{280,-90}}),
-        iconTransformation(extent={{100,-70},{140,-30}})));
+        iconTransformation(extent={{100,-60},{140,-20}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly(quantity="Power",
       final unit="W")
     "Electrical power consumed by glycol pump of heat pump"
     annotation (Placement(transformation(extent={{240,-100},{280,-60}}),
-        iconTransformation(extent={{100,-50},{140,-10}})));
+        iconTransformation(extent={{100,-40},{140,0}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHexGly(quantity="Power",
       final unit="W")
     "Electrical power consumed by the glycol pump of HEX"
@@ -261,7 +265,7 @@ model CentralPlantMultiFlow
     each TExt0_start=T_start,
     each borFieDat=borFieDat,
     each dT_dz=0) "Borefield modules on the left edge"
-    annotation (Placement(transformation(extent={{60,40},{80,60}})));
+    annotation (Placement(transformation(extent={{40,40},{60,60}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMul(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
@@ -294,7 +298,7 @@ model CentralPlantMultiFlow
     each TExt0_start=T_start,
     each borFieDat=borFieDat,
     each dT_dz=0) "Central borefield modules"
-    annotation (Placement(transformation(extent={{60,-10},{80,10}})));
+    annotation (Placement(transformation(extent={{40,-10},{60,10}})));
   Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes rigBorFie2[2](
     redeclare each final package Medium = MediumW,
     each allowFlowReversal=false,
@@ -302,19 +306,19 @@ model CentralPlantMultiFlow
     each TExt0_start=T_start,
     each borFieDat=borFieDat,
     each dT_dz=0) "Borefield modules on the right edge"
-    annotation (Placement(transformation(extent={{60,-60},{80,-40}})));
+    annotation (Placement(transformation(extent={{40,-60},{60,-40}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier massFlowRateMultiplier3[2*nZon](
     redeclare each final package Medium = MediumW,
     each allowFlowReversal=false,
     k=fill(31, 2*nZon))
-    annotation (Placement(transformation(extent={{100,-10},{120,10}})));
+    annotation (Placement(transformation(extent={{80,-10},{100,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del1(
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final m_flow_nominal=nGenMod*mWat_flow_nominal,
     nPorts=2*nZon*3+1)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
-        rotation=180, origin={170,10})));
+        rotation=180, origin={130,10})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(k=nGenMod)
     annotation (Placement(transformation(extent={{-60,130},{-40,150}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=nGenMod)
@@ -337,7 +341,7 @@ model CentralPlantMultiFlow
       Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=0,
-        origin={210,0})));
+        origin={160,0})));
   Buildings.Fluid.Sensors.TemperatureTwoPort entBorTem(redeclare final package
       Medium = MediumW,
     allowFlowReversal=false,
@@ -347,6 +351,19 @@ model CentralPlantMultiFlow
         extent={{-10,-10},{10,10}},
         rotation=0,
         origin={-60,0})));
+  Buildings.Fluid.Sensors.MassFlowRate senMasFlo(
+    redeclare final package Medium = MediumW)
+    "Water flow rate into borefield"
+    annotation (Placement(transformation(extent={{190,-10},{210,10}})));
+  Buildings.Controls.OBC.CDL.Reals.Subtract sub
+    "Water flow temperature difference"
+    annotation (Placement(transformation(extent={{180,30},{200,50}})));
+  Buildings.Controls.OBC.CDL.Reals.Multiply mul
+    annotation (Placement(transformation(extent={{160,-50},{180,-30}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter heaCap(final k=4184)
+    "Water specific heat capacity"
+    annotation (Placement(transformation(extent={{200,-50},{220,-30}})));
+
 equation
   connect(port_a, masFloMul.port_a) annotation (Line(
       points={{-240,0},{-220,0}},
@@ -369,12 +386,12 @@ equation
     for i in 1:nZon loop
       connect(del3.ports[(j - 1)*nZon + i], lefBorFie[j].port_a[i]) annotation
         (Line(
-          points={{0,0},{20,0},{20,50},{60,50}},
+          points={{0,0},{20,0},{20,50},{40,50}},
           color={0,127,255},
           thickness=0.5));
       connect(lefBorFie[j].port_b[i], del1.ports[(j - 1)*nZon + i]) annotation
         (Line(
-          points={{80,50},{130,50},{130,0},{170,0}},
+          points={{60,50},{110,50},{110,0},{130,0}},
           color={0,127,255},
           thickness=0.5));
     end for;
@@ -384,16 +401,16 @@ equation
     for i in 1:nZon loop
       connect(del3.ports[(j - 1 + 2)*nZon + i], cenBorFie1[j].port_a[i])
         annotation (Line(
-          points={{0,0},{60,0}},
+          points={{0,0},{40,0}},
           color={0,127,255},
           thickness=0.5));
       connect(cenBorFie1[j].port_b[i], massFlowRateMultiplier3[(j - 1)*nZon + i].port_a)
         annotation (Line(
-          points={{80,0},{100,0}},
+          points={{60,0},{80,0}},
           color={0,127,255},
           thickness=0.5));
       connect(massFlowRateMultiplier3[(j-1)*nZon+i].port_b, del1.ports[(j-1+2)*nZon+i])
-        annotation (Line(points={{120,0},{170,0}}, color={0,127,255}, thickness=0.5));
+        annotation (Line(points={{100,0},{130,0}}, color={0,127,255}, thickness=0.5));
     end for;
   end for;
 
@@ -401,23 +418,19 @@ equation
     for i in 1:nZon loop
       connect(del3.ports[(j - 1 + 4)*nZon + i], rigBorFie2[j].port_a[i])
         annotation (Line(
-          points={{0,0},{20,0},{20,-50},{60,-50}},
+          points={{0,0},{20,0},{20,-50},{40,-50}},
           color={0,127,255},
           thickness=0.5));
       connect(rigBorFie2[j].port_b[i], del1.ports[(j - 1 + 4)*nZon + i])
         annotation (Line(
-          points={{80,-50},{130,-50},{130,0},{170,0}},
+          points={{60,-50},{110,-50},{110,0},{130,0}},
           color={0,127,255},
           thickness=0.5));
     end for;
   end for;
 
   connect(del1.ports[2*nZon*3+1], leaBorTem.port_a)
-    annotation (Line(points={{170,0},{200,0}}, color={0,127,255},
-      thickness=0.5));
-
-  connect(leaBorTem.port_b, port_b)
-    annotation (Line(points={{220,0},{242,0}}, color={0,127,255},
+    annotation (Line(points={{130,0},{150,0}}, color={0,127,255},
       thickness=0.5));
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},{
@@ -466,6 +479,22 @@ equation
   connect(entBorTem.port_b, masFloMul2.port_a)
     annotation (Line(points={{-50,0},{-40,0}}, color={0,127,255},
       thickness=0.5));
+  connect(entBorTem.T, sub.u2)
+    annotation (Line(points={{-60,11},{-60,34},{178,34}}, color={0,0,127}));
+  connect(leaBorTem.T, sub.u1)
+    annotation (Line(points={{160,11},{160,46},{178,46}}, color={0,0,127}));
+  connect(leaBorTem.port_b, senMasFlo.port_a)
+    annotation (Line(points={{170,0},{190,0}}, color={0,127,255}));
+  connect(senMasFlo.port_b, port_b)
+    annotation (Line(points={{210,0},{242,0}}, color={0,127,255}));
+  connect(sub.y, mul.u2) annotation (Line(points={{202,40},{208,40},{208,60},{144,
+          60},{144,-46},{158,-46}}, color={0,0,127}));
+  connect(senMasFlo.m_flow, mul.u1) annotation (Line(points={{200,11},{200,20},{
+          148,20},{148,-34},{158,-34}}, color={0,0,127}));
+  connect(mul.y, heaCap.u)
+    annotation (Line(points={{182,-40},{198,-40}}, color={0,0,127}));
+  connect(heaCap.y, QBorOut_flow)
+    annotation (Line(points={{222,-40},{260,-40}}, color={0,0,127}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
