@@ -6,7 +6,7 @@ model ConnectedETSNoDHW
     "Medium model";
 
   parameter String filNam =
-    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA.mos";
+    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_futu.mos";
 
   ThermalGridJBA.BoundaryConditions.WeatherData wea(
     final weaFil = bui.weaFil) "fTMY weather data reader"
