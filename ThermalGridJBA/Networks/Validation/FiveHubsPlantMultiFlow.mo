@@ -311,15 +311,16 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiSum EPumPla(nin=5)
     "Plant pumps electricity energy"
     annotation (Placement(transformation(extent={{240,60},{260,80}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiMax mulMax(nin=nBui, y(unit="K",
-        displayUnit="degC"))
+  Buildings.Controls.OBC.CDL.Reals.MultiMax looMaxTem(nin=nBui, y(unit="K",
+        displayUnit="degC")) "Maximum mixing temperature"
     annotation (Placement(transformation(extent={{-300,-150},{-280,-130}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiMin mulMin(nin=nBui, y(unit="K",
-        displayUnit="degC"))
+  Buildings.Controls.OBC.CDL.Reals.MultiMin looMinTem(nin=nBui, y(unit="K",
+        displayUnit="degC")) "Minimum mixing temperature"
     annotation (Placement(transformation(extent={{-300,-190},{-280,-170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum mulSum(nin=nBui)
     annotation (Placement(transformation(extent={{-300,50},{-280,70}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=1/nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter looMeaTem(k=1/nBui)
+    "Average mixing points temperature"
     annotation (Placement(transformation(extent={{-260,50},{-240,70}})));
   BoundaryConditions.WeatherData weaDat[nBui](
     final weaFil = bui.weaFil)
@@ -430,18 +431,18 @@ equation
           100.75},{360,100.75}}, color={0,0,127}));
   connect(dis.TOut, mulSum.u) annotation (Line(points={{22,194},{40,194},{40,170},
           {-320,170},{-320,60},{-302,60}}, color={0,0,127}));
-  connect(dis.TOut, mulMax.u) annotation (Line(points={{22,194},{40,194},{40,170},
-          {-320,170},{-320,-140},{-302,-140}}, color={0,0,127}));
-  connect(dis.TOut, mulMin.u) annotation (Line(points={{22,194},{40,194},{40,170},
-          {-320,170},{-320,-180},{-302,-180}}, color={0,0,127}));
-  connect(mulMax.y, looPumSpe.TMixMax) annotation (Line(points={{-278,-140},{-80,
-          -140},{-80,-154},{-62,-154}}, color={0,0,127}));
-  connect(mulMin.y, looPumSpe.TMixMin) annotation (Line(points={{-278,-180},{-80,
-          -180},{-80,-166},{-62,-166}}, color={0,0,127}));
-  connect(mulSum.y, gai1.u)
+  connect(dis.TOut, looMaxTem.u) annotation (Line(points={{22,194},{40,194},{40,
+          170},{-320,170},{-320,-140},{-302,-140}}, color={0,0,127}));
+  connect(dis.TOut, looMinTem.u) annotation (Line(points={{22,194},{40,194},{40,
+          170},{-320,170},{-320,-180},{-302,-180}}, color={0,0,127}));
+  connect(looMaxTem.y, looPumSpe.TMixMax) annotation (Line(points={{-278,-140},
+          {-80,-140},{-80,-154},{-62,-154}}, color={0,0,127}));
+  connect(looMinTem.y, looPumSpe.TMixMin) annotation (Line(points={{-278,-180},
+          {-80,-180},{-80,-166},{-62,-166}}, color={0,0,127}));
+  connect(mulSum.y, looMeaTem.u)
     annotation (Line(points={{-278,60},{-262,60}}, color={0,0,127}));
-  connect(gai1.y, cenPla.TMixAve) annotation (Line(points={{-238,60},{-170,60},{
-          -170,3},{-162,3}}, color={0,0,127}));
+  connect(looMeaTem.y, cenPla.TMixAve) annotation (Line(points={{-238,60},{-170,
+          60},{-170,3},{-162,3}}, color={0,0,127}));
   connect(cenPla.PFanDryCoo, EFunDryCoo.u) annotation (Line(points={{-138,7},{-132,
           7},{-132,120},{238,120}}, color={0,0,127}));
   connect(cenPla.PPumDryCoo, EPumDryCoo.u) annotation (Line(points={{-138,5},{-128,
