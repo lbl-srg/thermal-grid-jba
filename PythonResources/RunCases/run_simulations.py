@@ -136,7 +136,9 @@ def _simulate(spec):
     s.addPreProcessingStatement("OutputCPUtime:= true;")
     s.addPreProcessingStatement("Advanced.ParallelizeCode = false;")
 #    s.addPreProcessingStatement("Advanced.EfficientMinorEvents = true;")
-    if not 'solver' in spec:
+    if 'solver' in spec:
+        s.setSolver(spec['solver'])
+    else:
         s.setSolver("Cvode")
     if 'modifiers' in spec:
         s.addModelModifier(spec['modifiers'])
