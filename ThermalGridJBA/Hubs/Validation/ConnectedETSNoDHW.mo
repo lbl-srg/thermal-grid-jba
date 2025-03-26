@@ -47,6 +47,9 @@ model ConnectedETSNoDHW
   Modelica.Blocks.Continuous.Integrator dHHotWat if bui.have_hotWat
     "Cumulative enthalpy difference of domestic hot water"
     annotation (Placement(transformation(extent={{40,10},{60,30}})));
+  Modelica.Blocks.Continuous.Integrator EChi if bui.have_eleCoo
+    "Cumulative electric energy use by the heat recovery chiller of the ETS"
+    annotation (Placement(transformation(extent={{80,10},{100,30}})));
 equation
   connect(supAmbWat.ports[1], senMasFlo.port_a)
     annotation (Line(points={{-40,-10},{-20,-10}},
@@ -67,6 +70,8 @@ equation
       points={{0,70},{10,70},{10,4},{50,4},{50,0}},
       color={255,204,51},
       thickness=0.5));
+  connect(bui.PCoo, EChi.u) annotation (Line(points={{62,-3},{62,-2},{70,-2},{70,
+          20},{78,20}}, color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(
