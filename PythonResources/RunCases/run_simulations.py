@@ -12,7 +12,7 @@ import os
 BRANCH="master"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
-CASE_LIST = 'fivehubsnoplant'
+CASE_LIST = 'fivehubsmultiflow'
 """ This parameter determines which model to run and which load files to load.
     See `cases.py`, case insensitive:
         handwrite: explicitly listed cases
@@ -22,8 +22,8 @@ CASE_LIST = 'fivehubsnoplant'
         fivehubsmultiflow: runs ThermalGridJBA.Networks.Validation.FiveHubsPlantMultiFlow
 """
 CASE_SPECS = {
-     'start_time' : 90 * 24 * 3600,
-     'stop_time'  : 100* 24 * 3600,
+     'start_time' : 0 * 24 * 3600,
+     'stop_time'  : 365 * 24 * 3600,
      'solver'     : 'cvode'}
 """ Sets simulation specifications for all cases,
         UNLESS such a specification is already in the case constructor,
@@ -95,7 +95,7 @@ def checkout_repository(working_directory):
 
     des = os.path.join(working_directory, "ThermalGridJBA")
     print("*** Copying ThermalGridJBA library to {}".format(des))
-    shutil.copytree("/home/casper/gitRepo/thermal-grid-jba/ThermalGridJBA", des)
+    shutil.copytree("../../ThermalGridJBA", des)
     
     ### Test code using Buildings
     # des = os.path.join(working_directory, "Buildings")
@@ -118,7 +118,14 @@ def _simulate(spec):
     os.makedirs(out_dir)
 
     # Update MODELICAPATH to get the right library version
-    os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
+    modPath = os.environ["MODELICAPATH"]
+    patDir = modPath.split(':')
+    patDir.append(spec['lib_dir'])
+    patDir.append(out_dir)
+    newModPath = ":".join(patDir)
+    os.environ["MODELICAPATH"] = newModPath
+
+    # os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
 
     # Copy the models
 #    print("Copying models from {} to {}".format(CWD, wor_dir))
