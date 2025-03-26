@@ -586,14 +586,14 @@ equation
           {180,20},{180,-440},{104,-440},{104,-422}}, color={255,0,255}));
   connect(enaHeaPum.y, and2.u1) annotation (Line(points={{62,40},{80,40},{80,20},
           {98,20}}, color={255,0,255}));
-  connect(holHeaPum.y, leaWatTem.u2) annotation (Line(points={{162,20},{180,20},
-          {180,260},{218,260}}, color={255,0,255}));
   connect(delChe.y, disHeaPum.u2) annotation (Line(points={{-178,-40},{-160,-40},
           {-160,-8},{-142,-8}}, color={255,0,255}));
   connect(pre.y, delChe.u)
     annotation (Line(points={{-218,-40},{-202,-40}}, color={255,0,255}));
   connect(and2.y, pre.u) annotation (Line(points={{122,20},{130,20},{130,-60},{
           -260,-60},{-260,-40},{-242,-40}}, color={255,0,255}));
+  connect(enaHeaPum.y, leaWatTem.u2) annotation (Line(points={{62,40},{190,40},
+          {190,260},{218,260}}, color={255,0,255}));
   annotation (defaultComponentName="heaPumCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(

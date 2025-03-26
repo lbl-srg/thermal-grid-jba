@@ -69,8 +69,8 @@ record GenericDistrict "District network design parameters"
   parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186
-    *TApp
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186*
+    TApp
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConHea_nominal(unit="K")=TLooMin + TApp
@@ -101,10 +101,10 @@ record GenericDistrict "District network design parameters"
   parameter Real TCooSet(unit="K")=TLooMin
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=TLooMin
+  parameter Real THeaSet(unit="K")=TLooMax
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real offTim(unit="s")=12*3600
+  parameter Real offTim(unit="s")=6*3600
     "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real holOnTim(unit="s")=2*3600
@@ -114,10 +114,10 @@ record GenericDistrict "District network design parameters"
     "Heat pump hold off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
-  parameter Real TUpp(unit="K")=TLooMax
+  parameter Real TUpp(unit="K")=TLooMax - 1
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real TLow(unit="K")=TLooMin
+  parameter Real TLow(unit="K")=TLooMin + 1
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
   parameter Real dTSlo(unit="K")=2

@@ -110,7 +110,7 @@ model FiveHubsPlantMultiFlow
     "Heat pump hold off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
-  parameter Real TUpp(unit="K")=datDis.TUpp - 1
+  parameter Real TUpp(unit="K")=datDis.TUpp
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
   parameter Real TLow(unit="K")=datDis.TLow
