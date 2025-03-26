@@ -15,6 +15,7 @@ import os
 from datetime import datetime, timedelta
 
 y = 2025 # dummy year, has no effect
+CWD = os.getcwd()
 
 #%% Make epw weather file
 
@@ -106,8 +107,8 @@ def make_mos(load_from,
 
 #%% Main process
 
-weather_eps_from = os.path.join("/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Weather/fTMY_Maryland_Prince_George's_NORESM2_2020_2039.epw")
-weather_mos_from = os.path.join("/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Weather/fTMY_Maryland_Prince_George's_NORESM2_2020_2039.mos")
+weather_eps_from = os.path.realpath(os.path.join(CWD,"../Weather/fTMY_Maryland_Prince_George's_NORESM2_2020_2039.epw"))
+weather_mos_from = os.path.realpath(os.path.join(CWD,"../Weather/fTMY_Maryland_Prince_George's_NORESM2_2020_2039.mos"))
 hotday = datetime(y, 8, 2)
 heat_wave_from = datetime(y, 7, 27)
 heat_wave_to = datetime(y, 8, 9)
@@ -118,8 +119,8 @@ cold_snap_to = datetime(y, 3, 8)
 #%% Make weather files
 
 # heat wave
-weather_epw_to = os.path.join('/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Weather/USA_MD_Andrews.AFB.fTMY.HeatWave.epw')
-weather_mos_to = os.path.join('/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Weather/USA_MD_Andrews.AFB.fTMY.HeatWave.mos')
+weather_epw_to = os.path.realpath(os.path.join(CWD,"../Weather/USA_MD_Andrews.AFB.fTMY.HeatWave.epw"))
+weather_mos_to = os.path.realpath(os.path.join(CWD,"../Weather/USA_MD_Andrews.AFB.fTMY.HeatWave.mos"))
 make_epw(weather_eps_from,
          weather_epw_to,
          hotday,
@@ -133,8 +134,8 @@ make_mos(weather_mos_from,
          '\t')
 
 # cold snap
-weather_epw_to = os.path.join('/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Weather/USA_MD_Andrews.AFB.fTMY.ColdSnap.epw')
-weather_mos_to = os.path.join('/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Weather/USA_MD_Andrews.AFB.fTMY.ColdSnap.mos')
+weather_epw_to = os.path.realpath(os.path.join(CWD,"../Weather/USA_MD_Andrews.AFB.fTMY.ColdSnap.epw"))
+weather_mos_to = os.path.realpath(os.path.join(CWD,"../Weather/USA_MD_Andrews.AFB.fTMY.ColdSnap.mos"))
 make_epw(weather_eps_from,
          weather_epw_to,
          coldday,
@@ -149,7 +150,7 @@ make_mos(weather_mos_from,
 
 #%% Make load files
 
-load_from_directory = os.path.join("/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Consumption/Modelica/")
+load_from_directory = os.path.realpath(os.path.join(CWD,"Modelica/"))
 load_from_files = glob.glob(os.path.join(load_from_directory, "*_futu.mos"))
 
 for infile in load_from_files:
