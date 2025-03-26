@@ -52,10 +52,10 @@ model CentralPlantMultiFlow
   parameter Real QHeaPumCoo_flow_nominal(unit="W")
     "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConCoo_nominal(unit="K")=TLooMax - TApp
+  parameter Real TConCoo_nominal(unit="K")=TLooMax
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaCoo_nominal(unit="K")=TLooMax
+  parameter Real TEvaCoo_nominal(unit="K")=TLooMax + TApp
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
   parameter Real mBorMod_flow_nominual(unit="kg/s")=mWat_flow_nominal*nGenMod/
@@ -97,12 +97,10 @@ model CentralPlantMultiFlow
   parameter Real offTim(unit="s")=12*3600
      "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real holOnTim(
-    final unit="s")=1800
+  parameter Real holOnTim(unit="s")=1800
     "Heat pump hold on time"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real holOffTim(
-    final unit="s")=1800
+  parameter Real holOffTim(unit="s")=1800
     "Heat pump hold off time"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real minComSpe(unit="1")=0.2
