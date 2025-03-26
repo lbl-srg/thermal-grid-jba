@@ -44,6 +44,10 @@ CHECK_LOG_FILES = 'failed'
         any other string: skipped
 """
 KEEP_MAT_FILES = True # Set false to delete result mat files to save space
+if not KEEP_MAT_FILES:
+    print("="*10 + "!"*10 + "="*10)
+    print("Result mat files will be deleted because KEEP_MAT_FILES = False")
+    print("="*10 + "!"*10 + "="*10)
 
 CWD = os.getcwd()
 package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
