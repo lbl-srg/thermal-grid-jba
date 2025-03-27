@@ -15,6 +15,11 @@ from datetime import datetime, timedelta
 
 CWD = os.getcwd()
 
+# plot configurations
+linewidth = 0.25
+xticksC = np.arange(-10,50,10)
+xticksF = np.arange(5,110,15)
+
 def celsius_to_fahrenheit(celsius):
     return (celsius * 9/5) + 32
 
@@ -49,31 +54,41 @@ fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
 # Plot the fTMY on the top subplot
 ax1.plot(formatted_dates, df_base[1],
          label='fTMY',
-         linewidth=0.5,
-         color = 'grey')
+         linewidth=linewidth,
+         color = 'black')
+ax1.yaxis.set_ticks(xticksC)
+ax1.grid(True)
 fig.text(0.0, 0.5, 'Dry-Bulb Temperature (°C)', va='center', rotation='vertical')
 #ax1.set_title('Top Figure')
 #ax1.legend()
 
 secax1 = ax1.secondary_yaxis('right', functions=(celsius_to_fahrenheit, lambda f: (f - 32) * 5/9))
+secax1.yaxis.set_ticks(xticksF)
 fig.text(0.98, 0.5, 'Dry-Bulb Temperature (°F)', va='center', rotation='vertical')
 
 # Plot the first half of cold snap and the second half of heat wave on the bottom subplot
 ax2.plot(formatted_dates, tdb_hole,
          label="fTMY",
-         linewidth=0.5,
-         color = "grey")
+         linewidth=linewidth,
+         color = "black")
 ax2.plot([formatted_dates[i] for i in indices_heat], df_heat.iloc[indices_heat, 1],
          label="Heat wave",
-         linewidth=0.5,
+         linewidth=linewidth,
          color = "red")
 ax2.plot([formatted_dates[i] for i in indices_cold], df_cold.iloc[indices_cold, 1],
          label="Cold snap",
-         linewidth=0.5,
+         linewidth=linewidth,
          color = "blue")
-ax2.legend()
+ax2.yaxis.set_ticks(xticksC)
+ax2.grid(True)
+ax2.legend(loc = 'upper center',
+           bbox_to_anchor = (0.5, 1.4, 0., 0.),
+           fancybox = True,
+           shadow = True,
+           ncol = 3)
 
 secax2 = ax2.secondary_yaxis('right', functions=(celsius_to_fahrenheit, lambda f: (f - 32) * 5/9))
+secax2.yaxis.set_ticks(xticksF)
 
 # Set the major ticks to be at the start of each month
 ax2.xaxis.set_major_locator(mdates.MonthLocator())
@@ -81,3 +96,6 @@ ax2.xaxis.set_major_formatter(mdates.DateFormatter('%b-%-d'))
 plt.xticks(rotation=45)
 plt.tight_layout()
 
+plt.savefig("extreme-weather-scenarios.pdf",
+            bbox_inches = 'tight')
+plt.close()
