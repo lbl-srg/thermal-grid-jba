@@ -72,8 +72,8 @@ record GenericDistrict "District network design parameters"
   parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186*
-    TApp
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186
+    *TApp
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConHea_nominal(unit="K")=TLooMin + TApp
@@ -120,7 +120,7 @@ record GenericDistrict "District network design parameters"
   parameter Real TUpp(unit="K")=TLooMax - 1
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real TLow(unit="K")=TLooMin + 1
+  parameter Real TLow(unit="K")=TLooMin
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
   parameter Real dTSlo(unit="K")=2
