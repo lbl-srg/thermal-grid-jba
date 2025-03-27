@@ -560,14 +560,15 @@ equation
           {-270,256},{-262,256}}, color={0,0,127}));
   connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-238,261},{-220,
           261},{-220,179},{-182,179}}, color={255,127,0}));
-  connect(ind.yEle, dryCooHexCon.uEleRat) annotation (Line(points={{-238,261},{-220,
-          261},{-220,219},{-82,219}}, color={255,127,0}));
-  connect(ind.ySt, dryCooHexCon.uSt) annotation (Line(points={{-238,266},{-212,266},
-          {-212,217},{-82,217}},      color={255,127,0}));
+  connect(ind.yEle, dryCooHexCon.uEleRat) annotation (Line(points={{-238,261},{
+          -220,261},{-220,217},{-82,217}},
+                                      color={255,127,0}));
+  connect(ind.ySt, dryCooHexCon.uSt) annotation (Line(points={{-238,266},{-212,
+          266},{-212,215},{-82,215}}, color={255,127,0}));
   connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-238,266},{-212,266},
           {-212,177},{-182,177}}, color={255,127,0}));
-  connect(ind.yGen, dryCooHexCon.uGen) annotation (Line(points={{-238,254},{-228,
-          254},{-228,215},{-82,215}},      color={255,127,0}));
+  connect(ind.yGen, dryCooHexCon.uGen) annotation (Line(points={{-238,254},{
+          -228,254},{-228,213},{-82,213}}, color={255,127,0}));
   connect(ind.yGen, heaPumCon.uGen) annotation (Line(points={{-238,254},{-228,
           254},{-228,168},{-182,168}}, color={255,127,0}));
   connect(heaPumCon.y1On, dryCooHexCon.u1HeaPum) annotation (Line(points={{-158,
@@ -584,7 +585,7 @@ equation
   connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-320,190},{-270,
           190},{-270,209},{-82,209}},      color={0,0,127}));
   connect(entGenTem.T, dryCooHexCon.TGenIn) annotation (Line(points={{-260,-149},
-          {-260,212},{-82,212}}, color={0,0,127}));
+          {-260,211},{-82,211}}, color={0,0,127}));
   connect(dryCoo.port_b, dryCooOut.port_a)
     annotation (Line(points={{60,130},{120,130}}, color={0,127,255},
       thickness=0.5));
@@ -679,10 +680,12 @@ equation
       points={{180,-10},{180,-24},{160,-24}},
       color={0,127,255},
       thickness=0.5));
-  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{-158,179},{96,179},
-          {96,-27.9},{138.9,-27.9}}, color={255,0,255}));
-  connect(heaPumCon.ySet, heaPum.ySet) annotation (Line(points={{-158,174},{92,174},
-          {92,-31.9},{138.9,-31.9}}, color={0,0,127}));
+  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{-158,177},{96,
+          177},{96,-27.9},{138.9,-27.9}},
+                                     color={255,0,255}));
+  connect(heaPumCon.ySet, heaPum.ySet) annotation (Line(points={{-158,173},{92,
+          173},{92,-31.9},{138.9,-31.9}},
+                                     color={0,0,127}));
   connect(heaPum.P, PCom)
     annotation (Line(points={{161,-30},{320,-30}}, color={0,0,127}));
   connect(jun3.port_2, leaGenTem.port_a) annotation (Line(
@@ -721,7 +724,9 @@ equation
           {126,60},{126,91.6},{-100,91.6}},color={0,127,255},
       thickness=0.5));
   connect(heaPumCon.y1Mod, dryCooHexCon.u1HeaPumMod) annotation (Line(points={{-158,
-          179},{-116,179},{-116,204},{-82,204}}, color={255,0,255}));
+          177},{-116,177},{-116,204},{-82,204}}, color={255,0,255}));
+  connect(heaPumCon.y1CooLoo, dryCooHexCon.u1CooLoo) annotation (Line(points={{
+          -158,179},{-124,179},{-124,219},{-82,219}}, color={255,0,255}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={

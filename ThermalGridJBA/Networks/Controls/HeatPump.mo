@@ -140,21 +140,21 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1Mod
     "=true for heating, =false for cooling"
     annotation (Placement(transformation(extent={{300,380},{340,420}}),
-        iconTransformation(extent={{100,70},{140,110}})));
+        iconTransformation(extent={{100,50},{140,90}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput TLea(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Leaving water temperature setpoint"
     annotation (Placement(transformation(extent={{300,240},{340,280}}),
-        iconTransformation(extent={{100,40},{140,80}})));
+        iconTransformation(extent={{100,30},{140,70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput ySet(
     final min=0,
     final max=1,
     final unit="1")
     "Heat pump compression speed setpoint"
     annotation (Placement(transformation(extent={{300,90},{340,130}}),
-        iconTransformation(extent={{100,20},{140,60}})));
+        iconTransformation(extent={{100,10},{140,50}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1On
     "Heat pump commanded on"
     annotation (Placement(transformation(extent={{300,0},{340,40}}),
@@ -389,6 +389,10 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     annotation (Placement(transformation(extent={{-200,-50},{-180,-30}})));
   Buildings.Controls.OBC.CDL.Logical.Pre pre "Break loop"
     annotation (Placement(transformation(extent={{-240,-50},{-220,-30}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1CooLoo
+    "True: cool loop; False: warm loop" annotation (Placement(transformation(
+          extent={{300,430},{340,470}}), iconTransformation(extent={{100,70},{
+            140,110}})));
 equation
   connect(higLoa.y, higLoaMod.u1)
     annotation (Line(points={{-258,390},{-222,390}}, color={255,127,0}));
@@ -594,6 +598,8 @@ equation
           -260,-60},{-260,-40},{-242,-40}}, color={255,0,255}));
   connect(enaHeaPum.y, leaWatTem.u2) annotation (Line(points={{62,40},{190,40},
           {190,260},{218,260}}, color={255,0,255}));
+  connect(colLoo.y, y1CooLoo) annotation (Line(points={{-138,330},{-130,330},{
+          -130,450},{320,450}}, color={255,0,255}));
   annotation (defaultComponentName="heaPumCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
