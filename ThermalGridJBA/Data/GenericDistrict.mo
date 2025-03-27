@@ -80,7 +80,7 @@ record GenericDistrict "District network design parameters"
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-
-    QPlaHeaPumHea_flow_nominal*2
+    QPlaHeaPumHea_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConCoo_nominal(unit="K")=TLooMax
