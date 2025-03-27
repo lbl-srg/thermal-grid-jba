@@ -28,6 +28,9 @@ model FiveHubsPlantMultiFlow
   parameter Integer nGenMod=datDis.nGenMod
     "Total number of generation modules in central plant"
     annotation (Dialog(tab="Central plant"));
+  parameter Integer nBorSec = datDis.nBorSec
+    "Number of borefield sectors. It includes 2 modules and the number should be divisible by 3"
+    annotation (Dialog(tab="Central plant"));
   parameter Real samplePeriod(unit="s")=datDis.samplePeriod
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));
@@ -242,6 +245,7 @@ model FiveHubsPlantMultiFlow
     annotation (Placement(transformation(extent={{320,-130},{340,-110}})));
   BaseClasses.CentralPlantMultiFlow cenPla(
     final nGenMod=nGenMod,
+    nBorSec=nBorSec,
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
     final mWat_flow_nominal=mPlaWat_flow_nominal,

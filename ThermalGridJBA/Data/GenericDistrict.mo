@@ -28,6 +28,9 @@ record GenericDistrict "District network design parameters"
   parameter Integer nGenMod=4
     "Total number of generation modules in central plant"
     annotation (Dialog(tab="Central plant"));
+  parameter Integer nBorSec = 33
+    "Number of borefield sectors. It includes 2 modules and the number should be divisible by 3"
+    annotation (Dialog(tab="Central plant"));
   parameter Real samplePeriod(unit="s")=1200
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));

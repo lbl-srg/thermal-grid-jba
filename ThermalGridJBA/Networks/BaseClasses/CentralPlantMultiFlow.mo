@@ -5,6 +5,8 @@ model CentralPlantMultiFlow
   package MediumW = Buildings.Media.Water "Water";
   parameter Integer nGenMod=4
     "Number of generation modules";
+  parameter Integer nBorSec = 33
+    "Number of borefield sectors. It includes 2 modules and the number should be divisible by 3";
   parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
@@ -59,7 +61,7 @@ model CentralPlantMultiFlow
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
   parameter Real mBorMod_flow_nominual(unit="kg/s")=mWat_flow_nominal*nGenMod/
-    66
+    (nBorSec*2)
     "Nominal mass flow rate to each borefield module"
     annotation (Dialog(group="Borefield"));
   parameter Real mBorHol_flow_nominal[nZon](unit=fill("kg/s", nZon))=fill(
@@ -133,7 +135,7 @@ model CentralPlantMultiFlow
     kTub=0.42,
     eTub=0.0029,
     xC=(2*((0.04/2)^2))^(1/2))
-    "Construction data: FIXME, the borehole height, boreholes coordinate should be updated"
+    "Construction data: the borehole height, boreholes coordinate should be updated"
     annotation (Placement(transformation(extent={{-160,-80},{-140,-60}})));
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Borefield.Template borFieDat(
     filDat=filDat,
@@ -289,7 +291,7 @@ model CentralPlantMultiFlow
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMul2(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
-    k=3/33)
+    k=3/nBorSec)
     "Split total flow"
     annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del3(
@@ -318,7 +320,7 @@ model CentralPlantMultiFlow
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier massFlowRateMultiplier3[2*nZon](
     redeclare each final package Medium = MediumW,
     each allowFlowReversal=false,
-    k=fill(31, 2*nZon))
+    k=fill(nBorSec - 2, 2*nZon))
     annotation (Placement(transformation(extent={{80,-10},{100,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del1(
     redeclare final package Medium = MediumW,
