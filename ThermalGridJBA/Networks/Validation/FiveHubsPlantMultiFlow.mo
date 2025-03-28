@@ -334,6 +334,17 @@ model FiveHubsPlantMultiFlow
   Modelica.Blocks.Continuous.Integrator EBorOut(initType=Modelica.Blocks.Types.Init.InitialState)
     "Out of borefield energy"
     annotation (Placement(transformation(extent={{180,-230},{200,-210}})));
+  Buildings.Controls.OBC.CDL.Reals.Subtract sub
+    "Water flow temperature difference across central plant"
+    annotation (Placement(transformation(extent={{180,-160},{200,-140}})));
+  Buildings.Controls.OBC.CDL.Reals.Multiply mul
+    annotation (Placement(transformation(extent={{240,-180},{260,-160}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter plaHeaSup(final k=4184)
+    "Heat flow rate supply from central plant"
+    annotation (Placement(transformation(extent={{280,-180},{300,-160}})));
+  Modelica.Blocks.Continuous.Integrator EPlaHea(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Energy supply from central plant"
+    annotation (Placement(transformation(extent={{320,-180},{340,-160}})));
 equation
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
           {-14,210},{-14,240},{-10,240}},color={0,127,255}));
@@ -364,7 +375,8 @@ equation
   connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,160},{340,160},{340,
           99.75},{360,99.75}}, color={0,0,127}));
   connect(TDisWatSup.T, conVio.u[1]) annotation (Line(points={{-91,150},{-220,
-          150},{-220,-122},{50,-122},{50,-120.5},{318,-120.5}}, color={0,0,127}));
+          150},{-220,-126},{160,-126},{160,-120.5},{318,-120.5}},
+                                                                color={0,0,127}));
   connect(TDisWatRet.T, conVio.u[2]) annotation (Line(points={{-91,-80},{-100,
           -80},{-100,-119.5},{318,-119.5}}, color={0,0,127}));
   connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-90},
@@ -468,6 +480,18 @@ equation
       thickness=0.5));
   connect(cenPla.QBorOut_flow, EBorOut.u) annotation (Line(points={{-138,-10},{
           -124,-10},{-124,-220},{178,-220}}, color={0,0,127}));
+  connect(TDisWatSup.T, sub.u1) annotation (Line(points={{-91,150},{-220,150},{
+          -220,-126},{160,-126},{160,-144},{178,-144}}, color={0,0,127}));
+  connect(TDisWatRet.T, sub.u2) annotation (Line(points={{-91,-80},{-100,-80},{
+          -100,-112},{140,-112},{140,-156},{178,-156}}, color={0,0,127}));
+  connect(sub.y, mul.u1) annotation (Line(points={{202,-150},{220,-150},{220,
+          -164},{238,-164}}, color={0,0,127}));
+  connect(gai.y, mul.u2) annotation (Line(points={{22,-160},{40,-160},{40,-176},
+          {238,-176}}, color={0,0,127}));
+  connect(mul.y, plaHeaSup.u)
+    annotation (Line(points={{262,-170},{278,-170}}, color={0,0,127}));
+  connect(plaHeaSup.y, EPlaHea.u)
+    annotation (Line(points={{302,-170},{318,-170}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
