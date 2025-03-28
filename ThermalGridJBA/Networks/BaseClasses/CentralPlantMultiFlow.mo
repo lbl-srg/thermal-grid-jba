@@ -142,7 +142,7 @@ model CentralPlantMultiFlow
     soiDat=soiDat,
     conDat=conDat) "Borefield data"
     annotation (Placement(transformation(extent={{-160,-40},{-140,-20}})));
-  final parameter Modelica.Units.SI.Temperature T_start=286.65
+  final parameter Modelica.Units.SI.Temperature T_start=289.65
     "Initial temperature of the soil";
   final parameter Integer nZon=borFieDat.conDat.nZon
     "Total number of independent bore field zones in each borefield module";
