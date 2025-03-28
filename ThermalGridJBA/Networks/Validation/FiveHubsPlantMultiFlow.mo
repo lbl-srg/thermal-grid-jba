@@ -7,7 +7,7 @@ model FiveHubsPlantMultiFlow
   parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
     "Pipe diameter (without insulation)";
   parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
-  parameter Modelica.Units.SI.Radius thiGroLay=0.5
+  parameter Modelica.Units.SI.Radius thiGroLay=1.0
     "Dynamic ground layer thickness";
   parameter Real dpDis_length_nominal(unit="Pa/m")=250
     "Pressure drop per pipe length at nominal flow rate - Distribution line";
@@ -139,6 +139,8 @@ model FiveHubsPlantMultiFlow
     each rPip=rPip,
     each thiGroLay=thiGroLay,
     each nSeg=1,
+    nSta=2,
+    redeclare parameter ThermalGridJBA.Networks.Data.Andrew_AFB cliCon,
     redeclare parameter Buildings.HeatTransfer.Data.Soil.Generic soiDat(
       each k=2.3,
       each c=1000,
@@ -499,8 +501,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StartTime=18144000,
-      StopTime=18662400,
+      StopTime=31536000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
