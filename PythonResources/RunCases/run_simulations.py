@@ -2,20 +2,55 @@
 #
 # Start the script for the directory that contains the package
 # with your model
+#
+# KNOWN ISSUES:
+#   Each run adds an entry to Dymola > Tools > Library Management > Modelica Path,
+#       after a point it may fail to add more and the simulation can't find Buildings.
+#       Manually deleting paths can help.
 #############################################################
 import os
 BRANCH="master"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
-CASE_LIST = 'eachcluster'
-""" case lists (case insensitive), see `cases.py`:
+CASE_LIST = 'fivehubsmultiflow'
+""" This parameter determines which model to run and which load files to load.
+    See `cases.py`, case insensitive:
         handwrite: explicitly listed cases
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
+        fivehubsnoplant: runs ThermalGridJBA.Networks.Validation.SinglePlantFiveHubs
+        fivehubsmultiflow: runs ThermalGridJBA.Networks.Validation.FiveHubsPlantMultiFlow
 """
-KEEP_MAT_FILES = False # Set false to delete result mat files to save space
+CASE_SPECS = {
+     'start_time' : 0 * 24 * 3600,
+     'stop_time'  : 365 * 24 * 3600,
+     'solver'     : 'cvode'}
+""" Sets simulation specifications for all cases,
+        UNLESS such a specification is already in the case constructor,
+        in which case this specification is ignored.
+"""
+CASE_SCENARIOS = ['futu']
+#CASE_SCENARIOS = ['futu', 'heat', 'cold']
+""" List of weather scenarios:
+        'base', 'post' : TMY3, also chooses baseline or post-retrofit load files
+        'futu' : fTMY
+        'heat' : heat wave
+        'cold' : cold snap
+"""
+CHECK_LOG_FILES = 'failed'
+""" Case insensitive:
+        all: check all log files
+        failed: check failed cases only
+        any other string: skipped
+"""
+KEEP_MAT_FILES = True # Set false to delete result mat files to save space
+if not KEEP_MAT_FILES:
+    print("="*10 + "!"*10 + "="*10)
+    print("Result mat files will be deleted because KEEP_MAT_FILES = False")
+    print("="*10 + "!"*10 + "="*10)
 
 CWD = os.getcwd()
+package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
 
 def sh(cmd, path):
     ''' Run the command ```cmd``` command in the directory ```path```
@@ -60,7 +95,7 @@ def checkout_repository(working_directory):
 
     des = os.path.join(working_directory, "ThermalGridJBA")
     print("*** Copying ThermalGridJBA library to {}".format(des))
-    shutil.copytree("/home/casper/gitRepo/thermal-grid-jba/ThermalGridJBA", des)
+    shutil.copytree("../../ThermalGridJBA", des)
     
     ### Test code using Buildings
     # des = os.path.join(working_directory, "Buildings")
@@ -83,7 +118,14 @@ def _simulate(spec):
     os.makedirs(out_dir)
 
     # Update MODELICAPATH to get the right library version
-    os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
+    modPath = os.environ["MODELICAPATH"]
+    patDir = modPath.split(':')
+    patDir.append(spec['lib_dir'])
+    patDir.append(out_dir)
+    newModPath = ":".join(patDir)
+    os.environ["MODELICAPATH"] = newModPath
+
+    # os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
 
     # Copy the models
 #    print("Copying models from {} to {}".format(CWD, wor_dir))
@@ -101,12 +143,14 @@ def _simulate(spec):
         
     print(out_dir)
     # s=Simulator(spec["model"], packagePath="/home/casper/gitRepo/modelica-buildings/Buildings")
-    s=Simulator(spec["model"], packagePath="/home/casper/gitRepo/thermal-grid-jba/ThermalGridJBA")
+    s=Simulator(spec["model"], packagePath=package_path)
     s.setOutputDirectory(out_dir)
     s.addPreProcessingStatement("OutputCPUtime:= true;")
     s.addPreProcessingStatement("Advanced.ParallelizeCode = false;")
 #    s.addPreProcessingStatement("Advanced.EfficientMinorEvents = true;")
-    if not 'solver' in spec:
+    if 'solver' in spec:
+        s.setSolver(spec['solver'])
+    else:
         s.setSolver("Cvode")
     if 'modifiers' in spec:
         s.addModelModifier(spec['modifiers'])
@@ -130,53 +174,78 @@ def _simulate(spec):
         flag = True
     except:
         print(f"Simulation failed: {spec['name']}")
-    if flag:
-        # Copy results back
-        res_des = os.path.join(CWD, "simulations", spec["name"])
-        if os.path.isdir(res_des):
-           shutil.rmtree(res_des)
-        print("Copying results to {}".format(res_des))
-        shutil.move(out_dir, res_des)
-    
-        # Delete the working directory
-        shutil.rmtree(wor_dir)
-        
-        # Delete mat files if asked to
-        if not KEEP_MAT_FILES:
-            pattern = os.path.join(res_des,"*.mat")
-            for f in glob.glob(pattern):
-                os.remove(f)
+    #if flag:
+    # Copy results back
+    res_des = os.path.join(CWD, "simulations", spec["name"])
+    if os.path.isdir(res_des):
+       shutil.rmtree(res_des)
+    print("Copying results to {}".format(res_des))
+    shutil.move(out_dir, res_des)
 
-def check_tests():
+    # Delete the working directory
+    shutil.rmtree(wor_dir)
     
-    import os
+    # Delete mat files if asked to
+    if not KEEP_MAT_FILES:
+        pattern = os.path.join(res_des,"*.mat")
+        for f in glob.glob(pattern):
+            os.remove(f)
     
-    directory = os.path.join(CWD, "simulations")
-    nfolders = [entry for entry in os.listdir(directory) if os.path.isdir(os.path.join(directory, entry))]
-        # names of folders
-    numcases = len(list_of_cases) # number of cases
-    numfail = 0 # number of failed tests
-    listfail = list()
+    success = {'name' : spec["name"], 
+               'flag' : flag}
+    return success
+
+def summarise_tests(success):
     
-    print("")
-    print("="*30)
-    for casename in [item['name'] for item in list_of_cases]:
-        if not casename in nfolders:
-            numfail += 1
-            listfail.append([casename])
-        else:
-            with open(os.path.join(directory,casename,"dslog.txt"),'r') as f:
-                for line in f:
-                    if "Warning" in line:
-                        warning_line = line.strip()
-                        print(" "*4+f"There are warnings from {casename}. First occurance:")
-                        print(" "*8+warning_line)
-                        break
-    if numfail == 0:
-        print(f"All {numcases} cases simulated successfully.")
+    num_cases = len(list_of_cases)
+    num_success = sum(1 for item in success if item['flag'])
+    print('='*30)
+    if num_success == num_cases:
+        print(f"All {num_cases} cases simulated successfully.")
     else:
-        print(f"{numfail} out of {numcases} cases failed. Failed cases:")
-        print(listfail)
+        print(f"Out of {num_cases} cases, the following {num_cases - num_success} failed:")
+        for cas in success:
+            if not cas['flag']:
+                print(" "*4 + f'The case "{cas["name"]}" failed.')
+                if not os.path.exists(os.path.join(CWD,'simulations',cas['name'],'dslog.txt')):
+                    print(" "*8 + '"dslog.txt" was not generated, indicating the simulation did not initialise.')
+                
+def check_logs(CHECK_LOG_FILES,
+               success,
+               output_warning_tags=True, 
+               output_error_vars=True, 
+               output_unaccounted=False, 
+               output_warning_blocks=True):
+    
+    import whofailed
+    
+    flag = False
+    if CHECK_LOG_FILES.upper() == "ALL":
+        cases = [item['name'] for item in success]
+        flag = len(cases)
+    elif CHECK_LOG_FILES.upper() == "FAILED":
+        cases = [item['name'] for item in success if item['flag'] is False]
+        flag = len(cases)
+    
+    if flag:
+        print("="*30)
+        print("Checking log files")
+        directory = os.path.join(CWD, "simulations")
+        for cas in cases:
+            print("="*5 + f" Case: {cas}")
+            path_dslog = os.path.join(directory, cas, "dslog.txt")
+            path_dsmodelc = os.path.join(directory, cas, "dsmodel.c")
+            whofailed.main(path_dslog,
+                           path_dsmodelc,
+                           output_warning_tags, 
+                           output_error_vars, 
+                           output_unaccounted, 
+                           output_warning_blocks)
+            
+    
+    else:
+        print("="*30)
+        print("Log file checking is skipped.")
 
 ################################################################################
 if __name__=='__main__':
@@ -185,7 +254,7 @@ if __name__=='__main__':
     import shutil
     import cases
 
-    list_of_cases = cases.get_cases(CASE_LIST)
+    list_of_cases = cases.get_cases(CASE_LIST, CASE_SPECS, CASE_SCENARIOS)
 
     for iEle in range(len(list_of_cases)):
         if ONLY_SHORT_TIME:
@@ -212,10 +281,15 @@ if __name__=='__main__':
             case['git'] = d
 
     # Run all cases
-    po.map(_simulate, list_of_cases)
+    success = po.map(_simulate, list_of_cases)
     # Delete the checked out repository
     shutil.rmtree(lib_dir)
-
-    check_tests()
+    
+    print("="*10 + "TEST SUMMARY" + "="*10)
+    summarise_tests(success)
+    if CHECK_LOG_FILES.upper() in ['ALL', 'FAILED']:
+        check_logs(CHECK_LOG_FILES, success)
+    
     if not KEEP_MAT_FILES:
+        print("="*30)
         print("All mat files deleted because KEEP_MAT_FILES=False")
