@@ -53,6 +53,9 @@ model ConnectedETSNoDHW
         else 2)
     "Cumulative net energy consumption, heating + dhw (if present) - cooling"
     annotation (Placement(transformation(extent={{80,40},{100,60}})));
+  Modelica.Blocks.Continuous.Integrator EChi
+    "Cumulative electricity consumption of the heat recovery chiller"
+    annotation (Placement(transformation(extent={{80,0},{100,20}})));
 equation
   connect(supAmbWat.ports[1], senMasFlo.port_a)
     annotation (Line(points={{-40,-10},{-20,-10}},
@@ -81,8 +84,9 @@ equation
       points={{0,70},{10,70},{10,4},{50,4},{50,0}},
       color={255,204,51},
       thickness=0.5));
-  connect(bui.PCoo, EChi.u) annotation (Line(points={{62,-3},{62,-2},{70,-2},{70,
-          20},{78,20}}, color={0,0,127}));
+  connect(bui.PCoo, EChi.u) annotation (Line(points={{62,-3},{62,-4},{70,-4},{
+          70,10},{78,10}},
+                        color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(
