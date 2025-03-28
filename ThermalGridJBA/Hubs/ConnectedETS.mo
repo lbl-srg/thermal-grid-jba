@@ -10,7 +10,11 @@ model ConnectedETS
       QHotWat_flow_nominal=QHot_flow_nominal,
       dp1Hex_nominal=40E3,
       dp2Hex_nominal=40E3,
-      QHex_flow_nominal=max(QHea_flow_nominal, abs(QCoo_flow_nominal*1.5)),
+      QHex_flow_nominal=max(
+        QHea_flow_nominal*datChi.COP_rejCoo_nominal/
+          (1 + datChi.COP_rejCoo_nominal),
+        abs(QCoo_flow_nominal*(1 + datChi.COP_rejHea_nominal)
+          /datChi.COP_rejHea_nominal)),
       T_a1Hex_nominal=283.65,
       T_b1Hex_nominal=279.65,
       T_a2Hex_nominal=276.65,

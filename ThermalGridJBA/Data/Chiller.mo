@@ -16,6 +16,13 @@ record Chiller "Parameters for the modular expandable chiller"
   parameter Real PLRMin(min=0) = 0.3 "Minimum part load ratio"
     annotation (Dialog(group="Part load"));
 
+  parameter Real COP_rejCoo_nominal = 3.2658
+    "Nominal COP when the heat recovery chiller rejects cooling to the district"
+    annotation (Dialog(group="COP"));
+    parameter Real COP_rejHea_nominal = 7.54851
+    "Nominal COP when the heat recovery chiller rejects heating to the district"
+    annotation (Dialog(group="COP"));
+
   parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(min=Modelica.Constants.eps)
     "Nominal heating capacity"
     annotation (Dialog(group="Condenser"));
