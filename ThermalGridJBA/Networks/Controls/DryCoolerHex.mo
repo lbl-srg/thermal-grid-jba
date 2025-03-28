@@ -40,47 +40,57 @@ model DryCoolerHex
   parameter Real THys=0.1 "Hysteresis for comparing temperature"
     annotation (Dialog(tab="Advanced"));
 
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1Spr "True: in Spring"
+    annotation (Placement(transformation(extent={{-360,330},{-320,370}}),
+        iconTransformation(extent={{-140,80},{-100,120}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1CooLoo
+    "True: the loop water is cool; False: the loop water is warm"
+    annotation (Placement(transformation(extent={{-360,300},{-320,340}}),
+        iconTransformation(extent={{-140,60},{-100,100}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1Fal "True: in Fall"
+    annotation (Placement(transformation(extent={{-360,270},{-320,310}}),
+        iconTransformation(extent={{-140,40},{-100,80}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uEleRat
     "Electricity rate indicator. 0-normal rate; 1-high rate"
     annotation (Placement(transformation(extent={{-360,200},{-320,240}}),
-        iconTransformation(extent={{-140,50},{-100,90}})));
+        iconTransformation(extent={{-140,20},{-100,60}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uSt
     "District loop load indicator. 1-low load; 2-medium load; 3-high load"
     annotation (Placement(transformation(extent={{-360,150},{-320,190}}),
-        iconTransformation(extent={{-140,30},{-100,70}})));
+        iconTransformation(extent={{-140,0},{-100,40}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uGen
     "Season indicator. 1-winter; 2-shoulder; 3-summer"
     annotation (Placement(transformation(extent={{-360,100},{-320,140}}),
-        iconTransformation(extent={{-140,10},{-100,50}})));
+        iconTransformation(extent={{-140,-20},{-100,20}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TGenIn(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Temperature of the water from the district loop"
     annotation (Placement(transformation(extent={{-360,60},{-320,100}}),
-        iconTransformation(extent={{-140,-10},{-100,30}})));
+        iconTransformation(extent={{-140,-40},{-100,0}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Ambient dry bulb temperature"
     annotation (Placement(transformation(extent={{-360,20},{-320,60}}),
-        iconTransformation(extent={{-140,-30},{-100,10}})));
+        iconTransformation(extent={{-140,-60},{-100,-20}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1HeaPum
     "Heat pump commanded on"
     annotation (Placement(transformation(extent={{-360,-250},{-320,-210}}),
-        iconTransformation(extent={{-140,-60},{-100,-20}})));
+        iconTransformation(extent={{-140,-80},{-100,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1HeaPumMod
     "Heat pump mode: true - heating mode"
     annotation (Placement(transformation(extent={{-360,-300},{-320,-260}}),
-        iconTransformation(extent={{-140,-80},{-100,-40}})));
+        iconTransformation(extent={{-140,-100},{-100,-60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryCooOut(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Dry cooler outlet glycol temperature"
     annotation (Placement(transformation(extent={{-360,-360},{-320,-320}}),
-        iconTransformation(extent={{-140,-110},{-100,-70}})));
+        iconTransformation(extent={{-140,-120},{-100,-80}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yValHexByp(
     final min=0,
     final max=1,
@@ -284,36 +294,25 @@ model DryCoolerHex
   Buildings.Controls.OBC.CDL.Logical.Or ena
     "Enable the dry cooler based on weather condition, or heat pump operation"
     annotation (Placement(transformation(extent={{160,60},{180,80}})));
-  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1CooLoo
-    "True: the loop water is cool; False: the loop water is warm" annotation (
-      Placement(transformation(extent={{-360,300},{-320,340}}),
-        iconTransformation(extent={{-140,70},{-100,110}})));
-  Buildings.Controls.OBC.CDL.Integers.Equal inSho
-    "Check if it is in shoulder season"
-    annotation (Placement(transformation(extent={{-240,280},{-220,300}})));
-  Buildings.Controls.OBC.CDL.Integers.Sources.Constant sho(final k=2)
-    "Shoulder season"
-    annotation (Placement(transformation(extent={{-300,280},{-280,300}})));
-  Buildings.Controls.OBC.CDL.Logical.And shoCooLoo
-    "In shoulder season and conditions are good for cool loop"
+  Buildings.Controls.OBC.CDL.Logical.And warFal "Warm Fall"
     annotation (Placement(transformation(extent={{-140,280},{-120,300}})));
-  Buildings.Controls.OBC.CDL.Logical.And shoWarLoo
-    "In shoulder season and conditions are good for warm loop"
+  Buildings.Controls.OBC.CDL.Logical.And colSpr "Cold spring"
     annotation (Placement(transformation(extent={{-140,340},{-120,360}})));
-  Buildings.Controls.OBC.CDL.Logical.And shoWarLoo1
-    "In shoulder season and conditions are good for warm loop"
-    annotation (Placement(transformation(extent={{-18,340},{2,360}})));
-  Buildings.Controls.OBC.CDL.Logical.And shoCooLoo1
-    "In shoulder season and conditions are good for cool loop"
-    annotation (Placement(transformation(extent={{-18,280},{2,300}})));
+  Buildings.Controls.OBC.CDL.Logical.And sprWarLoo
+    "In Spring and conditions are good for warm loop"
+    annotation (Placement(transformation(extent={{-20,340},{0,360}})));
+  Buildings.Controls.OBC.CDL.Logical.And falCooLoo
+    "In Fall and conditions are good for cool loop"
+    annotation (Placement(transformation(extent={{-20,280},{0,300}})));
   Buildings.Controls.OBC.CDL.Logical.Not warLoo "Warm loop"
     annotation (Placement(transformation(extent={{-80,310},{-60,330}})));
   Buildings.Controls.OBC.CDL.Logical.Or enaHexSho
     "Enable heat exchanger in shoulder season"
-    annotation (Placement(transformation(extent={{40,340},{60,360}})));
+    annotation (Placement(transformation(extent={{80,340},{100,360}})));
   Buildings.Controls.OBC.CDL.Logical.Or enaHexSho1
     "Enable heat exchanger in shoulder season"
-    annotation (Placement(transformation(extent={{142,240},{162,260}})));
+    annotation (Placement(transformation(extent={{140,240},{160,260}})));
+
 equation
   connect(uEleRat, higRatMod.u2) annotation (Line(points={{-340,220},{-270,220},
           {-270,232},{-242,232}}, color={255,127,0}));
@@ -506,40 +505,36 @@ equation
           -280},{224,-280},{224,-272}}, color={255,0,255}));
   connect(ena.y, dryCooFan.u2) annotation (Line(points={{182,70},{200,70},{200,-280},
           {280,-280}},       color={255,0,255}));
-  connect(sho.y, inSho.u1)
-    annotation (Line(points={{-278,290},{-242,290}}, color={255,127,0}));
-  connect(uGen, inSho.u2) annotation (Line(points={{-340,120},{-250,120},{-250,282},
-          {-242,282}}, color={255,127,0}));
-  connect(inSho.y, shoWarLoo.u1) annotation (Line(points={{-218,290},{-200,290},
-          {-200,350},{-142,350}}, color={255,0,255}));
-  connect(gre.y, shoWarLoo.u2) annotation (Line(points={{-198,20},{-170,20},{-170,
-          342},{-142,342}}, color={255,0,255}));
-  connect(inSho.y, shoCooLoo.u1)
-    annotation (Line(points={{-218,290},{-142,290}}, color={255,0,255}));
-  connect(les.y, shoCooLoo.u2) annotation (Line(points={{-198,80},{-160,80},{-160,
-          282},{-142,282}}, color={255,0,255}));
-  connect(shoCooLoo.y, shoCooLoo1.u1)
-    annotation (Line(points={{-118,290},{-20,290}}, color={255,0,255}));
-  connect(shoWarLoo.y, shoWarLoo1.u1)
-    annotation (Line(points={{-118,350},{-20,350}}, color={255,0,255}));
-  connect(shoWarLoo1.y, enaHexSho.u1)
-    annotation (Line(points={{4,350},{38,350}}, color={255,0,255}));
-  connect(shoCooLoo1.y, enaHexSho.u2) annotation (Line(points={{4,290},{20,290},
-          {20,342},{38,342}}, color={255,0,255}));
+  connect(gre.y, colSpr.u2) annotation (Line(points={{-198,20},{-170,20},{-170,342},
+          {-142,342}}, color={255,0,255}));
+  connect(les.y, warFal.u2) annotation (Line(points={{-198,80},{-160,80},{-160,282},
+          {-142,282}}, color={255,0,255}));
+  connect(warFal.y, falCooLoo.u1)
+    annotation (Line(points={{-118,290},{-22,290}}, color={255,0,255}));
+  connect(colSpr.y, sprWarLoo.u1)
+    annotation (Line(points={{-118,350},{-22,350}}, color={255,0,255}));
   connect(enaHexSho1.y, hexPumByaVal.u2)
-    annotation (Line(points={{164,250},{238,250}}, color={255,0,255}));
-  connect(enaHexSho1.y, hexPumVal.u2) annotation (Line(points={{164,250},{180,250},
+    annotation (Line(points={{162,250},{238,250}}, color={255,0,255}));
+  connect(enaHexSho1.y, hexPumVal.u2) annotation (Line(points={{162,250},{180,250},
           {180,170},{238,170}}, color={255,0,255}));
-  connect(enaHexSho.y, enaHexSho1.u1) annotation (Line(points={{62,350},{120,350},
-          {120,250},{140,250}}, color={255,0,255}));
+  connect(enaHexSho.y, enaHexSho1.u1) annotation (Line(points={{102,350},{120,350},
+          {120,250},{138,250}}, color={255,0,255}));
   connect(enaHex4.y, enaHexSho1.u2) annotation (Line(points={{102,170},{120,170},
-          {120,242},{140,242}}, color={255,0,255}));
+          {120,242},{138,242}}, color={255,0,255}));
   connect(u1CooLoo, warLoo.u)
     annotation (Line(points={{-340,320},{-82,320}}, color={255,0,255}));
-  connect(warLoo.y, shoWarLoo1.u2) annotation (Line(points={{-58,320},{-40,320},
-          {-40,342},{-20,342}}, color={255,0,255}));
-  connect(u1CooLoo, shoCooLoo1.u2) annotation (Line(points={{-340,320},{-100,320},
-          {-100,282},{-20,282}}, color={255,0,255}));
+  connect(warLoo.y, sprWarLoo.u2) annotation (Line(points={{-58,320},{-40,320},{
+          -40,342},{-22,342}}, color={255,0,255}));
+  connect(u1CooLoo, falCooLoo.u2) annotation (Line(points={{-340,320},{-100,320},
+          {-100,282},{-22,282}}, color={255,0,255}));
+  connect(u1Spr, colSpr.u1) annotation (Line(points={{-340,350},{-146,350},{-146,
+          350},{-142,350}}, color={255,0,255}));
+  connect(u1Fal, warFal.u1) annotation (Line(points={{-340,290},{-142,290},{-142,
+          290}}, color={255,0,255}));
+  connect(sprWarLoo.y, enaHexSho.u1)
+    annotation (Line(points={{2,350},{78,350}}, color={255,0,255}));
+  connect(falCooLoo.y, enaHexSho.u2) annotation (Line(points={{2,290},{20,290},{
+          20,342},{78,342}}, color={255,0,255}));
 annotation (defaultComponentName="dryCooHexCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
@@ -551,31 +546,31 @@ annotation (defaultComponentName="dryCooHexCon",
           textString="%name",
           textColor={0,0,255}),
         Text(
-          extent={{-100,80},{-52,64}},
+          extent={{-100,48},{-52,32}},
           textColor={255,127,0},
           textString="uEleRat"),
         Text(
-          extent={{-100,60},{-74,44}},
+          extent={{-100,28},{-74,12}},
           textColor={255,127,0},
           textString="uSt"),
         Text(
-          extent={{-100,40},{-62,24}},
+          extent={{-100,8},{-62,-8}},
           textColor={255,127,0},
           textString="uGen"),
         Text(
-          extent={{-98,18},{-60,2}},
+          extent={{-98,-10},{-60,-26}},
           textColor={0,0,127},
           textString="TGenIn"),
         Text(
-          extent={{-98,-2},{-60,-18}},
+          extent={{-98,-32},{-60,-48}},
           textColor={0,0,127},
           textString="TDryBul"),
         Text(
-          extent={{-98,-82},{-40,-98}},
+          extent={{-98,-84},{-40,-100}},
           textColor={0,0,127},
           textString="TDryCooOut"),
         Text(
-          extent={{-96,-30},{-46,-48}},
+          extent={{-96,-50},{-46,-68}},
           textColor={255,0,255},
           textString="u1HeaPum"),
         Text(
@@ -599,13 +594,21 @@ annotation (defaultComponentName="dryCooHexCon",
           textColor={0,0,127},
           textString="yPumHex"),
         Text(
-          extent={{-96,-52},{-32,-70}},
+          extent={{-96,-68},{-32,-86}},
           textColor={255,0,255},
           textString="u1HeaPumMod"),
         Text(
-          extent={{-96,98},{-46,80}},
+          extent={{-96,90},{-46,72}},
           textColor={255,0,255},
-          textString="u1CooLoo")}),
+          textString="u1CooLoo"),
+        Text(
+          extent={{-96,70},{-70,52}},
+          textColor={255,0,255},
+          textString="u1Fal"),
+        Text(
+          extent={{-96,104},{-66,86}},
+          textColor={255,0,255},
+          textString="u1Spr")}),
                           Diagram(coordinateSystem(preserveAspectRatio=false,
           extent={{-320,-380},{320,380}})),
 Documentation(info="
