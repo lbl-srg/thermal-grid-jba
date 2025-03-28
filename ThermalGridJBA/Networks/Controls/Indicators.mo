@@ -1,16 +1,16 @@
 within ThermalGridJBA.Networks.Controls;
 model Indicators "District load, electricity rate and season indicator"
 
-  parameter Integer winEndWee=14
+  parameter Integer winEndWee=12
     "Week that winter season ends after it"
     annotation (Dialog(group="Season"));
-  parameter Integer winStaWee=45
+  parameter Integer winStaWee=44
     "Week that winter season starts at beginning of it"
     annotation (Dialog(group="Season"));
-  parameter Integer sumStaWee=24
+  parameter Integer sumStaWee=22
     "Week that summer season starts at beginning of it"
     annotation (Dialog(group="Season"));
-  parameter Integer sumEndWee=40
+  parameter Integer sumEndWee=36
     "Week that summer season ends after it"
     annotation (Dialog(group="Season"));
   parameter Real samplePeriod=7200
