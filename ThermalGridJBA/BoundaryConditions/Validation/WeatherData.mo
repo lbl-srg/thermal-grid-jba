@@ -4,7 +4,7 @@ model WeatherData "Test model for weather data"
   ThermalGridJBA.BoundaryConditions.WeatherData weaDat_fTMY(weaFil=
         ThermalGridJBA.Hubs.BaseClasses.getWeatherFileName(
         string="#Weather file name",
-        filNam=Modelica.Utilities.Files.loadResource("modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos")))
+        filNam=Modelica.Utilities.Files.loadResource("modelica://ThermalGridJBA/Resources/Data/Consumptions/All_futu.mos")))
     "Weather data reader for the fTMY file"
     annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
   ThermalGridJBA.BoundaryConditions.WeatherData weaDat_HeaWav(weaFil=

@@ -97,7 +97,7 @@ def make_mos(load_from,
                 sec, rest = line.split(delimiter,1)
                 iSec = int(float(sec))
                 if (iSec >= soy_paste_from) and (iSec < soy_paste_before):
-                    new_line = ','.join([sec, lines_to_copy[index]])
+                    new_line = delimiter.join([sec, lines_to_copy[index]])
                     index = (index + 1) % 24
                 else:
                     new_line = line  # If the day is not in the specified range, keep the original line

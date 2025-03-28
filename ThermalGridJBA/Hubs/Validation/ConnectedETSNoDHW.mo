@@ -47,9 +47,12 @@ model ConnectedETSNoDHW
   Modelica.Blocks.Continuous.Integrator dHHotWat if bui.have_hotWat
     "Cumulative enthalpy difference of domestic hot water"
     annotation (Placement(transformation(extent={{40,10},{60,30}})));
-  Modelica.Blocks.Continuous.Integrator EChi if bui.have_eleCoo
-    "Cumulative electric energy use by the heat recovery chiller of the ETS"
-    annotation (Placement(transformation(extent={{80,10},{100,30}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ENet(
+    nin=if bui.have_hotWat
+        then 3
+        else 2)
+    "Cumulative net energy consumption, heating + dhw (if present) - cooling"
+    annotation (Placement(transformation(extent={{80,40},{100,60}})));
 equation
   connect(supAmbWat.ports[1], senMasFlo.port_a)
     annotation (Line(points={{-40,-10},{-20,-10}},
@@ -66,6 +69,14 @@ equation
           -40},{20,-40},{20,80},{38,80}}, color={0,0,127}));
   connect(bui.dHHotWat_flow, dHHotWat.u) annotation (Line(points={{44,-22},{44,-36},
           {24,-36},{24,20},{38,20}}, color={0,0,127}));
+  connect(dHChiWat.y, ENet.u[1]) annotation (Line(points={{61,80},{68,80},{68,50},
+          {78,50}},                  color={0,0,127}));
+  connect(dHHeaWat.y, ENet.u[2]) annotation (Line(points={{61,50},{78,50}},
+                                     color={0,0,127}));
+  connect(dHChiWat.y, ENet.u[1]) annotation (Line(points={{61,80},{68,80},{68,50},
+          {78,50}},                  color={0,0,127}));
+  connect(dHHotWat.y, ENet.u[3]) annotation (Line(points={{61,20},{68,20},{68,
+          50},{78,50}},              color={0,0,127}));
   connect(wea.weaBus, bui.weaBus) annotation (Line(
       points={{0,70},{10,70},{10,4},{50,4},{50,0}},
       color={255,204,51},
