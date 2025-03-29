@@ -43,12 +43,12 @@ model DryCoolerHex
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1Spr "True: in Spring"
     annotation (Placement(transformation(extent={{-360,330},{-320,370}}),
         iconTransformation(extent={{-140,80},{-100,120}})));
-  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1CooLoo
-    "True: the loop water is cool; False: the loop water is warm"
-    annotation (Placement(transformation(extent={{-360,300},{-320,340}}),
-        iconTransformation(extent={{-140,60},{-100,100}})));
+  Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uLooHea
+    "-1: cool loop; 1: warm loop; 0: average" annotation (Placement(
+        transformation(extent={{-360,300},{-320,340}}), iconTransformation(
+          extent={{-140,60},{-100,100}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1Fal "True: in Fall"
-    annotation (Placement(transformation(extent={{-360,270},{-320,310}}),
+    annotation (Placement(transformation(extent={{-360,260},{-320,300}}),
         iconTransformation(extent={{-140,40},{-100,80}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uEleRat
     "Electricity rate indicator. 0-normal rate; 1-high rate"
@@ -295,7 +295,7 @@ model DryCoolerHex
     "Enable the dry cooler based on weather condition, or heat pump operation"
     annotation (Placement(transformation(extent={{160,60},{180,80}})));
   Buildings.Controls.OBC.CDL.Logical.And warFal "Warm Fall"
-    annotation (Placement(transformation(extent={{-140,280},{-120,300}})));
+    annotation (Placement(transformation(extent={{-140,270},{-120,290}})));
   Buildings.Controls.OBC.CDL.Logical.And colSpr "Cold spring"
     annotation (Placement(transformation(extent={{-140,340},{-120,360}})));
   Buildings.Controls.OBC.CDL.Logical.And sprWarLoo
@@ -303,9 +303,7 @@ model DryCoolerHex
     annotation (Placement(transformation(extent={{-20,340},{0,360}})));
   Buildings.Controls.OBC.CDL.Logical.And falCooLoo
     "In Fall and conditions are good for cool loop"
-    annotation (Placement(transformation(extent={{-20,280},{0,300}})));
-  Buildings.Controls.OBC.CDL.Logical.Not warLoo "Warm loop"
-    annotation (Placement(transformation(extent={{-80,310},{-60,330}})));
+    annotation (Placement(transformation(extent={{-20,290},{0,310}})));
   Buildings.Controls.OBC.CDL.Logical.Or enaHexSho
     "Enable heat exchanger in shoulder season"
     annotation (Placement(transformation(extent={{80,340},{100,360}})));
@@ -313,6 +311,10 @@ model DryCoolerHex
     "Enable heat exchanger in shoulder season"
     annotation (Placement(transformation(extent={{140,240},{160,260}})));
 
+  Buildings.Controls.OBC.CDL.Integers.GreaterThreshold war "Warm loop"
+    annotation (Placement(transformation(extent={{-80,310},{-60,330}})));
+  Buildings.Controls.OBC.CDL.Integers.LessThreshold coo "Cool loop"
+    annotation (Placement(transformation(extent={{-240,290},{-220,310}})));
 equation
   connect(uEleRat, higRatMod.u2) annotation (Line(points={{-340,220},{-270,220},
           {-270,232},{-242,232}}, color={255,127,0}));
@@ -507,10 +509,9 @@ equation
           {280,-280}},       color={255,0,255}));
   connect(gre.y, colSpr.u2) annotation (Line(points={{-198,20},{-170,20},{-170,342},
           {-142,342}}, color={255,0,255}));
-  connect(les.y, warFal.u2) annotation (Line(points={{-198,80},{-160,80},{-160,282},
-          {-142,282}}, color={255,0,255}));
-  connect(warFal.y, falCooLoo.u1)
-    annotation (Line(points={{-118,290},{-22,290}}, color={255,0,255}));
+  connect(les.y, warFal.u2) annotation (Line(points={{-198,80},{-160,80},{-160,
+          272},{-142,272}},
+                       color={255,0,255}));
   connect(colSpr.y, sprWarLoo.u1)
     annotation (Line(points={{-118,350},{-22,350}}, color={255,0,255}));
   connect(enaHexSho1.y, hexPumByaVal.u2)
@@ -521,20 +522,24 @@ equation
           {120,250},{138,250}}, color={255,0,255}));
   connect(enaHex4.y, enaHexSho1.u2) annotation (Line(points={{102,170},{120,170},
           {120,242},{138,242}}, color={255,0,255}));
-  connect(u1CooLoo, warLoo.u)
-    annotation (Line(points={{-340,320},{-82,320}}, color={255,0,255}));
-  connect(warLoo.y, sprWarLoo.u2) annotation (Line(points={{-58,320},{-40,320},{
-          -40,342},{-22,342}}, color={255,0,255}));
-  connect(u1CooLoo, falCooLoo.u2) annotation (Line(points={{-340,320},{-100,320},
-          {-100,282},{-22,282}}, color={255,0,255}));
   connect(u1Spr, colSpr.u1) annotation (Line(points={{-340,350},{-146,350},{-146,
           350},{-142,350}}, color={255,0,255}));
-  connect(u1Fal, warFal.u1) annotation (Line(points={{-340,290},{-142,290},{-142,
-          290}}, color={255,0,255}));
+  connect(u1Fal, warFal.u1) annotation (Line(points={{-340,280},{-142,280}},
+                 color={255,0,255}));
   connect(sprWarLoo.y, enaHexSho.u1)
     annotation (Line(points={{2,350},{78,350}}, color={255,0,255}));
-  connect(falCooLoo.y, enaHexSho.u2) annotation (Line(points={{2,290},{20,290},{
-          20,342},{78,342}}, color={255,0,255}));
+  connect(falCooLoo.y, enaHexSho.u2) annotation (Line(points={{2,300},{20,300},
+          {20,342},{78,342}},color={255,0,255}));
+  connect(uLooHea, war.u)
+    annotation (Line(points={{-340,320},{-82,320}}, color={255,127,0}));
+  connect(war.y, sprWarLoo.u2) annotation (Line(points={{-58,320},{-40,320},{
+          -40,342},{-22,342}}, color={255,0,255}));
+  connect(uLooHea, coo.u) annotation (Line(points={{-340,320},{-260,320},{-260,
+          300},{-242,300}}, color={255,127,0}));
+  connect(coo.y, falCooLoo.u1)
+    annotation (Line(points={{-218,300},{-22,300}}, color={255,0,255}));
+  connect(warFal.y, falCooLoo.u2) annotation (Line(points={{-118,280},{-40,280},
+          {-40,292},{-22,292}}, color={255,0,255}));
 annotation (defaultComponentName="dryCooHexCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
@@ -599,8 +604,8 @@ annotation (defaultComponentName="dryCooHexCon",
           textString="u1HeaPumMod"),
         Text(
           extent={{-96,90},{-46,72}},
-          textColor={255,0,255},
-          textString="u1CooLoo"),
+          textColor={255,127,0},
+          textString="uLooHea"),
         Text(
           extent={{-96,70},{-70,52}},
           textColor={255,0,255},

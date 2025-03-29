@@ -727,12 +727,12 @@ equation
       thickness=0.5));
   connect(heaPumCon.y1Mod, dryCooHexCon.u1HeaPumMod) annotation (Line(points={{-158,
           177},{-116,177},{-116,202},{-82,202}}, color={255,0,255}));
-  connect(heaPumCon.y1CooLoo, dryCooHexCon.u1CooLoo) annotation (Line(points={{-158,
-          179},{-124,179},{-124,218},{-82,218}},      color={255,0,255}));
   connect(ind.y1Spr, dryCooHexCon.u1Spr) annotation (Line(points={{-238,253},{
           -196,253},{-196,220},{-82,220}}, color={255,0,255}));
   connect(ind.y1Fal, dryCooHexCon.u1Fal) annotation (Line(points={{-238,251},{
           -204,251},{-204,216},{-82,216}}, color={255,0,255}));
+  connect(heaPumCon.yLooHea, dryCooHexCon.uLooHea) annotation (Line(points={{
+          -158,179},{-124,179},{-124,218},{-82,218}}, color={255,127,0}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={
