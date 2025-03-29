@@ -139,7 +139,7 @@ model FiveHubsPlantMultiFlow
     each rPip=rPip,
     each thiGroLay=thiGroLay,
     each nSeg=1,
-    nSta=2,
+    each nSta=2,
     redeclare parameter ThermalGridJBA.Networks.Data.Andrew_AFB cliCon,
     redeclare parameter Buildings.HeatTransfer.Data.Soil.Generic soiDat(
       each k=2.3,
@@ -501,7 +501,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StopTime=157680000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
