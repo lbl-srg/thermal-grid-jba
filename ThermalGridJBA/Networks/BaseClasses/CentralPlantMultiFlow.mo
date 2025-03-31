@@ -175,13 +175,6 @@ model CentralPlantMultiFlow
     displayUnit="degC") "Ambient dry bulb temperature"
     annotation (Placement(transformation(extent={{-280,-60},{-240,-20}}),
         iconTransformation(extent={{-140,-90},{-100,-50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput TWetBul(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")
-    "Ambient wet bulb temperature"
-    annotation (Placement(transformation(extent={{-280,-100},{-240,-60}}),
-        iconTransformation(extent={{-140,-110},{-100,-70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(quantity="Power",
       final unit="W")
     "Electrical power consumed by circulation pump"
@@ -451,8 +444,6 @@ equation
           3},{-162,3}}, color={0,0,127}));
   connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,-40},{-180,-40},{
           -180,-7},{-162,-7}}, color={0,0,127}));
-  connect(TWetBul, gen.TWetBul) annotation (Line(points={{-260,-80},{-170,-80},{
-          -170,-9},{-162,-9}}, color={0,0,127}));
   connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-130,9},{-130,
           170},{260,170}}, color={0,0,127}));
   connect(gai.y, PFanDryCoo)

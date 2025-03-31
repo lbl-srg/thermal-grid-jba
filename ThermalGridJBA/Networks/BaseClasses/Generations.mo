@@ -174,13 +174,6 @@ model Generations
     displayUnit="degC") "Ambient dry bulb temperature"
     annotation (Placement(transformation(extent={{-340,170},{-300,210}}),
         iconTransformation(extent={{-140,-90},{-100,-50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput TWetBul(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")
-    "Ambient wet bulb temperature"
-    annotation (Placement(transformation(extent={{-340,90},{-300,130}}),
-        iconTransformation(extent={{-140,-110},{-100,-70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
     "Current electricity rate, cent per kWh"
     annotation (Placement(transformation(extent={{300,250},{340,290}}),
@@ -293,14 +286,14 @@ model Generations
     "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={120,-80})));
-  Buildings.Fluid.HeatExchangers.CoolingTowers.Merkel   dryCoo(
+  Buildings.Fluid.HeatExchangers.CoolingTowers.FixedApproach
+                                                        dryCoo(
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
     final m_flow_nominal=mDryCoo_flow_nominal,
     final dp_nominal=dpDryCoo_nominal,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    TWatIn_nominal=273.15 + 30.55,
-    TWatOut_nominal=273.15 + 27.55)
+    final TApp=TAppSet)
     "Dry cooler"
     annotation (Placement(transformation(extent={{40,120},{60,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo(
@@ -601,10 +594,6 @@ equation
       points={{-60,-44},{-20,-44},{-20,10}},
       color={0,127,255},
       thickness=0.5));
-  connect(dryCooHexCon.yDryCoo, dryCoo.y) annotation (Line(points={{-58,202},{20,
-          202},{20,138},{38,138}}, color={0,0,127}));
-  connect(TWetBul, dryCoo.TAir) annotation (Line(points={{-320,110},{20,110},{20,
-          134},{38,134}}, color={0,0,127}));
   connect(heaPumCon.yVal, valHeaPum.y) annotation (Line(points={{-158,165},{80,165},
           {80,-120},{108,-120}}, color={0,0,127}));
   connect(heaPumCon.yValByp, valHeaPumByp.y) annotation (Line(points={{-158,161},
@@ -612,7 +601,7 @@ equation
   connect(dryCooHexCon.yPumHex, pumDryCoo1.m_flow_in) annotation (Line(points={{-58,214},
           {0,214},{0,20},{-8,20}},           color={0,0,127}));
   connect(dryCooHexCon.yPumDryCoo, pumDryCoo.m_flow_in)
-    annotation (Line(points={{-58,206},{-50,206},{-50,142}}, color={0,0,127}));
+    annotation (Line(points={{-58,208},{-50,208},{-50,142}}, color={0,0,127}));
   connect(heaPumCon.yPumGly, pumHeaPumGly.m_flow_in) annotation (Line(points={{-158,
           168},{246,168},{246,0},{192,0}},      color={0,0,127}));
   connect(heaPumCon.yPum, pumHeaPumWat.m_flow_in) annotation (Line(points={{
@@ -621,8 +610,6 @@ equation
           20},{-160,-148}}, color={0,0,127}));
   connect(uDisPum, gai2.u) annotation (Line(points={{-320,260},{-290,260},{-290,
           20},{-202,20}}, color={0,0,127}));
-  connect(dryCoo.PFan, PFanDryCoo) annotation (Line(points={{61,138},{100,138},{
-          100,230},{320,230}}, color={0,0,127}));
   connect(pumDryCoo.P, PPumDryCoo) annotation (Line(points={{-39,139},{-20,139},
           {-20,200},{320,200}}, color={0,0,127}));
   connect(pumDryCoo1.P, PPumHexGly) annotation (Line(points={{-11,9},{-11,0},{
@@ -733,6 +720,8 @@ equation
           -204,251},{-204,216},{-82,216}}, color={255,0,255}));
   connect(heaPumCon.yLooHea, dryCooHexCon.uLooHea) annotation (Line(points={{
           -158,179},{-124,179},{-124,218},{-82,218}}, color={255,127,0}));
+  connect(dryCooHexCon.TAirDryCooIn, dryCoo.TAir) annotation (Line(points={{-58,
+          204},{20,204},{20,134},{38,134}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={

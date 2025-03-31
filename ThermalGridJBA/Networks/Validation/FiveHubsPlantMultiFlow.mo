@@ -328,8 +328,7 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter looMeaTem(k=1/nBui)
     "Average mixing points temperature"
     annotation (Placement(transformation(extent={{-260,50},{-240,70}})));
-  BoundaryConditions.WeatherData weaDat[nBui](each computeWetBulbTemperature=
-        true,
+  BoundaryConditions.WeatherData weaDat[nBui](
     final weaFil = bui.weaFil)
     "Weather data reader"
     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
@@ -420,14 +419,6 @@ equation
       points={{-299.9,-19.9},{-260,-19.9},{-260,-7},{-162,-7}},
       color={255,204,51},
       thickness=0.5));
-  connect(weaBus.TWetBul, cenPla.TWetBul) annotation (Line(
-      points={{-299.9,-19.9},{-260,-19.9},{-260,-9},{-162,-9}},
-      color={255,204,51},
-      thickness=0.5), Text(
-      string="%first",
-      index=-1,
-      extent={{-6,3},{-6,3}},
-      horizontalAlignment=TextAlignment.Right));
   connect(weaDat[1].weaBus, weaBus) annotation (Line(
       points={{-360,-20},{-300,-20}},
       color={255,204,51},
