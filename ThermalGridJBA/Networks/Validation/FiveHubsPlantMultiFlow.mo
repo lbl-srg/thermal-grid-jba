@@ -328,7 +328,8 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter looMeaTem(k=1/nBui)
     "Average mixing points temperature"
     annotation (Placement(transformation(extent={{-260,50},{-240,70}})));
-  BoundaryConditions.WeatherData weaDat[nBui](
+  BoundaryConditions.WeatherData weaDat[nBui](each computeWetBulbTemperature=
+        true,
     final weaFil = bui.weaFil)
     "Weather data reader"
     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
@@ -501,7 +502,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=157680000,
+      StopTime=31536000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
