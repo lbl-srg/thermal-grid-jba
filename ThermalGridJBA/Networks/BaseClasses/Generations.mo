@@ -285,6 +285,7 @@ model Generations
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
     final m_flow_nominal=mDryCoo_flow_nominal,
+    final show_T=true,
     final dp_nominal=dpDryCoo_nominal,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final TApp=TAppSet)
