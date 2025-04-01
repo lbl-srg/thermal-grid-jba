@@ -16,10 +16,10 @@ record Chiller "Parameters for the modular expandable chiller"
   parameter Real PLRMin(min=0) = 0.3 "Minimum part load ratio"
     annotation (Dialog(group="Part load"));
 
-  parameter Real COP_hexSizRejCoo = 2.294668674468994
+  parameter Real COP_hexSizRejCoo = 11.570534706115723
     "Cooling rejection COP for hex sizing"
     annotation (Dialog(group="COP"));
-  parameter Real COP_hexSizRejHea = 13.447315216064453
+  parameter Real COP_hexSizRejHea = 2.3183610439300537
     "Heating rejection COP for hex sizing"
     annotation (Dialog(group="COP"));
 
