@@ -151,6 +151,7 @@ model FiveHubsPlantMultiFlow
     nCon=nBui,
     allowFlowReversal=allowFlowReversalSer,
     redeclare package Medium = Medium,
+    show_entFlo=true,
     show_TOut=true,
     mDis_flow_nominal=datDis.mPipDis_flow_nominal,
     mCon_flow_nominal=datDis.mCon_flow_nominal,
@@ -236,7 +237,7 @@ model FiveHubsPlantMultiFlow
     initType=Modelica.Blocks.Types.Init.InitialState)
     "Heat pump electric energy"
     annotation (Placement(transformation(extent={{240,190},{260,210}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=4) "Total electric energy"
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=3) "Total electric energy"
     annotation (Placement(transformation(extent={{362,90},{382,110}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
@@ -293,9 +294,6 @@ model FiveHubsPlantMultiFlow
   Buildings.BoundaryConditions.WeatherData.Bus weaBus annotation (Placement(
         transformation(extent={{-320,-40},{-280,0}}), iconTransformation(extent
           ={{-364,-80},{-344,-60}})));
-  Modelica.Blocks.Continuous.Integrator EFunDryCoo(initType=Modelica.Blocks.Types.Init.InitialState)
-    "Dry cooler fan electric energy"
-    annotation (Placement(transformation(extent={{240,110},{260,130}})));
   Modelica.Blocks.Continuous.Integrator EPumDryCoo(initType=Modelica.Blocks.Types.Init.InitialState)
     "Dry cooler pump electric energy"
     annotation (Placement(transformation(extent={{100,90},{120,110}})));
@@ -347,6 +345,12 @@ model FiveHubsPlantMultiFlow
   Modelica.Blocks.Continuous.Integrator EPlaHea(initType=Modelica.Blocks.Types.Init.InitialState)
     "Energy supply from central plant"
     annotation (Placement(transformation(extent={{320,-180},{340,-160}})));
+  Modelica.Blocks.Continuous.Integrator Eets[nBui](each initType=Modelica.Blocks.Types.Init.InitialState)
+    "Heat flow through each ETS"
+    annotation (Placement(transformation(extent={{120,140},{140,160}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ETotEts(nin=nBui)
+    "Sum of all the ETS heat flow"
+    annotation (Placement(transformation(extent={{180,140},{200,160}})));
 equation
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
           {-14,210},{-14,240},{-10,240}},color={0,127,255}));
@@ -373,9 +377,10 @@ equation
   connect(PHeaPump.y, EHeaPum.u)
     annotation (Line(points={{202,200},{238,200}}, color={0,0,127}));
   connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{261,200},{350,200},{
-          350,99.25},{360,99.25}}, color={0,0,127}));
+          350,99.3333},{360,99.3333}},
+                                   color={0,0,127}));
   connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,160},{340,160},{340,
-          99.75},{360,99.75}}, color={0,0,127}));
+          100},{360,100}},     color={0,0,127}));
   connect(TDisWatSup.T, conVio.u[1]) annotation (Line(points={{-91,150},{-220,
           150},{-220,-126},{160,-126},{160,-120.5},{318,-120.5}},
                                                                 color={0,0,127}));
@@ -415,10 +420,6 @@ equation
       index=-1,
       extent={{-6,3},{-6,3}},
       horizontalAlignment=TextAlignment.Right));
-  connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
-      points={{-299.9,-19.9},{-260,-19.9},{-260,-7},{-162,-7}},
-      color={255,204,51},
-      thickness=0.5));
   connect(weaDat[1].weaBus, weaBus) annotation (Line(
       points={{-360,-20},{-300,-20}},
       color={255,204,51},
@@ -435,10 +436,9 @@ equation
           -30},{226,70.8},{238,70.8}}, color={0,0,127}));
   connect(EPumPla.y, EPum.u[3]) annotation (Line(points={{262,70},{282,70},{282,
           160.667},{298,160.667}}, color={0,0,127}));
-  connect(EFunDryCoo.y, ETot.u[3]) annotation (Line(points={{261,120},{332,120},
-          {332,100.25},{360,100.25}}, color={0,0,127}));
-  connect(EComPla.y, ETot.u[4]) annotation (Line(points={{261,30},{320,30},{320,
-          100.75},{360,100.75}}, color={0,0,127}));
+  connect(EComPla.y, ETot.u[3]) annotation (Line(points={{261,30},{320,30},{320,
+          100.667},{360,100.667}},
+                                 color={0,0,127}));
   connect(dis.TOut, mulSum.u) annotation (Line(points={{22,194},{40,194},{40,170},
           {-320,170},{-320,60},{-302,60}}, color={0,0,127}));
   connect(dis.TOut, looMaxTem.u) annotation (Line(points={{22,194},{40,194},{40,
@@ -453,8 +453,6 @@ equation
     annotation (Line(points={{-278,60},{-262,60}}, color={0,0,127}));
   connect(looMeaTem.y, cenPla.TMixAve) annotation (Line(points={{-238,60},{-170,
           60},{-170,3},{-162,3}}, color={0,0,127}));
-  connect(cenPla.PFanDryCoo, EFunDryCoo.u) annotation (Line(points={{-138,7},{-132,
-          7},{-132,120},{238,120}}, color={0,0,127}));
   connect(cenPla.PPumDryCoo, EPumDryCoo.u) annotation (Line(points={{-138,5},{-128,
           5},{-128,100},{98,100}}, color={0,0,127}));
   connect(cenPla.PPumHexGly, EPumHexGly.u) annotation (Line(points={{-138,3},{-124,
@@ -486,6 +484,18 @@ equation
     annotation (Line(points={{262,-170},{278,-170}}, color={0,0,127}));
   connect(plaHeaSup.y, EPlaHea.u)
     annotation (Line(points={{302,-170},{318,-170}}, color={0,0,127}));
+  connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
+      points={{-299.9,-19.9},{-260,-19.9},{-260,-7},{-162,-7}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(dis.dH_flow, Eets.u) annotation (Line(points={{22,207},{100,207},{100,
+          150},{118,150}}, color={0,0,127}));
+  connect(Eets.y, ETotEts.u)
+    annotation (Line(points={{141,150},{178,150}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
@@ -493,7 +503,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StopTime=1296000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),

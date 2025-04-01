@@ -209,11 +209,6 @@ model CentralPlantMultiFlow
     "Electrical power consumed by dry cool pump"
     annotation (Placement(transformation(extent={{240,90},{280,130}}),
         iconTransformation(extent={{100,30},{140,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo(quantity="Power",
-      final unit="W")
-    "Electric power consumed by fan"
-    annotation (Placement(transformation(extent={{240,120},{280,160}}),
-        iconTransformation(extent={{100,50},{140,90}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
     "Current electricity rate, cent per kWh"
     annotation (Placement(transformation(extent={{240,150},{280,190}}),
@@ -322,8 +317,6 @@ model CentralPlantMultiFlow
     nPorts=2*nZon*3+1)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={130,10})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(k=nGenMod)
-    annotation (Placement(transformation(extent={{-60,130},{-40,150}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=nGenMod)
     annotation (Placement(transformation(extent={{-20,100},{0,120}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(k=nGenMod)
@@ -446,14 +439,10 @@ equation
           -180,-7},{-162,-7}}, color={0,0,127}));
   connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-130,9},{-130,
           170},{260,170}}, color={0,0,127}));
-  connect(gai.y, PFanDryCoo)
-    annotation (Line(points={{-38,140},{260,140}}, color={0,0,127}));
   connect(gai1.y, PPumDryCoo)
     annotation (Line(points={{2,110},{260,110}},  color={0,0,127}));
   connect(gai2.y, PPumHexGly)
     annotation (Line(points={{42,80},{260,80}}, color={0,0,127}));
-  connect(gen.PFanDryCoo, gai.u) annotation (Line(points={{-138,7},{-122,7},{-122,
-          140},{-62,140}}, color={0,0,127}));
   connect(gen.PPumDryCoo, gai1.u) annotation (Line(points={{-138,5},{-114,5},{-114,
           110},{-22,110}},color={0,0,127}));
   connect(gen.PPumHexGly, gai2.u) annotation (Line(points={{-138,3},{-106,3},{-106,
