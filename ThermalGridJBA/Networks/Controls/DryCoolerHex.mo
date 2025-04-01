@@ -315,7 +315,6 @@ model DryCoolerHex
   Buildings.Controls.OBC.CDL.Logical.Or enaHexSho1
     "Enable heat exchanger in shoulder season"
     annotation (Placement(transformation(extent={{120,240},{140,260}})));
-
   Buildings.Controls.OBC.CDL.Integers.GreaterThreshold war "Warm loop"
     annotation (Placement(transformation(extent={{-100,310},{-80,330}})));
   Buildings.Controls.OBC.CDL.Integers.LessThreshold coo "Cool loop"
@@ -332,8 +331,12 @@ model DryCoolerHex
   Buildings.Controls.OBC.CDL.Reals.Switch dryCooInAir1
     "Dry cooler inlet air temperature"
     annotation (Placement(transformation(extent={{200,-200},{220,-180}})));
-  Buildings.Controls.OBC.CDL.Reals.AddParameter addPar2(p=TAppSet)
+  Buildings.Controls.OBC.CDL.Reals.AddParameter heaShi(p=-TAppSet)
+    "Temperature shift when the dry cooler should heat up the fluid"
     annotation (Placement(transformation(extent={{40,-220},{60,-200}})));
+  Buildings.Controls.OBC.CDL.Reals.AddParameter cooShi(p=TAppSet)
+    "Temperature shift when the dry cooler should cool down the fluid"
+    annotation (Placement(transformation(extent={{40,-180},{60,-160}})));
 equation
   connect(uEleRat, higRatMod.u2) annotation (Line(points={{-360,220},{-290,220},
           {-290,232},{-262,232}}, color={255,127,0}));
@@ -581,12 +584,14 @@ equation
   connect(dryCooInAir1.y, dryCooInAir.u1) annotation (Line(points={{222,-190},{
           280,-190},{280,-212},{298,-212}},
                                         color={0,0,127}));
-  connect(TDryBul, dryCooInAir1.u1) annotation (Line(points={{-360,40},{-330,40},
-          {-330,-170},{180,-170},{180,-182},{198,-182}}, color={0,0,127}));
-  connect(TDryBul, addPar2.u) annotation (Line(points={{-360,40},{-330,40},{
-          -330,-210},{38,-210}}, color={0,0,127}));
-  connect(addPar2.y, dryCooInAir1.u3) annotation (Line(points={{62,-210},{160,
-          -210},{160,-198},{198,-198}}, color={0,0,127}));
+  connect(TDryBul, heaShi.u) annotation (Line(points={{-360,40},{-330,40},{-330,
+          -210},{38,-210}}, color={0,0,127}));
+  connect(heaShi.y, dryCooInAir1.u3) annotation (Line(points={{62,-210},{160,-210},
+          {160,-198},{198,-198}}, color={0,0,127}));
+  connect(TDryBul, cooShi.u) annotation (Line(points={{-360,40},{-330,40},{-330,
+          -170},{38,-170}}, color={0,0,127}));
+  connect(cooShi.y, dryCooInAir1.u1) annotation (Line(points={{62,-170},{180,-170},
+          {180,-182},{198,-182}}, color={0,0,127}));
 annotation (defaultComponentName="dryCooHexCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(

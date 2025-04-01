@@ -288,7 +288,7 @@ model Generations
     final show_T=true,
     final dp_nominal=dpDryCoo_nominal,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    final TApp=TAppSet)
+    final TApp=0)
     "Dry cooler"
     annotation (Placement(transformation(extent={{40,120},{60,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo(
