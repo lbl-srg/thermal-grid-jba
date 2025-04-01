@@ -5,8 +5,6 @@ model CentralPlantMultiFlow
   package MediumW = Buildings.Media.Water "Water";
   parameter Integer nGenMod=4
     "Number of generation modules";
-  parameter Integer nBorSec = 33
-    "Number of borefield sectors. It includes 2 modules and the number should be divisible by 3";
   parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
@@ -60,8 +58,7 @@ model CentralPlantMultiFlow
   parameter Real TEvaCoo_nominal(unit="K")=TLooMax + TApp
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real mBorMod_flow_nominual(unit="kg/s")=mWat_flow_nominal*nGenMod/
-    (nBorSec*2)
+  parameter Real mBorMod_flow_nominual(unit="kg/s")=mWat_flow_nominal*nGenMod
     "Nominal mass flow rate to each borefield module"
     annotation (Dialog(group="Borefield"));
   parameter Real mBorHol_flow_nominal[nZon](unit=fill("kg/s", nZon))=fill(
@@ -73,10 +70,10 @@ model CentralPlantMultiFlow
     annotation (Dialog(group="Borefield"));
 
   parameter Real samplePeriod(unit="s")=7200
-                         "Sample period of district loop pump speed"
+    "Sample period of district loop pump speed"
     annotation (Dialog(tab="Controls", group="Indicators"));
   parameter Real TAppSet(unit="K")=2
-                      "Dry cooler approch setpoint"
+    "Dry cooler approch setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
@@ -109,6 +106,23 @@ model CentralPlantMultiFlow
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
 
+
+//   final parameter Modelica.Units.SI.Length[:,2] zonACooBor=
+//   {{{3*(i-1), 1.5}, {1.5+3*(i-1), 4.5}, {3*(i-1), 7.5}, {1.5+3*(i-1), 10.5}, {3*(i-1), 13.5}, {1.5+3*(i-1), 16.5},
+//   {3*(i-1), 46.5}, {1.5+3*(i-1), 49.5}, {3*(i-1), 52.5}, {1.5+3*(i-1), 55.5}, {3*(i-1), 58.5}, {1.5+3*(i-1), 61.5}} for i in 1:(33*5)};
+//
+//   final parameter Modelica.Units.SI.Length[:,2] zonBCooBor=
+//   {{{5.4*(j-1), 22.5}, {2.7+5.4*(j-1), 28.5}, {5.4*(j-1), 34.5}, {2.7+5.4*(j-1), 40.5}} for j in 1:(33*3)};
+
+  final parameter Modelica.Units.SI.Length[:,2] cooBor =
+  {{{{3*(i-1), 1.5}, {1.5+3*(i-1), 4.5}, {3*(i-1), 7.5}, {1.5+3*(i-1), 10.5}, {3*(i-1), 13.5}, {1.5+3*(i-1), 16.5},
+  {3*(i-1), 46.5}, {1.5+3*(i-1), 49.5}, {3*(i-1), 52.5}, {1.5+3*(i-1), 55.5}, {3*(i-1), 58.5}, {1.5+3*(i-1), 61.5}} for i in 1:(33*5)},
+  {{{5.4*(j-1), 22.5}, {2.7+5.4*(j-1), 28.5}, {5.4*(j-1), 34.5}, {2.7+5.4*(j-1), 40.5}} for j in 1:(33*3)}}
+    "Boreholes coordinations";
+  final parameter Integer[:] iZon = {{1 for i in 1:(33*2*30)},{2 for j in 1:(33*2*6)}}
+    "Borehole zone index";
+
+
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Soil.SandStone soiDat(
     kSoi=1.1,
     cSoi=1.4E6/1800,
@@ -125,18 +139,37 @@ model CentralPlantMultiFlow
     rBor=0.075,
     dBor=0.5,
     nZon=2,
-    iZon={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2},
-    cooBor={{0,1.5},{3,1.5},{6,1.5},{9,1.5},{12,1.5},{1.5,4.5},{4.5,4.5},{7.5,4.5},
-        {10.5,4.5},{13.5,4.5},{0,7.5},{3,7.5},{6,7.5},{9,7.5},{12,7.5},{1.5,10.5},
-        {4.5,10.5},{7.5,10.5},{10.5,10.5},{13.5,10.5},{0,13.5},{3,13.5},{6,13.5},
-        {9,13.5},{12,13.5},{1.5,16.5},{4.5,16.5},{7.5,16.5},{10.5,16.5},{13.5,16.5},
-        {0,22.5},{5.4,22.5},{10.8,22.5},{2.7,28.5},{8.1,28.5},{13.5,28.5}},
+    iZon=iZon,
+    cooBor=cooBor,
     rTub=0.016,
     kTub=0.42,
     eTub=0.0029,
     xC=(2*((0.04/2)^2))^(1/2))
     "Construction data: the borehole height, boreholes coordinate should be updated"
     annotation (Placement(transformation(extent={{-160,-80},{-140,-60}})));
+//   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template conDat(
+//     borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
+//     mBor_flow_nominal=mBorHol_flow_nominal,
+//     dp_nominal=dp_nominal,
+//     hBor=91,
+//     rBor=0.075,
+//     dBor=0.5,
+//     nZon=2,
+//     iZon={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2},
+//     cooBor={{0,1.5},{3,1.5},{6,1.5},{9,1.5},{12,1.5},
+//     {1.5,4.5},{4.5,4.5},{7.5,4.5}, {10.5,4.5},{13.5,4.5},
+//     {0,7.5},{3,7.5},{6,7.5},{9,7.5},{12,7.5},
+//     {1.5,10.5},{4.5,10.5},{7.5,10.5},{10.5,10.5},{13.5,10.5},
+//     {0,13.5},{3,13.5},{6,13.5},{9,13.5},{12,13.5},
+//     {1.5,16.5},{4.5,16.5},{7.5,16.5},{10.5,16.5},{13.5,16.5},
+//     {0,22.5},{5.4,22.5},{10.8,22.5},
+//     {2.7,28.5},{8.1,28.5},{13.5,28.5}},
+//     rTub=0.016,
+//     kTub=0.42,
+//     eTub=0.0029,
+//     xC=(2*((0.04/2)^2))^(1/2))
+//     "Construction data: the borehole height, boreholes coordinate should be updated"
+//     annotation (Placement(transformation(extent={{-160,-80},{-140,-60}})));
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Borefield.Template borFieDat(
     filDat=filDat,
     soiDat=soiDat,
@@ -256,14 +289,6 @@ model CentralPlantMultiFlow
     "Fluid connector for waterflow to the district"
     annotation (Placement(transformation(extent={{232,-10},{252,10}}),
       iconTransformation(extent={{90,-10},{110,10}})));
-  Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes lefBorFie[2](
-    redeclare each final package Medium = MediumW,
-    each allowFlowReversal=false,
-    each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    each TExt0_start=T_start,
-    each borFieDat=borFieDat,
-    each dT_dz=0) "Borefield modules on the left edge"
-    annotation (Placement(transformation(extent={{40,40},{60,60}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMul(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
@@ -276,47 +301,29 @@ model CentralPlantMultiFlow
     k=nGenMod)
     "Sum the mass flow from single generation module to total flow"
     annotation (Placement(transformation(extent={{-100,-10},{-80,10}})));
-  Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMul2(
-    redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
-    k=3/nBorSec)
-    "Split total flow"
-    annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del3(
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final m_flow_nominal=nGenMod*mWat_flow_nominal,
-    nPorts=2*nZon*3+1)
+    nPorts=1+nZon)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
         rotation=180, origin={0,10})));
-  Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes cenBorFie1[2](
+  Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie(
     redeclare each final package Medium = MediumW,
     each allowFlowReversal=false,
     each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     each TExt0_start=T_start,
     each borFieDat=borFieDat,
-    each dT_dz=0) "Central borefield modules"
+    each dT_dz=0)
+    "Borefield that has two zones with all the holes being included"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
-  Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes rigBorFie2[2](
-    redeclare each final package Medium = MediumW,
-    each allowFlowReversal=false,
-    each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    each TExt0_start=T_start,
-    each borFieDat=borFieDat,
-    each dT_dz=0) "Borefield modules on the right edge"
-    annotation (Placement(transformation(extent={{40,-60},{60,-40}})));
-  Buildings.Fluid.BaseClasses.MassFlowRateMultiplier massFlowRateMultiplier3[2*nZon](
-    redeclare each final package Medium = MediumW,
-    each allowFlowReversal=false,
-    k=fill(nBorSec - 2, 2*nZon))
-    annotation (Placement(transformation(extent={{80,-10},{100,10}})));
   Buildings.Fluid.Delays.DelayFirstOrder del1(
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final m_flow_nominal=nGenMod*mWat_flow_nominal,
-    nPorts=2*nZon*3+1)
+    nPorts=1+nZon)
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
-        rotation=180, origin={130,10})));
+        rotation=180, origin={110,10})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=nGenMod)
     annotation (Placement(transformation(extent={{-20,100},{0,120}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(k=nGenMod)
@@ -329,24 +336,21 @@ model CentralPlantMultiFlow
     annotation (Placement(transformation(extent={{-60,-150},{-40,-130}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai6(k=nGenMod)
     annotation (Placement(transformation(extent={{-100,-180},{-80,-160}})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort leaBorTem(redeclare final package
-      Medium = MediumW,
+  Buildings.Fluid.Sensors.TemperatureTwoPort leaBorTem(
+    redeclare final package Medium = MediumW,
     allowFlowReversal=false,
-                        final m_flow_nominal=nGenMod*mWat_flow_nominal)
-    "Temperature of waterflow leaving borefield"           annotation (
-      Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=0,
-        origin={160,0})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort entBorTem(redeclare final package
-      Medium = MediumW,
+    final m_flow_nominal=nGenMod*mWat_flow_nominal)
+    "Temperature of waterflow leaving borefield"
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=0, origin={160,0})));
+  Buildings.Fluid.Sensors.TemperatureTwoPort entBorTem(
+    redeclare final package
+    Medium = MediumW,
     allowFlowReversal=false,
-                        final m_flow_nominal=nGenMod*mWat_flow_nominal)
-    "Temperature of waterflow entering borefield" annotation (Placement(
-        transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=0,
-        origin={-60,0})));
+    final m_flow_nominal=nGenMod*mWat_flow_nominal)
+    "Temperature of waterflow entering borefield"
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=0, origin={-60,0})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFlo(
     redeclare final package Medium = MediumW)
     "Water flow rate into borefield"
@@ -372,61 +376,6 @@ equation
   connect(gen.port_b, masFloMul1.port_a) annotation (Line(
       points={{-140,0},{-100,0}},
       color={0,127,255},
-      thickness=0.5));
-
-  connect(masFloMul2.port_b, del3.ports[2*nZon*3 + 1]) annotation (Line(
-      points={{-20,0},{0,0}},
-      color={0,127,255},
-      thickness=0.5));
-  for j in 1:2 loop
-    for i in 1:nZon loop
-      connect(del3.ports[(j - 1)*nZon + i], lefBorFie[j].port_a[i]) annotation
-        (Line(
-          points={{0,0},{20,0},{20,50},{40,50}},
-          color={0,127,255},
-          thickness=0.5));
-      connect(lefBorFie[j].port_b[i], del1.ports[(j - 1)*nZon + i]) annotation
-        (Line(
-          points={{60,50},{110,50},{110,0},{130,0}},
-          color={0,127,255},
-          thickness=0.5));
-    end for;
-  end for;
-
-  for j in 1:2 loop
-    for i in 1:nZon loop
-      connect(del3.ports[(j - 1 + 2)*nZon + i], cenBorFie1[j].port_a[i])
-        annotation (Line(
-          points={{0,0},{40,0}},
-          color={0,127,255},
-          thickness=0.5));
-      connect(cenBorFie1[j].port_b[i], massFlowRateMultiplier3[(j - 1)*nZon + i].port_a)
-        annotation (Line(
-          points={{60,0},{80,0}},
-          color={0,127,255},
-          thickness=0.5));
-      connect(massFlowRateMultiplier3[(j-1)*nZon+i].port_b, del1.ports[(j-1+2)*nZon+i])
-        annotation (Line(points={{100,0},{130,0}}, color={0,127,255}, thickness=0.5));
-    end for;
-  end for;
-
-  for j in 1:2 loop
-    for i in 1:nZon loop
-      connect(del3.ports[(j - 1 + 4)*nZon + i], rigBorFie2[j].port_a[i])
-        annotation (Line(
-          points={{0,0},{20,0},{20,-50},{40,-50}},
-          color={0,127,255},
-          thickness=0.5));
-      connect(rigBorFie2[j].port_b[i], del1.ports[(j - 1 + 4)*nZon + i])
-        annotation (Line(
-          points={{60,-50},{110,-50},{110,0},{130,0}},
-          color={0,127,255},
-          thickness=0.5));
-    end for;
-  end for;
-
-  connect(del1.ports[2*nZon*3+1], leaBorTem.port_a)
-    annotation (Line(points={{130,0},{150,0}}, color={0,127,255},
       thickness=0.5));
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},{
@@ -466,9 +415,6 @@ equation
   connect(masFloMul1.port_b, entBorTem.port_a)
     annotation (Line(points={{-80,0},{-70,0}}, color={0,127,255},
       thickness=0.5));
-  connect(entBorTem.port_b, masFloMul2.port_a)
-    annotation (Line(points={{-50,0},{-40,0}}, color={0,127,255},
-      thickness=0.5));
   connect(entBorTem.T, sub.u2)
     annotation (Line(points={{-60,11},{-60,34},{178,34}}, color={0,0,127}));
   connect(leaBorTem.T, sub.u1)
@@ -485,6 +431,21 @@ equation
     annotation (Line(points={{182,-40},{198,-40}}, color={0,0,127}));
   connect(heaCap.y, QBorOut_flow)
     annotation (Line(points={{222,-40},{260,-40}}, color={0,0,127}));
+  connect(entBorTem.port_b, del3.ports[nZon+1])
+    annotation (Line(points={{-50,0},{0,0}}, color={0,127,255}));
+  connect(del1.ports[nZon+1], leaBorTem.port_a)
+    annotation (Line(points={{110,0},{150,0}}, color={0,127,255}));
+
+  for i in 1:nZon loop
+    connect(del3.ports[i], borFie.port_a[i]) annotation (Line(points={{0,0},{40,
+            0}},                          color={0,127,255}));
+    connect(del1.ports[i], borFie.port_b[i]) annotation (Line(points={{110,0},{60,
+            0}},                          color={0,127,255}));
+  end for;
+
+
+
+
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
