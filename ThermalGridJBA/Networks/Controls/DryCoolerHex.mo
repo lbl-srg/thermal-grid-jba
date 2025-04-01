@@ -331,9 +331,9 @@ model DryCoolerHex
     annotation (Placement(transformation(extent={{300,-230},{320,-210}})));
   Buildings.Controls.OBC.CDL.Reals.Switch dryCooInAir1
     "Dry cooler inlet air temperature"
-    annotation (Placement(transformation(extent={{200,-210},{220,-190}})));
-  Buildings.Controls.OBC.CDL.Reals.AddParameter addPar2(p=-2*TAppSet)
-    annotation (Placement(transformation(extent={{60,-180},{80,-160}})));
+    annotation (Placement(transformation(extent={{200,-200},{220,-180}})));
+  Buildings.Controls.OBC.CDL.Reals.AddParameter addPar2(p=TAppSet)
+    annotation (Placement(transformation(extent={{40,-220},{60,-200}})));
 equation
   connect(uEleRat, higRatMod.u2) annotation (Line(points={{-360,220},{-290,220},
           {-290,232},{-262,232}}, color={255,127,0}));
@@ -575,16 +575,18 @@ equation
           -220},{298,-220}}, color={255,0,255}));
   connect(TDryBul, dryCooInAir.u3) annotation (Line(points={{-360,40},{-330,40},
           {-330,-228},{298,-228}}, color={0,0,127}));
-  connect(cooWat.y, dryCooInAir1.u2) annotation (Line(points={{162,-310},{180,-310},
-          {180,-200},{198,-200}}, color={255,0,255}));
-  connect(dryCooInAir1.y, dryCooInAir.u1) annotation (Line(points={{222,-200},{280,
-          -200},{280,-212},{298,-212}}, color={0,0,127}));
-  connect(TDryBul, dryCooInAir1.u3) annotation (Line(points={{-360,40},{-330,40},
-          {-330,-208},{198,-208}}, color={0,0,127}));
-  connect(TDryBul, addPar2.u) annotation (Line(points={{-360,40},{-330,40},{-330,
-          -170},{58,-170}}, color={0,0,127}));
-  connect(addPar2.y, dryCooInAir1.u1) annotation (Line(points={{82,-170},{180,-170},
-          {180,-192},{198,-192}}, color={0,0,127}));
+  connect(cooWat.y, dryCooInAir1.u2) annotation (Line(points={{162,-310},{180,
+          -310},{180,-190},{198,-190}},
+                                  color={255,0,255}));
+  connect(dryCooInAir1.y, dryCooInAir.u1) annotation (Line(points={{222,-190},{
+          280,-190},{280,-212},{298,-212}},
+                                        color={0,0,127}));
+  connect(TDryBul, dryCooInAir1.u1) annotation (Line(points={{-360,40},{-330,40},
+          {-330,-170},{180,-170},{180,-182},{198,-182}}, color={0,0,127}));
+  connect(TDryBul, addPar2.u) annotation (Line(points={{-360,40},{-330,40},{
+          -330,-210},{38,-210}}, color={0,0,127}));
+  connect(addPar2.y, dryCooInAir1.u3) annotation (Line(points={{62,-210},{160,
+          -210},{160,-198},{198,-198}}, color={0,0,127}));
 annotation (defaultComponentName="dryCooHexCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
