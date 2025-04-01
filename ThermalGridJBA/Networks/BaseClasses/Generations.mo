@@ -178,12 +178,6 @@ model Generations
     "Current electricity rate, cent per kWh"
     annotation (Placement(transformation(extent={{300,250},{340,290}}),
         iconTransformation(extent={{100,70},{140,110}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo(
-    final quantity="Power",
-    final unit="W")
-    "Electric power consumed by fan"
-    annotation (Placement(transformation(extent={{300,210},{340,250}}),
-        iconTransformation(extent={{100,50},{140,90}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo(
     final quantity="Power",
     final unit="W")
