@@ -362,7 +362,7 @@ model Generations
     annotation (Placement(transformation(extent={{-80,200},{-60,220}})));
   ThermalGridJBA.Networks.Controls.HeatPump heaPumCon(
     final mWat_flow_nominal=mWat_flow_nominal,
-    final mWat_flow_min=mWat_flow_min,
+    final mWat_flow_min=1.05*mWat_flow_min,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,
@@ -442,6 +442,7 @@ model Generations
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{170,-150},{190,-170}})));
   Buildings.Fluid.HeatPumps.ModularReversible.Modular heaPum(
+    show_T=true,
     redeclare final package MediumCon = MediumW,
     redeclare final package MediumEva = MediumG,
     use_rev=true,
@@ -728,5 +729,17 @@ equation
           textString="%name",
           textColor={0,0,255})}),
                           Diagram(coordinateSystem(preserveAspectRatio=false,
-          extent={{-300,-280},{300,280}})));
+          extent={{-300,-280},{300,280}})),
+    Documentation(revisions="<html>
+<ul>
+<li>
+March 31, 2025, by Michael Wetter:<br/>
+Increased minimum flow rate for heat pump, as it was set to <i>10&perc;</i>, but the
+heat pump safety control goes to a minimum flow rate error when the water flow rate
+gets below <i>10%</i> of the design water flow rate.<br/>
+This is for
+<a href=\\\"https://github.com/lbl-srg/thermal-grid-jba/issues/13\\\">issue 13</a>.
+</li>
+</ul>
+</html>"));
 end Generations;
