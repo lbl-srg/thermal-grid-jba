@@ -345,7 +345,7 @@ model FiveHubsPlantMultiFlow
   Modelica.Blocks.Continuous.Integrator EPlaHea(initType=Modelica.Blocks.Types.Init.InitialState)
     "Energy supply from central plant"
     annotation (Placement(transformation(extent={{320,-180},{340,-160}})));
-  Modelica.Blocks.Continuous.Integrator Eets[nBui](initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator Eets[nBui](each initType=Modelica.Blocks.Types.Init.InitialState)
     "Heat flow through each ETS"
     annotation (Placement(transformation(extent={{120,140},{140,160}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum ETotEts(nin=nBui)
@@ -503,7 +503,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StopTime=1296000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
