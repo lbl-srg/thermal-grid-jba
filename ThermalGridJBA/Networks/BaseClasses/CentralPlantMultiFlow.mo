@@ -407,6 +407,24 @@ model CentralPlantMultiFlow
     "Water specific heat capacity"
     annotation (Placement(transformation(extent={{200,-50},{220,-30}})));
 
+  Modelica.Blocks.Sources.RealExpression heaPumFlo(y=gen.heaPum.Q1_flow)
+    "Heat pump condenser side heat flow"
+    annotation (Placement(transformation(extent={{-102,140},{-82,160}})));
+  Modelica.Blocks.Sources.RealExpression hexFlo(y=gen.hex.Q2_flow)
+    "Economizer heat flow"
+    annotation (Placement(transformation(extent={{-62,120},{-42,140}})));
+  Modelica.Blocks.Continuous.Integrator ECenHeaPum(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Central heat pump energy"
+    annotation (Placement(transformation(extent={{0,140},{20,160}})));
+  Modelica.Blocks.Continuous.Integrator ECenHex(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Central heat exchanger energy"
+    annotation (Placement(transformation(extent={{40,120},{60,140}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter cenHeaPumEne(k=nGenMod)
+    "Central heat pump energy"
+    annotation (Placement(transformation(extent={{80,140},{100,160}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter cenHexEne(k=nGenMod)
+    "Central heat exchanger energy"
+    annotation (Placement(transformation(extent={{120,120},{140,140}})));
 equation
   connect(port_a, masFloMul.port_a) annotation (Line(
       points={{-240,0},{-220,0}},
@@ -489,6 +507,14 @@ equation
 
 
 
+  connect(heaPumFlo.y, ECenHeaPum.u)
+    annotation (Line(points={{-81,150},{-2,150}}, color={0,0,127}));
+  connect(hexFlo.y, ECenHex.u)
+    annotation (Line(points={{-41,130},{38,130}}, color={0,0,127}));
+  connect(ECenHeaPum.y, cenHeaPumEne.u)
+    annotation (Line(points={{21,150},{78,150}}, color={0,0,127}));
+  connect(ECenHex.y, cenHexEne.u)
+    annotation (Line(points={{61,130},{118,130}}, color={0,0,127}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
