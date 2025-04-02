@@ -120,21 +120,37 @@ model CentralPlantMultiFlow
 //   final parameter Modelica.Units.SI.Length[:,2] cooBor=
 //     { if i<33*5*12+1 then zonACooBor[i,:] else zonBCooBor[i-33*5*12,:]  for i in (33*5*12 + 33*3*4)};
 
+//   final parameter Modelica.Units.SI.Length[:,2] cooBor=
+//   { { if i<33*5*12+1 then
+//         if j==1 then
+//           3*(i-33*5*floor((i-1)/(33*5))-1)+1.5*(1+(-1)^(i-12*floor((i-1)/12)))/2
+//         else
+//           if (i-12*floor((i-1)/12)) < 7 then
+//             1.5+3*(i-12*floor((i-1)/12)-1)
+//           else
+//             46.5+3*(i-12*floor((i-1)/12)-7)
+//       else
+//         if j==1 then
+//           5.4*(((i-33*5*12) - 33*3*floor(((i-33*5*12)-1)/(33*3)))-1)+2.7*(1+(-1)^((i-33*5*12) - 4*floor(((i-33*5*12)-1)/4)))/2
+//         else
+//           22.5+6*((i-33*5*12) - 4*floor(((i-33*5*12)-1)/4)-1)
+//       for j in 1:2} for i in 1:(33*5*12 + 33*3*4)};
   final parameter Modelica.Units.SI.Length[:,2] cooBor=
-  { { if i<33*5*12+1 then
-        if j==1 then
+  { { if j==1 then
+        if i<33*5*12+1 then
           3*(i-33*5*floor((i-1)/(33*5))-1)+1.5*(1+(-1)^(i-12*floor((i-1)/12)))/2
         else
+          5.4*(((i-33*5*12) - 33*3*floor(((i-33*5*12)-1)/(33*3)))-1)+2.7*(1+(-1)^((i-33*5*12) - 4*floor(((i-33*5*12)-1)/4)))/2
+      else
+        if i<33*5*12+1 then
           if (i-12*floor((i-1)/12)) < 7 then
             1.5+3*(i-12*floor((i-1)/12)-1)
           else
             46.5+3*(i-12*floor((i-1)/12)-7)
-      else
-        if j==1 then
-          5.4*(((i-33*5*12) - 33*3*floor(((i-33*5*12)-1)/(33*3)))-1)+2.7*(1+(-1)^((i-33*5*12) - 4*floor(((i-33*5*12)-1)/4)))/2
         else
           22.5+6*((i-33*5*12) - 4*floor(((i-33*5*12)-1)/4)-1)
-      for j in 1:2} for i in 1:(33*5*12 + 33*3*4)};
+  for j in 1:2} for i in 1:(33*5*12 + 33*3*4)};
+
 //           if (i-12*floor((i-1)/12)) < 7 then
 //             3*(i-33*5*floor((i-1)/(33*5))-1)+1.5*(1+(-1)^(i-12*floor((i-1)/12)))/2
 //           else
