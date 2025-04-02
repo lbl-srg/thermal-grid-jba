@@ -110,16 +110,59 @@ model CentralPlantMultiFlow
 //   final parameter Modelica.Units.SI.Length[:,2] zonACooBor=
 //   {{{3*(i-1), 1.5}, {1.5+3*(i-1), 4.5}, {3*(i-1), 7.5}, {1.5+3*(i-1), 10.5}, {3*(i-1), 13.5}, {1.5+3*(i-1), 16.5},
 //   {3*(i-1), 46.5}, {1.5+3*(i-1), 49.5}, {3*(i-1), 52.5}, {1.5+3*(i-1), 55.5}, {3*(i-1), 58.5}, {1.5+3*(i-1), 61.5}} for i in 1:(33*5)};
+
+
+//   final parameter Modelica.Units.SI.Length[:,2] zonACooBor={
+//     { if j<7 then {3*(i-1)+1.5*(1+(-1)^j)/2,  1.5+3*(j-1)}
+//       else {3*(i-1)+1.5*(1+(-1)^j)/2,  46.5+3*(j-7)} for j in 1:12} for i in 1:33*5};
+//   final parameter Modelica.Units.SI.Length[:,2] zonBCooBor={
+//     { {5.4*(i-1)+2.7*(1+(-1)^j)/2,  22.5+6*(j-1)} for j in 1:4} for i in 1:(33*3)};
+//   final parameter Modelica.Units.SI.Length[:,2] cooBor=
+//     { if i<33*5*12+1 then zonACooBor[i,:] else zonBCooBor[i-33*5*12,:]  for i in (33*5*12 + 33*3*4)};
+
+  final parameter Modelica.Units.SI.Length[:,2] cooBor=
+  { { if i<33*5*12+1 then
+        if j==1 then
+          3*(i-33*5*floor((i-1)/(33*5))-1)+1.5*(1+(-1)^(i-12*floor((i-1)/12)))/2
+        else
+          if (i-12*floor((i-1)/12)) < 7 then
+            1.5+3*(i-12*floor((i-1)/12)-1)
+          else
+            46.5+3*(i-12*floor((i-1)/12)-7)
+      else
+        if j==1 then
+          5.4*(((i-33*5*12) - 33*3*floor(((i-33*5*12)-1)/(33*3)))-1)+2.7*(1+(-1)^((i-33*5*12) - 4*floor(((i-33*5*12)-1)/4)))/2
+        else
+          22.5+6*((i-33*5*12) - 4*floor(((i-33*5*12)-1)/4)-1)
+      for j in 1:2} for i in 1:(33*5*12 + 33*3*4)};
+//           if (i-12*floor((i-1)/12)) < 7 then
+//             3*(i-33*5*floor((i-1)/(33*5))-1)+1.5*(1+(-1)^(i-12*floor((i-1)/12)))/2
+//           else
+//             3*(i-33*5*floor((i-1)/(33*5))-1)+1.5*(1+(-1)^j)/2
 //
+//                // 1,2,3,~11,12
+//           i-33*5*floor((i-1)/(33*5))
+//          (i-33*5*12) - 4*floor(((i-33*5*12)-1)/4)       //j
+//          (i-33*5*12) - 33*3*floor(((i-33*5*12)-1)/(33*3)) // i
+
+//   {{{5.4*(j-1), 22.5}, {2.7+5.4*(j-1), 28.5}, {5.4*(j-1), 34.5}, {2.7+5.4*(j-1), 40.5}} for j in 1:(33*3)};
+
+
 //   final parameter Modelica.Units.SI.Length[:,2] zonBCooBor=
 //   {{{5.4*(j-1), 22.5}, {2.7+5.4*(j-1), 28.5}, {5.4*(j-1), 34.5}, {2.7+5.4*(j-1), 40.5}} for j in 1:(33*3)};
 
-  final parameter Modelica.Units.SI.Length[:,2] cooBor =
-  {{{{3*(i-1), 1.5}, {1.5+3*(i-1), 4.5}, {3*(i-1), 7.5}, {1.5+3*(i-1), 10.5}, {3*(i-1), 13.5}, {1.5+3*(i-1), 16.5},
-  {3*(i-1), 46.5}, {1.5+3*(i-1), 49.5}, {3*(i-1), 52.5}, {1.5+3*(i-1), 55.5}, {3*(i-1), 58.5}, {1.5+3*(i-1), 61.5}} for i in 1:(33*5)},
-  {{{5.4*(j-1), 22.5}, {2.7+5.4*(j-1), 28.5}, {5.4*(j-1), 34.5}, {2.7+5.4*(j-1), 40.5}} for j in 1:(33*3)}}
-    "Boreholes coordinations";
-  final parameter Integer[:] iZon = {{1 for i in 1:(33*2*30)},{2 for j in 1:(33*2*6)}}
+
+//   final parameter Modelica.Units.SI.Length[:,2] cooBor = {zonACooBor, zonBCooBor}
+//     "Boreholes coordinations";
+
+//   final parameter Modelica.Units.SI.Length[:,2] cooBor =
+//   {{{{3*(i-1), 1.5}, {1.5+3*(i-1), 4.5}, {3*(i-1), 7.5}, {1.5+3*(i-1), 10.5}, {3*(i-1), 13.5}, {1.5+3*(i-1), 16.5},
+//   {3*(i-1), 46.5}, {1.5+3*(i-1), 49.5}, {3*(i-1), 52.5}, {1.5+3*(i-1), 55.5}, {3*(i-1), 58.5}, {1.5+3*(i-1), 61.5}} for i in 1:(33*5)},
+//   {{{5.4*(j-1), 22.5}, {2.7+5.4*(j-1), 28.5}, {5.4*(j-1), 34.5}, {2.7+5.4*(j-1), 40.5}} for j in 1:(33*3)}}
+//     "Boreholes coordinations";
+//   final parameter Integer[:] iZon = {{1 for i in 1:(33*2*30)}, {2 for j in 1:(33*2*6)}}
+//     "Borehole zone index";
+  final parameter Integer[:] iZon = {if (i<33*2*30+1) then 1 else 2 for i in 1:(33*2*30+33*2*6)}
     "Borehole zone index";
 
 
