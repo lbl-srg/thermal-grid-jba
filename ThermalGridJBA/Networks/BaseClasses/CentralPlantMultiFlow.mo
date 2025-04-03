@@ -360,6 +360,24 @@ model CentralPlantMultiFlow
     "Water specific heat capacity"
     annotation (Placement(transformation(extent={{200,-50},{220,-30}})));
 
+  Modelica.Blocks.Sources.RealExpression heaPumHea(y=gen.heaPum.Q1_flow)
+    "Heat pump heat flow"
+    annotation (Placement(transformation(extent={{-100,140},{-80,160}})));
+  Modelica.Blocks.Sources.RealExpression hexHea(y=gen.hex.Q2_flow)
+    "Heat exchanger heat flow"
+    annotation (Placement(transformation(extent={{-100,120},{-80,140}})));
+  Modelica.Blocks.Continuous.Integrator EHeaPumEne(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Heat pump energy"
+    annotation (Placement(transformation(extent={{-60,140},{-40,160}})));
+  Modelica.Blocks.Continuous.Integrator EHexEne(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Heat exchanger energy"
+    annotation (Placement(transformation(extent={{20,120},{40,140}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter heaPumEne(k=nGenMod)
+    "Heat pump energy"
+    annotation (Placement(transformation(extent={{80,140},{100,160}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter hexEne(k=nGenMod)
+    "Heat exchanger energy"
+    annotation (Placement(transformation(extent={{120,120},{140,140}})));
 equation
   connect(port_a, masFloMul.port_a) annotation (Line(
       points={{-240,0},{-220,0}},
@@ -485,6 +503,14 @@ equation
     annotation (Line(points={{182,-40},{198,-40}}, color={0,0,127}));
   connect(heaCap.y, QBorOut_flow)
     annotation (Line(points={{222,-40},{260,-40}}, color={0,0,127}));
+  connect(heaPumHea.y, EHeaPumEne.u)
+    annotation (Line(points={{-79,150},{-62,150}}, color={0,0,127}));
+  connect(hexHea.y, EHexEne.u)
+    annotation (Line(points={{-79,130},{18,130}}, color={0,0,127}));
+  connect(EHeaPumEne.y, heaPumEne.u)
+    annotation (Line(points={{-39,150},{78,150}}, color={0,0,127}));
+  connect(EHexEne.y, hexEne.u)
+    annotation (Line(points={{41,130},{118,130}}, color={0,0,127}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
