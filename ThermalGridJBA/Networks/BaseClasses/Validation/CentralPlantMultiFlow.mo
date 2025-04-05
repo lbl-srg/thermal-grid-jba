@@ -4,19 +4,19 @@ model CentralPlantMultiFlow
   package MediumW = Buildings.Media.Water "Water";
   parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=600
     "Nominal mass flow rate of main distribution pump";
-  parameter Integer nGenMod=4 "Number of generation modules";
-  parameter Real mPlaWat_flow_nominal(unit="kg/s")=mPumDis_flow_nominal/
-    nGenMod
+  //parameter Integer nGenMod=4 "Number of generation modules";
+  parameter Real mPlaWat_flow_nominal(unit="kg/s")=mPumDis_flow_nominal
     "Nominal water mass flow rate to each module";
+  final parameter Modelica.Units.SI.TemperatureDifference dT_nominal = 4
+    "Design temperature difference for central plant";
 
-  ThermalGridJBA.Networks.BaseClasses.CentralPlantMultiFlow cenPla(nGenMod=
-        nGenMod,
+  ThermalGridJBA.Networks.BaseClasses.CentralPlantMultiFlow cenPla(
     mWat_flow_nominal=mPlaWat_flow_nominal,
     mHexGly_flow_nominal=mPlaWat_flow_nominal,
     mWat_flow_min=0.105*mPlaWat_flow_nominal,
     mHpGly_flow_nominal=mPlaWat_flow_nominal,
-    QHeaPumHea_flow_nominal=mPlaWat_flow_nominal*4186*4,
-    QHeaPumCoo_flow_nominal=-mPlaWat_flow_nominal*4186*4,
+    QHeaPumHea_flow_nominal=mPlaWat_flow_nominal*4186*dT_nominal,
+    QHeaPumCoo_flow_nominal=-mPlaWat_flow_nominal*4186*dT_nominal,
     TConInMin=291.15,
     TEvaInMax=289.65)
     annotation (Placement(transformation(extent={{20,-10},{40,10}})));
