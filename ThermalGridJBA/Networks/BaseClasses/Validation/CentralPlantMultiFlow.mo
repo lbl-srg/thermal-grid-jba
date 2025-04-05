@@ -20,12 +20,11 @@ model CentralPlantMultiFlow
     TConInMin=291.15,
     TEvaInMax=289.65)
     annotation (Placement(transformation(extent={{20,-10},{40,10}})));
-  Buildings.Fluid.Sources.MassFlowSource_T sou(
+  Buildings.Fluid.Sources.Boundary_pT sou(
     redeclare package Medium = MediumW,
-    use_m_flow_in=true,
     use_T_in=true,
     nPorts=1) "Mass flow source"
-    annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
+    annotation (Placement(transformation(extent={{-30,-10},{-10,10}})));
   Buildings.Fluid.Sources.Boundary_ph sin(redeclare package Medium =
         MediumW, nPorts=1) "Sink"
     annotation (Placement(transformation(extent={{80,-10},{60,10}})));
@@ -37,7 +36,7 @@ model CentralPlantMultiFlow
     "District pump speed"
     annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.CivilTime civTim
-    annotation (Placement(transformation(extent={{-80,-90},{-60,-70}})));
+    annotation (Placement(transformation(extent={{-80,20},{-60,40}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Sin mixWatTem(
     amplitude=6,
     freqHz=1/(24*365*3600),
@@ -47,27 +46,24 @@ model CentralPlantMultiFlow
     amplitude=20,
     freqHz=1/(24*365*3600),
     offset=273.15 + 10) "Dry bulb temperature"
-    annotation (Placement(transformation(extent={{-20,-80},{0,-60}})));
+    annotation (Placement(transformation(extent={{-80,-80},{-60,-60}})));
 equation
   connect(sou.ports[1], cenPla.port_a)
-    annotation (Line(points={{-40,0},{20,0}},  color={0,127,255}));
+    annotation (Line(points={{-10,0},{20,0}},  color={0,127,255}));
   connect(cenPla.port_b, sin.ports[1])
     annotation (Line(points={{40,0},{60,0}}, color={0,127,255}));
   connect(disPum.y, gai.u)
     annotation (Line(points={{-58,70},{18,70}}, color={0,0,127}));
-  connect(gai.y, sou.m_flow_in) annotation (Line(points={{42,70},{60,70},{60,40},
-          {-82,40},{-82,8},{-62,8}}, color={0,0,127}));
-  connect(disPum.y, cenPla.uDisPum) annotation (Line(points={{-58,70},{-20,70},
-          {-20,9},{18,9}}, color={0,0,127}));
-  connect(civTim.y, cenPla.uSolTim) annotation (Line(points={{-58,-80},{-34,-80},
-          {-34,7},{18,7}},  color={0,0,127}));
-  connect(mixWatTem.y, sou.T_in) annotation (Line(points={{-58,-40},{-26,-40},{-26,
-          -20},{-80,-20},{-80,4},{-62,4}}, color={0,0,127}));
-  connect(mixWatTem.y, cenPla.TMixAve) annotation (Line(points={{-58,-40},{-26,
-          -40},{-26,3},{18,3}},
-                            color={0,0,127}));
-  connect(dryBul.y, cenPla.TDryBul) annotation (Line(points={{2,-70},{10,-70},{
-          10,-7},{18,-7}},                   color={0,0,127}));
+  connect(disPum.y, cenPla.uDisPum) annotation (Line(points={{-58,70},{10,70},{10,
+          9},{18,9}},      color={0,0,127}));
+  connect(civTim.y, cenPla.uSolTim) annotation (Line(points={{-58,30},{4,30},{4,
+          7},{18,7}},       color={0,0,127}));
+  connect(mixWatTem.y, sou.T_in) annotation (Line(points={{-58,-40},{-40,-40},{-40,
+          4},{-32,4}},                     color={0,0,127}));
+  connect(mixWatTem.y, cenPla.TMixAve) annotation (Line(points={{-58,-40},{6,-40},
+          {6,3},{18,3}},    color={0,0,127}));
+  connect(dryBul.y, cenPla.TDryBul) annotation (Line(points={{-58,-70},{10,-70},
+          {10,-7},{18,-7}},                  color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
     experiment(
