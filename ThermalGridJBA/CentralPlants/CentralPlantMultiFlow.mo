@@ -1,4 +1,4 @@
-within ThermalGridJBA.Networks.BaseClasses;
+within ThermalGridJBA.CentralPlants;
 model CentralPlantMultiFlow
   "Central plant model with flow multiplier to simplify the simulation"
 
@@ -573,7 +573,6 @@ equation
     annotation (Line(points={{208.4,0},{230,0}}, color={0,127,255},
       thickness=0.5));
 
-
   connect(sou[1].ports[1], edgBorFie.port_a[3]) annotation (Line(
       points={{60,110},{90,110},{90,50},{100,50}},
       color={0,127,255},
@@ -606,11 +605,6 @@ equation
       points={{160,-70},{140,-70},{140,0},{120,0}},
       color={0,127,255},
       thickness=0.5));
-
-
-
-
-
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},{
           -170,9},{-162,9}}, color={0,0,127}));
@@ -648,7 +642,6 @@ equation
   connect(entEdgBorMasFlo.port_b, entEdgBorTem.port_a)
     annotation (Line(points={{50,50},{60,50}}, color={0,127,255},
       thickness=0.5));
-
 
   connect(entCorBorMasFlo.port_b, entCorBorTem.port_a)
     annotation (Line(points={{50,0},{60,0}}, color={0,127,255},

@@ -1,4 +1,4 @@
-within ThermalGridJBA.Networks.BaseClasses;
+within ThermalGridJBA.CentralPlants;
 model Generations
   "Cooling and heating generation from the heat pump and heat exchanger"
   package MediumW = Buildings.Media.Water "Water";
