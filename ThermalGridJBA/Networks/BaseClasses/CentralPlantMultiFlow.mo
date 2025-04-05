@@ -61,16 +61,16 @@ model CentralPlantMultiFlow
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
 
-  final parameter Real mBorMod_flow_nominual(
+  final parameter Real mBorMod_flow_nominal(
     unit="kg/s")=mWat_flow_nominal*nGenMod/nBorSec
     "Nominal mass flow rate to each borefield sectors (each section have 2 of the 36-holes modules)"
     annotation (Dialog(group="Borefield"));
   parameter Real mEdgBorHol_flow_nominal[nEdgZon](
-    unit=fill("kg/s", nEdgZon))=fill(mBorMod_flow_nominual/72, nEdgZon)
+    unit=fill("kg/s", nEdgZon))=fill(mBorMod_flow_nominal/72, nEdgZon)
     "Nominal mass flow rate per borehole in each zone of edge borefield"
     annotation (Dialog(group="Borefield"));
   parameter Real mCorBorHol_flow_nominal[nCorZon](
-    unit=fill("kg/s", nCorZon))=fill(mBorMod_flow_nominual/72, nCorZon)
+    unit=fill("kg/s", nCorZon))=fill(mBorMod_flow_nominal/72, nCorZon)
     "Nominal mass flow rate per borehole in each zone of core borefield"
     annotation (Dialog(group="Borefield"));
   parameter Real dpEdg_nominal[nEdgZon](
@@ -519,13 +519,13 @@ model CentralPlantMultiFlow
     each allowFlowReversal=false,
     k=fill(2, 2))
     annotation (Placement(transformation(extent={{160,40},{180,60}})));
-  Buildings.Fluid.Sources.Boundary_ph sin[2](redeclare each package Medium =
-        MediumW,
-      nPorts=1) "Sink"
+  Buildings.Fluid.Sources.Boundary_ph sin[2](
+    redeclare each package Medium =MediumW,
+    each nPorts=1) "Sink"
     annotation (Placement(transformation(extent={{180,100},{160,120}})));
-  Buildings.Fluid.Sources.Boundary_ph sin1[2](redeclare each package Medium =
-        MediumW,
-      nPorts=1) "Sink"
+  Buildings.Fluid.Sources.Boundary_ph sin1[2](
+    redeclare each package Medium =MediumW,
+    each nPorts=1) "Sink"
     annotation (Placement(transformation(extent={{180,-80},{160,-60}})));
   Buildings.Fluid.Sources.MassFlowSource_T sou[2](
     redeclare each package Medium = MediumW,
@@ -533,22 +533,26 @@ model CentralPlantMultiFlow
     each use_T_in=true,
     each nPorts=1) "Mass flow source"
     annotation (Placement(transformation(extent={{40,100},{60,120}})));
-  Buildings.Fluid.Sensors.MassFlowRate entEdgBorMasFlo[2](redeclare each
-      package Medium = MediumW,             each allowFlowReversal=false)
+  Buildings.Fluid.Sensors.MassFlowRate entEdgBorMasFlo[2](
+    redeclare each package Medium = MediumW,
+    each allowFlowReversal=false)
     "Mass flow rate entering edge borefield"
     annotation (Placement(transformation(extent={{30,40},{50,60}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort entEdgBorTem[2](
-    redeclare each package Medium = MediumW,each allowFlowReversal=false,
-    each m_flow_nominal=mBorMod_flow_nominual/2)
+    redeclare each package Medium = MediumW,
+    each allowFlowReversal=false,
+    each m_flow_nominal=mBorMod_flow_nominal/2)
     "Water flow temperature to the edge borefield"
     annotation (Placement(transformation(extent={{60,40},{80,60}})));
-  Buildings.Fluid.Sensors.MassFlowRate entCorBorMasFlo[2](redeclare each
-      package Medium = MediumW,             each allowFlowReversal=false)
+  Buildings.Fluid.Sensors.MassFlowRate entCorBorMasFlo[2](
+    redeclare each package Medium = MediumW,
+    each allowFlowReversal=false)
     "Mass flow rate entering core borefield"
     annotation (Placement(transformation(extent={{30,10},{50,-10}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort entCorBorTem[2](
-    redeclare each package Medium = MediumW,each allowFlowReversal=false,
-    each m_flow_nominal=mBorMod_flow_nominual/2)
+    redeclare each package Medium = MediumW,
+    each allowFlowReversal=false,
+    each m_flow_nominal=mBorMod_flow_nominal/2)
     "Water flow temperature to the core borefield"
     annotation (Placement(transformation(extent={{60,10},{80,-10}})));
   Buildings.Fluid.Sources.MassFlowSource_T sou1[2](
