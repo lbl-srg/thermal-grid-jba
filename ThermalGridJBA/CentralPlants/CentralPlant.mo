@@ -2,10 +2,7 @@ within ThermalGridJBA.CentralPlants;
 model CentralPlant "Central plant"
 
   package MediumW = Buildings.Media.Water "Water";
-//  parameter Integer nGenMod=4
-//    "Number of generation modules";
-  parameter Integer nBorSec = 33
-    "Number of borefield sectors. It includes 2 modules and the number should be divisible by 3";
+
   parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
@@ -18,6 +15,20 @@ model CentralPlant "Central plant"
     "Nominal water mass flow rate to each generation module";
   parameter Real dpValve_nominal(unit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve";
+
+  parameter Modelica.Units.SI.MassFlowRate mBorFiePer_flow_nominal = borFie.mPer_flow_nominal
+    "Mass flow rate for perimeter of borefield"
+    annotation (Dialog(group="Borefield"));
+  parameter Modelica.Units.SI.MassFlowRate mBorFieCen_flow_nominal = borFie.mCen_flow_nominal
+    "Mass flow rate for center of borefield"
+    annotation (Dialog(group="Borefield"));
+  parameter Modelica.Units.SI.PressureDifference dpBorFiePer_nominal = borFie.dp_nominal
+    "Nominal pressure drop of perimeter zones of borefield"
+    annotation (Dialog(group="Borefield"));
+  parameter Modelica.Units.SI.PressureDifference dpBorFieCen_nominal = borFie.dp_nominal
+    "Nominal pressure drop of center zones of borefield"
+    annotation (Dialog(group="Borefield"));
+
 
   // Heat exchanger parameters
   parameter Real dpHex_nominal(unit="Pa")=10000
@@ -166,6 +177,10 @@ model CentralPlant "Central plant"
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,
     final mWat_flow_nominal=mWat_flow_nominal,
+    final mBorFiePer_flow_nominal=mBorFiePer_flow_nominal,
+    final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal,
+    final dpBorFiePer_nominal=dpBorFiePer_nominal,
+    final dpBorFieCen_nominal=dpBorFieCen_nominal,
     final mWat_flow_min=mWat_flow_min,
     final mHexGly_flow_nominal=mHexGly_flow_nominal,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
@@ -217,13 +232,14 @@ model CentralPlant "Central plant"
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
 
-  BaseClasses.Borefield borFie(m_flow_nominal=mWat_flow_nominal) "Borefield"
+  BaseClasses.Borefield borFie                                   "Borefield"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=0,
         origin={-70,30})));
   Buildings.Controls.OBC.CDL.Reals.Add QBorFieSum_flow
     "Sum for borefield perimeter and center heat flow rates"
     annotation (Placement(transformation(extent={{-40,20},{-20,40}})));
+
 equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},
