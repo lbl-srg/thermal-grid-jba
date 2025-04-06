@@ -25,15 +25,11 @@ record GenericDistrict "District network design parameters"
     "Length of each connection pipe (supply only, not counting return line)";
 
   // Central plant
-  parameter Integer nGenMod=4
-    "Total number of generation modules in central plant"
-    annotation (Dialog(tab="Central plant"));
   parameter Real samplePeriod(unit="s")=1200
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));
-  parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(mCon_flow_nominal)/
-    nGenMod
-    "Nominal water mass flow rate to each module"
+  parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(mCon_flow_nominal)
+    "Nominal water mass flow rate of plant"
     annotation (Dialog(tab="Central plant"));
   parameter Real dpPlaValve_nominal(unit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve"

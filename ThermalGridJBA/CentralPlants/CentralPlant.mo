@@ -2,8 +2,7 @@ within ThermalGridJBA.CentralPlants;
 model CentralPlant "Central plant"
 
   package MediumW = Buildings.Media.Water "Water";
-//  parameter Integer nGenMod=4
-//    "Number of generation modules";
+
   parameter Integer nBorSec = 33
     "Number of borefield sectors. It includes 2 modules and the number should be divisible by 3";
   parameter Real TLooMin(
