@@ -25,9 +25,6 @@ model FiveHubsPlantMultiFlow
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
   // Central plant
-  parameter Integer nGenMod=datDis.nGenMod
-    "Total number of generation modules in central plant"
-    annotation (Dialog(tab="Central plant"));
   parameter Real samplePeriod(unit="s")=datDis.samplePeriod
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));
@@ -244,7 +241,6 @@ model FiveHubsPlantMultiFlow
     "Check if loop temperatures are within given range"
     annotation (Placement(transformation(extent={{320,-130},{340,-110}})));
   CentralPlants.CentralPlant cenPla(
-    final nGenMod=nGenMod,
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
     final mWat_flow_nominal=mPlaWat_flow_nominal,

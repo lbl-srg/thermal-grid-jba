@@ -4,7 +4,6 @@ model CentralPlant "Validation model for central plant"
   package MediumW = Buildings.Media.Water "Water";
   parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=600
     "Nominal mass flow rate of main distribution pump";
-  //parameter Integer nGenMod=4 "Number of generation modules";
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=mPumDis_flow_nominal
     "Nominal water mass flow rate to each module";
   final parameter Modelica.Units.SI.TemperatureDifference dT_nominal = 4
