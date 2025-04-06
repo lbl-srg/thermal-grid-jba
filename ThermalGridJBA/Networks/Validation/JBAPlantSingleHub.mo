@@ -233,7 +233,7 @@ model JBAPlantSingleHub
     u(each final unit="K", each displayUnit="degC"))
     "Check if loop temperatures are within given range"
     annotation (Placement(transformation(extent={{320,-130},{340,-110}})));
-  BaseClasses.CentralPlant cenPla(
+  CentralPlants.BaseClasses.CentralPlant cenPla(
     final nMod=nMod,
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
@@ -260,8 +260,7 @@ model JBAPlantSingleHub
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,
-    final minComSpe=minPlaComSpe)
-     "Central plant"
+    final minComSpe=minPlaComSpe) "Central plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,

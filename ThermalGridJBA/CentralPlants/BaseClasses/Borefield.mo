@@ -2,11 +2,20 @@ within ThermalGridJBA.CentralPlants.BaseClasses;
 model Borefield "Borefield model"
   extends Modelica.Blocks.Icons.Block;
 
-  package MediumW = Buildings.Media.Water "Water";
+  package Medium = Buildings.Media.Water "Water";
 //  parameter Integer nGenMod=4
 //    "Number of generation modules";
   parameter Integer nBorSec = 33
     "Number of borefield sectors. Each section includes 2 modules with 2 zones each, and the number should be divisible by 3";
+  constant Integer iEdgZon[:] = {
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,
+        2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+        3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+        3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+        3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+        4}
+     "Index of boreholes of edge zone (at the left short edge, with two dummy zones to the right)";
   constant Integer iCorZon[:] = {
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,
@@ -19,15 +28,6 @@ model Borefield "Borefield model"
         3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,
         4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
         4} "Index of boreholes of core zone (at the core with two dummy zones to the left and two dummy zones to the right)";
-  constant Integer iEdgZon[:] = {
-        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,
-        2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-        3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-        3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-        3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-        4}
-     "Index of boreholes of edge zone (at the left short edge, with two dummy zones to the right)";
   constant Integer nEdgZon=4
     "Total number of independent bore field zones in edge borefield";
   constant Integer nCorZon=4
@@ -37,11 +37,11 @@ model Borefield "Borefield model"
     "Nominal water mass flow rate for all bores combined";
 
   final parameter Modelica.Units.SI.MassFlowRate mEdgBorHol_flow_nominal[nEdgZon]=
-    fill(m_flow_nominal/nBorSec/size(iEdgZon, 1)/3, nEdgZon)
+    m_flow_nominal/nBorSec/(size(iEdgZon, 1)/3)*{1, 1, 2, 2}
     "Nominal mass flow rate per borehole in each zone of edge borefield"
     annotation (Dialog(group="Borefield"));
   final parameter Modelica.Units.SI.MassFlowRate mCorBorHol_flow_nominal[nCorZon]=
-    fill(m_flow_nominal/nBorSec/size(iCorZon, 1)/5, nCorZon)
+    m_flow_nominal/nBorSec/(size(iCorZon, 1)/5)*{1, 1, 4, 4}
     "Nominal mass flow rate per borehole in each zone of core borefield"
     annotation (Dialog(group="Borefield"));
   parameter Real dpEdg_nominal[nEdgZon](
@@ -56,22 +56,26 @@ model Borefield "Borefield model"
   final parameter Modelica.Units.SI.Temperature T_start=289.65
     "Initial temperature of the soil";
 
-  Modelica.Fluid.Interfaces.FluidPort_a portEdg_a(
-    redeclare final package Medium = MediumW) "Fluid connector for edge of borefield" annotation (
+  Modelica.Fluid.Interfaces.FluidPort_a portPer_a(
+    redeclare final package Medium = Medium)
+    "Fluid connector for perimeter of borefield"
+    annotation (
       Placement(transformation(extent={{-110,30},{-90,50}}),
         iconTransformation(extent={{-110,70},{-90,90}})));
 
-  Modelica.Fluid.Interfaces.FluidPort_b portEdg_b(redeclare final package
-      Medium = MediumW) "Fluid connector outlet of edge borefield zones"
+  Modelica.Fluid.Interfaces.FluidPort_b portPer_b(redeclare final package
+      Medium = Medium) "Fluid connector outlet of perimeter borefield zones"
     annotation (Placement(transformation(extent={{90,30},{110,50}}),
         iconTransformation(extent={{90,70},{110,90}})));
 
-  Modelica.Fluid.Interfaces.FluidPort_a portCor_a(redeclare final package
-      Medium = MediumW) "Fluid connector for core of borefield" annotation (
+  Modelica.Fluid.Interfaces.FluidPort_a portCen_a(redeclare final package
+      Medium = Medium) "Fluid connector for center of borefield"
+                                                               annotation (
       Placement(transformation(extent={{-110,-50},{-90,-30}}),
         iconTransformation(extent={{-110,-90},{-90,-70}})));
-  Modelica.Fluid.Interfaces.FluidPort_b portCor_b(redeclare final package
-      Medium = MediumW) "Fluid connector for core of the borefield" annotation
+  Modelica.Fluid.Interfaces.FluidPort_b portCen_b(redeclare final package
+      Medium = Medium) "Fluid connector for center of the borefield"
+                                                                   annotation
     (Placement(transformation(extent={{90,-50},{110,-30}}), iconTransformation(
           extent={{88,-90},{108,-70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput QPer_flow(
@@ -83,32 +87,36 @@ model Borefield "Borefield model"
     "Center heat flow rate" annotation (Placement(transformation(extent={{100,-30},
             {140,10}}), iconTransformation(extent={{100,-10},{140,30}})));
 
-  Buildings.Controls.OBC.CDL.Reals.Add sumQPer_flow(
-     u1(final unit="W"),
-     u2(final unit="W"),
-     y(final unit="W")) "Perimeter borefield heat flow rates"
-    annotation (Placement(transformation(extent={{40,10},{60,30}})));
-  Buildings.Controls.OBC.CDL.Reals.Add sumQCen_flow(
+  Modelica.Blocks.Math.Add sumQPer_flow(
     u1(final unit="W"),
     u2(final unit="W"),
-    y(final unit="W")) "Center borefield heat flow rates"
-    annotation (Placement(transformation(extent={{40,-20},{60,0}})));
+    y(final unit="W"),
+    k1=2,
+    k2=nBorSec - 2) "Perimeter borefield heat flow rates"
+    annotation (Placement(transformation(extent={{10,10},{30,30}})));
+  Modelica.Blocks.Math.Add             sumQCen_flow(
+    u1(final unit="W"),
+    u2(final unit="W"),
+    y(final unit="W"),
+    k1=2,
+    k2=nBorSec - 2)    "Center borefield heat flow rates"
+    annotation (Placement(transformation(extent={{10,-20},{30,0}})));
 
   BorefieldSection edgSec(
-    redeclare package Medium = MediumW,
+    redeclare package Medium = Medium,
     final nDumSec=2,
     final borFieDat=edgBorFieDat,
     final nBorSec=nBorSec,
     final T_start=T_start) "Edge section of borefield" annotation (Placement(
-        transformation(rotation=0, extent={{-10,30},{10,50}})));
+        transformation(rotation=0, extent={{-50,30},{-30,50}})));
 
   BorefieldSection corSec(
-    redeclare package Medium = MediumW,
+    redeclare package Medium = Medium,
     final nDumSec=4,
     final borFieDat=corBorFieDat,
     final nBorSec=nBorSec,
     final T_start=T_start) "Core section of borefield" annotation (Placement(
-        transformation(rotation=0, extent={{-10,-50},{10,-30}})));
+        transformation(rotation=0, extent={{-50,-50},{-30,-30}})));
 
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Soil.SandStone soiDat(
     kSoi=1.1,
@@ -117,7 +125,7 @@ model Borefield "Borefield model"
     annotation (Placement(transformation(extent={{-40,-88},{-20,-68}})));
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Filling.Bentonite filDat(kFil=1.0)
     "Borehole filling data"
-    annotation (Placement(transformation(extent={{-80,-88},{-60,-68}})));
+    annotation (Placement(transformation(extent={{-90,-88},{-70,-68}})));
 
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template corConDat(
     borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
@@ -191,14 +199,14 @@ model Borefield "Borefield model"
     soiDat=soiDat,
     conDat=edgConDat)
     "Edge borefield data"
-    annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
+    annotation (Placement(transformation(extent={{-90,60},{-70,80}})));
 
   final parameter
     Buildings.Fluid.Geothermal.ZonedBorefields.Data.Borefield.Template corBorFieDat(
     filDat=filDat,
     soiDat=soiDat,
     conDat=corConDat) "Core borefield data"
-    annotation (Placement(transformation(extent={{-80,-20},{-60,0}})));
+    annotation (Placement(transformation(extent={{-90,-20},{-70,0}})));
 
   final parameter
     Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template edgConDat(
@@ -246,29 +254,80 @@ model Borefield "Borefield model"
     "Construction data for the edge: the borehole height, boreholes coordinate should be updated"
     annotation (Placement(transformation(extent={{-40,60},{-20,80}})));
 
+  Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulEntPer(
+    redeclare final package Medium = Medium,
+    allowFlowReversal=false,
+    k=2/nBorSec)
+    "Split total flow to each segment along the long length of the borefield. Factor 2 because the flow is split into two different models."
+    annotation (Placement(transformation(extent={{-88,30},{-68,50}})));
+  Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaEdgPer(
+    redeclare each final package Medium = Medium,
+    each allowFlowReversal=false,
+    k=2) "Mass flow rate multiplier at outlet of edge perimeter"
+    annotation (Placement(transformation(extent={{40,60},{60,80}})));
+  Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulEntCen(
+    redeclare final package Medium = Medium,
+    allowFlowReversal=false,
+    k=2/nBorSec)
+    "Split total flow to each segment along the long length of the borefield. Factor 2 because the flow is split into two different models."
+    annotation (Placement(transformation(extent={{-90,-50},{-70,-30}})));
+  Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaCorPer(
+    redeclare each final package Medium = Medium,
+    each allowFlowReversal=false,
+    k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
+    annotation (Placement(transformation(extent={{40,30},{60,50}})));
+  Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaEdgCen(
+    redeclare each final package Medium = Medium,
+    each allowFlowReversal=false,
+    k=2) "Mass flow rate multiplier at outlet of edge center"
+    annotation (Placement(transformation(extent={{40,-40},{60,-20}})));
+  Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaCorCen(
+    redeclare each final package Medium = Medium,
+    each allowFlowReversal=false,
+    k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
+    annotation (Placement(transformation(extent={{40,-70},{60,-50}})));
 equation
 
-  connect(edgSec.port_b, portEdg_b)
-    annotation (Line(points={{10,40},{100,40}},            color={0,127,255}));
-  connect(portEdg_a, edgSec.port_a) annotation (Line(points={{-100,40},{-52,40},
-          {-52,40.05},{-9.95,40.05}},
-                              color={0,127,255}));
-  connect(edgSec.QPer_flow, sumQPer_flow.u1) annotation (Line(points={{12,48},{30,
-          48},{30,26},{38,26}}, color={0,0,127}));
-  connect(corSec.QPer_flow, sumQPer_flow.u2) annotation (Line(points={{12,-32},{
-          30,-32},{30,14},{38,14}}, color={0,0,127}));
-  connect(edgSec.QCen_flow, sumQCen_flow.u1) annotation (Line(points={{12,44},{26,
-          44},{26,-4},{38,-4}}, color={0,0,127}));
-  connect(corSec.QCen_flow, sumQCen_flow.u2) annotation (Line(points={{12,-36},{
-          26,-36},{26,-16},{38,-16}}, color={0,0,127}));
-  connect(sumQPer_flow.y, QPer_flow)
-    annotation (Line(points={{62,20},{120,20}}, color={0,0,127}));
+  connect(edgSec.QPer_flow, sumQPer_flow.u1)
+    annotation (Line(points={{-28,46},{4,46},{4,26},{8,26}}, color={0,0,127}));
+  connect(corSec.QPer_flow, sumQPer_flow.u2) annotation (Line(points={{-28,-34},
+          {4,-34},{4,14},{8,14}}, color={0,0,127}));
+  connect(edgSec.QCor_flow, sumQCen_flow.u1) annotation (Line(points={{-28,43},{
+          0,43},{0,-4},{8,-4}}, color={0,0,127}));
+  connect(corSec.QCor_flow, sumQCen_flow.u2) annotation (Line(points={{-28,-37},
+          {0,-37},{0,-16},{8,-16}},   color={0,0,127}));
   connect(sumQCen_flow.y, QCen_flow)
-    annotation (Line(points={{62,-10},{120,-10}}, color={0,0,127}));
-  connect(portCor_a, corSec.port_a) annotation (Line(points={{-100,-40},{-54,-40},
-          {-54,-39.95},{-9.95,-39.95}}, color={0,127,255}));
-  connect(corSec.port_b, portCor_b)
-    annotation (Line(points={{10,-40},{100,-40}}, color={0,127,255}));
+    annotation (Line(points={{31,-10},{120,-10}}, color={0,0,127}));
+  connect(portCen_a,masFloMulEntCen. port_a)
+    annotation (Line(points={{-100,-40},{-90,-40}}, color={0,127,255}));
+  connect(portPer_a, masFloMulEntPer.port_a)
+    annotation (Line(points={{-100,40},{-88,40}}, color={0,127,255}));
+  connect(edgSec.portPer_a, masFloMulEntPer.port_b) annotation (Line(points={{-50,
+          48},{-60,48},{-60,40},{-68,40}}, color={0,127,255}));
+  connect(corSec.portPer_a, masFloMulEntPer.port_b) annotation (Line(points={{-50,
+          -32},{-60,-32},{-60,40},{-68,40}}, color={0,127,255}));
+  connect(masFloMulEntCen.port_b, edgSec.portCor_a) annotation (Line(points={{-70,
+          -40},{-56,-40},{-56,32},{-50,32}}, color={0,127,255}));
+  connect(masFloMulEntCen.port_b, corSec.portCor_a) annotation (Line(points={{-70,
+          -40},{-56,-40},{-56,-48},{-50,-48}}, color={0,127,255}));
+  connect(sumQPer_flow.y, QPer_flow)
+    annotation (Line(points={{31,20},{120,20}}, color={0,0,127}));
+  connect(edgSec.portPer_b, masFloMulLeaEdgPer.port_a) annotation (Line(points=
+          {{-30,48},{0,48},{0,70},{40,70}}, color={0,127,255}));
+  connect(corSec.portPer_b, masFloMulLeaCorPer.port_a) annotation (Line(points=
+          {{-30,-32},{-4,-32},{-4,40},{40,40}}, color={0,127,255}));
+  connect(edgSec.portCor_b, masFloMulLeaEdgCen.port_a) annotation (Line(points=
+          {{-30.2,32},{-6,32},{-6,-30},{40,-30}}, color={0,127,255}));
+  connect(corSec.portCor_b, masFloMulLeaCorCen.port_a) annotation (Line(points=
+          {{-30.2,-48},{-6,-48},{-6,-60},{40,-60}}, color={0,127,255}));
+  connect(masFloMulLeaEdgCen.port_b, portCen_b) annotation (Line(points={{60,
+          -30},{80,-30},{80,-40},{100,-40}}, color={0,127,255}));
+  connect(masFloMulLeaCorCen.port_b, portCen_b) annotation (Line(points={{60,
+          -60},{80,-60},{80,-40},{100,-40}}, color={0,127,255}));
+  connect(masFloMulLeaEdgPer.port_b, portPer_b) annotation (Line(points={{60,70},
+          {80,70},{80,40},{100,40}}, color={0,127,255}));
+  connect(masFloMulLeaCorPer.port_b, portPer_b)
+    annotation (Line(points={{60,40},{100,40}}, color={0,127,255}));
   annotation (defaultComponentName="borFie",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

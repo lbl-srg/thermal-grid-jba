@@ -236,7 +236,7 @@ model FiveHubsPlant "District network with the JBA plant and five hubs"
     u(each final unit="K", each displayUnit="degC"))
     "Check if loop temperatures are within given range"
     annotation (Placement(transformation(extent={{320,-130},{340,-110}})));
-  BaseClasses.CentralPlant cenPla(
+  CentralPlants.BaseClasses.CentralPlant cenPla(
     final nGenMod=nGenMod,
     final nBorMod=nBorMod,
     final TLooMin=datDis.TLooMin,
@@ -264,8 +264,7 @@ model FiveHubsPlant "District network with the JBA plant and five hubs"
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,
-    final minComSpe=minPlaComSpe)
-     "Central plant"
+    final minComSpe=minPlaComSpe) "Central plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
