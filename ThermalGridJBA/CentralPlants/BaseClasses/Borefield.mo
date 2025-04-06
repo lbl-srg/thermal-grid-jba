@@ -44,11 +44,11 @@ model Borefield "Borefield model"
     m_flow_nominal/nBorSec/(size(iCorZon, 1)/5)*{1, 1, 4, 4}
     "Nominal mass flow rate per borehole in each zone of core borefield"
     annotation (Dialog(group="Borefield"));
-  parameter Real dpEdg_nominal[nEdgZon](
+  final parameter Real dpEdg_nominal[nEdgZon](
     unit=fill("Pa", nEdgZon))={2e4,2e4,2e4,2e4}
     "Pressure losses for each zone of borefield module"
     annotation (Dialog(group="Borefield"));
-  parameter Real dpCor_nominal[nCorZon](
+  final parameter Real dpCor_nominal[nCorZon](
     unit=fill("Pa", nCorZon))={2e4,2e4,2e4,2e4}
     "Pressure losses for each zone of borefield module"
     annotation (Dialog(group="Borefield"));

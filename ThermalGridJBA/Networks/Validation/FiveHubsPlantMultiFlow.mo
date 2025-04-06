@@ -246,7 +246,7 @@ model FiveHubsPlantMultiFlow
     u(each final unit="K", each displayUnit="degC"))
     "Check if loop temperatures are within given range"
     annotation (Placement(transformation(extent={{320,-130},{340,-110}})));
-  CentralPlants.CentralPlantMultiFlow cenPla(
+  CentralPlants.CentralPlant cenPla(
     final nGenMod=nGenMod,
     nBorSec=nBorSec,
     final TLooMin=datDis.TLooMin,

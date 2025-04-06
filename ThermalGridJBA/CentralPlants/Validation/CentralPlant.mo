@@ -1,5 +1,5 @@
 within ThermalGridJBA.CentralPlants.Validation;
-model CentralPlantMultiFlow
+model CentralPlant "Validation model for central plant"
   extends Modelica.Icons.Example;
   package MediumW = Buildings.Media.Water "Water";
   parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=600
@@ -10,7 +10,7 @@ model CentralPlantMultiFlow
   final parameter Modelica.Units.SI.TemperatureDifference dT_nominal = 4
     "Design temperature difference for central plant";
 
-  ThermalGridJBA.CentralPlants.CentralPlantMultiFlow cenPla(
+  ThermalGridJBA.CentralPlants.CentralPlant cenPla(
     mWat_flow_nominal=mPlaWat_flow_nominal,
     mHexGly_flow_nominal=mPlaWat_flow_nominal,
     mWat_flow_min=0.105*mPlaWat_flow_nominal,
@@ -71,4 +71,4 @@ equation
       Interval=3600,
       Tolerance=1e-05,
       __Dymola_Algorithm="Cvode"));
-end CentralPlantMultiFlow;
+end CentralPlant;
