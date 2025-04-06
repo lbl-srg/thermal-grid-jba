@@ -133,7 +133,7 @@ model CentralPlant "Central plant"
     "Electrical power consumed by heat pump waterside pump"
     annotation (Placement(transformation(extent={{320,-230},{360,-190}}),
         iconTransformation(extent={{100,-80},{140,-40}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorOut_flow(unit="W")
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorFie_flow(unit="W")
     "Heat flow from borefield to water"
     annotation (Placement(transformation(extent={{320,-60},{360,-20}}),
         iconTransformation(extent={{100,-120},{140,-80}})));
@@ -203,36 +203,6 @@ model CentralPlant "Central plant"
     "Fluid connector for waterflow to the district"
     annotation (Placement(transformation(extent={{312,-10},{332,10}}),
       iconTransformation(extent={{90,-10},{110,10}})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort leaBorTem(
-    redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
-    final m_flow_nominal=mWat_flow_nominal)
-    "Temperature of waterflow leaving borefield"           annotation (
-      Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=0,
-        origin={240,0})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort entBorTem(
-    redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
-    final m_flow_nominal=mWat_flow_nominal)
-    "Temperature of waterflow entering borefield" annotation (Placement(
-        transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=0,
-        origin={-60,0})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFlo(
-    redeclare final package Medium = MediumW)
-    "Water flow rate into borefield"
-    annotation (Placement(transformation(extent={{270,-10},{290,10}})));
-  Buildings.Controls.OBC.CDL.Reals.Subtract sub
-    "Water flow temperature difference"
-    annotation (Placement(transformation(extent={{260,30},{280,50}})));
-  Buildings.Controls.OBC.CDL.Reals.Multiply mul
-    annotation (Placement(transformation(extent={{240,-50},{260,-30}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter heaCap(final k=4184)
-    "Water specific heat capacity"
-    annotation (Placement(transformation(extent={{280,-50},{300,-30}})));
 
   Modelica.Blocks.Sources.RealExpression heaPumHea(y=gen.heaPum.Q1_flow)
     "Heat pump heat flow"
@@ -248,35 +218,27 @@ model CentralPlant "Central plant"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
 
   BaseClasses.Borefield borFie(m_flow_nominal=mWat_flow_nominal) "Borefield"
-    annotation (Placement(transformation(extent={{40,-10},{60,10}})));
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=0,
+        origin={-70,30})));
+  Buildings.Controls.OBC.CDL.Reals.Add QBorFieSum_flow
+    "Sum for borefield perimeter and center heat flow rates"
+    annotation (Placement(transformation(extent={{-40,20},{-20,40}})));
 equation
 
-  connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},{
-          -170,9},{-162,9}}, color={0,0,127}));
-  connect(uSolTim, gen.uSolTim) annotation (Line(points={{-260,80},{-180,80},{-180,
-          7},{-162,7}}, color={0,0,127}));
-  connect(TMixAve, gen.TMixAve) annotation (Line(points={{-260,40},{-190,40},{-190,
-          3},{-162,3}}, color={0,0,127}));
-  connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,-40},{-180,-40},{
-          -180,-7},{-162,-7}}, color={0,0,127}));
-  connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-130,9},{-130,
-          240},{340,240}}, color={0,0,127}));
-  connect(entBorTem.T, sub.u2)
-    annotation (Line(points={{-60,11},{-60,34},{258,34}}, color={0,0,127}));
-  connect(leaBorTem.T, sub.u1)
-    annotation (Line(points={{240,11},{240,46},{258,46}}, color={0,0,127}));
-  connect(leaBorTem.port_b, senMasFlo.port_a)
-    annotation (Line(points={{250,0},{270,0}}, color={0,127,255}));
-  connect(senMasFlo.port_b, port_b)
-    annotation (Line(points={{290,0},{322,0}}, color={0,127,255}));
-  connect(sub.y, mul.u2) annotation (Line(points={{282,40},{288,40},{288,60},{224,
-          60},{224,-46},{238,-46}}, color={0,0,127}));
-  connect(senMasFlo.m_flow, mul.u1) annotation (Line(points={{280,11},{280,20},{
-          228,20},{228,-34},{238,-34}}, color={0,0,127}));
-  connect(mul.y, heaCap.u)
-    annotation (Line(points={{262,-40},{278,-40}}, color={0,0,127}));
-  connect(heaCap.y, QBorOut_flow)
-    annotation (Line(points={{302,-40},{340,-40}}, color={0,0,127}));
+  connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},
+          {-170,9},{-162,9}},color={0,0,127}));
+  connect(uSolTim, gen.uSolTim) annotation (Line(points={{-260,80},{-180,80},{
+          -180,7},{-162,7}},
+                        color={0,0,127}));
+  connect(TMixAve, gen.TMixAve) annotation (Line(points={{-260,40},{-190,40},{
+          -190,3},{-162,3}},
+                        color={0,0,127}));
+  connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,-40},{-180,-40},
+          {-180,-4},{-162,-4}},color={0,0,127}));
+  connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-130,9},{
+          -130,240},{340,240}},
+                           color={0,0,127}));
   connect(heaPumHea.y, EHeaPumEne.u)
     annotation (Line(points={{-79,220},{-62,220}}, color={0,0,127}));
   connect(hexHea.y, EHexEne.u)
@@ -287,9 +249,8 @@ equation
   connect(gen.PPumHexGly, PPumHexGly) annotation (Line(points={{-138,3},{-110,3},
           {-110,150},{340,150}}, color={0,0,127}));
   connect(port_a, gen.port_a)
-    annotation (Line(points={{-240,0},{-160,0}}, color={0,127,255}));
-  connect(entBorTem.port_a, gen.port_b)
-    annotation (Line(points={{-70,0},{-140,0}}, color={0,127,255}));
+    annotation (Line(points={{-240,0},{-200,0},{-200,0},{-160,0}},
+                                                 color={0,127,255}));
   connect(gen.PPumHeaPumGly, PPumHeaPumGly) annotation (Line(points={{-138,-3},
           {-100,-3},{-100,-150},{340,-150}}, color={0,0,127}));
   connect(gen.PCom, PCom) annotation (Line(points={{-138,-5},{-108,-5},{-108,
@@ -298,14 +259,22 @@ equation
           {-114,-7},{-114,-210},{340,-210}}, color={0,0,127}));
   connect(gen.PPumCirPum, PPumCirPum) annotation (Line(points={{-138,-9},{-120,
           -9},{-120,-240},{340,-240}}, color={0,0,127}));
-  connect(entBorTem.port_b, borFie.portPer_a)
-    annotation (Line(points={{-50,0},{0,0},{0,8},{40,8}}, color={0,127,255}));
-  connect(entBorTem.port_b, borFie.portCen_a) annotation (Line(points={{-50,0},{
-          0,0},{0,-8},{40,-8}}, color={0,127,255}));
-  connect(borFie.portPer_b, leaBorTem.port_a) annotation (Line(points={{60,8},{100,
-          8},{100,0},{230,0}}, color={0,127,255}));
-  connect(borFie.portCen_b, leaBorTem.port_a) annotation (Line(points={{59.8,-8},
-          {100,-8},{100,0},{230,0}}, color={0,127,255}));
+  connect(gen.portBorFiePer_b, borFie.portPer_a) annotation (Line(points={{-158,
+          10},{-158,38},{-80,38}}, color={0,127,255}));
+  connect(borFie.portPer_b, gen.portBorFiePer_a) annotation (Line(points={{-60,
+          38},{-50,38},{-50,48},{-154,48},{-154,10}}, color={0,127,255}));
+  connect(gen.portBorFieCen_b, borFie.portCen_a) annotation (Line(points={{-146,
+          10},{-146,22},{-80,22}}, color={0,127,255}));
+  connect(borFie.portCen_b, gen.portBorFieCen_a) annotation (Line(points={{
+          -60.2,22},{-50,22},{-50,18},{-142,18},{-142,10}}, color={0,127,255}));
+  connect(borFie.QPer_flow, QBorFieSum_flow.u1) annotation (Line(points={{-58,
+          34},{-50,34},{-50,36},{-42,36}}, color={0,0,127}));
+  connect(borFie.QCen_flow, QBorFieSum_flow.u2) annotation (Line(points={{-58,
+          31},{-50,31},{-50,24},{-42,24}}, color={0,0,127}));
+  connect(QBorFieSum_flow.y, QBorFie_flow) annotation (Line(points={{-18,30},{
+          300,30},{300,-40},{340,-40}}, color={0,0,127}));
+  connect(gen.port_b, port_b) annotation (Line(points={{-160,-8},{-170,-8},{
+          -170,-20},{280,-20},{280,0},{322,0}}, color={0,127,255}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

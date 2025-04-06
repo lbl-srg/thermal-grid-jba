@@ -465,7 +465,7 @@ equation
       points={{-360,-20},{-340,-20},{-340,250},{0,250}},
       color={255,204,51},
       thickness=0.5));
-  connect(cenPla.QBorOut_flow, EBorOut.u) annotation (Line(points={{-138,-10},{
+  connect(cenPla.QBorFie_flow, EBorOut.u) annotation (Line(points={{-138,-10},{
           -124,-10},{-124,-220},{178,-220}}, color={0,0,127}));
   connect(TDisWatSup.T, sub.u1) annotation (Line(points={{-91,150},{-220,150},{
           -220,-126},{160,-126},{160,-144},{178,-144}}, color={0,0,127}));
