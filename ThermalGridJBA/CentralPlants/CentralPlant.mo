@@ -247,7 +247,7 @@ model CentralPlant "Central plant"
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
 
-  BaseClasses.Borefield borFie(m_flow_nominal=mWat_flow_nominal) "Borefield"
+  BaseClasses.Borefield borFie                                   "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
 equation
 

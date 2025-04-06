@@ -1,12 +1,17 @@
 within ThermalGridJBA.CentralPlants.BaseClasses;
 model Borefield "Borefield model"
   extends Modelica.Blocks.Icons.Block;
+  replaceable package Medium = Buildings.Media.Water "Water";
+  /////////////////////////////////////////////////
+  constant Medium.SpecificHeatCapacity cpFlu_nominal = Medium.cp_const
+    "Constant specific heat capacity at constant pressure"
+    annotation (Dialog(group="Borefield"));
 
-  package Medium = Buildings.Media.Water "Water";
-//  parameter Integer nGenMod=4
-//    "Number of generation modules";
-  parameter Integer nBorSec = 33
-    "Number of borefield sectors. Each section includes 2 modules with 2 zones each, and the number should be divisible by 3";
+  /////////////////////////////////////////////////
+  // Borefield configuration and mass flow rate sizing
+  constant Integer nBorSec = 33
+    "Number of borefield sectors. Each section includes 2 modules with 2 zones each, and the number should be divisible by 3"
+    annotation (Dialog(group="Borefield"));
   constant Integer iEdgZon[:] = {
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,
@@ -15,7 +20,8 @@ model Borefield "Borefield model"
         3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
         3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
         4}
-     "Index of boreholes of edge zone (at the left short edge, with two dummy zones to the right)";
+     "Index of boreholes of edge zone (at the left short edge, with two dummy zones to the right)"
+    annotation (Dialog(group="Borefield"));
   constant Integer iCorZon[:] = {
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,
@@ -27,35 +33,89 @@ model Borefield "Borefield model"
         3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
         3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,
         4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-        4} "Index of boreholes of core zone (at the core with two dummy zones to the left and two dummy zones to the right)";
+        4} "Index of boreholes of core zone (at the core with two dummy zones to the left and two dummy zones to the right)"
+    annotation (Dialog(group="Borefield"));
   constant Integer nEdgZon=4
-    "Total number of independent bore field zones in edge borefield";
+    "Total number of independent bore field zones in edge borefield"
+    annotation (Dialog(group="Borefield"));
   constant Integer nCorZon=4
-    "Total number of independent bore field zones in core borefield";
+    "Total number of independent bore field zones in core borefield"
+    annotation (Dialog(group="Borefield"));
 
-  parameter Modelica.Units.SI.MassFlowRate m_flow_nominal
-    "Nominal water mass flow rate for all bores combined";
+  constant Integer nBorPerSeg = sum(if iCorZon[i] == 1 then 1 else 0 for i in 1:size(iCorZon, 1))
+    "Number of bores in perimeter per segment. This counts the top and bottom edge"
+    annotation (Dialog(group="Borefield"));
+  constant Integer nBorCenSeg = sum(if iCorZon[i] == 2 then 1 else 0 for i in 1:size(iCorZon, 1))
+    "Number of bores in center per segment. This counts the top and bottom edge"
+    annotation (Dialog(group="Borefield"));
+  constant Integer nBorPerTot = nBorPerSeg * nBorSec
+    "Number of bores in perimeter for whole borefield. This counts the top and bottom edge"
+    annotation (Dialog(group="Borefield"));
+  constant Integer nBorCenTot = nBorCenSeg * nBorSec
+    "Number of bores in center for whole borefield. This counts the top and bottom edge"
+    annotation (Dialog(group="Borefield"));
 
-  final parameter Modelica.Units.SI.MassFlowRate mEdgBorHol_flow_nominal[nEdgZon]=
-    m_flow_nominal/nBorSec/(size(iEdgZon, 1)/3)*{1, 1, 2, 2}
-    "Nominal mass flow rate per borehole in each zone of edge borefield"
+  parameter Modelica.Units.SI.Height hBor=91 "Total height of the borehole"
+      annotation (Dialog(group="Borefield"));
+  parameter Real qBorSpe_flow_nominal(
+    final unit="W/m",
+    min=30, max=50) = 40 "Specific heat flow rate per meter of borehole"
     annotation (Dialog(group="Borefield"));
-  final parameter Modelica.Units.SI.MassFlowRate mCorBorHol_flow_nominal[nCorZon]=
-    m_flow_nominal/nBorSec/(size(iCorZon, 1)/5)*{1, 1, 4, 4}
-    "Nominal mass flow rate per borehole in each zone of core borefield"
+  parameter Modelica.Units.SI.TemperatureDifference dTBor_nominal(min=4) = 4
+    "Inlet minus outlet design temperature difference"
     annotation (Dialog(group="Borefield"));
-  final parameter Real dpEdg_nominal[nEdgZon](
-    unit=fill("Pa", nEdgZon))={2e4,2e4,2e4,2e4}
-    "Pressure losses for each zone of borefield module"
+  parameter Modelica.Units.SI.MassFlowRate mBor_flow_nominal = hBor*qBorSpe_flow_nominal/cpFlu_nominal/dTBor_nominal
+    "Design mass flow rate per borehole, to be distributed to the double U-pipe"
     annotation (Dialog(group="Borefield"));
-  final parameter Real dpCor_nominal[nCorZon](
-    unit=fill("Pa", nCorZon))={2e4,2e4,2e4,2e4}
-    "Pressure losses for each zone of borefield module"
+
+
+  final parameter Modelica.Units.SI.Radius rTub=0.016
+    "Outer radius of the tubes"
     annotation (Dialog(group="Borefield"));
+  final parameter Modelica.Units.SI.Length eTub=0.0029 "Thickness of a tube"
+    annotation (Dialog(group="Borefield"));
+  final parameter Modelica.Units.SI.Velocity vFlu = mBor_flow_nominal/Medium.d_const/(rTub-eTub)^2/Modelica.Constants.pi / 2
+    "Flow velocity in tube at design conditions. Divided by 2 to account for double-U tube"
+    annotation (Dialog(group="Borefield"));
+  final parameter Medium.ThermodynamicState sta_nominal=Medium.setState_pTX(
+      T=Medium.T_default, p=Medium.p_default, X=Medium.X_default);
+  final parameter Modelica.Units.SI.ReynoldsNumber Re =
+    Modelica.Fluid.Pipes.BaseClasses.CharacteristicNumbers.ReynoldsNumber(
+      v = vFlu,
+      rho = Medium.density(sta_nominal),
+      D = 2*(rTub-eTub),
+      mu = Medium.dynamicViscosity(sta_nominal)) "Reynolds number at design flow rate"
+    annotation (Dialog(group="Borefield"));
+  final parameter Modelica.Units.SI.PressureDifference dp_nominal(
+    displayUnit="Pa") =
+    Modelica.Fluid.Pipes.BaseClasses.WallFriction.QuadraticTurbulent.pressureLoss_m_flow(
+      m_flow=mBor_flow_nominal,
+      rho_a=Medium.density(sta_nominal),
+      rho_b=Medium.density(sta_nominal),
+      mu_a=Medium.dynamicViscosity(sta_nominal),
+      mu_b=Medium.dynamicViscosity(sta_nominal),
+      diameter=2*(rTub-eTub),
+      length=2*hBor,
+      roughness=0.0015e-3)
+     "Pressure loss of pipe at design conditions, accounting for down-tube an up-tube length"
+    annotation (Dialog(group="Borefield"));
+  final parameter Real dpSpe(final unit="Pa/m") = dp_nominal/2/hBor
+    "Specific pressure drop per meter"
+    annotation (Dialog(group="Borefield"));
+
+  parameter Modelica.Units.SI.MassFlowRate mPer_flow_nominal=mBor_flow_nominal * nBorPerTot
+    "Nominal water mass flow rate for all bores in perimeter"
+      annotation (Dialog(group="Borefield"));
+
+  parameter Modelica.Units.SI.MassFlowRate mCen_flow_nominal=mBor_flow_nominal * nBorCenTot
+    "Nominal water mass flow rate for all bores in center"
+      annotation (Dialog(group="Borefield"));
 
   final parameter Modelica.Units.SI.Temperature T_start=289.65
     "Initial temperature of the soil";
 
+  /////////////////////////////////////////////////
+  // Connectors
   Modelica.Fluid.Interfaces.FluidPort_a portPer_a(
     redeclare final package Medium = Medium)
     "Fluid connector for perimeter of borefield"
@@ -94,7 +154,7 @@ model Borefield "Borefield model"
     k1=2,
     k2=nBorSec - 2) "Perimeter borefield heat flow rates"
     annotation (Placement(transformation(extent={{10,10},{30,30}})));
-  Modelica.Blocks.Math.Add             sumQCen_flow(
+  Modelica.Blocks.Math.Add sumQCen_flow(
     u1(final unit="W"),
     u2(final unit="W"),
     y(final unit="W"),
@@ -129,9 +189,9 @@ model Borefield "Borefield model"
 
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template corConDat(
     borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
-    mBor_flow_nominal=mCorBorHol_flow_nominal,
-    dp_nominal=dpCor_nominal,
-    hBor=91,
+    final mBor_flow_nominal=mBor_flow_nominal*ones(4),
+    final dp_nominal=dp_nominal*ones(4),
+    final hBor=hBor,
     rBor=0.075,
     dBor=0.5,
     nZon=nCorZon,
@@ -186,9 +246,9 @@ model Borefield "Borefield model"
         15,34.5; 45,34.5; 60,34.5; 20.4,34.5; 50.4,34.5; 65.4,34.5; 25.8,34.5;
         55.8,34.5; 70.8,34.5; 17.7,40.5; 47.7,40.5; 62.7,40.5; 23.1,40.5; 53.1,
         40.5; 68.1,40.5; 28.5,40.5; 58.5,40.5; 73.5,40.5],
-    rTub=0.016,
+    final rTub=rTub,
     kTub=0.42,
-    eTub=0.0029,
+    final eTub=eTub,
     xC=(2*((0.04/2)^2))^(1/2))
     "Construction data for the core: the borehole height, boreholes coordinate should be updated"
     annotation (Placement(transformation(extent={{-40,-20},{-20,0}})));
@@ -211,9 +271,9 @@ model Borefield "Borefield model"
   final parameter
     Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template edgConDat(
     borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
-    mBor_flow_nominal=mEdgBorHol_flow_nominal,
-    dp_nominal=dpEdg_nominal,
-    hBor=91,
+    final mBor_flow_nominal=mBor_flow_nominal*ones(4),
+    final dp_nominal=dp_nominal*ones(4),
+    final hBor=hBor,
     rBor=0.075,
     dBor=0.5,
     nZon=nEdgZon,
@@ -247,9 +307,9 @@ model Borefield "Borefield model"
         32.7,28.5; 23.1,28.5; 38.1,28.5; 28.5,28.5; 43.5,28.5; 15,34.5; 30,34.5;
         20.4,34.5; 35.4,34.5; 25.8,34.5; 40.8,34.5; 17.7,40.5; 32.7,40.5; 23.1,40.5;
         38.1,40.5; 28.5,40.5; 43.5,40.5],
-    rTub=0.016,
+    final rTub=rTub,
     kTub=0.42,
-    eTub=0.0029,
+    final eTub=eTub,
     xC=(2*((0.04/2)^2))^(1/2))
     "Construction data for the edge: the borehole height, boreholes coordinate should be updated"
     annotation (Placement(transformation(extent={{-40,60},{-20,80}})));
