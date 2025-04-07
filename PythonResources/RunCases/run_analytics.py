@@ -32,40 +32,40 @@ units =    [
 
 variables = [
                 {'name' : 'EChi.u',
-                 'desc' : 'ETS heat recovery chiller electric power input',
+                 'description' : 'ETS heat recovery chiller electric power input',
                  'quantity' : 'power',
                  'actions'  : ['max', 'plot'],
                  'captions' : ['Peak heat recovery chiller electric power input',
                                'Heat recovery chiller electric power input']
                  },
                 {'name' : 'EChi.y',
-                 'desc' : 'ETS heat recovery chiller electrical energy consumption',
+                 'description' : 'ETS heat recovery chiller electrical energy consumption',
                  'quantity' : 'energy',
                  'actions'  : ['last'],
                  'captions' : ['Total heat recovery chiller electrical consumption']
                  },
                 {'name' : 'bui.bui.QReqHea_flow',
-                 'desc' : 'Space heating demand at the coil',
+                 'description' : 'Space heating demand at the coil',
                  'quantity' : 'power',
                  'actions'  : ['max', 'plot'],
                  'captions' : ['Peak space heating load',
                                'Space heating load']
                  },
                 {'name' : 'bui.bui.QReqCoo_flow',
-                 'desc' : 'Space cooling demand at the coil',
+                 'description' : 'Space cooling demand at the coil',
                  'quantity' : 'power',
                  'actions'  : ['min', 'plot'],
                  'captions' : ['Peak cooling load',
                                'Cooling load']
                  },
                 {'name' : 'dHHeaWat.y',
-                 'desc' : 'Space heating load at the coil',
+                 'description' : 'Space heating load at the coil',
                  'quantity' : 'energy',
                  'actions'  : ['last'],
                  'captions' : ['Total space heating load']
                  },
                 {'name' : 'dHChiWat.y',
-                 'desc' : 'Space cooling load at the coil',
+                 'description' : 'Space cooling load at the coil',
                  'quantity' : 'energy',
                  'actions'  : ['last'],
                  'captions' : ['Total cooling load']
@@ -80,17 +80,17 @@ actions = {'max': max,
 # the first scenario will be the baseline to be compared against
 ### replace this with a list of dict?
 scenarios = [
-                {'name'     : 'fTMY',
-                 'mat_file' : 'ConnectedETSNoDHW_futu.mat',
-                 'results'  : {}
+                {'name'    : 'fTMY',
+                 'matFile' : 'ConnectedETSNoDHW_futu.mat',
+                 'results' : {}
                  },
-                {'name'     : 'Heat wave',
-                 'mat_file' : 'ConnectedETSNoDHW_heat.mat',
-                 'results'  : {}
+                {'name'    : 'Heat wave',
+                 'matFile' : 'ConnectedETSNoDHW_heat.mat',
+                 'results' : {}
                  },
-                {'name'     : 'Cold snap',
-                 'mat_file' : 'ConnectedETSNoDHW_cold.mat',
-                 'results'  : {}
+                {'name'    : 'Cold snap',
+                 'matFile' : 'ConnectedETSNoDHW_cold.mat',
+                 'results' : {}
                  }
             ]
 
@@ -117,7 +117,7 @@ def str_with_unit(value, quantity):
 
 #%%
 for i, scenario in enumerate(scenarios):
-    mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", scenario['mat_file']))
+    mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", scenario['matFile']))
     r=Reader(mat_file_path, 'dymola')
     print(f'Scenario: {scenario["name"]}')
     for var in variables:
