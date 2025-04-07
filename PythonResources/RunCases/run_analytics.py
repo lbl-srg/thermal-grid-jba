@@ -13,6 +13,8 @@ from buildingspy.io.outputfile import Reader
 
 CWD = os.getcwd()
 MAT_FILE_NAME = "ConnectedETSNoDHW_futu.mat"
+PRINT_ACTION_NOT_FOUND = False
+
 mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", MAT_FILE_NAME))
 
 units =    [
@@ -57,16 +59,21 @@ variables = [
                 {'name' : 'dHHeaWat.y',
                  'desc' : 'Space heating load at the coil',
                  'quantity' : 'energy',
-                 'actions'  : ['last'],'unit' : uy.J,
+                 'actions'  : ['last'],
                  'captions' : ['Total space heating load']
                  },
                 {'name' : 'dHChiWat.y',
                  'desc' : 'Space cooling load at the coil',
                  'quantity' : 'energy',
                  'actions'  : ['last'],
-                 'captions' : ['Total space cooling load']
+                 'captions' : ['Total cooling load']
                  },
             ]
+
+actions = {'max': max,
+           'min': min,
+           'last': lambda y: y[-1]
+           }
 
 
 r=Reader(mat_file_path, "dymola")
@@ -92,17 +99,17 @@ def str_with_unit(value, quantity):
     u = next((item for item in units if item.get('quantity') == quantity), None)
     return (value * u['unit']).to(u['displayUnit'])
     
-
 for var in variables:
     y = find_var(var['name'])
     if len(y):
-        if 'max' in var['actions']:
-            v = max(y)
-        if 'min' in var['actions']:
-            v = min(y)
-        if 'last' in var['actions']:
-            v = y[-1]
-        vstr = str_with_unit(v, var['quantity'])
-        msg = f"{var['captions'][0]}: {vstr:,.0f}"
-        print(msg)
+        for action in var['actions']:
+            if action in actions:
+                v = actions[action](y)
+                vstr = str_with_unit(v, var['quantity'])
+                msg = f"{var['captions'][0]}: {vstr:,.0f}"
+                print(msg)
+            else:
+                msg = f'## The action "{action}" is not defined for the varialbe "{var["name"]}"'
+                if PRINT_ACTION_NOT_FOUND:
+                    print(msg)
 
