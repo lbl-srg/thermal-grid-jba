@@ -767,8 +767,6 @@ equation
       thickness=0.5));
   connect(uDisPum, ind.uDisPum) annotation (Line(points={{-560,260},{-530,260},{
           -530,264},{-482,264}},  color={0,0,127}));
-  connect(uSolTim, ind.uSolTim) annotation (Line(points={{-560,230},{-510,230},{
-          -510,256},{-482,256}},  color={0,0,127}));
   connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-458,262},{-220,
           262},{-220,179},{-182,179}}, color={255,127,0}));
   connect(ind.yEle, dryCooHexCon.uEleRat) annotation (Line(points={{-458,262},{-440,
@@ -920,10 +918,6 @@ equation
       thickness=0.5));
   connect(heaPumCon.y1Mod, dryCooHexCon.u1HeaPumMod) annotation (Line(points={{-158,
           177},{-116,177},{-116,202},{-82,202}}, color={255,0,255}));
-  connect(ind.y1Spr, dryCooHexCon.u1Spr) annotation (Line(points={{-458,253},{-416,
-          253},{-416,220},{-82,220}},      color={255,0,255}));
-  connect(ind.y1Fal, dryCooHexCon.u1Fal) annotation (Line(points={{-458,251},{-424,
-          251},{-424,216},{-82,216}},      color={255,0,255}));
   connect(heaPumCon.yLooHea, dryCooHexCon.uLooHea) annotation (Line(points={{
           -158,179},{-124,179},{-124,218},{-82,218}}, color={255,127,0}));
   connect(dryCooHexCon.TAirDryCooIn, dryCoo.TAir) annotation (Line(points={{-58,

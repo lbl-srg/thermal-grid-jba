@@ -40,16 +40,10 @@ model DryCoolerHex
   parameter Real THys=0.1 "Hysteresis for comparing temperature"
     annotation (Dialog(tab="Advanced"));
 
-  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1Spr "True: in Spring"
-    annotation (Placement(transformation(extent={{-380,330},{-340,370}}),
-        iconTransformation(extent={{-140,80},{-100,120}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uLooHea
     "-1: cool loop; 1: warm loop; 0: average" annotation (Placement(
         transformation(extent={{-380,300},{-340,340}}), iconTransformation(
           extent={{-140,60},{-100,100}})));
-  Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1Fal "True: in Fall"
-    annotation (Placement(transformation(extent={{-380,260},{-340,300}}),
-        iconTransformation(extent={{-140,40},{-100,80}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uEleRat
     "Electricity rate indicator. 0-normal rate; 1-high rate"
     annotation (Placement(transformation(extent={{-380,200},{-340,240}}),
@@ -337,6 +331,14 @@ model DryCoolerHex
   Buildings.Controls.OBC.CDL.Reals.AddParameter cooShi(p=TAppSet)
     "Temperature shift when the dry cooler should cool down the fluid"
     annotation (Placement(transformation(extent={{40,-180},{60,-160}})));
+  Buildings.Controls.OBC.CDL.Integers.Equal inSpr "Output true in spring"
+    annotation (Placement(transformation(extent={{-260,340},{-240,360}})));
+  Buildings.Controls.OBC.CDL.Integers.Sources.Constant spr(final k=2) "Spring"
+    annotation (Placement(transformation(extent={{-300,350},{-280,370}})));
+  Buildings.Controls.OBC.CDL.Integers.Equal inFal "Output true in fall"
+    annotation (Placement(transformation(extent={{-260,260},{-240,280}})));
+  Buildings.Controls.OBC.CDL.Integers.Sources.Constant fal(final k=4) "Fall"
+    annotation (Placement(transformation(extent={{-300,270},{-280,290}})));
 equation
   connect(uEleRat, higRatMod.u2) annotation (Line(points={{-360,220},{-290,220},
           {-290,232},{-262,232}}, color={255,127,0}));
@@ -536,10 +538,6 @@ equation
           {100,250},{118,250}}, color={255,0,255}));
   connect(enaHex4.y, enaHexSho1.u2) annotation (Line(points={{82,170},{100,170},
           {100,242},{118,242}}, color={255,0,255}));
-  connect(u1Spr, colSpr.u1) annotation (Line(points={{-360,350},{-182,350}},
-                            color={255,0,255}));
-  connect(u1Fal, warFal.u1) annotation (Line(points={{-360,280},{-182,280}},
-                 color={255,0,255}));
   connect(sprWarLoo.y, enaHexSho.u1)
     annotation (Line(points={{-18,350},{58,350}}, color={255,0,255}));
   connect(falCooLoo.y, enaHexSho.u2) annotation (Line(points={{-18,300},{40,300},
@@ -592,6 +590,18 @@ equation
           -170},{38,-170}}, color={0,0,127}));
   connect(cooShi.y, dryCooInAir1.u1) annotation (Line(points={{62,-170},{180,-170},
           {180,-182},{198,-182}}, color={0,0,127}));
+  connect(spr.y, inSpr.u1) annotation (Line(points={{-278,360},{-270,360},{-270,
+          350},{-262,350}}, color={255,127,0}));
+  connect(inSpr.y, colSpr.u1)
+    annotation (Line(points={{-238,350},{-182,350}}, color={255,0,255}));
+  connect(inFal.y, warFal.u1) annotation (Line(points={{-238,270},{-220,270},{
+          -220,280},{-182,280}}, color={255,0,255}));
+  connect(fal.y, inFal.u1) annotation (Line(points={{-278,280},{-270,280},{-270,
+          270},{-262,270}}, color={255,127,0}));
+  connect(uGen, inSpr.u2) annotation (Line(points={{-360,120},{-328,120},{-328,
+          334},{-268,334},{-268,342},{-262,342}}, color={255,127,0}));
+  connect(uGen, inFal.u2) annotation (Line(points={{-360,120},{-328,120},{-328,
+          256},{-270,256},{-270,262},{-262,262}}, color={255,127,0}));
 annotation (defaultComponentName="dryCooHexCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
