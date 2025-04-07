@@ -63,14 +63,14 @@ model Generations
   parameter Real TConHea_nominal(unit="K")=TLooMin + TApp
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaHea_nominal(unit="K")=TLooMin
-    "Nominal temperature of the cooled fluid in heating mode"
+  parameter Real TEvaHea_nominal(unit="K")
+    "Nominal temperature of evaporator for heat pump design during heating"
     annotation (Dialog(group="Heat pump"));
   parameter Real QHeaPumCoo_flow_nominal(unit="W")=-cpWat*mWat_flow_nominal*TApp
     "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConCoo_nominal(unit="K")=TLooMax
-    "Nominal temperature of the cooled fluid in cooling mode"
+  parameter Real TConCoo_nominal(unit="K")
+    "Nominal temperature of condenser for heat pump design during cooling"
     annotation (Dialog(group="Heat pump"));
   parameter Real TEvaCoo_nominal(unit="K")=TLooMax + TApp
     "Nominal temperature of the heated fluid in cooling mode"

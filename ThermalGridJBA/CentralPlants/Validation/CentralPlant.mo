@@ -15,7 +15,9 @@ model CentralPlant "Validation model for central plant"
     mWat_flow_min=0.105*mPlaWat_flow_nominal,
     mHpGly_flow_nominal=mPlaWat_flow_nominal,
     QHeaPumHea_flow_nominal=mPlaWat_flow_nominal*4186*dT_nominal,
+    TEvaHea_nominal=260.15,
     QHeaPumCoo_flow_nominal=-mPlaWat_flow_nominal*4186*dT_nominal,
+    TConCoo_nominal=315.15,
     TConInMin=291.15,
     TEvaInMax=289.65)
     annotation (Placement(transformation(extent={{20,-10},{40,10}})));
