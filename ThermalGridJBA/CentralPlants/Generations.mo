@@ -214,6 +214,18 @@ model Generations
     final unit="W")
     "Electrical power consumed by glycol pump of heat pump"
     annotation (Placement(transformation(extent={{540,120},{580,160}}),
+        iconTransformation(extent={{100,-10},{140,30}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumBorFiePer(
+    final quantity="Power",
+    final unit="W")
+    "Electrical power consumed by pump for borefield perimeter"
+    annotation (Placement(transformation(extent={{540,90},{580,130}}),
+        iconTransformation(extent={{100,-30},{140,10}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumBorFieCen(
+    final quantity="Power",
+    final unit="W")
+    "Electrical power consumed by pump for borefield center"
+    annotation (Placement(transformation(extent={{540,58},{580,98}}),
         iconTransformation(extent={{100,-50},{140,-10}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PCom(
     final quantity="Power",
@@ -229,8 +241,7 @@ model Generations
         iconTransformation(extent={{100,-90},{140,-50}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(
     final quantity="Power",
-    final unit="W")
-    "Electrical power consumed by circulation pump"
+    final unit="W") "Electrical power consumed by circulation pumps"
     annotation (Placement(transformation(extent={{540,-230},{580,-190}}),
         iconTransformation(extent={{100,-110},{140,-70}})));
 
@@ -244,13 +255,14 @@ model Generations
     "Fluid connector for waterflow to the district"
     annotation (Placement(transformation(extent={{-550,-250},{-530,-230}}),
       iconTransformation(extent={{-110,-90},{-90,-70}})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPla(
+  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaPri(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     addPowerToMedium=false,
     use_riseTime=false,
     m_flow_nominal=mWat_flow_nominal,
-    dpMax=Modelica.Constants.inf)     "Pump for the whole central plant"
+    dpMax=Modelica.Constants.inf)
+    "Pump for the primary loop of the central plant"
     annotation (Placement(transformation(extent={{-390,-170},{-370,-150}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHexByp(
     redeclare final package Medium = MediumW,
@@ -519,13 +531,13 @@ model Generations
         extent={{-10,-10},{10,10}},
         rotation=270,
         origin={400,100})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPla1(
+  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaSec(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     addPowerToMedium=false,
     use_riseTime=false,
     m_flow_nominal=mWat_flow_nominal,
-    dpMax=Modelica.Constants.inf)     "Pump for the whole central plant"
+    dpMax=Modelica.Constants.inf) "Pump for secondary loop of central plant"
     annotation (Placement(transformation(extent={{110,-170},{130,-150}})));
   Buildings.Fluid.FixedResistances.Junction jun4(
     redeclare final package Medium = MediumW,
@@ -713,6 +725,13 @@ model Generations
         extent={{-10,-10},{10,10}},
         rotation=270,
         origin={240,-110})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant fixme(k=0)
+    "Zero output signal until control is implemented"
+    annotation (Placement(transformation(extent={{-320,-220},{-300,-200}})));
+protected
+  Buildings.Controls.OBC.CDL.Reals.Add PPumCirAdd
+    "Adder for circulation pump power"
+    annotation (Placement(transformation(extent={{200,-270},{220,-250}})));
 equation
   connect(valHex.port_b, hex.port_a2) annotation (Line(
       points={{-320,-90},{-320,-56},{-300,-56}},
@@ -730,7 +749,7 @@ equation
       points={{-540,0},{-500,0},{-500,-160},{-490,-160}},
       color={0,127,255},
       thickness=0.5));
-  connect(entGenTem.port_b, pumCenPla.port_a) annotation (Line(
+  connect(entGenTem.port_b, pumCenPlaPri.port_a) annotation (Line(
       points={{-470,-160},{-390,-160}},
       color={0,127,255},
       thickness=0.5));
@@ -782,8 +801,8 @@ equation
       thickness=0.5));
   connect(dryCooOut.T, dryCooHexCon.TDryCooOut) annotation (Line(points={{130,141},
           {130,190},{-100,190},{-100,200},{-82,200}},      color={0,0,127}));
-  connect(dryCooHexCon.yValHex, valHex.y) annotation (Line(points={{-58,217},{-260,
-          217},{-260,150},{-360,150},{-360,-100},{-332,-100}},    color={0,0,
+  connect(dryCooHexCon.yValHex, valHex.y) annotation (Line(points={{-58,217},{-42,
+          217},{-42,158},{-360,158},{-360,-100},{-332,-100}},     color={0,0,
           127}));
   connect(dryCooHexCon.yValHexByp, valHexByp.y) annotation (Line(points={{-58,219},
           {-42,219},{-42,238},{-210,238},{-210,-120},{-280,-120},{-280,-148}},
@@ -802,27 +821,29 @@ equation
   connect(dryCooHexCon.yPumDryCoo, pumDryCoo.m_flow_in)
     annotation (Line(points={{-58,208},{-50,208},{-50,142}}, color={0,0,127}));
   connect(heaPumCon.yPumGly, pumHeaPumGly.m_flow_in) annotation (Line(points={{-158,
-          168},{246,168},{246,0},{382,0}},      color={0,0,127}));
+          168},{448,168},{448,0},{382,0}},      color={0,0,127}));
   connect(heaPumCon.yPum, pumHeaPumWat.m_flow_in) annotation (Line(points={{-158,
           163},{276,163},{276,-80},{298,-80}},    color={0,0,127}));
-  connect(gai2.y, pumCenPla.m_flow_in) annotation (Line(points={{-398,20},{-380,
+  connect(gai2.y, pumCenPlaPri.m_flow_in) annotation (Line(points={{-398,20},{-380,
           20},{-380,-148}}, color={0,0,127}));
   connect(uDisPum, gai2.u) annotation (Line(points={{-560,260},{-530,260},{-530,
           20},{-422,20}}, color={0,0,127}));
   connect(pumDryCoo.P, PPumDryCoo) annotation (Line(points={{-39,139},{-22,139},
           {-22,140},{-20,140},{-20,200},{560,200}},
                                 color={0,0,127}));
-  connect(pumDryCoo1.P, PPumHexGly) annotation (Line(points={{-251,5},{-251,0},{
-          344,0},{344,170},{560,170}},  color={0,0,127}));
+  connect(pumDryCoo1.P, PPumHexGly) annotation (Line(points={{-251,5},{-251,-8},
+          {-240,-8},{-240,144},{480,144},{480,170},{560,170}},
+                                        color={0,0,127}));
   connect(pumHeaPumGly.P, PPumHeaPumGly) annotation (Line(points={{379,-11},{379,
-          -20},{500,-20},{500,140},{560,140}}, color={0,0,127}));
+          -20},{526,-20},{526,140},{560,140}}, color={0,0,127}));
   connect(pumHeaPumWat.P, PPumHeaPumWat) annotation (Line(points={{301,-69},{301,
           -60},{490,-60},{490,-140},{560,-140}},
                                                color={0,0,127}));
   connect(ind.yEleRat, yEleRat) annotation (Line(points={{-458,260},{260,260},{260,
           270},{560,270}}, color={0,0,127}));
-  connect(pumCenPla.port_b, jun.port_1)
-    annotation (Line(points={{-370,-160},{-330,-160}}, color={0,127,255},
+  connect(pumCenPlaPri.port_b, jun.port_1) annotation (Line(
+      points={{-370,-160},{-330,-160}},
+      color={0,127,255},
       thickness=0.5));
   connect(jun.port_2, valHexByp.port_a)
     annotation (Line(points={{-310,-160},{-290,-160}},
@@ -919,9 +940,9 @@ equation
     annotation (Line(points={{2,-160},{20,-160}}, color={0,127,255}));
   connect(valIsoPriSec.port_b, jun11.port_1)
     annotation (Line(points={{40,-160},{60,-160}}, color={0,127,255}));
-  connect(jun11.port_2, pumCenPla1.port_a)
+  connect(jun11.port_2, pumCenPlaSec.port_a)
     annotation (Line(points={{80,-160},{110,-160}}, color={0,127,255}));
-  connect(pumCenPla1.port_b, jun4.port_1)
+  connect(pumCenPlaSec.port_b, jun4.port_1)
     annotation (Line(points={{130,-160},{170,-160}}, color={0,127,255}));
   connect(jun8.port_2, jun9.port_1)
     annotation (Line(points={{60,-240},{0,-240}}, color={0,127,255}));
@@ -970,6 +991,26 @@ equation
   connect(senTemBorCenRet.port_a,portBorFieCen_a)  annotation (Line(points={{240,
           -100},{240,-48},{184,-48},{184,238},{180,238},{180,280}}, color={0,127,
           255}));
+  connect(fixme.y, pumBorFiePer.m_flow_in) annotation (Line(points={{-298,-210},
+          {-170,-210},{-170,-80},{-162,-80}}, color={0,0,127}));
+  connect(fixme.y, valPriByp.y) annotation (Line(points={{-298,-210},{-44,-210},
+          {-44,-222},{22,-222},{22,-200},{4,-200}}, color={0,0,127}));
+  connect(fixme.y, valIsoPriSec.y) annotation (Line(points={{-298,-210},{-170,-210},
+          {-170,-134},{30,-134},{30,-148}}, color={0,0,127}));
+  connect(fixme.y, pumBorFieCen.m_flow_in) annotation (Line(points={{-298,-210},
+          {-170,-210},{-170,-100},{120,-100},{120,-80},{168,-80}}, color={0,0,127}));
+  connect(fixme.y, pumCenPlaSec.m_flow_in) annotation (Line(points={{-298,-210},
+          {-170,-210},{-170,-100},{120,-100},{120,-148}}, color={0,0,127}));
+  connect(pumCenPlaPri.P, PPumCirAdd.u1) annotation (Line(points={{-369,-151},{-350,
+          -151},{-350,-254},{198,-254}}, color={0,0,127}));
+  connect(PPumCirAdd.u2, pumCenPlaSec.P) annotation (Line(points={{198,-266},{140,
+          -266},{140,-151},{131,-151}}, color={0,0,127}));
+  connect(PPumCirAdd.y, PPumCirPum) annotation (Line(points={{222,-260},{520,-260},
+          {520,-210},{560,-210}}, color={0,0,127}));
+  connect(pumBorFiePer.P, PPumBorFiePer) annotation (Line(points={{-159,-69},{-159,
+          148},{520,148},{520,110},{560,110}}, color={0,0,127}));
+  connect(pumBorFieCen.P, PPumBorFieCen) annotation (Line(points={{171,-69},{171,
+          140},{516,140},{516,78},{560,78}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
