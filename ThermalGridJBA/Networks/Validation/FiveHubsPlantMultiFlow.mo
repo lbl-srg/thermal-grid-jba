@@ -457,7 +457,8 @@ equation
   connect(mulSum.y, looMeaTem.u)
     annotation (Line(points={{-278,60},{-262,60}}, color={0,0,127}));
   connect(looMeaTem.y, cenPla.TMixAve) annotation (Line(points={{-238,60},{-170,
-          60},{-170,3},{-162,3}}, color={0,0,127}));
+          60},{-170,-4},{-162,-4}},
+                                  color={0,0,127}));
   connect(cenPla.PPumDryCoo, EPumDryCoo.u) annotation (Line(points={{-138,5},{
           -128,5},{-128,128},{98,128}},
                                    color={0,0,127}));
@@ -491,7 +492,7 @@ equation
   connect(plaHeaSup.y, EPlaHea.u)
     annotation (Line(points={{302,-170},{318,-170}}, color={0,0,127}));
   connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
-      points={{-299.9,-19.9},{-260,-19.9},{-260,-7},{-162,-7}},
+      points={{-299.9,-19.9},{-260,-19.9},{-260,11},{-162,11}},
       color={255,204,51},
       thickness=0.5), Text(
       string="%first",
@@ -514,6 +515,10 @@ equation
           -124,-16},{-124,-210},{178,-210}}, color={0,0,127}));
   connect(cenPla.QBorCen_flow, EBorCen.u) annotation (Line(points={{-138,-18},{
           -126,-18},{-126,-240},{178,-240}}, color={0,0,127}));
+  connect(cenPla.TLooMaxMea, looMaxTem.y) annotation (Line(points={{-162,-8},{
+          -260,-8},{-260,-140},{-278,-140}}, color={0,0,127}));
+  connect(cenPla.TLooMinMea, looMinTem.y) annotation (Line(points={{-162,-12},{
+          -256,-12},{-256,-180},{-278,-180}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
