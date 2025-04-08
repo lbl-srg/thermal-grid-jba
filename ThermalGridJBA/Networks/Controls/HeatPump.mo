@@ -422,7 +422,7 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
     annotation (Placement(transformation(extent={{60,370},{80,390}})));
   Buildings.Controls.OBC.CDL.Reals.Add add2
     annotation (Placement(transformation(extent={{120,390},{140,410}})));
-  Buildings.Controls.OBC.CDL.Discrete.TriggeredSampler triSam
+  Buildings.Controls.OBC.CDL.Discrete.TriggeredSampler triSam(y_start=1)
     annotation (Placement(transformation(extent={{170,390},{190,410}})));
   Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr
     annotation (Placement(transformation(extent={{220,390},{240,410}})));
