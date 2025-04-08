@@ -179,20 +179,34 @@ model Generations
   Buildings.Controls.OBC.CDL.Interfaces.RealInput uSolTim
     "Solar time. An output from weather data"
     annotation (Placement(transformation(extent={{-580,210},{-540,250}}),
-        iconTransformation(extent={{-140,50},{-100,90}})));
+        iconTransformation(extent={{-140,40},{-100,80}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TMixAve(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Average temperature of mixing points after each energy transfer station"
     annotation (Placement(transformation(extent={{-580,120},{-540,160}}),
-        iconTransformation(extent={{-140,10},{-100,50}})));
+        iconTransformation(extent={{-140,-62},{-100,-22}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMaxMea(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")
+    "Maximum temperature of mixing points after each energy transfer station"
+    annotation (Placement(transformation(extent={{-580,80},{-540,120}}),
+        iconTransformation(extent={{-140,-102},{-100,-62}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMinMea(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")
+    "Minimum temperature of mixing points after each energy transfer station"
+    annotation (Placement(transformation(extent={{-580,40},{-540,80}}),
+        iconTransformation(extent={{-140,-142},{-100,-102}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Ambient dry bulb temperature"
     annotation (Placement(transformation(extent={{-580,170},{-540,210}}),
-        iconTransformation(extent={{-140,-60},{-100,-20}})));
+        iconTransformation(extent={{-140,-2},{-100,38}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
     "Current electricity rate, cent per kWh"
     annotation (Placement(transformation(extent={{540,250},{580,290}}),
@@ -248,13 +262,13 @@ model Generations
   Modelica.Fluid.Interfaces.FluidPort_a port_a(
     redeclare final package Medium = MediumW)
     "Fluid connector for waterflow from the district"
-    annotation (Placement(transformation(extent={{-550,-10},{-530,10}}),
-      iconTransformation(extent={{-110,-10},{-90,10}})));
+    annotation (Placement(transformation(extent={{-550,-170},{-530,-150}}),
+      iconTransformation(extent={{-110,-170},{-90,-150}})));
   Modelica.Fluid.Interfaces.FluidPort_b port_b(
     redeclare final package Medium = MediumW)
     "Fluid connector for waterflow to the district"
     annotation (Placement(transformation(extent={{-550,-250},{-530,-230}}),
-      iconTransformation(extent={{-110,-90},{-90,-70}})));
+      iconTransformation(extent={{-110,-210},{-90,-190}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaPri(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
@@ -414,7 +428,7 @@ model Generations
     final TiVal=TiVal,
     final TdVal=TdVal)
     "Control of heat pump and the corresponed pumps and valves"
-    annotation (Placement(transformation(extent={{-180,160},{-160,180}})));
+    annotation (Placement(transformation(extent={{-180,170},{-160,190}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort dryCooOut(
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
@@ -736,9 +750,6 @@ model Generations
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant fixme2(k=0)
     "Zero output signal until control is implemented"
     annotation (Placement(transformation(extent={{-72,-210},{-52,-190}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant fixme3(k=0)
-    "Zero output signal until control is implemented"
-    annotation (Placement(transformation(extent={{44,-32},{64,-12}})));
 protected
   Buildings.Controls.OBC.CDL.Reals.Add PPumCirAdd
     "Adder for circulation pump power"
@@ -757,7 +768,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(port_a, entGenTem.port_a) annotation (Line(
-      points={{-540,0},{-500,0},{-500,-160},{-490,-160}},
+      points={{-540,-160},{-490,-160}},
       color={0,127,255},
       thickness=0.5));
   connect(entGenTem.port_b, pumCenPlaPri.port_a) annotation (Line(
@@ -776,31 +787,33 @@ equation
       points={{-300,-44},{-334,-44}},
       color={0,127,255},
       thickness=0.5));
-  connect(uDisPum, ind.uDisPum) annotation (Line(points={{-560,260},{-530,260},{
-          -530,264},{-482,264}},  color={0,0,127}));
-  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-458,262},{-220,
-          262},{-220,179},{-182,179}}, color={255,127,0}));
-  connect(ind.yEle, dryCooHexCon.uEleRat) annotation (Line(points={{-458,262},{-440,
-          262},{-440,214},{-82,214}}, color={255,127,0}));
-  connect(ind.ySt, dryCooHexCon.uSt) annotation (Line(points={{-458,266},{-432,266},
-          {-432,212},{-82,212}},      color={255,127,0}));
-  connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-458,266},{-212,266},
-          {-212,177},{-182,177}}, color={255,127,0}));
-  connect(ind.yGen, dryCooHexCon.uGen) annotation (Line(points={{-458,257},{-448,
-          257},{-448,210},{-82,210}},      color={255,127,0}));
-  connect(ind.yGen, heaPumCon.uGen) annotation (Line(points={{-458,257},{-228,257},
-          {-228,168},{-182,168}},      color={255,127,0}));
+  connect(uDisPum, ind.uDisPum) annotation (Line(points={{-560,260},{-530,260},
+          {-530,264},{-482,264}}, color={0,0,127}));
+  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-458,262},{
+          -220,262},{-220,189},{-182,189}},
+                                       color={255,127,0}));
+  connect(ind.yEle, dryCooHexCon.uEleRat) annotation (Line(points={{-458,262},{
+          -440,262},{-440,214},{-82,214}},
+                                      color={255,127,0}));
+  connect(ind.ySt, dryCooHexCon.uSt) annotation (Line(points={{-444,295},{-432,
+          295},{-432,212},{-82,212}}, color={255,127,0}));
+  connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-444,295},{-212,295},
+          {-212,187},{-182,187}}, color={255,127,0}));
+  connect(ind.yGen, dryCooHexCon.uGen) annotation (Line(points={{-458,257},{
+          -448,257},{-448,210},{-82,210}}, color={255,127,0}));
+  connect(ind.yGen, heaPumCon.uGen) annotation (Line(points={{-458,257},{-228,
+          257},{-228,178},{-182,178}}, color={255,127,0}));
   connect(heaPumCon.y1On, dryCooHexCon.u1HeaPum) annotation (Line(points={{-158,
-          171},{-120,171},{-120,204},{-82,204}}, color={255,0,255}));
+          181},{-120,181},{-120,204},{-82,204}}, color={255,0,255}));
   connect(TMixAve, heaPumCon.TMixAve) annotation (Line(points={{-560,140},{-520,
-          140},{-520,174},{-182,174}}, color={0,0,127}));
-  connect(heaPumLea.T, heaPumCon.TWatOut) annotation (Line(points={{381,-100},{440,
-          -100},{440,156},{-206,156},{-206,171},{-182,171}},       color={0,0,
+          140},{-520,184},{-182,184}}, color={0,0,127}));
+  connect(heaPumLea.T, heaPumCon.TWatOut) annotation (Line(points={{381,-100},{
+          440,-100},{440,156},{-206,156},{-206,181},{-182,181}},   color={0,0,
           127}));
   connect(uDisPum, heaPumCon.uDisPum) annotation (Line(points={{-560,260},{-530,
-          260},{-530,164},{-182,164}}, color={0,0,127}));
-  connect(heaPumGlyIn.T, heaPumCon.TGlyIn) annotation (Line(points={{381,30},{432,
-          30},{432,152},{-200,152},{-200,161},{-182,161}},       color={0,0,127}));
+          260},{-530,166},{-182,166}}, color={0,0,127}));
+  connect(heaPumGlyIn.T, heaPumCon.TGlyIn) annotation (Line(points={{381,30},{
+          432,30},{432,152},{-200,152},{-200,175},{-182,175}},   color={0,0,127}));
   connect(TDryBul, dryCooHexCon.TDryBul) annotation (Line(points={{-560,190},{-500,
           190},{-500,206},{-82,206}},      color={0,0,127}));
   connect(entGenTem.T, dryCooHexCon.TGenIn) annotation (Line(points={{-480,-149},
@@ -820,19 +833,19 @@ equation
       points={{-280,-44},{-260,-44},{-260,6}},
       color={0,127,255},
       thickness=0.5));
-  connect(heaPumCon.yVal, valHeaPum.y) annotation (Line(points={{-158,165},{270,
-          165},{270,-120},{298,-120}},
+  connect(heaPumCon.yVal, valHeaPum.y) annotation (Line(points={{-158,175},{270,
+          175},{270,-120},{298,-120}},
                                  color={0,0,127}));
-  connect(heaPumCon.yValByp, valHeaPumByp.y) annotation (Line(points={{-158,161},
-          {424,161},{424,60},{382,60}}, color={0,0,127}));
+  connect(heaPumCon.yValByp, valHeaPumByp.y) annotation (Line(points={{-158,171},
+          {424,171},{424,60},{382,60}}, color={0,0,127}));
   connect(dryCooHexCon.yPumHex, pumDryCoo1.m_flow_in) annotation (Line(points={{-58,214},
           {0,214},{0,16},{-248,16}},         color={0,0,127}));
   connect(dryCooHexCon.yPumDryCoo, pumDryCoo.m_flow_in)
     annotation (Line(points={{-58,208},{-50,208},{-50,142}}, color={0,0,127}));
   connect(heaPumCon.yPumGly, pumHeaPumGly.m_flow_in) annotation (Line(points={{-158,
-          168},{448,168},{448,0},{382,0}},      color={0,0,127}));
+          178},{448,178},{448,0},{382,0}},      color={0,0,127}));
   connect(heaPumCon.yPum, pumHeaPumWat.m_flow_in) annotation (Line(points={{-158,
-          163},{276,163},{276,-80},{298,-80}},    color={0,0,127}));
+          173},{276,173},{276,-80},{298,-80}},    color={0,0,127}));
   connect(gai2.y, pumCenPlaPri.m_flow_in) annotation (Line(points={{-398,20},{-380,
           20},{-380,-148}}, color={0,0,127}));
   connect(uDisPum, gai2.u) annotation (Line(points={{-560,260},{-530,260},{-530,
@@ -848,8 +861,9 @@ equation
   connect(pumHeaPumWat.P, PPumHeaPumWat) annotation (Line(points={{301,-69},{301,
           -60},{490,-60},{490,-140},{560,-140}},
                                                color={0,0,127}));
-  connect(ind.yEleRat, yEleRat) annotation (Line(points={{-458,260},{260,260},{260,
-          270},{560,270}}, color={0,0,127}));
+  connect(ind.yEleRat, yEleRat) annotation (Line(points={{-458,260},{260,260},{
+          260,270},{560,270}},
+                           color={0,0,127}));
   connect(pumCenPlaPri.port_b, jun.port_1) annotation (Line(
       points={{-370,-160},{-330,-160}},
       color={0,127,255},
@@ -893,8 +907,9 @@ equation
       points={{370,-10},{370,-24},{350,-24}},
       color={0,127,255},
       thickness=0.5));
-  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{-158,177},{96,177},
-          {96,-27.9},{328.9,-27.9}}, color={255,0,255}));
+  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{-158,187},{96,
+          187},{96,-27.9},{328.9,-27.9}},
+                                     color={255,0,255}));
   connect(heaPum.P, PCom)
     annotation (Line(points={{351,-30},{560,-30}}, color={0,0,127}));
   connect(pumDryCoo.port_a, delRet.ports[1]) annotation (Line(points={{-60,130},
@@ -926,11 +941,11 @@ equation
           {328,60},{328,91.6},{-100,91.6}},color={0,127,255},
       thickness=0.5));
   connect(heaPumCon.y1Mod, dryCooHexCon.u1HeaPumMod) annotation (Line(points={{-158,
-          177},{-116,177},{-116,202},{-82,202}}, color={255,0,255}));
-  connect(heaPumCon.yLooHea, dryCooHexCon.uLooHea) annotation (Line(points={{
-          -158,179},{-124,179},{-124,218},{-82,218}}, color={255,127,0}));
-  connect(dryCooHexCon.TAirDryCooIn, dryCoo.TAir) annotation (Line(points={{-58,
-          204},{20,204},{20,134},{38,134}}, color={0,0,127}));
+          187},{-116,187},{-116,202},{-82,202}}, color={255,0,255}));
+  connect(heaPumCon.yLooHea, dryCooHexCon.uLooHea) annotation (Line(points={{-158,
+          189},{-124,189},{-124,218},{-82,218}},      color={255,127,0}));
+  connect(dryCooHexCon.TAirDryCooIn, dryCoo.TAir) annotation (Line(points={{-58,204},
+          {20,204},{20,134},{38,134}},      color={0,0,127}));
   connect(jun4.port_2,jun5. port_1) annotation (Line(
       points={{190,-160},{230,-160}},
       color={0,127,255},
@@ -1016,17 +1031,21 @@ equation
     annotation (Line(points={{4,-120},{30,-120},{30,-148}}, color={0,0,127}));
   connect(fixme2.y, valPriByp.y) annotation (Line(points={{-50,-200},{-36,-200},
           {-36,-200},{-20,-200}}, color={0,0,127}));
-  connect(fixme3.y, heaPum.ySet) annotation (Line(points={{66,-22},{198,-22},{
-          198,-31.9},{328.9,-31.9}}, color={0,0,127}));
+  connect(TLooMaxMea, heaPumCon.TLooMaxMea) annotation (Line(points={{-560,100},
+          {-472,100},{-472,172},{-182,172}}, color={0,0,127}));
+  connect(TLooMinMea, heaPumCon.TLooMinMea) annotation (Line(points={{-560,60},
+          {-466,60},{-466,169},{-182,169}}, color={0,0,127}));
+  connect(heaPum.ySet, heaPumCon.yComSet) annotation (Line(points={{328.9,-31.9},
+          {282,-31.9},{282,184},{-158,184},{-158,183}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
                                 Rectangle(
-        extent={{-100,-100},{100,100}},
+        extent={{-100,-220},{100,100}},
         lineColor={0,0,127},
         fillColor={255,255,255},
         fillPattern=FillPattern.Solid),
-       Text(extent={{-98,-96},{102,-136}},
+       Text(extent={{-90,-216},{110,-256}},
           textString="%name",
           textColor={0,0,255})}),
    Diagram(coordinateSystem(preserveAspectRatio=false,

@@ -114,14 +114,29 @@ model CentralPlant "Central plant"
     final unit="K",
     displayUnit="degC")
     "Average temperature of mixing points after each energy transfer station"
-    annotation (Placement(transformation(extent={{-280,20},{-240,60}}),
-        iconTransformation(extent={{-140,10},{-100,50}})));
+    annotation (Placement(transformation(extent={{-280,-100},{-240,-60}}),
+        iconTransformation(extent={{-140,-60},{-100,-20}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMaxMea(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")
+    "Maximum temperature of mixing points after each energy transfer station"
+    annotation (Placement(transformation(extent={{-280,-160},{-240,-120}}),
+        iconTransformation(extent={{-140,-100},{-100,-60}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMinMea(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")
+    "Minimum temperature of mixing points after each energy transfer station"
+    annotation (Placement(transformation(extent={{-280,-220},{-240,-180}}),
+        iconTransformation(extent={{-140,-140},{-100,-100}})));
+
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Ambient dry bulb temperature"
-    annotation (Placement(transformation(extent={{-280,-60},{-240,-20}}),
-        iconTransformation(extent={{-140,-90},{-100,-50}})));
+    annotation (Placement(transformation(extent={{-280,180},{-240,220}}),
+        iconTransformation(extent={{-140,90},{-100,130}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(quantity="Power",
       final unit="W")
     "Electrical power consumed by circulation pump"
@@ -240,16 +255,19 @@ model CentralPlant "Central plant"
     "Heat flow from borefield center to water" annotation (Placement(
         transformation(extent={{320,-250},{360,-210}}), iconTransformation(
           extent={{100,-200},{140,-160}})));
+
 equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},{
           -170,9},{-162,9}}, color={0,0,127}));
   connect(uSolTim, gen.uSolTim) annotation (Line(points={{-260,80},{-180,80},{-180,
-          7},{-162,7}}, color={0,0,127}));
-  connect(TMixAve, gen.TMixAve) annotation (Line(points={{-260,40},{-190,40},{-190,
-          3},{-162,3}}, color={0,0,127}));
-  connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,-40},{-180,-40},
-          {-180,-4},{-162,-4}},color={0,0,127}));
+          6},{-162,6}}, color={0,0,127}));
+  connect(TMixAve, gen.TMixAve) annotation (Line(points={{-260,-80},{-190,-80},{
+          -190,-4.2},{-162,-4.2}},
+                        color={0,0,127}));
+  connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,200},{-180,200},{
+          -180,1.8},{-162,1.8}},
+                               color={0,0,127}));
   connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-130,9},{-130,
           240},{340,240}}, color={0,0,127}));
   connect(heaPumHea.y, EHeaPumEne.u)
@@ -262,7 +280,8 @@ equation
   connect(gen.PPumHexGly, PPumHexGly) annotation (Line(points={{-138,3},{-110,3},
           {-110,150},{340,150}}, color={0,0,127}));
   connect(port_a, gen.port_a)
-    annotation (Line(points={{-240,0},{-160,0}}, color={0,127,255}));
+    annotation (Line(points={{-240,0},{-200,0},{-200,-16},{-160,-16}},
+                                                 color={0,127,255}));
   connect(gen.PPumHeaPumGly, PPumHeaPumGly) annotation (Line(points={{-138,1},{-100,
           1},{-100,-80},{340,-80}},          color={0,0,127}));
   connect(gen.PCom, PCom) annotation (Line(points={{-138,-5},{-108,-5},{-108,-110},
@@ -279,7 +298,7 @@ equation
           10},{-146,18},{-62,18},{-62,-8},{40,-8}}, color={0,127,255}));
   connect(borFie.portCen_b, gen.portBorFieCen_a) annotation (Line(points={{59.8,
           -8},{74,-8},{74,26},{-142,26},{-142,10}}, color={0,127,255}));
-  connect(gen.port_b, port_b) annotation (Line(points={{-160,-8},{-170,-8},{-170,
+  connect(gen.port_b, port_b) annotation (Line(points={{-160,-20},{-170,-20},{-170,
           -32},{280,-32},{280,0},{322,0}}, color={0,127,255}));
   connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,4},{100,4},
           {100,-200},{340,-200}}, color={0,0,127}));
@@ -289,6 +308,10 @@ equation
           {-104,-1},{-104,110},{340,110}}, color={0,0,127}));
   connect(gen.PPumBorFieCen, PPumBorFieCen) annotation (Line(points={{-138,-3},
           {-102,-3},{-102,80},{340,80}}, color={0,0,127}));
+  connect(TLooMaxMea, gen.TLooMaxMea) annotation (Line(points={{-260,-140},{-186,
+          -140},{-186,-8.2},{-162,-8.2}}, color={0,0,127}));
+  connect(TLooMinMea, gen.TLooMinMea) annotation (Line(points={{-260,-200},{-182,
+          -200},{-182,-12.2},{-162,-12.2}}, color={0,0,127}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

@@ -20,10 +20,12 @@ model CentralPlant "Validation model for central plant"
     TConCoo_nominal=315.15,
     TConInMin=291.15,
     TEvaInMax=289.65)
+    "Central plant"
     annotation (Placement(transformation(extent={{20,-50},{40,-30}})));
   Buildings.Fluid.Sources.MassFlowSource_T
                                       sou(
     redeclare package Medium = MediumW,
+    m_flow=mPumDis_flow_nominal,
     use_T_in=true,
     nPorts=1) "Mass flow source"
     annotation (Placement(transformation(extent={{-48,-10},{-28,10}})));
@@ -34,21 +36,24 @@ model CentralPlant "Validation model for central plant"
     "District pump speed"
     annotation (Placement(transformation(extent={{20,60},{40,80}})));
 
-  Buildings.Controls.OBC.CDL.Reals.Sources.Sin disPum(freqHz=1/(24*365*3600))
+  Buildings.Controls.OBC.CDL.Reals.Sources.Sin disPum(
+    amplitude=0.4,                                    freqHz=1/(24*365*3600),
+    offset=0.6)
     "District pump speed"
     annotation (Placement(transformation(extent={{-90,60},{-70,80}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.CivilTime civTim
     annotation (Placement(transformation(extent={{-90,20},{-70,40}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Sin mixWatTem(
-    amplitude=6,
+    amplitude=8,
     freqHz=1/(24*365*3600),
-    offset=273.15 + 18) "Mixed water temperature"
-    annotation (Placement(transformation(extent={{-90,-48},{-70,-28}})));
+    phase=3.1415926535898,
+    offset=273.15 + 17) "Mixed water temperature"
+    annotation (Placement(transformation(extent={{-90,-30},{-70,-10}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Sin dryBul(
     amplitude=20,
     freqHz=1/(24*365*3600),
     offset=273.15 + 10) "Dry bulb temperature"
-    annotation (Placement(transformation(extent={{-90,-80},{-70,-60}})));
+    annotation (Placement(transformation(extent={{-90,-60},{-70,-40}})));
   Buildings.Fluid.FixedResistances.Junction jun(
     redeclare package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
@@ -67,6 +72,10 @@ model CentralPlant "Validation model for central plant"
     m_flow_nominal=mPlaWat_flow_nominal*{1,1,1},
     dp_nominal={0,0,1e4})
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
+  Buildings.Controls.OBC.CDL.Reals.AddParameter addPar(p=1)
+    annotation (Placement(transformation(extent={{-52,-80},{-32,-60}})));
+  Buildings.Controls.OBC.CDL.Reals.AddParameter addPar1(p=-1)
+    annotation (Placement(transformation(extent={{-52,-110},{-32,-90}})));
 equation
   connect(disPum.y, gai.u)
     annotation (Line(points={{-68,70},{18,70}}, color={0,0,127}));
@@ -75,13 +84,12 @@ equation
                            color={0,0,127}));
   connect(civTim.y, cenPla.uSolTim) annotation (Line(points={{-68,30},{4,30},{4,
           -33},{18,-33}},   color={0,0,127}));
-  connect(mixWatTem.y, sou.T_in) annotation (Line(points={{-68,-38},{-60,-38},{
-          -60,4},{-50,4}},                 color={0,0,127}));
-  connect(mixWatTem.y, cenPla.TMixAve) annotation (Line(points={{-68,-38},{6,
-          -38},{6,-37},{18,-37}},
-                            color={0,0,127}));
-  connect(dryBul.y, cenPla.TDryBul) annotation (Line(points={{-68,-70},{10,-70},
-          {10,-47},{18,-47}},                color={0,0,127}));
+  connect(mixWatTem.y, sou.T_in) annotation (Line(points={{-68,-20},{-60,-20},{-60,
+          4},{-50,4}},                     color={0,0,127}));
+  connect(mixWatTem.y, cenPla.TMixAve) annotation (Line(points={{-68,-20},{6,-20},
+          {6,-44},{18,-44}},color={0,0,127}));
+  connect(dryBul.y, cenPla.TDryBul) annotation (Line(points={{-68,-50},{10,-50},
+          {10,-29},{18,-29}},                color={0,0,127}));
   connect(sou.ports[1], jun.port_1)
     annotation (Line(points={{-28,0},{-20,0}}, color={0,127,255}));
   connect(jun.port_2, jun1.port_1)
@@ -92,8 +100,17 @@ equation
           -40},{20,-40}}, color={0,127,255}));
   connect(cenPla.port_b, jun1.port_3)
     annotation (Line(points={{40,-40},{50,-40},{50,-10}}, color={0,127,255}));
-  annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
-        coordinateSystem(preserveAspectRatio=false)),
+  connect(cenPla.TLooMaxMea, addPar.y) annotation (Line(points={{18,-48},{-6,-48},
+          {-6,-70},{-30,-70}}, color={0,0,127}));
+  connect(addPar1.y, cenPla.TLooMinMea) annotation (Line(points={{-30,-100},{-4,
+          -100},{-4,-52},{18,-52}}, color={0,0,127}));
+  connect(mixWatTem.y, addPar.u) annotation (Line(points={{-68,-20},{-62,-20},{-62,
+          -70},{-54,-70}}, color={0,0,127}));
+  connect(mixWatTem.y, addPar1.u) annotation (Line(points={{-68,-20},{-62,-20},{
+          -62,-100},{-54,-100}}, color={0,0,127}));
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
+            {100,100}})),                                        Diagram(
+        coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})),
     experiment(
       StopTime=31536000,
       Interval=3600,

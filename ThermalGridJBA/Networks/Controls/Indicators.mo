@@ -1,6 +1,15 @@
 within ThermalGridJBA.Networks.Controls;
 model Indicators "District load, electricity rate and season indicator"
 
+  parameter Real TLooMin(
+    unit="K",
+    displayUnit="degC")=283.65
+    "Design minimum district loop temperature";
+  parameter Real TLooMax(
+    unit="K",
+    displayUnit="degC")=297.15
+    "Design maximum district loop temperature";
+
   parameter Integer winEndWee=12
     "Week that winter season ends after it"
     annotation (Dialog(group="Season"));
@@ -49,12 +58,8 @@ model Indicators "District load, electricity rate and season indicator"
 
   Buildings.Controls.OBC.CDL.Interfaces.RealInput uDisPum
     "District loop pump speed"
-    annotation (Placement(transformation(extent={{-280,240},{-240,280}}),
+    annotation (Placement(transformation(extent={{-280,330},{-240,370}}),
         iconTransformation(extent={{-140,20},{-100,60}})));
-  Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput ySt
-    "District loop load indicator. 1-low load; 2-medium load; 3-high load"
-    annotation (Placement(transformation(extent={{240,240},{280,280}}),
-        iconTransformation(extent={{100,40},{140,80}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput yEle
     "Electricity rate indicator. 0-normal rate; 1-high rate"
     annotation (Placement(transformation(extent={{240,100},{280,140}}),
@@ -71,26 +76,26 @@ model Indicators "District load, electricity rate and season indicator"
   Buildings.Controls.OBC.CDL.Discrete.Sampler sam(
     final samplePeriod=samplePeriod)
     "District loop load sampler"
-    annotation (Placement(transformation(extent={{-220,250},{-200,270}})));
+    annotation (Placement(transformation(extent={{-200,340},{-180,360}})));
   Buildings.Controls.OBC.CDL.Reals.LessThreshold lesThr(final t=1/3)
     "Check if the speed is less than 1/3"
-    annotation (Placement(transformation(extent={{-160,250},{-140,270}})));
+    annotation (Placement(transformation(extent={{-140,340},{-120,360}})));
   Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr(final t=2/3)
     "Check if the speed is greater than 2/3"
-    annotation (Placement(transformation(extent={{-160,210},{-140,230}})));
+    annotation (Placement(transformation(extent={{-140,300},{-120,320}})));
   Buildings.Controls.OBC.CDL.Integers.Switch intSwi3 "Check district load"
-    annotation (Placement(transformation(extent={{40,250},{60,270}})));
+    annotation (Placement(transformation(extent={{60,340},{80,360}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant lowLoa(final k=1)
     "Low district loop load"
-    annotation (Placement(transformation(extent={{-80,270},{-60,290}})));
+    annotation (Placement(transformation(extent={{-60,360},{-40,380}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant higLoa(final k=3)
     "High district loop load"
-    annotation (Placement(transformation(extent={{-80,230},{-60,250}})));
+    annotation (Placement(transformation(extent={{-60,320},{-40,340}})));
   Buildings.Controls.OBC.CDL.Integers.Switch intSwi4 "Check district load"
-    annotation (Placement(transformation(extent={{-20,210},{0,230}})));
+    annotation (Placement(transformation(extent={{0,300},{20,320}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant medLoa(final k=2)
     "Medium district loop load"
-    annotation (Placement(transformation(extent={{-80,190},{-60,210}})));
+    annotation (Placement(transformation(extent={{-60,280},{-40,300}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.CalendarTime calTim(
     final zerTim=Buildings.Controls.OBC.CDL.Types.ZeroTime.NY2025)
     "Calendar time"
@@ -200,27 +205,28 @@ model Indicators "District load, electricity rate and season indicator"
     period(displayUnit="d") = 31536000)
     "Table that outputs season: 1 winter; 2 spring; 3 summer; 4 fall"
     annotation (Placement(transformation(extent={{200,-160},{220,-140}})));
+  Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput ySt "Load indicator"
+    annotation (Placement(transformation(extent={{240,330},{280,370}})));
 equation
   connect(uDisPum, sam.u)
-    annotation (Line(points={{-260,260},{-222,260}}, color={0,0,127}));
+    annotation (Line(points={{-260,350},{-202,350}}, color={0,0,127}));
   connect(lesThr.y, intSwi3.u2)
-    annotation (Line(points={{-138,260},{38,260}},color={255,0,255}));
-  connect(lowLoa.y, intSwi3.u1) annotation (Line(points={{-58,280},{20,280},{20,
-          268},{38,268}}, color={255,127,0}));
-  connect(higLoa.y, intSwi4.u1) annotation (Line(points={{-58,240},{-40,240},{-40,
-          228},{-22,228}}, color={255,127,0}));
+    annotation (Line(points={{-118,350},{58,350}},color={255,0,255}));
+  connect(lowLoa.y, intSwi3.u1) annotation (Line(points={{-38,370},{40,370},{40,
+          358},{58,358}}, color={255,127,0}));
+  connect(higLoa.y, intSwi4.u1) annotation (Line(points={{-38,330},{-20,330},{-20,
+          318},{-2,318}},  color={255,127,0}));
   connect(greThr.y, intSwi4.u2)
-    annotation (Line(points={{-138,220},{-22,220}}, color={255,0,255}));
-  connect(medLoa.y, intSwi4.u3) annotation (Line(points={{-58,200},{-40,200},{-40,
-          212},{-22,212}}, color={255,127,0}));
-  connect(intSwi4.y, intSwi3.u3) annotation (Line(points={{2,220},{20,220},{20,252},
-          {38,252}}, color={255,127,0}));
+    annotation (Line(points={{-118,310},{-2,310}},  color={255,0,255}));
+  connect(medLoa.y, intSwi4.u3) annotation (Line(points={{-38,290},{-20,290},{-20,
+          302},{-2,302}},  color={255,127,0}));
+  connect(intSwi4.y, intSwi3.u3) annotation (Line(points={{22,310},{40,310},{40,
+          342},{58,342}},
+                     color={255,127,0}));
   connect(sam.y, lesThr.u)
-    annotation (Line(points={{-198,260},{-162,260}}, color={0,0,127}));
-  connect(sam.y, greThr.u) annotation (Line(points={{-198,260},{-178,260},{-178,
-          220},{-162,220}}, color={0,0,127}));
-  connect(intSwi3.y, ySt)
-    annotation (Line(points={{62,260},{260,260}},  color={255,127,0}));
+    annotation (Line(points={{-178,350},{-142,350}}, color={0,0,127}));
+  connect(sam.y, greThr.u) annotation (Line(points={{-178,350},{-158,350},{-158,
+          310},{-142,310}}, color={0,0,127}));
   connect(calTim.month, aftJun.u)
     annotation (Line(points={{-199,130},{-182,130}}, color={255,127,0}));
   connect(calTim.month, earSep.u) annotation (Line(points={{-199,130},{-188,130},
@@ -313,6 +319,8 @@ equation
     annotation (Line(points={{222,40},{260,40}}, color={0,0,127}));
   connect(seaTab.y[1], yGen)
     annotation (Line(points={{222,-150},{260,-150}}, color={255,127,0}));
+  connect(intSwi3.y, ySt)
+    annotation (Line(points={{82,350},{260,350}}, color={255,127,0}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
@@ -320,10 +328,10 @@ annotation (defaultComponentName="ind",
         lineColor={0,0,127},
         fillColor={255,255,255},
         fillPattern=FillPattern.Solid),
-       Text(extent={{-100,140},{100,100}},
+       Text(extent={{-108,144},{92,104}},
           textString="%name",
           textColor={0,0,255})}),
-  Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-240,-300},{240,300}})),
+  Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-240,-300},{240,400}})),
 Documentation(info="
 <html>
 <p>
