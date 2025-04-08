@@ -23,6 +23,7 @@ CASE_LIST = 'fivehubsnoplant'
 CASE_SPECS = {
      'start_time' : 90 * 24 * 3600,
      'stop_time'  : 100* 24 * 3600,
+     'number_of_intervals' : 365 * 24,
      'solver'     : 'cvode'}
 """ Sets simulation specifications for all cases,
         UNLESS such a specification is already in the case constructor,
@@ -140,6 +141,8 @@ def _simulate(spec):
         s.setSolver(spec['solver'])
     else:
         s.setSolver("Cvode")
+    if 'number_of_intervals' in spec:
+        s.setNumberOfIntervals(n=spec['number_of_intervals'])
     if 'modifiers' in spec:
         s.addModelModifier(spec['modifiers'])
     if 'parameters' in spec:
