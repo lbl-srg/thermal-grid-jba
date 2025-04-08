@@ -116,10 +116,9 @@ def str_with_unit(value, quantity):
     return (value * u['unit']).to(u['displayUnit'])
 
 #%%
-for i, scenario in enumerate(scenarios):
+for scenario in scenarios:
     mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", scenario['matFile']))
     r=Reader(mat_file_path, 'dymola')
-    print(f'Scenario: {scenario["name"]}')
     for var in variables:
         y = find_var(var['name'])
         if len(y):
@@ -127,17 +126,35 @@ for i, scenario in enumerate(scenarios):
             for action in var['actions']:
                 if action in actions:
                     v = actions[action](y)
-                    vstr = str_with_unit(v, var['quantity'])
-                    msg = ' '*4+f"{var['captions'][0]}: {vstr:,.0f}"
-                    print(msg)
-                    
                     scenario['results'][var['name']][action] = v
-                    # if i > 0:
-                    #     baseline_value = scenario_results[scenarios[0]][var['name']][action]
-                    #     comparison_msg = f"Comparison with baseline ({scenarios[0]}): {var['captions'][0]}: {vstr:,.0f} vs {str_with_unit(baseline_value, var['quantity']):,.0f}"
-                    #     print(comparison_msg)
                 else:
                     msg = f'## The action "{action}" is not defined for the varialbe "{var["name"]}"'
                     if PRINT_ACTION_NOT_FOUND:
                         print(msg)
 
+#%% 
+tableWidth = 12
+row = f"{'Scenarios:':<{tableWidth}}"
+for s in scenarios:
+    row += f" | {s['name']:<{tableWidth}}"
+print(row)
+for var in variables:
+    for i,action in enumerate(var['actions']):
+        if action == 'plot':
+            continue
+        row = var['captions'][i]
+        print(row)
+    
+        unit_with_bracket = f"[{str_with_unit(0, var['quantity']).units}]"
+        row = f"{unit_with_bracket:>{tableWidth}}"
+        for i,scenario in enumerate(scenarios):
+            v = scenario['results'][var['name']][action]
+            displayValue = f"{str_with_unit(v,var['quantity']).value:.0f}"
+            if i == 0 :
+                vBase = v
+            else:
+                displayCompare = f"{v/vBase-1:+.0%}"
+                displayValue += f' ({displayCompare})'
+            row += f" | {displayValue:>{tableWidth}}"
+        print(row)
+    
