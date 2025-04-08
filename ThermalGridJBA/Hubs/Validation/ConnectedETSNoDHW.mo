@@ -6,9 +6,10 @@ model ConnectedETSNoDHW
     "Medium model";
 
   parameter String filNam =
-    "modelica://ThermalGridJBA/Resources/Data/Consumptions/B1500.mos";
+    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_futu.mos";
 
-  ThermalGridJBA.BoundaryConditions.WeatherDataFTMY wea "fTMY weather data reader"
+  ThermalGridJBA.BoundaryConditions.WeatherData wea(
+    final weaFil = bui.weaFil) "fTMY weather data reader"
     annotation (Placement(transformation(extent={{-20,60},{0,80}})));
   Buildings.Fluid.Sources.Boundary_pT supAmbWat(
     redeclare package Medium = Medium,
@@ -21,11 +22,13 @@ model ConnectedETSNoDHW
     redeclare package Medium = Medium,
     p(displayUnit="bar"),
     nPorts=1) "Sink for ambient water"
-    annotation (Placement(transformation(extent={{-10,-10},{10,10}},rotation=0,origin={-50,-70})));
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},rotation=0,origin={-50,-60})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFlo(
     redeclare package Medium = Medium)
     "Mass flow rate sensor"
-    annotation (Placement(transformation(extent={{-20,-20},{0,0}})));
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=-90,
+        origin={70,-40})));
   Modelica.Blocks.Sources.Constant TDisSup(k(
       unit="K",
       displayUnit="degC") = 288.15)
@@ -46,26 +49,48 @@ model ConnectedETSNoDHW
   Modelica.Blocks.Continuous.Integrator dHHotWat if bui.have_hotWat
     "Cumulative enthalpy difference of domestic hot water"
     annotation (Placement(transformation(extent={{40,10},{60,30}})));
+  Buildings.DHC.Networks.BaseClasses.DifferenceEnthalpyFlowRate senHFlo(
+      redeclare final package Medium1 = Medium, final m_flow_nominal=bui.ets.hex.m1_flow_nominal)
+    "Variation of enthalpy flow rate" annotation (Placement(transformation(
+        extent={{10,10},{-10,-10}},
+        rotation=180,
+        origin={-10,-30})));
+  Modelica.Blocks.Continuous.Integrator dHFlo if bui.have_hotWat
+    "Cumulative enthalpy difference across the ets hex"
+    annotation (Placement(transformation(extent={{40,-90},{60,-70}})));
 equation
-  connect(supAmbWat.ports[1], senMasFlo.port_a)
-    annotation (Line(points={{-40,-10},{-20,-10}},
-                                                 color={0,127,255}));
   connect(TDisSup.y,supAmbWat. T_in)
     annotation (Line(points={{-71,-6},{-62,-6}}, color={0,0,127}));
-  connect(senMasFlo.port_b, bui.port_aSerAmb) annotation (Line(points={{0,-10},
-          {40,-10}},              color={0,127,255}));
-  connect(sinAmbWat.ports[1], bui.port_bSerAmb) annotation (Line(points={{-40,-70},
-          {70,-70},{70,-10},{60,-10}}, color={0,127,255}));
   connect(bui.dHHeaWat_flow, dHHeaWat.u) annotation (Line(points={{46,-22},{46,
           -38},{22,-38},{22,50},{38,50}}, color={0,0,127}));
   connect(bui.dHChiWat_flow, dHChiWat.u) annotation (Line(points={{48,-22},{48,
           -40},{20,-40},{20,80},{38,80}}, color={0,0,127}));
   connect(bui.dHHotWat_flow, dHHotWat.u) annotation (Line(points={{44,-22},{44,-36},
           {24,-36},{24,20},{38,20}}, color={0,0,127}));
+  connect(dHChiWat.y, ENet.u[1]) annotation (Line(points={{61,80},{68,80},{68,50},
+          {78,50}},                  color={0,0,127}));
+  connect(dHHeaWat.y, ENet.u[2]) annotation (Line(points={{61,50},{78,50}},
+                                     color={0,0,127}));
+  connect(dHChiWat.y, ENet.u[1]) annotation (Line(points={{61,80},{68,80},{68,50},
+          {78,50}},                  color={0,0,127}));
+  connect(dHHotWat.y, ENet.u[3]) annotation (Line(points={{61,20},{68,20},{68,
+          50},{78,50}},              color={0,0,127}));
   connect(wea.weaBus, bui.weaBus) annotation (Line(
       points={{0,70},{10,70},{10,4},{50,4},{50,0}},
       color={255,204,51},
       thickness=0.5));
+  connect(senMasFlo.port_a, bui.port_bSerAmb)
+    annotation (Line(points={{70,-30},{70,-10},{60,-10}}, color={0,127,255}));
+  connect(sinAmbWat.ports[1], senHFlo.port_b2) annotation (Line(points={{-40,
+          -60},{-30,-60},{-30,-36},{-20,-36}}, color={0,127,255}));
+  connect(senHFlo.port_a2, senMasFlo.port_b) annotation (Line(points={{0,-36},{
+          14,-36},{14,-60},{70,-60},{70,-50}}, color={0,127,255}));
+  connect(senHFlo.port_b1, bui.port_aSerAmb) annotation (Line(points={{0,-24},{
+          12,-24},{12,-10},{40,-10}}, color={0,127,255}));
+  connect(supAmbWat.ports[1], senHFlo.port_a1) annotation (Line(points={{-40,
+          -10},{-30,-10},{-30,-24},{-20,-24}}, color={0,127,255}));
+  connect(senHFlo.dH_flow, dHFlo.u) annotation (Line(points={{2,-27},{2,-28},{
+          10,-28},{10,-80},{38,-80}}, color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(

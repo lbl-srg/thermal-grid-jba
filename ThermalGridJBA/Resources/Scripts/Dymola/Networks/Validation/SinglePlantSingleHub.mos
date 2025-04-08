@@ -1,6 +1,6 @@
 removePlots();
 simulateModel("ThermalGridJBA.Networks.Validation.SinglePlantSingleHub",
-    method="cvode",
+    method="radau",
     tolerance=1e-6,
     startTime=7776000,
     stopTime=8640000,

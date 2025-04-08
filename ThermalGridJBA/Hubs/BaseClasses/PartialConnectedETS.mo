@@ -20,7 +20,7 @@ partial model PartialConnectedETS
     PLRMin=0,
     QHea_flow_nominal=max(QHea_flow_nominal, QCoo_flow_nominal*1.5),
     QCoo_flow_nominal=QCoo_flow_nominal,
-    TConEntMin=313.15,
+    TConEntMin=298.15,
     TEvaEntMax=293.15,
     TEvaLvgMin=277.15,
     TEvaLvgMax=288.15,

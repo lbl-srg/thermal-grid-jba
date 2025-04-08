@@ -7,13 +7,13 @@ model FiveHubsPlantMultiFlow
   parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
     "Pipe diameter (without insulation)";
   parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
-  parameter Modelica.Units.SI.Radius thiGroLay=0.5
+  parameter Modelica.Units.SI.Radius thiGroLay=1.0
     "Dynamic ground layer thickness";
   parameter Real dpDis_length_nominal(unit="Pa/m")=250
     "Pressure drop per pipe length at nominal flow rate - Distribution line";
   parameter Real dpCon_length_nominal(unit="Pa/m")=250
     "Pressure drop per pipe length at nominal flow rate - Connection line";
-  parameter Boolean allowFlowReversalSer = true
+  parameter Boolean allowFlowReversalSer = false
     "Set to true to allow flow reversal in the service lines"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
   parameter Boolean allowFlowReversalBui = false
@@ -25,99 +25,98 @@ model FiveHubsPlantMultiFlow
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
   // Central plant
-  parameter Integer nGenMod=4
-    "Total number of generation modules in central plant"
-    annotation (Dialog(tab="Central plant"));
-  parameter Real samplePeriod(unit="s")=7200
+  parameter Real samplePeriod(unit="s")=datDis.samplePeriod
     "Sample period of district loop pump speed"
     annotation (Dialog(tab="Central plant"));
-  parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(datDis.mCon_flow_nominal)
-    /nGenMod
+  parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
     annotation (Dialog(tab="Central plant"));
-  parameter Real dpPlaValve_nominal(unit="Pa")=6000
+  parameter Real dpPlaValve_nominal(unit="Pa")=datDis.dpPlaValve_nominal
     "Nominal pressure drop of fully open 2-way valve"
     annotation (Dialog(tab="Central plant"));
   // Central plant: heat exchangers
-  parameter Real dpPlaHex_nominal(unit="Pa")=10000
+  parameter Real dpPlaHex_nominal(unit="Pa")=datDis.dpPlaHex_nominal
     "Pressure difference across heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
-  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*0.75
+  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=datDis.mPlaHexGly_flow_nominal
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
-  parameter Real dpDryCoo_nominal(unit="Pa")=10000
+  parameter Real dpDryCoo_nominal(unit="Pa")=datDis.dpDryCoo_nominal
     "Nominal pressure drop of dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mPlaHexGly_flow_nominal +
-    mHpGly_flow_nominal
+  parameter Real mDryCoo_flow_nominal(unit="kg/s")=datDis.mDryCoo_flow_nominal
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TAppSet(unit="K")=2
+  parameter Real TAppSet(unit="K")=datDis.TAppSet
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TApp(unit="K")=4
+  parameter Real TApp(unit="K")=datDis.TApp
     "Approach temperature for checking if the dry cooler should be enabled"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real minFanSpe(unit="1")=0.1
+  parameter Real minFanSpe(unit="1")=datDis.minFanSpe
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   // Central plant: heat pumps
-  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=0.1*mPlaWat_flow_nominal
+  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=datDis.mPlaHeaPumWat_flow_min
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*07.5
+  parameter Real mHpGly_flow_nominal(unit="kg/s")=datDis.mHpGly_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=mPlaWat_flow_nominal*4186
-    *TApp
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=datDis.QPlaHeaPumHea_flow_nominal
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConHea_nominal(unit="K")=datDis.TLooMin + TApp
+  parameter Real TPlaConHea_nominal(unit="K")=datDis.TPlaConHea_nominal
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaHea_nominal(unit="K")=datDis.TLooMin
+  parameter Real TPlaEvaHea_nominal(unit="K")=datDis.TPlaEvaHea_nominal
     "Nominal temperature of the cooled fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-0.6*
-    QPlaHeaPumHea_flow_nominal
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=datDis.QPlaHeaPumCoo_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConCoo_nominal(unit="K")=datDis.TLooMax - TApp
+  parameter Real TPlaConCoo_nominal(unit="K")=datDis.TPlaConCoo_nominal
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaCoo_nominal(unit="K")=datDis.TLooMax
+  parameter Real TPlaEvaCoo_nominal(unit="K")=datDis.TPlaEvaCoo_nominal
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConInMin(unit="K")=datDis.TLooMax - TApp - TAppSet
+  parameter Real TPlaConInMin(unit="K")=datDis.TPlaConInMin
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaInMax(unit="K")=datDis.TLooMin + TApp + TAppSet
+  parameter Real TPlaEvaInMax(unit="K")=datDis.TPlaEvaInMax
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real minPlaComSpe(unit="1")=0.2
+  parameter Real minPlaComSpe(unit="1")=datDis.minPlaComSpe
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TCooSet(unit="K")=datDis.TLooMin
+  parameter Real TCooSet(unit="K")=datDis.TCooSet
     "Heat pump tracking temperature setpoint in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=datDis.TLooMax
+  parameter Real THeaSet(unit="K")=datDis.THeaSet
     "Heat pump tracking temperature setpoint in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real offTim(unit="s")=12*3600
-    "Heat pump off time"
+  parameter Real offTim(unit="s")=datDis.offTim
+    "Heat pump off time due to the low compressor speed"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real holOnTim(unit="s")=datDis.holOnTim
+    "Heat pump hold on time"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real holOffTim(unit="s")=datDis.holOffTim
+    "Heat pump hold off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
-  parameter Real TUpp(unit="K")=datDis.TLooMax
+  parameter Real TUpp(unit="K")=datDis.TUpp
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real TLow(unit="K")=datDis.TLooMin
+  parameter Real TLow(unit="K")=datDis.TLow
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real dTSlo(unit="K")=2
+  parameter Real dTSlo(unit="K")=datDis.dTSlo
     "Temperature deadband for changing pump speed"
     annotation (Dialog(tab="District pump"));
-  parameter Real yDisPumMin(unit="1")=0.1
+  parameter Real yDisPumMin(unit="1")=datDis.yDisPumMin
     "District loop pump minimum speed"
     annotation (Dialog(tab="District pump"));
 
@@ -134,6 +133,8 @@ model FiveHubsPlantMultiFlow
     each rPip=rPip,
     each thiGroLay=thiGroLay,
     each nSeg=1,
+    each nSta=2,
+    redeclare parameter ThermalGridJBA.Networks.Data.Andrew_AFB cliCon,
     redeclare parameter Buildings.HeatTransfer.Data.Soil.Generic soiDat(
       each k=2.3,
       each c=1000,
@@ -144,6 +145,7 @@ model FiveHubsPlantMultiFlow
     nCon=nBui,
     allowFlowReversal=allowFlowReversalSer,
     redeclare package Medium = Medium,
+    show_entFlo=true,
     show_TOut=true,
     mDis_flow_nominal=datDis.mPipDis_flow_nominal,
     mCon_flow_nominal=datDis.mCon_flow_nominal,
@@ -155,7 +157,7 @@ model FiveHubsPlantMultiFlow
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumDis(
     redeclare final package Medium = Medium,
     final m_flow_nominal=datDis.mPumDis_flow_nominal,
-    final allowFlowReversal=allowFlowReversalSer,
+    allowFlowReversal=false,
     final dp_nominal=sum(dis.con.pipDis.res.dp_nominal) + dis.pipEnd.res.dp_nominal)
     "Distribution pump"
     annotation (Placement(transformation(
@@ -182,13 +184,17 @@ model FiveHubsPlantMultiFlow
         rotation=90,
         origin={-80,-10})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup(redeclare final package
-      Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
+      Medium = Medium,
+    allowFlowReversal=false,
+                       final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water supply temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,150})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet(redeclare final package
-      Medium = Medium, final m_flow_nominal=datDis.mPumDis_flow_nominal)
+      Medium = Medium,
+    allowFlowReversal=false,
+                       final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water return temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
@@ -225,7 +231,7 @@ model FiveHubsPlantMultiFlow
     initType=Modelica.Blocks.Types.Init.InitialState)
     "Heat pump electric energy"
     annotation (Placement(transformation(extent={{240,190},{260,210}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=4) "Total electric energy"
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=3) "Total electric energy"
     annotation (Placement(transformation(extent={{362,90},{382,110}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
@@ -234,8 +240,7 @@ model FiveHubsPlantMultiFlow
     u(each final unit="K", each displayUnit="degC"))
     "Check if loop temperatures are within given range"
     annotation (Placement(transformation(extent={{320,-130},{340,-110}})));
-  BaseClasses.CentralPlantMultiFlow cenPla(
-    final nGenMod=nGenMod,
+  CentralPlants.CentralPlant cenPla(
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
@@ -261,8 +266,9 @@ model FiveHubsPlantMultiFlow
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,
-    final minComSpe=minPlaComSpe)
-     "Central plant"
+    final holOnTim=holOnTim,
+    final holOffTim=holOffTim,
+    final minComSpe=minPlaComSpe) "Central plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
@@ -273,15 +279,12 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(final k=datDis.mPumDis_flow_nominal)
     "District pump speed"
     annotation (Placement(transformation(extent={{0,-170},{20,-150}})));
-  BoundaryConditions.WeatherDataFTMY weaDat[nBui](computeWetBulbTemperature=
-        fill(true, nBui)) "Weather data reader"
-    annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
+//   BoundaryConditions.WeatherDataFTMY weaDat[nBui](computeWetBulbTemperature=
+//         fill(true, nBui)) "Weather data reader"
+//     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
   Buildings.BoundaryConditions.WeatherData.Bus weaBus annotation (Placement(
         transformation(extent={{-320,-40},{-280,0}}), iconTransformation(extent
           ={{-364,-80},{-344,-60}})));
-  Modelica.Blocks.Continuous.Integrator EFunDryCoo(initType=Modelica.Blocks.Types.Init.InitialState)
-    "Dry cooler fan electric energy"
-    annotation (Placement(transformation(extent={{240,110},{260,130}})));
   Modelica.Blocks.Continuous.Integrator EPumDryCoo(initType=Modelica.Blocks.Types.Init.InitialState)
     "Dry cooler pump electric energy"
     annotation (Placement(transformation(extent={{100,90},{120,110}})));
@@ -303,17 +306,42 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiSum EPumPla(nin=5)
     "Plant pumps electricity energy"
     annotation (Placement(transformation(extent={{240,60},{260,80}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiMax mulMax(nin=nBui, y(unit="K",
-        displayUnit="degC"))
+  Buildings.Controls.OBC.CDL.Reals.MultiMax looMaxTem(nin=nBui, y(unit="K",
+        displayUnit="degC")) "Maximum mixing temperature"
     annotation (Placement(transformation(extent={{-300,-150},{-280,-130}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiMin mulMin(nin=nBui, y(unit="K",
-        displayUnit="degC"))
+  Buildings.Controls.OBC.CDL.Reals.MultiMin looMinTem(nin=nBui, y(unit="K",
+        displayUnit="degC")) "Minimum mixing temperature"
     annotation (Placement(transformation(extent={{-300,-190},{-280,-170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum mulSum(nin=nBui)
     annotation (Placement(transformation(extent={{-300,50},{-280,70}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=1/nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter looMeaTem(k=1/nBui)
+    "Average mixing points temperature"
     annotation (Placement(transformation(extent={{-260,50},{-240,70}})));
+  BoundaryConditions.WeatherData weaDat[nBui](
+    final weaFil = bui.weaFil)
+    "Weather data reader"
+    annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
 
+  Modelica.Blocks.Continuous.Integrator EBorOut(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Out of borefield energy"
+    annotation (Placement(transformation(extent={{180,-230},{200,-210}})));
+  Buildings.Controls.OBC.CDL.Reals.Subtract sub
+    "Water flow temperature difference across central plant"
+    annotation (Placement(transformation(extent={{180,-160},{200,-140}})));
+  Buildings.Controls.OBC.CDL.Reals.Multiply mul
+    annotation (Placement(transformation(extent={{240,-180},{260,-160}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter plaHeaSup(final k=4184)
+    "Heat flow rate supply from central plant"
+    annotation (Placement(transformation(extent={{280,-180},{300,-160}})));
+  Modelica.Blocks.Continuous.Integrator EPlaHea(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Energy supply from central plant"
+    annotation (Placement(transformation(extent={{320,-180},{340,-160}})));
+  Modelica.Blocks.Continuous.Integrator Eets[nBui](each initType=Modelica.Blocks.Types.Init.InitialState)
+    "Heat flow through each ETS"
+    annotation (Placement(transformation(extent={{120,140},{140,160}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ETotEts(nin=nBui)
+    "Sum of all the ETS heat flow"
+    annotation (Placement(transformation(extent={{180,140},{200,160}})));
 equation
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
           {-14,210},{-14,240},{-10,240}},color={0,127,255}));
@@ -340,11 +368,13 @@ equation
   connect(PHeaPump.y, EHeaPum.u)
     annotation (Line(points={{202,200},{238,200}}, color={0,0,127}));
   connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{261,200},{350,200},{
-          350,99.25},{360,99.25}}, color={0,0,127}));
+          350,99.3333},{360,99.3333}},
+                                   color={0,0,127}));
   connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,160},{340,160},{340,
-          99.75},{360,99.75}}, color={0,0,127}));
+          100},{360,100}},     color={0,0,127}));
   connect(TDisWatSup.T, conVio.u[1]) annotation (Line(points={{-91,150},{-220,
-          150},{-220,-122},{50,-122},{50,-120.5},{318,-120.5}}, color={0,0,127}));
+          150},{-220,-126},{160,-126},{160,-120.5},{318,-120.5}},
+                                                                color={0,0,127}));
   connect(TDisWatRet.T, conVio.u[2]) annotation (Line(points={{-91,-80},{-100,
           -80},{-100,-119.5},{318,-119.5}}, color={0,0,127}));
   connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-90},
@@ -381,18 +411,6 @@ equation
       index=-1,
       extent={{-6,3},{-6,3}},
       horizontalAlignment=TextAlignment.Right));
-  connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
-      points={{-299.9,-19.9},{-260,-19.9},{-260,-7},{-162,-7}},
-      color={255,204,51},
-      thickness=0.5));
-  connect(weaBus.TWetBul, cenPla.TWetBul) annotation (Line(
-      points={{-299.9,-19.9},{-260,-19.9},{-260,-9},{-162,-9}},
-      color={255,204,51},
-      thickness=0.5), Text(
-      string="%first",
-      index=-1,
-      extent={{-6,3},{-6,3}},
-      horizontalAlignment=TextAlignment.Right));
   connect(weaDat[1].weaBus, weaBus) annotation (Line(
       points={{-360,-20},{-300,-20}},
       color={255,204,51},
@@ -409,42 +427,66 @@ equation
           -30},{226,70.8},{238,70.8}}, color={0,0,127}));
   connect(EPumPla.y, EPum.u[3]) annotation (Line(points={{262,70},{282,70},{282,
           160.667},{298,160.667}}, color={0,0,127}));
-  connect(EFunDryCoo.y, ETot.u[3]) annotation (Line(points={{261,120},{332,120},
-          {332,100.25},{360,100.25}}, color={0,0,127}));
-  connect(EComPla.y, ETot.u[4]) annotation (Line(points={{261,30},{320,30},{320,
-          100.75},{360,100.75}}, color={0,0,127}));
+  connect(EComPla.y, ETot.u[3]) annotation (Line(points={{261,30},{320,30},{320,
+          100.667},{360,100.667}},
+                                 color={0,0,127}));
   connect(dis.TOut, mulSum.u) annotation (Line(points={{22,194},{40,194},{40,170},
           {-320,170},{-320,60},{-302,60}}, color={0,0,127}));
-  connect(dis.TOut, mulMax.u) annotation (Line(points={{22,194},{40,194},{40,170},
-          {-320,170},{-320,-140},{-302,-140}}, color={0,0,127}));
-  connect(dis.TOut, mulMin.u) annotation (Line(points={{22,194},{40,194},{40,170},
-          {-320,170},{-320,-180},{-302,-180}}, color={0,0,127}));
-  connect(mulMax.y, looPumSpe.TMixMax) annotation (Line(points={{-278,-140},{-80,
-          -140},{-80,-154},{-62,-154}}, color={0,0,127}));
-  connect(mulMin.y, looPumSpe.TMixMin) annotation (Line(points={{-278,-180},{-80,
-          -180},{-80,-166},{-62,-166}}, color={0,0,127}));
-  connect(mulSum.y, gai1.u)
+  connect(dis.TOut, looMaxTem.u) annotation (Line(points={{22,194},{40,194},{40,
+          170},{-320,170},{-320,-140},{-302,-140}}, color={0,0,127}));
+  connect(dis.TOut, looMinTem.u) annotation (Line(points={{22,194},{40,194},{40,
+          170},{-320,170},{-320,-180},{-302,-180}}, color={0,0,127}));
+  connect(looMaxTem.y, looPumSpe.TMixMax) annotation (Line(points={{-278,-140},
+          {-80,-140},{-80,-154},{-62,-154}}, color={0,0,127}));
+  connect(looMinTem.y, looPumSpe.TMixMin) annotation (Line(points={{-278,-180},
+          {-80,-180},{-80,-166},{-62,-166}}, color={0,0,127}));
+  connect(mulSum.y, looMeaTem.u)
     annotation (Line(points={{-278,60},{-262,60}}, color={0,0,127}));
-  connect(gai1.y, cenPla.TMixAve) annotation (Line(points={{-238,60},{-170,60},{
-          -170,3},{-162,3}}, color={0,0,127}));
-  connect(cenPla.PFanDryCoo, EFunDryCoo.u) annotation (Line(points={{-138,7},{-132,
-          7},{-132,120},{238,120}}, color={0,0,127}));
+  connect(looMeaTem.y, cenPla.TMixAve) annotation (Line(points={{-238,60},{-170,
+          60},{-170,3},{-162,3}}, color={0,0,127}));
   connect(cenPla.PPumDryCoo, EPumDryCoo.u) annotation (Line(points={{-138,5},{-128,
           5},{-128,100},{98,100}}, color={0,0,127}));
   connect(cenPla.PPumHexGly, EPumHexGly.u) annotation (Line(points={{-138,3},{-124,
           3},{-124,80},{138,80}}, color={0,0,127}));
-  connect(cenPla.PPumHeaPumGly, EPumHeaPumGly.u) annotation (Line(points={{-138,
-          -3},{-120,-3},{-120,60},{178,60}}, color={0,0,127}));
-  connect(cenPla.PCom, EComPla.u) annotation (Line(points={{-138,-5},{-116,-5},{
-          -116,30},{238,30}}, color={0,0,127}));
-  connect(cenPla.PPumHeaPumWat, EPumHeaPumWat.u) annotation (Line(points={{-138,
-          -7},{-112,-7},{-112,10},{178,10}}, color={0,0,127}));
-  connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-138,-9},{-120,
-          -9},{-120,-30},{178,-30}}, color={0,0,127}));
+  connect(cenPla.PPumHeaPumGly, EPumHeaPumGly.u) annotation (Line(points={{-138,-2},
+          {-120,-2},{-120,60},{178,60}},     color={0,0,127}));
+  connect(cenPla.PCom, EComPla.u) annotation (Line(points={{-138,-4},{-116,-4},
+          {-116,30},{238,30}},color={0,0,127}));
+  connect(cenPla.PPumHeaPumWat, EPumHeaPumWat.u) annotation (Line(points={{-138,-6},
+          {-112,-6},{-112,10},{178,10}},     color={0,0,127}));
+  connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-138,-8},{
+          -120,-8},{-120,-30},{178,-30}},
+                                     color={0,0,127}));
   connect(weaDat.weaBus, bui.weaBus) annotation (Line(
       points={{-360,-20},{-340,-20},{-340,250},{0,250}},
       color={255,204,51},
       thickness=0.5));
+  connect(cenPla.QBorOut_flow, EBorOut.u) annotation (Line(points={{-138,-10},{
+          -124,-10},{-124,-220},{178,-220}}, color={0,0,127}));
+  connect(TDisWatSup.T, sub.u1) annotation (Line(points={{-91,150},{-220,150},{
+          -220,-126},{160,-126},{160,-144},{178,-144}}, color={0,0,127}));
+  connect(TDisWatRet.T, sub.u2) annotation (Line(points={{-91,-80},{-100,-80},{
+          -100,-112},{140,-112},{140,-156},{178,-156}}, color={0,0,127}));
+  connect(sub.y, mul.u1) annotation (Line(points={{202,-150},{220,-150},{220,
+          -164},{238,-164}}, color={0,0,127}));
+  connect(gai.y, mul.u2) annotation (Line(points={{22,-160},{40,-160},{40,-176},
+          {238,-176}}, color={0,0,127}));
+  connect(mul.y, plaHeaSup.u)
+    annotation (Line(points={{262,-170},{278,-170}}, color={0,0,127}));
+  connect(plaHeaSup.y, EPlaHea.u)
+    annotation (Line(points={{302,-170},{318,-170}}, color={0,0,127}));
+  connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
+      points={{-299.9,-19.9},{-260,-19.9},{-260,-7},{-162,-7}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(dis.dH_flow, Eets.u) annotation (Line(points={{22,207},{100,207},{100,
+          150},{118,150}}, color={0,0,127}));
+  connect(Eets.y, ETotEts.u)
+    annotation (Line(points={{141,150},{178,150}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
@@ -452,10 +494,10 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StopTime=1296000,
       Interval=3600.00288,
       Tolerance=1e-06,
-      __Dymola_Algorithm="Radau"),
+      __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
 <p>
 Adapted from

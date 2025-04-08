@@ -29,7 +29,9 @@ model SinglePlantSingleHub
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
-  ThermalGridJBA.BoundaryConditions.WeatherDataFTMY wea[nBui] "fTMY weather data reader"
+  ThermalGridJBA.BoundaryConditions.WeatherData wea[nBui](
+    final weaFil = bui.weaFil)
+                              "fTMY weather data reader"
     annotation (Placement(transformation(extent={{-40,220},{-20,240}})));
 
   Buildings.DHC.Networks.Controls.MainPump1Pipe conPum(
