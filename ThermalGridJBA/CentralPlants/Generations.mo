@@ -491,6 +491,8 @@ model Generations
     dTEva_nominal=TApp,
     dpEva_nominal=30000,
     use_evaCap=false,
+    allowFlowReversalEva=false,
+    allowFlowReversalCon=false,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final QHea_flow_nominal=QHeaPumHea_flow_nominal,
     final QCoo_flow_nominal=QHeaPumCoo_flow_nominal,
