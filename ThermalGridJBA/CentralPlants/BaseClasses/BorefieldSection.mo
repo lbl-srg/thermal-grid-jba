@@ -25,7 +25,7 @@ model BorefieldSection "Section for a core or an edge of the borefield"
 
   Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie(
     redeclare each final package Medium = Medium,
-    each allowFlowReversal=false,
+    each allowFlowReversal=true,
     show_T=true,
     each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     each TExt0_start=T_start,

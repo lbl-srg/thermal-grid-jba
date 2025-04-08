@@ -3,7 +3,7 @@ model Borefield "Borefield model"
   extends Modelica.Blocks.Icons.Block;
   replaceable package Medium = Buildings.Media.Water "Water";
 
-  parameter Boolean useDummy_borefield = true
+  parameter Boolean useDummy_borefield = false
     "Boolean flag to use dummy borefield for debugging only";
   /////////////////////////////////////////////////
   constant Medium.SpecificHeatCapacity cpFlu_nominal = Medium.cp_const
@@ -351,11 +351,13 @@ model Borefield "Borefield model"
     k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
     annotation (Placement(transformation(extent={{40,-70},{60,-50}})));
 
-  DummyBorefield edgDummy(redeclare package Medium = Medium)
+  DummyBorefield edgDummy(redeclare package Medium = Medium, final
+      m_flow_nominal=mPer_flow_nominal)
     if useDummy_borefield
     "Dummy borefield for edge (for development only)"
-    annotation (Placement(transformation(extent={{-50,2},{-30,22}})));
-  DummyBorefield corDummy(redeclare package Medium = Medium)
+    annotation (Placement(transformation(extent={{-50,0},{-30,20}})));
+  DummyBorefield corDummy(redeclare package Medium = Medium, final
+      m_flow_nominal=mPer_flow_nominal)
     if useDummy_borefield
     "Dummy borefield for core (for development only)"
     annotation (Placement(transformation(extent={{-50,-80},{-30,-60}})));
@@ -412,24 +414,24 @@ equation
           -50,-62},{-60,-62},{-60,40},{-68,40}}, color={0,127,255}));
   connect(corDummy.portCor_a, masFloMulEntCen.port_b) annotation (Line(points={{
           -50,-78},{-64,-78},{-64,-40},{-70,-40}}, color={0,127,255}));
-  connect(edgDummy.portPer_a, masFloMulEntPer.port_b) annotation (Line(points={{
-          -50,20},{-64,20},{-64,40},{-68,40}}, color={0,127,255}));
-  connect(edgDummy.portCor_a, masFloMulEntCen.port_b) annotation (Line(points={{
-          -50,4},{-64,4},{-64,-40},{-70,-40}}, color={0,127,255}));
+  connect(edgDummy.portPer_a, masFloMulEntPer.port_b) annotation (Line(points={{-50,18},
+          {-64,18},{-64,40},{-68,40}},         color={0,127,255}));
+  connect(edgDummy.portCor_a, masFloMulEntCen.port_b) annotation (Line(points={{-50,2},
+          {-64,2},{-64,-40},{-70,-40}},        color={0,127,255}));
   connect(edgDummy.portPer_b, masFloMulLeaEdgPer.port_a) annotation (Line(
-        points={{-30,20},{-10,20},{-10,70},{40,70}}, color={0,127,255}));
+        points={{-30,18},{-10,18},{-10,70},{40,70}}, color={0,127,255}));
   connect(edgDummy.portCor_b, masFloMulLeaEdgCen.port_a) annotation (Line(
-        points={{-30.2,4},{-6,4},{-6,-30},{40,-30}}, color={0,127,255}));
+        points={{-30.2,2},{-6,2},{-6,-30},{40,-30}}, color={0,127,255}));
   connect(corDummy.portPer_b, masFloMulLeaCorPer.port_a) annotation (Line(
         points={{-30,-62},{-4,-62},{-4,40},{40,40}}, color={0,127,255}));
   connect(corDummy.portCor_b, masFloMulLeaCorCen.port_a) annotation (Line(
         points={{-30.2,-78},{20,-78},{20,-60},{40,-60}}, color={0,127,255}));
   connect(sumQPer_flow.u1, edgDummy.QPer_flow) annotation (Line(points={{8,26},{
-          -18,26},{-18,18},{-28,18}}, color={0,0,127}));
+          -18,26},{-18,16},{-28,16}}, color={0,0,127}));
   connect(sumQPer_flow.u2, corDummy.QPer_flow) annotation (Line(points={{8,14},{
           4,14},{4,-64},{-28,-64}}, color={0,0,127}));
   connect(sumQCen_flow.u1, edgDummy.QCor_flow)
-    annotation (Line(points={{8,-4},{0,-4},{0,15},{-28,15}}, color={0,0,127}));
+    annotation (Line(points={{8,-4},{0,-4},{0,13},{-28,13}}, color={0,0,127}));
   connect(corDummy.QCor_flow, sumQCen_flow.u2) annotation (Line(points={{-28,-67},
           {0,-67},{0,-16},{8,-16}}, color={0,0,127}));
   annotation (defaultComponentName="borFie",

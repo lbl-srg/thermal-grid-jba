@@ -458,7 +458,7 @@ model Generations
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
@@ -466,7 +466,7 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun3(
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
@@ -545,7 +545,7 @@ model Generations
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
@@ -553,7 +553,7 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun5(
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
@@ -563,7 +563,7 @@ model Generations
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
@@ -571,7 +571,7 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun7(
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
@@ -582,7 +582,7 @@ model Generations
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{80,-230},{60,-250}})));
@@ -591,7 +591,7 @@ model Generations
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{0,-230},{-20,-250}})));
@@ -600,7 +600,7 @@ model Generations
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{-18,-170},{2,-150}})));
@@ -609,18 +609,18 @@ model Generations
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{60,-170},{80,-150}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valPriByp(
     redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
+    final allowFlowReversal=true,
     final m_flow_nominal=mWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
     use_strokeTime=false) "Bypass valve to decouple primary and secondary loop"
     annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
+        extent={{-10,10},{10,-10}},
         rotation=270,
         origin={-8,-200})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valIsoPriSec(
@@ -638,7 +638,7 @@ model Generations
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=false,
+    use_riseTime=true,
     final m_flow_nominal=mBorFieCen_flow_nominal,
     dp_nominal=dpBorFieCen_nominal,
     dpMax=Modelica.Constants.inf) "Pump for borefield center" annotation (
@@ -650,7 +650,7 @@ model Generations
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=false,
+    use_riseTime=true,
     final m_flow_nominal=mBorFiePer_flow_nominal,
     dp_nominal=dpBorFiePer_nominal,
     dpMax=Modelica.Constants.inf) "Pump for borefield perimeter" annotation (
@@ -727,9 +727,18 @@ model Generations
         extent={{-10,-10},{10,10}},
         rotation=270,
         origin={240,-110})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant fixme(k=0)
-    "Zero output signal until control is implemented"
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant fixmeMassFlowRate(k=0.5*
+        mWat_flow_nominal) "Mass flow rate signal"
     annotation (Placement(transformation(extent={{-320,-220},{-300,-200}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant fixme1(k=1)
+    "Zero output signal until control is implemented"
+    annotation (Placement(transformation(extent={{-18,-130},{2,-110}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant fixme2(k=0)
+    "Zero output signal until control is implemented"
+    annotation (Placement(transformation(extent={{-72,-210},{-52,-190}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant fixme3(k=0)
+    "Zero output signal until control is implemented"
+    annotation (Placement(transformation(extent={{44,-32},{64,-12}})));
 protected
   Buildings.Controls.OBC.CDL.Reals.Add PPumCirAdd
     "Adder for circulation pump power"
@@ -886,8 +895,6 @@ equation
       thickness=0.5));
   connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{-158,177},{96,177},
           {96,-27.9},{328.9,-27.9}}, color={255,0,255}));
-  connect(heaPumCon.ySet, heaPum.ySet) annotation (Line(points={{-158,173},{92,173},
-          {92,-31.9},{328.9,-31.9}}, color={0,0,127}));
   connect(heaPum.P, PCom)
     annotation (Line(points={{351,-30},{560,-30}}, color={0,0,127}));
   connect(pumDryCoo.port_a, delRet.ports[1]) annotation (Line(points={{-60,130},
@@ -987,16 +994,14 @@ equation
   connect(senTemBorCenRet.port_a,portBorFieCen_a)  annotation (Line(points={{240,
           -100},{240,-48},{184,-48},{184,238},{180,238},{180,280}}, color={0,127,
           255}));
-  connect(fixme.y, pumBorFiePer.m_flow_in) annotation (Line(points={{-298,-210},
-          {-170,-210},{-170,-80},{-162,-80}}, color={0,0,127}));
-  connect(fixme.y, valPriByp.y) annotation (Line(points={{-298,-210},{-44,-210},
-          {-44,-222},{22,-222},{22,-200},{4,-200}}, color={0,0,127}));
-  connect(fixme.y, valIsoPriSec.y) annotation (Line(points={{-298,-210},{-170,-210},
-          {-170,-134},{30,-134},{30,-148}}, color={0,0,127}));
-  connect(fixme.y, pumBorFieCen.m_flow_in) annotation (Line(points={{-298,-210},
-          {-170,-210},{-170,-100},{120,-100},{120,-80},{168,-80}}, color={0,0,127}));
-  connect(fixme.y, pumCenPlaSec.m_flow_in) annotation (Line(points={{-298,-210},
-          {-170,-210},{-170,-100},{120,-100},{120,-148}}, color={0,0,127}));
+  connect(fixmeMassFlowRate.y, pumBorFiePer.m_flow_in) annotation (Line(points=
+          {{-298,-210},{-170,-210},{-170,-80},{-162,-80}}, color={0,0,127}));
+  connect(fixmeMassFlowRate.y, pumBorFieCen.m_flow_in) annotation (Line(points=
+          {{-298,-210},{-170,-210},{-170,-100},{120,-100},{120,-80},{168,-80}},
+        color={0,0,127}));
+  connect(fixmeMassFlowRate.y, pumCenPlaSec.m_flow_in) annotation (Line(points=
+          {{-298,-210},{-170,-210},{-170,-100},{120,-100},{120,-148}}, color={0,
+          0,127}));
   connect(pumCenPlaPri.P, PPumCirAdd.u1) annotation (Line(points={{-369,-151},{-350,
           -151},{-350,-254},{198,-254}}, color={0,0,127}));
   connect(PPumCirAdd.u2, pumCenPlaSec.P) annotation (Line(points={{198,-266},{140,
@@ -1007,6 +1012,12 @@ equation
           148},{520,148},{520,110},{560,110}}, color={0,0,127}));
   connect(pumBorFieCen.P, PPumBorFieCen) annotation (Line(points={{171,-69},{171,
           140},{516,140},{516,78},{560,78}}, color={0,0,127}));
+  connect(fixme1.y, valIsoPriSec.y)
+    annotation (Line(points={{4,-120},{30,-120},{30,-148}}, color={0,0,127}));
+  connect(fixme2.y, valPriByp.y) annotation (Line(points={{-50,-200},{-36,-200},
+          {-36,-200},{-20,-200}}, color={0,0,127}));
+  connect(fixme3.y, heaPum.ySet) annotation (Line(points={{66,-22},{198,-22},{
+          198,-31.9},{328.9,-31.9}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

@@ -4,6 +4,9 @@ model DummyBorefield
   extends Modelica.Blocks.Icons.Block;
   replaceable package Medium = Buildings.Media.Water "Water";
 
+  parameter Modelica.Units.SI.MassFlowRate m_flow_nominal
+    "Nominal mass flow rate";
+
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput QPer_flow(
     final unit="W")
     "Heat flow rate for center elements" annotation (Placement(transformation(
@@ -33,29 +36,52 @@ model DummyBorefield
           extent={{88,-90},{108,-70}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con(k=0)
     annotation (Placement(transformation(extent={{120,120},{140,140}})));
-  Buildings.Fluid.FixedResistances.PressureDrop res(
-    redeclare package Medium = Medium,
-    m_flow_nominal=100,
-    dp_nominal=10e3) "Flow resistance"
-    annotation (Placement(transformation(extent={{-10,50},{10,70}})));
   Buildings.Fluid.FixedResistances.PressureDrop res1(
     redeclare package Medium = Medium,
+    allowFlowReversal=false,
     m_flow_nominal=100,
-    dp_nominal=10e3) "Flow resistance"
-    annotation (Placement(transformation(extent={{-12,-70},{8,-50}})));
+    dp_nominal=1E4)  "Flow resistance"
+    annotation (Placement(transformation(extent={{-10,70},{10,90}})));
+  Buildings.Fluid.FixedResistances.PressureDrop res2(
+    redeclare package Medium = Medium,
+    allowFlowReversal=false,
+    m_flow_nominal=100,
+    dp_nominal=1E4)  "Flow resistance"
+    annotation (Placement(transformation(extent={{-10,30},{10,50}})));
+  Buildings.Fluid.FixedResistances.PressureDrop res3(
+    redeclare package Medium = Medium,
+    allowFlowReversal=false,
+    m_flow_nominal=100,
+    dp_nominal=1E4)  "Flow resistance"
+    annotation (Placement(transformation(extent={{-10,-50},{10,-30}})));
+  Buildings.Fluid.FixedResistances.PressureDrop res4(
+    redeclare package Medium = Medium,
+    allowFlowReversal=false,
+    m_flow_nominal=100,
+    dp_nominal=1E4)  "Flow resistance"
+    annotation (Placement(transformation(extent={{-10,-90},{10,-70}})));
+
 equation
   connect(con.y, QPer_flow) annotation (Line(points={{142,130},{174,130},{174,140},
           {220,140}}, color={0,0,127}));
   connect(con.y, QCor_flow) annotation (Line(points={{142,130},{174,130},{174,110},
           {220,110}}, color={0,0,127}));
-  connect(portPer_a, res.port_a)
-    annotation (Line(points={{-200,60},{-10,60}}, color={0,127,255}));
-  connect(res.port_b, portPer_b)
-    annotation (Line(points={{10,60},{200,60}}, color={0,127,255}));
-  connect(portCor_a, res1.port_a)
-    annotation (Line(points={{-200,-60},{-12,-60}}, color={0,127,255}));
-  connect(res1.port_b, portCor_b)
-    annotation (Line(points={{8,-60},{200,-60}}, color={0,127,255}));
+  connect(res1.port_b, portPer_b) annotation (Line(points={{10,80},{100,80},{100,
+          60},{200,60}}, color={0,127,255}));
+  connect(res2.port_b, portPer_b) annotation (Line(points={{10,40},{100,40},{100,
+          60},{200,60}}, color={0,127,255}));
+  connect(res3.port_b, portCor_b) annotation (Line(points={{10,-40},{100,-40},{100,
+          -60},{200,-60}}, color={0,127,255}));
+  connect(res4.port_b, portCor_b) annotation (Line(points={{10,-80},{100,-80},{100,
+          -60},{200,-60}}, color={0,127,255}));
+  connect(portPer_a, res1.port_a) annotation (Line(points={{-200,60},{-100,60},
+          {-100,80},{-10,80}}, color={0,127,255}));
+  connect(portPer_a, res2.port_a) annotation (Line(points={{-200,60},{-100,60},
+          {-100,40},{-10,40}}, color={0,127,255}));
+  connect(portCor_a, res3.port_a) annotation (Line(points={{-200,-60},{-100,-60},
+          {-100,-40},{-10,-40}}, color={0,127,255}));
+  connect(portCor_a, res4.port_a) annotation (Line(points={{-200,-60},{-100,-60},
+          {-100,-80},{-10,-80}}, color={0,127,255}));
   annotation (Diagram(coordinateSystem(extent={{-200,-160},{200,160}})),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}}), graphics={Rectangle(
           extent={{-88,0},{82,-82}},
