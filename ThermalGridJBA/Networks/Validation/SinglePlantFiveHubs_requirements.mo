@@ -171,6 +171,52 @@ model SinglePlantFiveHubs_requirements
     annotation (Placement(transformation(extent={{460,-360},{480,-340}})));
   Modelica.Blocks.Sources.Constant fracPLMax[nBui + 2](k=125)
     annotation (Placement(transformation(extent={{460,-320},{480,-300}})));
+  Buildings_Requirements.WithinBand reqTSHSet[nBui](
+    name="ETS",
+    text=
+        "O-303: The space heating water supply temperature set point must be tracked within ± 1 K once the system is on for 5 minutes.",
+    use_activeInput=true,
+    delayTime(displayUnit="min") = 300,
+    u_max(
+      final unit="K",
+      displayUnit="K") = 1,
+    u_min(
+      final unit="K",
+      displayUnit="K") = 1,
+    u(final unit="K", displayUnit="K"),
+    witBan(u(final unit="K")))
+    "Requirment for tracking the space heating water supply temperature set point"
+    annotation (Placement(transformation(extent={{500,-400},{520,-380}})));
+  Buildings_Requirements.WithinBand reqTSCSet[nBui](
+    name="ETS",
+    text=
+        "O-304: The space cooling water supply temperature set point must be tracked within ± 1 K once the system is on for 5 minutes.",
+    use_activeInput=true,
+    delayTime(displayUnit="min") = 300,
+    u_max(
+      final unit="K",
+      displayUnit="K") = 1,
+    u_min(
+      final unit="K",
+      displayUnit="K") = 1,
+    u(final unit="K", displayUnit="K"),
+    witBan(u(final unit="K")))
+    "Requirment for tracking the space cooling water supply temperature set point"
+    annotation (Placement(transformation(extent={{500,-450},{520,-430}})));
+  Modelica.Blocks.Math.Add TSHcompare[nBui](k2=-1)
+    annotation (Placement(transformation(extent={{460,-390},{480,-370}})));
+  Modelica.Blocks.Math.Add TSCCompare[nBui](k2=-1)
+    annotation (Placement(transformation(extent={{460,-440},{480,-420}})));
+  Modelica.Blocks.Sources.RealExpression TSHSupply[nBui](y=bui.bui.disFloHea.senTSup.T)
+    annotation (Placement(transformation(extent={{420,-384},{440,-364}})));
+  Modelica.Blocks.Sources.RealExpression TSHSupplySet[nBui](y=bui.THeaWatSupSet.y)
+    annotation (Placement(transformation(extent={{420,-396},{440,-376}})));
+  Modelica.Blocks.Sources.BooleanExpression BooOn[nBui](y=true)
+    annotation (Placement(transformation(extent={{360,-420},{380,-400}})));
+  Modelica.Blocks.Sources.RealExpression TSCSupply[nBui](y=bui.bui.disFloCoo.senTSup.T)
+    annotation (Placement(transformation(extent={{420,-434},{440,-414}})));
+  Modelica.Blocks.Sources.RealExpression TSCSupplySet[nBui](y=bui.TChiWatSupSet.y)
+    annotation (Placement(transformation(extent={{420,-446},{440,-426}})));
 equation
   for i in 1:5 loop
     y_value[i] = bui[i].ets.valIsoEva.y_actual;
@@ -243,4 +289,20 @@ equation
           {490,-324},{499,-324}}, color={0,0,127}));
   connect(PDis.y, reqPDis.u_min) annotation (Line(points={{481,-350},{490,-350},
           {490,-328},{499,-328}}, color={0,0,127}));
+  connect(TSHcompare.y, reqTSHSet.u) annotation (Line(points={{481,-380},{490,
+          -380},{490,-386},{499,-386}}, color={0,0,127}));
+  connect(TSCCompare.y, reqTSCSet.u) annotation (Line(points={{481,-430},{490,
+          -430},{490,-436},{499,-436}}, color={0,0,127}));
+  connect(BooOn.y, reqTSHSet.active) annotation (Line(points={{381,-410},{400,
+          -410},{400,-394},{498,-394}}, color={255,0,255}));
+  connect(BooOn.y, reqTSCSet.active) annotation (Line(points={{381,-410},{400,
+          -410},{400,-444},{498,-444}}, color={255,0,255}));
+  connect(TSCSupply.y, TSCCompare.u1)
+    annotation (Line(points={{441,-424},{458,-424}}, color={0,0,127}));
+  connect(TSCSupplySet.y, TSCCompare.u2)
+    annotation (Line(points={{441,-436},{458,-436}}, color={0,0,127}));
+  connect(TSHSupply.y, TSHcompare.u1)
+    annotation (Line(points={{441,-374},{458,-374}}, color={0,0,127}));
+  connect(TSHSupplySet.y, TSHcompare.u2)
+    annotation (Line(points={{441,-386},{458,-386}}, color={0,0,127}));
 end SinglePlantFiveHubs_requirements;
