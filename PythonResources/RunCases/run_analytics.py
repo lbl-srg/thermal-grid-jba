@@ -12,13 +12,8 @@ import unyt as uy
 from buildingspy.io.outputfile import Reader
 
 CWD = os.getcwd()
-MAT_FILE_NAME = "ConnectedETSNoDHW_futu.mat"
-PRINT_ACTION_NOT_FOUND = False
 
 #%%
-
-mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", MAT_FILE_NAME))
-
 units =    [
                 {'quantity' : 'power',
                  'unit'     : uy.W,
@@ -33,42 +28,39 @@ units =    [
 variables = [
                 {'name' : 'EChi.u',
                  'description' : 'ETS heat recovery chiller electric power input',
-                 'quantity' : 'power',
-                 'actions'  : ['max', 'plot'],
-                 'captions' : ['Peak heat recovery chiller electric power input',
-                               'Heat recovery chiller electric power input']
+                 'quantity': 'power',
+                 'action'  : 'max',
+                 'caption' : 'Peak heat recovery chiller electric power input'
                  },
                 {'name' : 'EChi.y',
                  'description' : 'ETS heat recovery chiller electrical energy consumption',
-                 'quantity' : 'energy',
-                 'actions'  : ['last'],
-                 'captions' : ['Total heat recovery chiller electrical consumption']
+                 'quantity': 'energy',
+                 'action'  : 'last',
+                 'caption' : 'Total heat recovery chiller electrical consumption'
                  },
                 {'name' : 'bui.bui.QReqHea_flow',
                  'description' : 'Space heating demand at the coil',
-                 'quantity' : 'power',
-                 'actions'  : ['max', 'plot'],
-                 'captions' : ['Peak space heating load',
-                               'Space heating load']
+                 'quantity': 'power',
+                 'action'  : 'max',
+                 'caption' : 'Peak space heating load'
                  },
                 {'name' : 'bui.bui.QReqCoo_flow',
                  'description' : 'Space cooling demand at the coil',
-                 'quantity' : 'power',
-                 'actions'  : ['min', 'plot'],
-                 'captions' : ['Peak cooling load',
-                               'Cooling load']
+                 'quantity': 'power',
+                 'action'  : 'min',
+                 'caption' : 'Peak cooling load'
                  },
                 {'name' : 'dHHeaWat.y',
                  'description' : 'Space heating load at the coil',
-                 'quantity' : 'energy',
-                 'actions'  : ['last'],
-                 'captions' : ['Total space heating load']
+                 'quantity': 'energy',
+                 'action'  : 'last',
+                 'caption' : 'Total space heating load'
                  },
                 {'name' : 'dHChiWat.y',
                  'description' : 'Space cooling load at the coil',
-                 'quantity' : 'energy',
-                 'actions'  : ['last'],
-                 'captions' : ['Total cooling load']
+                 'quantity': 'energy',
+                 'action'  : 'last',
+                 'caption' : 'Total cooling load'
                  },
             ]
 
@@ -120,41 +112,33 @@ for scenario in scenarios:
     mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", scenario['matFile']))
     r=Reader(mat_file_path, 'dymola')
     for var in variables:
-        y = find_var(var['name'])
-        if len(y):
-            scenario['results'][var['name']] = {}
-            for action in var['actions']:
-                if action in actions:
-                    v = actions[action](y)
-                    scenario['results'][var['name']][action] = v
-                else:
-                    msg = f'## The action "{action}" is not defined for the varialbe "{var["name"]}"'
-                    if PRINT_ACTION_NOT_FOUND:
-                        print(msg)
+        #y = find_var(var['name'])
+        (t, y) = r.values(var['name'])
+        if len(t) > 2 and not 'time' in scenario['results']:
+            scenario['results']['time'] = t # writes the time stamp
+        v = actions[var['action']](y)
+        scenario['results'][var['name']] = v
 
 #%% 
-tableWidth = 12
+tableWidth = 15
 row = f"{'Scenarios:':<{tableWidth}}"
 for s in scenarios:
     row += f" | {s['name']:<{tableWidth}}"
 print(row)
 for var in variables:
-    for i,action in enumerate(var['actions']):
-        if action == 'plot':
-            continue
-        row = var['captions'][i]
-        print(row)
+    row = var['caption']
+    print(row)
     
-        unit_with_bracket = f"[{str_with_unit(0, var['quantity']).units}]"
-        row = f"{unit_with_bracket:>{tableWidth}}"
-        for i,scenario in enumerate(scenarios):
-            v = scenario['results'][var['name']][action]
-            displayValue = f"{str_with_unit(v,var['quantity']).value:.0f}"
-            if i == 0 :
-                vBase = v
-            else:
-                displayCompare = f"{v/vBase-1:+.0%}"
-                displayValue += f' ({displayCompare})'
-            row += f" | {displayValue:>{tableWidth}}"
-        print(row)
+    unit_with_bracket = f"[{str_with_unit(0, var['quantity']).units}]"
+    row = f"{unit_with_bracket:>{tableWidth}}"
+    for i,scenario in enumerate(scenarios):
+        v = scenario['results'][var['name']]
+        displayValue = f"{str_with_unit(v,var['quantity']).value:.0f}"
+        if i == 0 :
+            vBase = v
+        else:
+            displayCompare = f"{v/vBase-1:+.1%}"
+            displayValue += f' ({displayCompare})'
+        row += f" | {displayValue:>{tableWidth}}"
+    print(row)
     
