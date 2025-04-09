@@ -25,42 +25,37 @@ units =    [
                  }
             ]
 
+# 'caption' is optional. 
 variables = [
                 {'name' : 'EChi.u',
-                 'description' : 'ETS heat recovery chiller electric power input',
                  'quantity': 'power',
                  'action'  : 'max',
-                 'caption' : 'Peak heat recovery chiller electric power input'
+                 'caption' : 'ETS heat recovery chiller peak electric power input'
                  },
                 {'name' : 'EChi.y',
-                 'description' : 'ETS heat recovery chiller electrical energy consumption',
                  'quantity': 'energy',
                  'action'  : 'last',
-                 'caption' : 'Total heat recovery chiller electrical consumption'
+                 'caption' : 'ETS heat recovery chiller total electrical consumption'
                  },
                 {'name' : 'bui.bui.QReqHea_flow',
-                 'description' : 'Space heating demand at the coil',
                  'quantity': 'power',
                  'action'  : 'max',
-                 'caption' : 'Peak space heating load'
+                 'caption' : 'Peak end-use space heating load'
                  },
                 {'name' : 'bui.bui.QReqCoo_flow',
-                 'description' : 'Space cooling demand at the coil',
                  'quantity': 'power',
                  'action'  : 'min',
-                 'caption' : 'Peak cooling load'
+                 'caption' : 'Peak end-use cooling load'
                  },
                 {'name' : 'dHHeaWat.y',
-                 'description' : 'Space heating load at the coil',
                  'quantity': 'energy',
                  'action'  : 'last',
-                 'caption' : 'Total space heating load'
+                 'caption' : 'Total end-use space heating load'
                  },
                 {'name' : 'dHChiWat.y',
-                 'description' : 'Space cooling load at the coil',
                  'quantity': 'energy',
                  'action'  : 'last',
-                 'caption' : 'Total cooling load'
+                 'caption' : 'Total end-use cooling load'
                  },
             ]
 
@@ -126,7 +121,10 @@ for s in scenarios:
     row += f" | {s['name']:<{tableWidth}}"
 print(row)
 for var in variables:
-    row = var['caption']
+    if 'caption' in var.keys():
+        row = var['caption']
+    else:
+        row = var['name']
     print(row)
     
     unit_with_bracket = f"[{str_with_unit(0, var['quantity']).units}]"
