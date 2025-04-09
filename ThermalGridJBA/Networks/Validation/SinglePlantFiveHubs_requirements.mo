@@ -1,6 +1,9 @@
 within ThermalGridJBA.Networks.Validation;
 model SinglePlantFiveHubs_requirements
   extends SinglePlantFiveHubs;
+  Real y_value[8*nBui];
+  Real fracPL[nBui + 2];
+
   Modelica.Blocks.Sources.RealExpression senTemHot[nBui](y={0,bui[2].ets.dhw.domHotWatTan.senTemHot.T,
         bui[3].ets.dhw.domHotWatTan.senTemHot.T,bui[4].ets.dhw.domHotWatTan.senTemHot.T,
         bui[5].ets.dhw.domHotWatTan.senTemHot.T})
@@ -60,10 +63,9 @@ model SinglePlantFiveHubs_requirements
     witBan(u(final unit="K")))
     "Requirement for  leaving water temperature on the primary side of the heat exchanger in the ETS "
     annotation (Placement(transformation(extent={{500,100},{520,120}})));
-  Buildings_Requirements.WithinBand reqTDomHotWatSupply6[nBui](
+  Buildings_Requirements.WithinBand reqTdiffHEX[nBui](
     name="ETS",
-    text=
-        "O-307: At the district heat exchanger in the ETS, the primary side water temperature difference must be ± 4 K, with a tolerance of ± 1 K.",
+    text="O-307: At the district heat exchanger in the ETS, the primary side water temperature difference must be ± 4 K, with a tolerance of ± 1 K.",
     delayTime(each displayUnit="min") = 300,
     u_max(
       final unit="K",
@@ -141,7 +143,58 @@ model SinglePlantFiveHubs_requirements
     witBan(u(final unit="K")))
     "Requirement for mixing water temperature in the district loop after the central plant"
     annotation (Placement(transformation(extent={{500,-280},{520,-260}})));
+  Buildings_Requirements.MinimumDuration reqHeaPumOn[nBui](
+    name="Heat pump",
+    text="O-201_0: The heat pump must operate at least 30 min when activated.",
+    durationMin(displayUnit="min") = 1800) "Requirement for heat pump on"
+    annotation (Placement(transformation(extent={{500,300},{520,320}})));
+  Buildings_Requirements.MinimumDuration reqHeaPumOff[nBui](
+    name="Heat pump",
+    text="O-201_1: The heat pump must remain off for at least 10 minutes.",
+    durationMin(displayUnit="min") = 600) "Requirement for heat pump off"
+    annotation (Placement(transformation(extent={{500,260},{520,280}})));
+  Modelica.Blocks.Logical.Not HeaPumOff[nBui]
+    annotation (Placement(transformation(extent={{460,260},{480,280}})));
+  Modelica.Blocks.Sources.BooleanExpression HeaPumOn[nBui](y=bui.ets.chi.con.yPum)
+    annotation (Placement(transformation(extent={{420,300},{440,320}})));
+  Buildings_Requirements.StableContinuousSignal reqStaVal[nBui*8](name="Valves",
+      text="O-202: All control valves must show stable operation.")
+    "Requirements to verify stability of control valves"
+    annotation (Placement(transformation(extent={{500,340},{520,360}})));
+  Modelica.Blocks.Sources.RealExpression Valy[nBui*8](y=y_value)
+    annotation (Placement(transformation(extent={{460,344},{480,364}})));
+  Buildings_Requirements.GreaterEqual reqPDis[nBui + 2](name="District loop",
+      text="O-402: The pressure drop in the district loop and the service line must be no bigger than 125 Pa/m at full load.")
+    "Requirement for pressure drop in the district loop"
+    annotation (Placement(transformation(extent={{500,-340},{520,-320}})));
+  Modelica.Blocks.Sources.RealExpression PDis[nBui + 2](y=fracPL)
+    annotation (Placement(transformation(extent={{460,-360},{480,-340}})));
+  Modelica.Blocks.Sources.Constant fracPLMax[nBui + 2](k=125)
+    annotation (Placement(transformation(extent={{460,-320},{480,-300}})));
 equation
+  for i in 1:5 loop
+    y_value[i] = bui[i].ets.valIsoEva.y_actual;
+    y_value[i+5] = bui[i].ets.valIsoCon.y_actual;
+    y_value[i+10] = bui[i].ets.valDivCon.val.y_actual;
+    y_value[i+15] = bui[i].ets.valDivEva.val.y_actual;
+    y_value[i+20] = bui[i].ets.hex.val2.y_actual;
+    y_value[i+25] = bui[i].ets.chi.valEva.y_actual;
+    y_value[i+30] = bui[i].ets.chi.valCon.y_actual;
+    fracPL[i] = dis.con[i].pipDis.dp / dis.con[i].pipDis.length;
+    if i == 1 then
+      y_value[i+35] = 0;
+    end if;
+  end for;
+
+  y_value[37] = bui[2].ets.dhw.domHotWatTan.divVal.y_actual;
+  y_value[38] = bui[3].ets.dhw.domHotWatTan.divVal.y_actual;
+  y_value[39] = bui[4].ets.dhw.domHotWatTan.divVal.y_actual;
+  y_value[40] = bui[5].ets.dhw.domHotWatTan.divVal.y_actual;
+  fracPL[6] = dis.pipEnd.dp / dis.pipEnd.length;
+  fracPL[7] = conPla.pipDis.dp / conPla.pipDis.length;
+
+
+
   connect(senTemHot.y, reqTDomHotWatSupply.u) annotation (Line(points={{481,232},
           {488,232},{488,234},{499,234}}, color={0,0,127}));
   connect(THEXWatLvg.y, reqTHEXETSLeaPri.u) annotation (Line(points={{401,90},{
@@ -150,8 +203,8 @@ equation
           {410,44},{418,44}}, color={0,0,127}));
   connect(calc_diff.y, abs.u)
     annotation (Line(points={{441,50},{458,50}}, color={0,0,127}));
-  connect(abs.y, reqTDomHotWatSupply6.u) annotation (Line(points={{481,50},{490,
-          50},{490,54},{499,54}}, color={0,0,127}));
+  connect(abs.y, reqTdiffHEX.u) annotation (Line(points={{481,50},{490,50},{490,
+          54},{499,54}}, color={0,0,127}));
   connect(THEXWatLvg.y, calc_diff.u1) annotation (Line(points={{401,90},{410,90},
           {410,56},{418,56}}, color={0,0,127}));
   connect(valEvaOpen.y, reqTHeaPumEva.active) annotation (Line(points={{482,-80},
@@ -178,4 +231,16 @@ equation
           160},{492,160},{492,166},{498,166}}, color={255,0,255}));
   connect(TminHeaPumEva.y, reqTHeaPumEva.u_min) annotation (Line(points={{481,
           -50},{490,-50},{490,-48},{499,-48}}, color={0,0,127}));
+  connect(HeaPumOn.y, reqHeaPumOn.u)
+    annotation (Line(points={{441,310},{498,310}}, color={255,0,255}));
+  connect(HeaPumOff.y, reqHeaPumOff.u)
+    annotation (Line(points={{481,270},{498,270}}, color={255,0,255}));
+  connect(HeaPumOn.y, HeaPumOff.u) annotation (Line(points={{441,310},{450,310},
+          {450,270},{458,270}}, color={255,0,255}));
+  connect(Valy.y, reqStaVal.u)
+    annotation (Line(points={{481,354},{499,354}}, color={0,0,127}));
+  connect(fracPLMax.y, reqPDis.u_max) annotation (Line(points={{481,-310},{490,-310},
+          {490,-324},{499,-324}}, color={0,0,127}));
+  connect(PDis.y, reqPDis.u_min) annotation (Line(points={{481,-350},{490,-350},
+          {490,-328},{499,-328}}, color={0,0,127}));
 end SinglePlantFiveHubs_requirements;

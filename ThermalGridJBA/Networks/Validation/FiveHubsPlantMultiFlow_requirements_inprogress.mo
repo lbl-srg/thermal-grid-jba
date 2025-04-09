@@ -1,4 +1,0 @@
-within ThermalGridJBA.Networks.Validation;
-model FiveHubsPlantMultiFlow_requirements_inprogress
-  extends FiveHubsPlantMultiFlow;
-end FiveHubsPlantMultiFlow_requirements_inprogress;
