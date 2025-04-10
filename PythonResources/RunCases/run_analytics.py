@@ -14,19 +14,16 @@ from buildingspy.io.outputfile import Reader
 CWD = os.getcwd()
 
 #%%
-units =    [
-                {'quantity' : 'power',
-                 'unit'     : uy.W,
-                 'displayUnit' : uy.kW
-                 },
-                {'quantity' : 'energy',
-                 'unit'     : uy.J,
-                 'displayUnit' : uy.MWh
-                 },
-                {'quantity' : 'time',
-                 'unit'     : uy.s,
-                 'displayUnit' : uy.s}
-            ]
+units = {'power':
+             {'unit'        : uy.W,
+              'displayUnit' : uy.kW},
+         'energy':
+             {'unit'        : uy.J,
+              'displayUnit' : uy.MWh},
+         'time':
+             {'unit'        : uy.s,
+              'displayUnit' : uy.s}
+        }
 
 # 'caption' is optional. 
 # if 'quantity' not given, treated as unit 1.
@@ -105,13 +102,6 @@ def find_var(n, print_message = True):
         
     return y
 
-def str_with_unit(value, quantity):
-    """
-    """
-    u = next((item for item in units if item.get('quantity') == quantity), None)
-    s = (value * u['unit']).to(u['displayUnit'])
-    return s
-
 def find_duration(t, y):
     
     indices = np.where(y > 0.99)[0]
@@ -149,14 +139,14 @@ for var in variables:
     print(row)
     
     if 'quantity' in var.keys():
-        unit_with_bracket = f"[{str_with_unit(0, var['quantity']).units}]"
+        unit_with_bracket = f"[{units[var['quantity']]['displayUnit']}]"
     else:
         unit_with_bracket = "[1]"
     row = f"{unit_with_bracket:>{tableWidth}}"
     for i,scenario in enumerate(scenarios):
         v = scenario['results'][var['name']]
         if 'quantity' in var.keys():
-            displayValue = f"{str_with_unit(v,var['quantity']).value:.0f}"
+            displayValue = f"{(v * units[var['quantity']]['unit']).to(units[var['quantity']]['displayUnit']).value:.0f}"
         else:
             displayValue = f"{v:.0f}"
         if i == 0 :
