@@ -1,14 +1,14 @@
 within ThermalGridJBA.Networks.Controls;
 model Indicators "District load, electricity rate and season indicator"
 
-  parameter Real TLooMin(
+  parameter Real TPlaHeaSet(
     unit="K",
     displayUnit="degC")=283.65
-    "Design minimum district loop temperature";
-  parameter Real TLooMax(
+    "Design plant heating setpoint temperature";
+  parameter Real TPlaCooSet(
     unit="K",
     displayUnit="degC")=297.15
-    "Design maximum district loop temperature";
+    "Design plant cooling setpoint temperature";
 
   parameter Integer winEndWee=12
     "Week that winter season ends after it"
@@ -56,271 +56,329 @@ model Indicators "District load, electricity rate and season indicator"
     "Winter low rate starts at the beginning of this hour"
     annotation (Dialog(tab="Electricity rate"));
 
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput uDisPum
-    "District loop pump speed"
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TPlaOut(
+    final unit="K",
+    final quantity="ThermodynamicTemperature",
+    displayUnit="degC")
+    "Central plant outlet water temperature"
     annotation (Placement(transformation(extent={{-280,330},{-240,370}}),
-        iconTransformation(extent={{-140,20},{-100,60}})));
+        iconTransformation(extent={{-140,-20},{-100,20}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yPlaOut
+    "Plant load"
+    annotation (Placement(transformation(extent={{240,280},{280,320}}),
+        iconTransformation(extent={{100,60},{140,100}})));
+  Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput ySt
+    "Load indicator"
+    annotation (Placement(transformation(extent={{240,120},{280,160}}),
+        iconTransformation(extent={{100,30},{140,70}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput yEle
     "Electricity rate indicator. 0-normal rate; 1-high rate"
-    annotation (Placement(transformation(extent={{240,100},{280,140}}),
-        iconTransformation(extent={{100,0},{140,40}})));
+    annotation (Placement(transformation(extent={{240,10},{280,50}}),
+        iconTransformation(extent={{100,-30},{140,10}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
     "Current electricity rate, cent per kWh"
-    annotation (Placement(transformation(extent={{240,20},{280,60}}),
-        iconTransformation(extent={{100,-20},{140,20}})));
-  Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput yGen
-    "Season indicator. 1-winter; 2-shoulder; 3-summer"
-    annotation (Placement(transformation(extent={{240,-170},{280,-130}}),
+    annotation (Placement(transformation(extent={{240,-70},{280,-30}}),
         iconTransformation(extent={{100,-50},{140,-10}})));
+  Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput ySea
+    "Season indicator: 1 winter; 2 spring; 3 summer; 4 fall"
+    annotation (Placement(transformation(extent={{240,-260},{280,-220}}),
+        iconTransformation(extent={{100,-100},{140,-60}})));
 
-  Buildings.Controls.OBC.CDL.Discrete.Sampler sam(
-    final samplePeriod=samplePeriod)
-    "District loop load sampler"
-    annotation (Placement(transformation(extent={{-200,340},{-180,360}})));
   Buildings.Controls.OBC.CDL.Reals.LessThreshold lesThr(final t=1/3)
     "Check if the speed is less than 1/3"
-    annotation (Placement(transformation(extent={{-140,340},{-120,360}})));
+    annotation (Placement(transformation(extent={{-140,130},{-120,150}})));
   Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr(final t=2/3)
     "Check if the speed is greater than 2/3"
-    annotation (Placement(transformation(extent={{-140,300},{-120,320}})));
+    annotation (Placement(transformation(extent={{-140,90},{-120,110}})));
   Buildings.Controls.OBC.CDL.Integers.Switch intSwi3 "Check district load"
-    annotation (Placement(transformation(extent={{60,340},{80,360}})));
+    annotation (Placement(transformation(extent={{60,130},{80,150}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant lowLoa(final k=1)
     "Low district loop load"
-    annotation (Placement(transformation(extent={{-60,360},{-40,380}})));
+    annotation (Placement(transformation(extent={{-60,150},{-40,170}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant higLoa(final k=3)
     "High district loop load"
-    annotation (Placement(transformation(extent={{-60,320},{-40,340}})));
+    annotation (Placement(transformation(extent={{-60,110},{-40,130}})));
   Buildings.Controls.OBC.CDL.Integers.Switch intSwi4 "Check district load"
-    annotation (Placement(transformation(extent={{0,300},{20,320}})));
+    annotation (Placement(transformation(extent={{0,90},{20,110}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant medLoa(final k=2)
     "Medium district loop load"
-    annotation (Placement(transformation(extent={{-60,280},{-40,300}})));
+    annotation (Placement(transformation(extent={{-60,70},{-40,90}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.CalendarTime calTim(
     final zerTim=Buildings.Controls.OBC.CDL.Types.ZeroTime.NY2025)
     "Calendar time"
-    annotation (Placement(transformation(extent={{-220,120},{-200,140}})));
+    annotation (Placement(transformation(extent={{-220,30},{-200,50}})));
   Buildings.Controls.OBC.CDL.Integers.GreaterEqualThreshold aftJun(final t=6)
     "After June"
-    annotation (Placement(transformation(extent={{-180,120},{-160,140}})));
+    annotation (Placement(transformation(extent={{-180,30},{-160,50}})));
   Buildings.Controls.OBC.CDL.Integers.LessEqualThreshold earSep(final t=9)
     "Earlier than September"
-    annotation (Placement(transformation(extent={{-180,90},{-160,110}})));
+    annotation (Placement(transformation(extent={{-180,0},{-160,20}})));
   Buildings.Controls.OBC.CDL.Integers.GreaterEqualThreshold fouPm(
     final t=sumPeaSta)
     "Later than 4PM"
-    annotation (Placement(transformation(extent={{-180,60},{-160,80}})));
+    annotation (Placement(transformation(extent={{-180,-30},{-160,-10}})));
   Buildings.Controls.OBC.CDL.Integers.LessEqualThreshold senPm(
     final t=sumPeaEnd)
     "Earlier than 7PM"
-    annotation (Placement(transformation(extent={{-180,30},{-160,50}})));
+    annotation (Placement(transformation(extent={{-180,-60},{-160,-40}})));
   Buildings.Controls.OBC.CDL.Logical.And inSum
     "Check if it is in summer rate period"
-    annotation (Placement(transformation(extent={{-140,120},{-120,140}})));
+    annotation (Placement(transformation(extent={{-140,30},{-120,50}})));
   Buildings.Controls.OBC.CDL.Logical.And sumHig
     "Check if it is in summer high rate period"
-    annotation (Placement(transformation(extent={{-140,60},{-120,80}})));
+    annotation (Placement(transformation(extent={{-140,-30},{-120,-10}})));
   Buildings.Controls.OBC.CDL.Logical.And sumHigRat
     "Check if it is in summer high rate period"
-    annotation (Placement(transformation(extent={{-20,120},{0,140}})));
+    annotation (Placement(transformation(extent={{-20,30},{0,50}})));
   Buildings.Controls.OBC.CDL.Logical.Not sumLow "Summer low rate"
-    annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+    annotation (Placement(transformation(extent={{-80,-50},{-60,-30}})));
   Buildings.Controls.OBC.CDL.Logical.And sumLowRat
     "Check if it is in summer low rate period"
-    annotation (Placement(transformation(extent={{-20,70},{0,90}})));
+    annotation (Placement(transformation(extent={{-20,-20},{0,0}})));
   Buildings.Controls.OBC.CDL.Integers.LessEqualThreshold sixAm(
     final t=winLowEnd1)
     "Earlier than 6AM"
-    annotation (Placement(transformation(extent={{-180,-10},{-160,10}})));
+    annotation (Placement(transformation(extent={{-180,-100},{-160,-80}})));
   Buildings.Controls.OBC.CDL.Integers.GreaterEqualThreshold ninAm(
     final t=winLowSta1)
     "Later than 9AM"
-    annotation (Placement(transformation(extent={{-180,-40},{-160,-20}})));
+    annotation (Placement(transformation(extent={{-180,-130},{-160,-110}})));
   Buildings.Controls.OBC.CDL.Integers.LessEqualThreshold fivPm(
     final t=winLowEnd2)
     "Earlier than 5PM"
-    annotation (Placement(transformation(extent={{-180,-70},{-160,-50}})));
+    annotation (Placement(transformation(extent={{-180,-160},{-160,-140}})));
   Buildings.Controls.OBC.CDL.Integers.GreaterEqualThreshold ninPm1(
     final t=winLowSta2)
     "Later than 9PM"
-    annotation (Placement(transformation(extent={{-180,-100},{-160,-80}})));
+    annotation (Placement(transformation(extent={{-180,-190},{-160,-170}})));
   Buildings.Controls.OBC.CDL.Logical.And ninToFiv
     "Check if it is between 9AM and 5PM"
-    annotation (Placement(transformation(extent={{-140,-40},{-120,-20}})));
+    annotation (Placement(transformation(extent={{-140,-130},{-120,-110}})));
   Buildings.Controls.OBC.CDL.Logical.Or winLow
     "Winter low rate period"
-    annotation (Placement(transformation(extent={{-100,-20},{-80,0}})));
+    annotation (Placement(transformation(extent={{-100,-110},{-80,-90}})));
   Buildings.Controls.OBC.CDL.Logical.Or winLow1
     "Winter low rate period"
-    annotation (Placement(transformation(extent={{-60,-20},{-40,0}})));
+    annotation (Placement(transformation(extent={{-60,-110},{-40,-90}})));
   Buildings.Controls.OBC.CDL.Logical.Not inWin
     "In winter"
-    annotation (Placement(transformation(extent={{-100,10},{-80,30}})));
+    annotation (Placement(transformation(extent={{-100,-80},{-80,-60}})));
   Buildings.Controls.OBC.CDL.Logical.And winLowRat
     "Check if it is in winter low rate period"
-    annotation (Placement(transformation(extent={{0,-20},{20,0}})));
+    annotation (Placement(transformation(extent={{0,-110},{20,-90}})));
   Buildings.Controls.OBC.CDL.Logical.Not winHig "Winter high rate"
-    annotation (Placement(transformation(extent={{0,-58},{20,-38}})));
+    annotation (Placement(transformation(extent={{0,-148},{20,-128}})));
   Buildings.Controls.OBC.CDL.Logical.And winHihRat
     "Check if it is in winter high rate period"
-    annotation (Placement(transformation(extent={{40,-80},{60,-60}})));
+    annotation (Placement(transformation(extent={{40,-170},{60,-150}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal booToRea(
     final realTrue=higRatSum)
     "Convert to summer high rate"
-    annotation (Placement(transformation(extent={{40,80},{60,100}})));
+    annotation (Placement(transformation(extent={{40,-10},{60,10}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToInteger booToInt
     "Convert to high rate flag"
-    annotation (Placement(transformation(extent={{40,120},{60,140}})));
+    annotation (Placement(transformation(extent={{40,30},{60,50}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal booToRea1(
     final realTrue=lowRatSum)
     "Convert to summer low rate"
-    annotation (Placement(transformation(extent={{42,40},{62,60}})));
+    annotation (Placement(transformation(extent={{42,-50},{62,-30}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToInteger booToInt1
     "Convert to high rate flag"
-    annotation (Placement(transformation(extent={{100,-80},{120,-60}})));
+    annotation (Placement(transformation(extent={{100,-170},{120,-150}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal booToRea2(
     final realTrue=lowRatWin)
     "Convert to winter low rate"
-    annotation (Placement(transformation(extent={{40,-20},{60,0}})));
+    annotation (Placement(transformation(extent={{40,-110},{60,-90}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal booToRea3(
     final realTrue=higRatWin)
     "Convert to winter high rate"
-    annotation (Placement(transformation(extent={{100,-50},{120,-30}})));
+    annotation (Placement(transformation(extent={{100,-140},{120,-120}})));
   Buildings.Controls.OBC.CDL.Integers.Add ratInd
     "Find the rate indicator"
-    annotation (Placement(transformation(extent={{200,110},{220,130}})));
+    annotation (Placement(transformation(extent={{200,20},{220,40}})));
   Buildings.Controls.OBC.CDL.Reals.Add curRat
     "Find current rate"
-    annotation (Placement(transformation(extent={{100,60},{120,80}})));
+    annotation (Placement(transformation(extent={{100,-30},{120,-10}})));
   Buildings.Controls.OBC.CDL.Reals.Add curRat1
     "Find current rate"
-    annotation (Placement(transformation(extent={{160,-10},{180,10}})));
+    annotation (Placement(transformation(extent={{160,-100},{180,-80}})));
   Buildings.Controls.OBC.CDL.Reals.Add curRat2
     "Find current rate"
-    annotation (Placement(transformation(extent={{200,30},{220,50}})));
+    annotation (Placement(transformation(extent={{200,-60},{220,-40}})));
 
   Buildings.Controls.OBC.CDL.Integers.Sources.TimeTable seaTab(
     table=[0,1; winEndWee,2; sumStaWee,3; sumEndWee,4; winStaWee,1],
     timeScale=7*24*3600,
     period(displayUnit="d") = 31536000)
     "Table that outputs season: 1 winter; 2 spring; 3 summer; 4 fall"
-    annotation (Placement(transformation(extent={{200,-160},{220,-140}})));
-  Buildings.Controls.OBC.CDL.Interfaces.IntegerOutput ySt "Load indicator"
-    annotation (Placement(transformation(extent={{240,330},{280,370}})));
+    annotation (Placement(transformation(extent={{200,-250},{220,-230}})));
+  Buildings.Controls.OBC.CDL.Reals.Line plaHeaLoa "Plant heating load"
+    annotation (Placement(transformation(extent={{-40,340},{-20,360}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant one(final k=1) "Constant 1"
+    annotation (Placement(transformation(extent={{-180,370},{-160,390}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant heaSet(y(unit="K",
+        displayUnit="degC"), final k=TPlaHeaSet) "Plant heating setpoint"
+    annotation (Placement(transformation(extent={{-120,370},{-100,390}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer(final k=0) "Constant 0"
+    annotation (Placement(transformation(extent={{-120,310},{-100,330}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant heaSetPlu(y(unit="K",
+        displayUnit="degC"), final k=TPlaHeaSet + 1)
+    "One degree higher than the plant heating setpoint"
+    annotation (Placement(transformation(extent={{-180,310},{-160,330}})));
+  Buildings.Controls.OBC.CDL.Reals.Line plaCooLoa "Plant cooling load"
+    annotation (Placement(transformation(extent={{-40,240},{-20,260}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSetMin(y(unit="K",
+        displayUnit="degC"), final k=TPlaCooSet - 1)
+    "One degree lower than the plant cooling setpoint"
+    annotation (Placement(transformation(extent={{-180,270},{-160,290}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant negOne(final k=-1)
+    "Constant -1"
+    annotation (Placement(transformation(extent={{-120,210},{-100,230}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSet(y(unit="K",
+        displayUnit="degC"), final k=TPlaCooSet) "Plant cooling setpoint"
+    annotation (Placement(transformation(extent={{-180,210},{-160,230}})));
+  Buildings.Controls.OBC.CDL.Reals.Add plaLoa "Plant load"
+    annotation (Placement(transformation(extent={{40,290},{60,310}})));
+  Buildings.Controls.OBC.CDL.Reals.Abs absLoa
+    "Absolute value of the plant load"
+    annotation (Placement(transformation(extent={{100,230},{120,250}})));
 equation
-  connect(uDisPum, sam.u)
-    annotation (Line(points={{-260,350},{-202,350}}, color={0,0,127}));
   connect(lesThr.y, intSwi3.u2)
-    annotation (Line(points={{-118,350},{58,350}},color={255,0,255}));
-  connect(lowLoa.y, intSwi3.u1) annotation (Line(points={{-38,370},{40,370},{40,
-          358},{58,358}}, color={255,127,0}));
-  connect(higLoa.y, intSwi4.u1) annotation (Line(points={{-38,330},{-20,330},{-20,
-          318},{-2,318}},  color={255,127,0}));
+    annotation (Line(points={{-118,140},{58,140}},color={255,0,255}));
+  connect(lowLoa.y, intSwi3.u1) annotation (Line(points={{-38,160},{40,160},{40,
+          148},{58,148}}, color={255,127,0}));
+  connect(higLoa.y, intSwi4.u1) annotation (Line(points={{-38,120},{-20,120},{-20,
+          108},{-2,108}},  color={255,127,0}));
   connect(greThr.y, intSwi4.u2)
-    annotation (Line(points={{-118,310},{-2,310}},  color={255,0,255}));
-  connect(medLoa.y, intSwi4.u3) annotation (Line(points={{-38,290},{-20,290},{-20,
-          302},{-2,302}},  color={255,127,0}));
-  connect(intSwi4.y, intSwi3.u3) annotation (Line(points={{22,310},{40,310},{40,
-          342},{58,342}},
-                     color={255,127,0}));
-  connect(sam.y, lesThr.u)
-    annotation (Line(points={{-178,350},{-142,350}}, color={0,0,127}));
-  connect(sam.y, greThr.u) annotation (Line(points={{-178,350},{-158,350},{-158,
-          310},{-142,310}}, color={0,0,127}));
+    annotation (Line(points={{-118,100},{-2,100}},  color={255,0,255}));
+  connect(medLoa.y, intSwi4.u3) annotation (Line(points={{-38,80},{-20,80},{-20,
+          92},{-2,92}},    color={255,127,0}));
+  connect(intSwi4.y, intSwi3.u3) annotation (Line(points={{22,100},{40,100},{40,
+          132},{58,132}}, color={255,127,0}));
   connect(calTim.month, aftJun.u)
-    annotation (Line(points={{-199,130},{-182,130}}, color={255,127,0}));
-  connect(calTim.month, earSep.u) annotation (Line(points={{-199,130},{-188,130},
-          {-188,100},{-182,100}}, color={255,127,0}));
+    annotation (Line(points={{-199,40},{-182,40}},   color={255,127,0}));
+  connect(calTim.month, earSep.u) annotation (Line(points={{-199,40},{-188,40},{
+          -188,10},{-182,10}},    color={255,127,0}));
   connect(aftJun.y, inSum.u1)
-    annotation (Line(points={{-158,130},{-142,130}}, color={255,0,255}));
-  connect(earSep.y, inSum.u2) annotation (Line(points={{-158,100},{-150,100},{-150,
-          122},{-142,122}}, color={255,0,255}));
-  connect(calTim.hour, fouPm.u) annotation (Line(points={{-199,136},{-194,136},{
-          -194,70},{-182,70}}, color={255,127,0}));
-  connect(calTim.hour, senPm.u) annotation (Line(points={{-199,136},{-194,136},{
-          -194,40},{-182,40}}, color={255,127,0}));
+    annotation (Line(points={{-158,40},{-142,40}},   color={255,0,255}));
+  connect(earSep.y, inSum.u2) annotation (Line(points={{-158,10},{-150,10},{-150,
+          32},{-142,32}},   color={255,0,255}));
+  connect(calTim.hour, fouPm.u) annotation (Line(points={{-199,46},{-194,46},{-194,
+          -20},{-182,-20}},    color={255,127,0}));
+  connect(calTim.hour, senPm.u) annotation (Line(points={{-199,46},{-194,46},{-194,
+          -50},{-182,-50}},    color={255,127,0}));
   connect(fouPm.y, sumHig.u1)
-    annotation (Line(points={{-158,70},{-142,70}}, color={255,0,255}));
-  connect(senPm.y, sumHig.u2) annotation (Line(points={{-158,40},{-150,40},{-150,
-          62},{-142,62}}, color={255,0,255}));
+    annotation (Line(points={{-158,-20},{-142,-20}}, color={255,0,255}));
+  connect(senPm.y, sumHig.u2) annotation (Line(points={{-158,-50},{-150,-50},{-150,
+          -28},{-142,-28}}, color={255,0,255}));
   connect(inSum.y, sumHigRat.u1)
-    annotation (Line(points={{-118,130},{-22,130}}, color={255,0,255}));
-  connect(sumHig.y, sumHigRat.u2) annotation (Line(points={{-118,70},{-100,70},{
-          -100,122},{-22,122}}, color={255,0,255}));
-  connect(sumHig.y, sumLow.u) annotation (Line(points={{-118,70},{-100,70},{-100,
-          50},{-82,50}}, color={255,0,255}));
-  connect(sumLow.y, sumLowRat.u2) annotation (Line(points={{-58,50},{-40,50},{-40,
-          72},{-22,72}}, color={255,0,255}));
-  connect(inSum.y, sumLowRat.u1) annotation (Line(points={{-118,130},{-110,130},
-          {-110,80},{-22,80}}, color={255,0,255}));
-  connect(calTim.hour, sixAm.u) annotation (Line(points={{-199,136},{-194,136},{
-          -194,0},{-182,0}}, color={255,127,0}));
-  connect(calTim.hour, ninAm.u) annotation (Line(points={{-199,136},{-194,136},{
-          -194,-30},{-182,-30}}, color={255,127,0}));
-  connect(calTim.hour, fivPm.u) annotation (Line(points={{-199,136},{-194,136},{
-          -194,-60},{-182,-60}}, color={255,127,0}));
-  connect(calTim.hour, ninPm1.u) annotation (Line(points={{-199,136},{-194,136},
-          {-194,-90},{-182,-90}}, color={255,127,0}));
+    annotation (Line(points={{-118,40},{-22,40}},   color={255,0,255}));
+  connect(sumHig.y, sumHigRat.u2) annotation (Line(points={{-118,-20},{-100,-20},
+          {-100,32},{-22,32}},  color={255,0,255}));
+  connect(sumHig.y, sumLow.u) annotation (Line(points={{-118,-20},{-100,-20},{-100,
+          -40},{-82,-40}}, color={255,0,255}));
+  connect(sumLow.y, sumLowRat.u2) annotation (Line(points={{-58,-40},{-40,-40},{
+          -40,-18},{-22,-18}}, color={255,0,255}));
+  connect(inSum.y, sumLowRat.u1) annotation (Line(points={{-118,40},{-110,40},{-110,
+          -10},{-22,-10}},     color={255,0,255}));
+  connect(calTim.hour, sixAm.u) annotation (Line(points={{-199,46},{-194,46},{-194,
+          -90},{-182,-90}},  color={255,127,0}));
+  connect(calTim.hour, ninAm.u) annotation (Line(points={{-199,46},{-194,46},{-194,
+          -120},{-182,-120}},    color={255,127,0}));
+  connect(calTim.hour, fivPm.u) annotation (Line(points={{-199,46},{-194,46},{-194,
+          -150},{-182,-150}},    color={255,127,0}));
+  connect(calTim.hour, ninPm1.u) annotation (Line(points={{-199,46},{-194,46},{-194,
+          -180},{-182,-180}},     color={255,127,0}));
   connect(ninAm.y, ninToFiv.u1)
-    annotation (Line(points={{-158,-30},{-142,-30}}, color={255,0,255}));
-  connect(fivPm.y, ninToFiv.u2) annotation (Line(points={{-158,-60},{-150,-60},{
-          -150,-38},{-142,-38}}, color={255,0,255}));
-  connect(sixAm.y, winLow.u1) annotation (Line(points={{-158,0},{-110,0},{-110,-10},
-          {-102,-10}}, color={255,0,255}));
-  connect(ninToFiv.y, winLow.u2) annotation (Line(points={{-118,-30},{-110,-30},
-          {-110,-18},{-102,-18}}, color={255,0,255}));
-  connect(ninPm1.y, winLow1.u2) annotation (Line(points={{-158,-90},{-70,-90},{-70,
-          -18},{-62,-18}}, color={255,0,255}));
+    annotation (Line(points={{-158,-120},{-142,-120}}, color={255,0,255}));
+  connect(fivPm.y, ninToFiv.u2) annotation (Line(points={{-158,-150},{-150,-150},
+          {-150,-128},{-142,-128}}, color={255,0,255}));
+  connect(sixAm.y, winLow.u1) annotation (Line(points={{-158,-90},{-110,-90},{-110,
+          -100},{-102,-100}}, color={255,0,255}));
+  connect(ninToFiv.y, winLow.u2) annotation (Line(points={{-118,-120},{-110,-120},
+          {-110,-108},{-102,-108}}, color={255,0,255}));
+  connect(ninPm1.y, winLow1.u2) annotation (Line(points={{-158,-180},{-70,-180},
+          {-70,-108},{-62,-108}}, color={255,0,255}));
   connect(winLow.y, winLow1.u1)
-    annotation (Line(points={{-78,-10},{-62,-10}}, color={255,0,255}));
-  connect(inSum.y, inWin.u) annotation (Line(points={{-118,130},{-110,130},{-110,
-          20},{-102,20}}, color={255,0,255}));
+    annotation (Line(points={{-78,-100},{-62,-100}}, color={255,0,255}));
+  connect(inSum.y, inWin.u) annotation (Line(points={{-118,40},{-110,40},{-110,-70},
+          {-102,-70}},    color={255,0,255}));
   connect(winLow1.y, winLowRat.u1)
-    annotation (Line(points={{-38,-10},{-2,-10}}, color={255,0,255}));
-  connect(inWin.y, winLowRat.u2) annotation (Line(points={{-78,20},{-20,20},{-20,
-          -18},{-2,-18}}, color={255,0,255}));
-  connect(winLow1.y, winHig.u) annotation (Line(points={{-38,-10},{-30,-10},{-30,
-          -48},{-2,-48}}, color={255,0,255}));
-  connect(winHig.y, winHihRat.u1) annotation (Line(points={{22,-48},{30,-48},{30,
-          -70},{38,-70}}, color={255,0,255}));
-  connect(inWin.y, winHihRat.u2) annotation (Line(points={{-78,20},{-20,20},{-20,
-          -78},{38,-78}}, color={255,0,255}));
+    annotation (Line(points={{-38,-100},{-2,-100}}, color={255,0,255}));
+  connect(inWin.y, winLowRat.u2) annotation (Line(points={{-78,-70},{-20,-70},{-20,
+          -108},{-2,-108}}, color={255,0,255}));
+  connect(winLow1.y, winHig.u) annotation (Line(points={{-38,-100},{-30,-100},{-30,
+          -138},{-2,-138}}, color={255,0,255}));
+  connect(winHig.y, winHihRat.u1) annotation (Line(points={{22,-138},{30,-138},{
+          30,-160},{38,-160}}, color={255,0,255}));
+  connect(inWin.y, winHihRat.u2) annotation (Line(points={{-78,-70},{-20,-70},{-20,
+          -168},{38,-168}}, color={255,0,255}));
   connect(winHihRat.y, booToInt1.u)
-    annotation (Line(points={{62,-70},{98,-70}}, color={255,0,255}));
-  connect(winHihRat.y, booToRea3.u) annotation (Line(points={{62,-70},{70,-70},{
-          70,-40},{98,-40}}, color={255,0,255}));
+    annotation (Line(points={{62,-160},{98,-160}}, color={255,0,255}));
+  connect(winHihRat.y, booToRea3.u) annotation (Line(points={{62,-160},{70,-160},
+          {70,-130},{98,-130}}, color={255,0,255}));
   connect(winLowRat.y, booToRea2.u)
-    annotation (Line(points={{22,-10},{38,-10}}, color={255,0,255}));
+    annotation (Line(points={{22,-100},{38,-100}}, color={255,0,255}));
   connect(sumLowRat.y, booToRea1.u)
-    annotation (Line(points={{2,80},{20,80},{20,50},{40,50}}, color={255,0,255}));
+    annotation (Line(points={{2,-10},{20,-10},{20,-40},{40,-40}}, color={255,0,255}));
   connect(sumHigRat.y, booToInt.u)
-    annotation (Line(points={{2,130},{38,130}}, color={255,0,255}));
-  connect(sumHigRat.y, booToRea.u) annotation (Line(points={{2,130},{20,130},{20,
-          90},{38,90}},   color={255,0,255}));
-  connect(booToInt1.y,ratInd. u2) annotation (Line(points={{122,-70},{130,-70},{
-          130,114},{198,114}}, color={255,127,0}));
-  connect(booToInt.y,ratInd. u1) annotation (Line(points={{62,130},{130,130},{130,
-          126},{198,126}}, color={255,127,0}));
+    annotation (Line(points={{2,40},{38,40}},   color={255,0,255}));
+  connect(sumHigRat.y, booToRea.u) annotation (Line(points={{2,40},{20,40},{20,0},
+          {38,0}},        color={255,0,255}));
+  connect(booToInt1.y,ratInd. u2) annotation (Line(points={{122,-160},{130,-160},
+          {130,24},{198,24}},  color={255,127,0}));
+  connect(booToInt.y,ratInd. u1) annotation (Line(points={{62,40},{130,40},{130,
+          36},{198,36}},   color={255,127,0}));
   connect(ratInd.y, yEle)
-    annotation (Line(points={{222,120},{260,120}}, color={255,127,0}));
-  connect(booToRea.y, curRat.u1) annotation (Line(points={{62,90},{80,90},{80,76},
-          {98,76}}, color={0,0,127}));
-  connect(booToRea1.y, curRat.u2) annotation (Line(points={{64,50},{80,50},{80,64},
-          {98,64}}, color={0,0,127}));
-  connect(booToRea2.y, curRat1.u1) annotation (Line(points={{62,-10},{100,-10},{
-          100,6},{158,6}}, color={0,0,127}));
-  connect(booToRea3.y, curRat1.u2) annotation (Line(points={{122,-40},{140,-40},
-          {140,-6},{158,-6}}, color={0,0,127}));
-  connect(curRat1.y, curRat2.u2) annotation (Line(points={{182,0},{190,0},{190,34},
-          {198,34}}, color={0,0,127}));
-  connect(curRat.y, curRat2.u1) annotation (Line(points={{122,70},{160,70},{160,
-          46},{198,46}}, color={0,0,127}));
+    annotation (Line(points={{222,30},{260,30}},   color={255,127,0}));
+  connect(booToRea.y, curRat.u1) annotation (Line(points={{62,0},{80,0},{80,-14},
+          {98,-14}},color={0,0,127}));
+  connect(booToRea1.y, curRat.u2) annotation (Line(points={{64,-40},{80,-40},{80,
+          -26},{98,-26}}, color={0,0,127}));
+  connect(booToRea2.y, curRat1.u1) annotation (Line(points={{62,-100},{100,-100},
+          {100,-84},{158,-84}}, color={0,0,127}));
+  connect(booToRea3.y, curRat1.u2) annotation (Line(points={{122,-130},{140,-130},
+          {140,-96},{158,-96}}, color={0,0,127}));
+  connect(curRat1.y, curRat2.u2) annotation (Line(points={{182,-90},{190,-90},{190,
+          -56},{198,-56}}, color={0,0,127}));
+  connect(curRat.y, curRat2.u1) annotation (Line(points={{122,-20},{160,-20},{160,
+          -44},{198,-44}}, color={0,0,127}));
   connect(curRat2.y, yEleRat)
-    annotation (Line(points={{222,40},{260,40}}, color={0,0,127}));
-  connect(seaTab.y[1], yGen)
-    annotation (Line(points={{222,-150},{260,-150}}, color={255,127,0}));
+    annotation (Line(points={{222,-50},{260,-50}}, color={0,0,127}));
+  connect(seaTab.y[1],ySea)
+    annotation (Line(points={{222,-240},{260,-240}}, color={255,127,0}));
   connect(intSwi3.y, ySt)
-    annotation (Line(points={{82,350},{260,350}}, color={255,127,0}));
+    annotation (Line(points={{82,140},{260,140}}, color={255,127,0}));
+  connect(heaSet.y, plaHeaLoa.x1) annotation (Line(points={{-98,380},{-60,380},{
+          -60,358},{-42,358}}, color={0,0,127}));
+  connect(one.y, plaHeaLoa.f1) annotation (Line(points={{-158,380},{-140,380},{-140,
+          354},{-42,354}}, color={0,0,127}));
+  connect(TPlaOut, plaHeaLoa.u)
+    annotation (Line(points={{-260,350},{-42,350}}, color={0,0,127}));
+  connect(heaSetPlu.y, plaHeaLoa.x2) annotation (Line(points={{-158,320},{-140,320},
+          {-140,346},{-42,346}}, color={0,0,127}));
+  connect(zer.y, plaHeaLoa.f2) annotation (Line(points={{-98,320},{-60,320},{-60,
+          342},{-42,342}}, color={0,0,127}));
+  connect(cooSetMin.y, plaCooLoa.x1) annotation (Line(points={{-158,280},{-60,280},
+          {-60,258},{-42,258}}, color={0,0,127}));
+  connect(TPlaOut, plaCooLoa.u) annotation (Line(points={{-260,350},{-220,350},{
+          -220,250},{-42,250}}, color={0,0,127}));
+  connect(cooSet.y, plaCooLoa.x2) annotation (Line(points={{-158,220},{-140,220},
+          {-140,246},{-42,246}}, color={0,0,127}));
+  connect(negOne.y, plaCooLoa.f2) annotation (Line(points={{-98,220},{-60,220},{
+          -60,242},{-42,242}}, color={0,0,127}));
+  connect(plaHeaLoa.y, plaLoa.u1) annotation (Line(points={{-18,350},{20,350},{20,
+          306},{38,306}}, color={0,0,127}));
+  connect(plaCooLoa.y, plaLoa.u2) annotation (Line(points={{-18,250},{20,250},{20,
+          294},{38,294}}, color={0,0,127}));
+  connect(plaLoa.y, yPlaOut)
+    annotation (Line(points={{62,300},{260,300}}, color={0,0,127}));
+  connect(plaLoa.y, absLoa.u) annotation (Line(points={{62,300},{80,300},{80,240},
+          {98,240}}, color={0,0,127}));
+  connect(absLoa.y, lesThr.u) annotation (Line(points={{122,240},{140,240},{140,
+          180},{-160,180},{-160,140},{-142,140}}, color={0,0,127}));
+  connect(absLoa.y, greThr.u) annotation (Line(points={{122,240},{140,240},{140,
+          180},{-160,180},{-160,100},{-142,100}}, color={0,0,127}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(

@@ -841,9 +841,9 @@ equation
           295},{-432,212},{-82,212}}, color={255,127,0}));
   connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-444,295},{-212,295},
           {-212,187},{-182,187}}, color={255,127,0}));
-  connect(ind.yGen, dryCooHexCon.uGen) annotation (Line(points={{-458,257},{
+  connect(ind.ySea, dryCooHexCon.uGen) annotation (Line(points={{-458,257},{
           -448,257},{-448,210},{-82,210}}, color={255,127,0}));
-  connect(ind.yGen, heaPumCon.uGen) annotation (Line(points={{-458,257},{-228,
+  connect(ind.ySea, heaPumCon.uGen) annotation (Line(points={{-458,257},{-228,
           257},{-228,178},{-182,178}}, color={255,127,0}));
   connect(heaPumCon.y1On, dryCooHexCon.u1HeaPum) annotation (Line(points={{-158,
           181},{-120,181},{-120,204},{-82,204}}, color={255,0,255}));
