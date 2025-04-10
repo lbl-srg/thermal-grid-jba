@@ -4,11 +4,13 @@ model Indicators "District load, electricity rate and season indicator"
   parameter Real TPlaHeaSet(
     unit="K",
     displayUnit="degC")=283.65
-    "Design plant heating setpoint temperature";
+    "Design plant heating setpoint temperature"
+    annotation (Dialog(group="Plant load"));
   parameter Real TPlaCooSet(
     unit="K",
     displayUnit="degC")=297.15
-    "Design plant cooling setpoint temperature";
+    "Design plant cooling setpoint temperature"
+    annotation (Dialog(group="Plant load"));
 
   parameter Integer winEndWee=12
     "Week that winter season ends after it"
@@ -22,9 +24,6 @@ model Indicators "District load, electricity rate and season indicator"
   parameter Integer sumEndWee=36
     "Week that summer season ends after it"
     annotation (Dialog(group="Season"));
-  parameter Real samplePeriod=7200
-    "Sample period of district loop pump speed"
-    annotation (Dialog(group="District load"));
   parameter Real higRatSum=24.5
     "Summer high rate, cent per kWh"
     annotation (Dialog(group="Electricity rate"));
@@ -214,34 +213,44 @@ model Indicators "District load, electricity rate and season indicator"
     annotation (Placement(transformation(extent={{200,-250},{220,-230}})));
   Buildings.Controls.OBC.CDL.Reals.Line plaHeaLoa "Plant heating load"
     annotation (Placement(transformation(extent={{-40,340},{-20,360}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant one(final k=1) "Constant 1"
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant one(
+    final k=1) "Constant 1"
     annotation (Placement(transformation(extent={{-180,370},{-160,390}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant heaSet(y(unit="K",
-        displayUnit="degC"), final k=TPlaHeaSet) "Plant heating setpoint"
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant heaSet(
+    y(unit="K", displayUnit="degC"),
+    final k=TPlaHeaSet) "Plant heating setpoint"
     annotation (Placement(transformation(extent={{-120,370},{-100,390}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer(final k=0) "Constant 0"
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer(
+    final k=0) "Constant 0"
     annotation (Placement(transformation(extent={{-120,310},{-100,330}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant heaSetPlu(y(unit="K",
-        displayUnit="degC"), final k=TPlaHeaSet + 1)
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant heaSetPlu(
+    y(unit="K", displayUnit="degC"),
+    final k=TPlaHeaSet + 1)
     "One degree higher than the plant heating setpoint"
     annotation (Placement(transformation(extent={{-180,310},{-160,330}})));
   Buildings.Controls.OBC.CDL.Reals.Line plaCooLoa "Plant cooling load"
     annotation (Placement(transformation(extent={{-40,240},{-20,260}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSetMin(y(unit="K",
-        displayUnit="degC"), final k=TPlaCooSet - 1)
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSetMin(
+    y(unit="K", displayUnit="degC"),
+    final k=TPlaCooSet - 1)
     "One degree lower than the plant cooling setpoint"
     annotation (Placement(transformation(extent={{-180,270},{-160,290}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant negOne(final k=-1)
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant negOne(
+    final k=-1)
     "Constant -1"
     annotation (Placement(transformation(extent={{-120,210},{-100,230}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSet(y(unit="K",
-        displayUnit="degC"), final k=TPlaCooSet) "Plant cooling setpoint"
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSet(
+    y(unit="K", displayUnit="degC"),
+    final k=TPlaCooSet)
+    "Plant cooling setpoint"
     annotation (Placement(transformation(extent={{-180,210},{-160,230}})));
-  Buildings.Controls.OBC.CDL.Reals.Add plaLoa "Plant load"
+  Buildings.Controls.OBC.CDL.Reals.Add plaLoa
+    "Plant load"
     annotation (Placement(transformation(extent={{40,290},{60,310}})));
   Buildings.Controls.OBC.CDL.Reals.Abs absLoa
     "Absolute value of the plant load"
     annotation (Placement(transformation(extent={{100,230},{120,250}})));
+
 equation
   connect(lesThr.y, intSwi3.u2)
     annotation (Line(points={{-118,140},{58,140}},color={255,0,255}));
@@ -393,8 +402,8 @@ annotation (defaultComponentName="ind",
 Documentation(info="
 <html>
 <p>
-It outputs the indicators for current district loop load <code>ySt</code>, electricity
-rate <code>yEleRat</code>, and heating or cooling season <code>yGen</code>.
+It outputs the indicators for current plant load <code>ySt</code>, electricity
+rate <code>yEleRat</code>, and the season <code>ySea</code>.
 </p>
 <h4>Electricity rate indicator</h4>
 <p>
@@ -413,47 +422,57 @@ Winter rates are from October to May. Low rates are 00:00 to 6:00, 9:00 to 17:00
 high rate at 20.9 &cent;/kWh (<code>higRatWin</code>).
 </li>
 </ul>
-<h4>District loop load indicator</h4>
+<h4>Plant load indicator</h4>
 <p>
-Based on the control signal of the district loop pump <code>uDisPum</code>, the
-district loop load indicator <code>ySt</code> is:
+The plant control signal <code>yPlaOut</code> can be computed based on the measured
+plant outlet temperature <code>TPlaOut</code>, as shown 
+</p>
+<p align=\"center\">
+<img src=\"modelica://ThermalGridJBA/Resources/Images/Networks/Controls/plantLoad.png\"
+     alt=\"plantLoad.png\" />
+</p>
+<p>
+The plant load indicator is then:
 </p>
 <ul>
 <li>
-If <code>uDisPum</code> &ge; 0 and <code>uDisPum</code> &lt; 1/3,
+If <code>|yPlaOut|</code> &ge; 0 and <code>|yPlaOut|</code> &lt; 1/3,
 then <code>ySt</code> = 1;
 </li>
 <li>
-Else if <code>uDisPum</code> &ge; 1/3 and <code>uDisPum</code> &lt; 2/3,
+Else if <code>|yPlaOut|</code> &ge; 1/3 and <code>|yPlaOut|</code> &lt; 2/3,
 then <code>ySt</code> = 2;
 </li>
 <li>
 Else, <code>ySt</code> = 3.
 </li>
 </ul>
-<p>
-The district loop pump speed is sampled with frequency specified by
-<code>samplePeriod</code>.
-</p>
 <h4>Seanson indicator</h4>
 <p>
-Based on the week of the year, the plant is either in heating, shoulder or cooling
-mode. The season indicator is used to determine whether the generation should add
-heat or cold to the system if the electrical rates are normal.
+Based on the week of the year, the plant is either in winter, spring, summer or
+fall mode. Determining the switch-over time is done offline based on the net heating
+and cooling load analysis of the thermal energy network. The season indicator is used
+to determine whether the central plant should add heat or cold to the system if the
+electrical rates are normal. Therefore, we set the season indicator to
 </p>
 <ul>
 <li>
 If current week is later than the winter start week <code>winStaWee</code>, or earlier
-than winter end week <code>winEndWee</code>, it is in the winter senson. Thus,
-<code>yGen</code> = 1.
+than winter end week <code>winEndWee</code>, it is in winter. Thus,
+<code>ySea</code> = 1.
+</li>
+<li>
+Else if current week is later than the winter end week <code>winEndWee</code> and
+earlier than summer start week <code>sumStaWee</code>, it is in spring. Thus,
+<code>ySa</code> = 2.
 </li>
 <li>
 Else if current week is later than the summer start week <code>sumStaWee</code> and
-earlier than summer end week <code>sumEndWee</code>, it is in the summer senson. Thus,
-<code>yGen</code> = 3.
+earlier than summer end week <code>sumEndWee</code>, it is in summer. Thus,
+<code>ySea</code> = 3.
 </li>
 <li>
-Else, it is in the shoulder season. Thus, <code>yGen</code> = 2.
+Else, it is in fall. Thus, <code>ySea</code> = 4.
 </li>
 </ul>
 </html>", revisions="<html>
