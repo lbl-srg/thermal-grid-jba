@@ -7,7 +7,7 @@ Created on Fri Mar 28 15:07:23 2025
 """
 
 import os
-import matplotlib.pyplot as plt
+import numpy as np
 import unyt as uy
 from buildingspy.io.outputfile import Reader
 
@@ -22,10 +22,14 @@ units =    [
                 {'quantity' : 'energy',
                  'unit'     : uy.J,
                  'displayUnit' : uy.MWh
-                 }
+                 },
+                {'quantity' : 'time',
+                 'unit'     : uy.s,
+                 'displayUnit' : uy.s}
             ]
 
 # 'caption' is optional. 
+# if 'quantity' not given, treated as unit 1.
 variables = [
                 {'name' : 'EChi.u',
                  'quantity': 'power',
@@ -57,11 +61,16 @@ variables = [
                  'action'  : 'last',
                  'caption' : 'Total end-use cooling load'
                  },
+                {'name' : 'bui.ets.chi.chi.ySet',
+                 'quantity': 'time',
+                 'action'  : 'duration>0.99',
+                 'caption' : 'Total duration of chiller speed > 0.99'}
             ]
 
 actions = {'max': max,
            'min': min,
-           'last': lambda y: y[-1]
+           'last': lambda y: y[-1],
+           'duration>0.99': lambda y: find_duration(t, y)
            }
 
 # the first scenario will be the baseline to be compared against
@@ -100,8 +109,20 @@ def str_with_unit(value, quantity):
     """
     """
     u = next((item for item in units if item.get('quantity') == quantity), None)
-    return (value * u['unit']).to(u['displayUnit'])
+    s = (value * u['unit']).to(u['displayUnit'])
+    return s
 
+def find_duration(t, y):
+    
+    indices = np.where(y > 0.99)[0]
+    duration = 0.0
+    for i in range(1, len(indices)):
+        if indices[i] == indices[i-1] + 1:  # Check if the indices are consecutive
+            duration += t[indices[i]] - t[indices[i-1]]
+            
+    return duration
+    
+    
 #%%
 for scenario in scenarios:
     mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", scenario['matFile']))
@@ -127,11 +148,17 @@ for var in variables:
         row = var['name']
     print(row)
     
-    unit_with_bracket = f"[{str_with_unit(0, var['quantity']).units}]"
+    if 'quantity' in var.keys():
+        unit_with_bracket = f"[{str_with_unit(0, var['quantity']).units}]"
+    else:
+        unit_with_bracket = "[1]"
     row = f"{unit_with_bracket:>{tableWidth}}"
     for i,scenario in enumerate(scenarios):
         v = scenario['results'][var['name']]
-        displayValue = f"{str_with_unit(v,var['quantity']).value:.0f}"
+        if 'quantity' in var.keys():
+            displayValue = f"{str_with_unit(v,var['quantity']).value:.0f}"
+        else:
+            displayValue = f"{v:.0f}"
         if i == 0 :
             vBase = v
         else:
