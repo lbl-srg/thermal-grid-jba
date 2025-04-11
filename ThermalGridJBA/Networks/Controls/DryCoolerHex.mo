@@ -148,8 +148,7 @@ model DryCoolerHex
     final p=-TApp)
     annotation (Placement(transformation(extent={{-320,30},{-300,50}})));
   Buildings.Controls.OBC.CDL.Reals.Less les(
-    final h=THys)
-    "Compare inputs"
+    final h=THys) "Compare inputs"
     annotation (Placement(transformation(extent={{-240,70},{-220,90}})));
   Buildings.Controls.OBC.CDL.Logical.And winPre "In Winter perferred condition"
     annotation (Placement(transformation(extent={{-180,130},{-160,150}})));
@@ -173,8 +172,7 @@ model DryCoolerHex
     final p=TApp)
     annotation (Placement(transformation(extent={{-320,-10},{-300,10}})));
   Buildings.Controls.OBC.CDL.Reals.Greater gre(
-    final h=THys)
-    "Compare inputs"
+    final h=THys) "Compare inputs"
     annotation (Placement(transformation(extent={{-240,10},{-220,30}})));
   Buildings.Controls.OBC.CDL.Logical.And sumPre
     "In Summer preferred condition"
