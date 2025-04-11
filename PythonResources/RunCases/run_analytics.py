@@ -30,48 +30,40 @@ units = {'power':
 variables = [
                 {'name' : 'EChi.u',
                  'quantity': 'power',
-                 'action'  : 'max',
+                 'action'  : max,
                  'caption' : 'ETS heat recovery chiller peak electric power input'
                  },
                 {'name' : 'EChi.y',
                  'quantity': 'energy',
-                 'action'  : 'last',
+                 'action'  : lambda y: y[-1],
                  'caption' : 'ETS heat recovery chiller total electrical consumption'
                  },
                 {'name' : 'bui.bui.QReqHea_flow',
                  'quantity': 'power',
-                 'action'  : 'max',
+                 'action'  : max,
                  'caption' : 'Peak end-use space heating load'
                  },
                 {'name' : 'bui.bui.QReqCoo_flow',
                  'quantity': 'power',
-                 'action'  : 'min',
+                 'action'  : min,
                  'caption' : 'Peak end-use cooling load'
                  },
                 {'name' : 'dHHeaWat.y',
                  'quantity': 'energy',
-                 'action'  : 'last',
+                 'action'  : lambda y: y[-1],
                  'caption' : 'Total end-use space heating load'
                  },
                 {'name' : 'dHChiWat.y',
                  'quantity': 'energy',
-                 'action'  : 'last',
+                 'action'  : lambda y: y[-1],
                  'caption' : 'Total end-use cooling load'
                  },
                 {'name' : 'bui.ets.chi.chi.ySet',
                  'quantity': 'time',
-                 'action'  : 'duration>0.99',
+                 'action'  : lambda y: find_duration(t, y),
                  'caption' : 'Total duration of chiller speed > 0.99'}
             ]
 
-actions = {'max': max,
-           'min': min,
-           'last': lambda y: y[-1],
-           'duration>0.99': lambda y: find_duration(t, y)
-           }
-
-# the first scenario will be the baseline to be compared against
-### replace this with a list of dict?
 scenarios = [
                 {'name'    : 'fTMY',
                  'matFile' : 'ConnectedETSNoDHW_futu.mat',
@@ -122,7 +114,7 @@ for scenario in scenarios:
         (t, y) = r.values(var['name'])
         if len(t) > 2 and not 'time' in scenario['results']:
             scenario['results']['time'] = t # writes the time stamp
-        v = actions[var['action']](y)
+        v = var['action'](y)
         scenario['results'][var['name']] = v
 
 #%% 
