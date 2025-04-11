@@ -1,5 +1,5 @@
 within ThermalGridJBA.Networks.Controls;
-model HeatPump "Sequence for controlling heat pump, its pumps and valves"
+model HeatPump_old "Sequence for controlling heat pump, its pumps and valves"
 
   parameter Real mWat_flow_nominal(
     final quantity="MassFlowRate",
@@ -251,8 +251,7 @@ model HeatPump "Sequence for controlling heat pump, its pumps and valves"
   Buildings.Controls.OBC.CDL.Logical.And sumCooMod
     "Heat pump in cooling mode when it is in summer and normal rate"
     annotation (Placement(transformation(extent={{-120,80},{-100,100}})));
-  Buildings.Controls.OBC.CDL.Logical.Or heaMod2
-    "Heat pump in heating mode"
+  Buildings.Controls.OBC.CDL.Logical.Or heaMod2 "Heat pump in heating mode"
     annotation (Placement(transformation(extent={{-40,320},{-20,340}})));
   Buildings.Controls.OBC.CDL.Logical.Or cooMod2
     "Heat pump in cooling mode"
@@ -840,4 +839,4 @@ First implementation.
 </li>
 </ul>
 </html>"));
-end HeatPump;
+end HeatPump_old;

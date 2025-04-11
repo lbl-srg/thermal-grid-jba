@@ -405,7 +405,7 @@ model Generations
     final TdFan=TdFan)
      "Control of dry cooler and heat exchanger"
     annotation (Placement(transformation(extent={{-80,200},{-60,220}})));
-  ThermalGridJBA.Networks.Controls.HeatPump heaPumCon(
+  ThermalGridJBA.Networks.Controls.HeatPump_old heaPumCon(
     final mWat_flow_nominal=mWat_flow_nominal,
     final mWat_flow_min=1.05*mWat_flow_min,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
@@ -831,20 +831,20 @@ equation
       thickness=0.5));
   connect(uDisPum, ind.uDisPum) annotation (Line(points={{-560,260},{-530,260},
           {-530,264},{-482,264}}, color={0,0,127}));
-  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-458,262},{
-          -220,262},{-220,189},{-182,189}},
+  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-458,259},{
+          -220,259},{-220,189},{-182,189}},
                                        color={255,127,0}));
-  connect(ind.yEle, dryCooHexCon.uEleRat) annotation (Line(points={{-458,262},{
-          -440,262},{-440,214},{-82,214}},
+  connect(ind.yEle, dryCooHexCon.uEleRat) annotation (Line(points={{-458,259},{
+          -440,259},{-440,214},{-82,214}},
                                       color={255,127,0}));
-  connect(ind.ySt, dryCooHexCon.uSt) annotation (Line(points={{-444,295},{-432,
-          295},{-432,212},{-82,212}}, color={255,127,0}));
-  connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-444,295},{-212,295},
+  connect(ind.ySt, dryCooHexCon.uSt) annotation (Line(points={{-458,265},{-432,
+          265},{-432,212},{-82,212}}, color={255,127,0}));
+  connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-458,265},{-212,265},
           {-212,187},{-182,187}}, color={255,127,0}));
-  connect(ind.ySea, dryCooHexCon.uGen) annotation (Line(points={{-458,257},{
-          -448,257},{-448,210},{-82,210}}, color={255,127,0}));
-  connect(ind.ySea, heaPumCon.uGen) annotation (Line(points={{-458,257},{-228,
-          257},{-228,178},{-182,178}}, color={255,127,0}));
+  connect(ind.ySea, dryCooHexCon.uGen) annotation (Line(points={{-458,252},{
+          -448,252},{-448,210},{-82,210}}, color={255,127,0}));
+  connect(ind.ySea, heaPumCon.uGen) annotation (Line(points={{-458,252},{-228,
+          252},{-228,178},{-182,178}}, color={255,127,0}));
   connect(heaPumCon.y1On, dryCooHexCon.u1HeaPum) annotation (Line(points={{-158,
           181},{-120,181},{-120,204},{-82,204}}, color={255,0,255}));
   connect(TMixAve, heaPumCon.TMixAve) annotation (Line(points={{-560,140},{-520,
@@ -903,7 +903,7 @@ equation
   connect(pumHeaPumWat.P, PPumHeaPumWat) annotation (Line(points={{301,-69},{301,
           -60},{490,-60},{490,-140},{560,-140}},
                                                color={0,0,127}));
-  connect(ind.yEleRat, yEleRat) annotation (Line(points={{-458,260},{260,260},{
+  connect(ind.yEleRat, yEleRat) annotation (Line(points={{-458,257},{260,257},{
           260,270},{560,270}},
                            color={0,0,127}));
   connect(pumCenPlaPri.port_b, jun.port_1) annotation (Line(
