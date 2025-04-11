@@ -118,14 +118,15 @@ def _simulate(spec):
     os.makedirs(out_dir)
 
     # Update MODELICAPATH to get the right library version
-    modPath = os.environ["MODELICAPATH"]
-    patDir = modPath.split(':')
-    patDir.append(spec['lib_dir'])
-    patDir.append(out_dir)
-    newModPath = ":".join(patDir)
-    os.environ["MODELICAPATH"] = newModPath
-
-    # os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
+    if "MODELICAPATH" in os.environ:
+        modPath = os.environ["MODELICAPATH"]
+        patDir = modPath.split(':')
+        patDir.append(spec['lib_dir'])
+        patDir.append(out_dir)
+        newModPath = ":".join(patDir)
+        os.environ["MODELICAPATH"] = newModPath
+    else:
+        os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
 
     # Copy the models
 #    print("Copying models from {} to {}".format(CWD, wor_dir))
