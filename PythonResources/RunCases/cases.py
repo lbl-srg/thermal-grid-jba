@@ -48,19 +48,26 @@ def handwrite_cases():
     """
     
     cases = list()
-    buil = '1045'
-    cases.append( \
-        {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-          "name": f"nodhw_{buil}_SCENARIO",
-          "building": buil,
-          "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
-         
-    buil = '1065'
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-          "name": f"widhw_{buil}_SCENARIO",
-          "building": buil,
-          "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
+          "name": "ETS_All_SCENARIO",
+          "building": 'All',
+          "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_SCENARIO.mos"}})
+
+#     cases = list()
+#     buil = '1045'
+#     cases.append( \
+#         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
+#           "name": f"nodhw_{buil}_SCENARIO",
+#           "building": buil,
+#           "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
+         
+#     buil = '1065'
+#     cases.append( \
+#         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
+#           "name": f"widhw_{buil}_SCENARIO",
+#           "building": buil,
+#           "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
     
     return cases
 

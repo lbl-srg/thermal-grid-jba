@@ -66,18 +66,32 @@ variables = [
 
 scenarios = [
                 {'name'    : 'fTMY',
-                 'matFile' : 'ConnectedETSNoDHW_futu.mat',
-                 'results' : {}
-                 },
+                  'matFile' : 'ConnectedETSWithDHW_futu.mat',
+                  'results' : {}
+                  },
                 {'name'    : 'Heat wave',
-                 'matFile' : 'ConnectedETSNoDHW_heat.mat',
-                 'results' : {}
-                 },
+                  'matFile' : 'ConnectedETSWithDHW_heat.mat',
+                  'results' : {}
+                  },
                 {'name'    : 'Cold snap',
-                 'matFile' : 'ConnectedETSNoDHW_cold.mat',
-                 'results' : {}
-                 }
+                  'matFile' : 'ConnectedETSWithDHW_cold.mat',
+                  'results' : {}
+                  }
             ]
+# scenarios = [
+#                 {'name'    : 'fTMY',
+#                   'matFile' : 'ETS_All_futu/ConnectedETSWithDHW.mat',
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'Heat wave',
+#                   'matFile' : 'ETS_All_heat/ConnectedETSWithDHW.mat',
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'Cold snap',
+#                   'matFile' : 'ETS_All_cold/ConnectedETSWithDHW.mat',
+#                   'results' : {}
+#                   }
+#             ]
 
 def find_var(n, print_message = True):
     """ Find the exact var name in results.
