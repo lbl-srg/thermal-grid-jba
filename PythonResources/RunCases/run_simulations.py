@@ -19,6 +19,7 @@ CASE_LIST = 'handwrite'
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
         fivehubsnoplant: runs ThermalGridJBA.Networks.Validation.SinglePlantFiveHubs
+        fivehubsmultiflow: runs ThermalGridJBA.Networks.Validation.FiveHubsPlantMultiFlow
 """
 CASE_SPECS = {
      'start_time' : 0 * 24 * 3600,
@@ -44,6 +45,10 @@ CHECK_LOG_FILES = 'failed'
         any other string: skipped
 """
 KEEP_MAT_FILES = True # Set false to delete result mat files to save space
+if not KEEP_MAT_FILES:
+    print("="*10 + "!"*10 + "="*10)
+    print("Result mat files will be deleted because KEEP_MAT_FILES = False")
+    print("="*10 + "!"*10 + "="*10)
 
 CWD = os.getcwd()
 package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
@@ -91,7 +96,7 @@ def checkout_repository(working_directory):
 
     des = os.path.join(working_directory, "ThermalGridJBA")
     print("*** Copying ThermalGridJBA library to {}".format(des))
-    shutil.copytree("/home/casper/gitRepo/thermal-grid-jba/ThermalGridJBA", des)
+    shutil.copytree("../../ThermalGridJBA", des)
     
     ### Test code using Buildings
     # des = os.path.join(working_directory, "Buildings")
@@ -114,7 +119,14 @@ def _simulate(spec):
     os.makedirs(out_dir)
 
     # Update MODELICAPATH to get the right library version
-    os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
+    modPath = os.environ["MODELICAPATH"]
+    patDir = modPath.split(':')
+    patDir.append(spec['lib_dir'])
+    patDir.append(out_dir)
+    newModPath = ":".join(patDir)
+    os.environ["MODELICAPATH"] = newModPath
+
+    # os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
 
     # Copy the models
 #    print("Copying models from {} to {}".format(CWD, wor_dir))

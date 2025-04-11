@@ -17,6 +17,8 @@ def get_cases(case_list : str,
         cases_ns = construct_clusters()
     elif hup == 'FIVEHUBSNOPLANT':
         cases_ns = fivehubsnoplant()
+    elif hup == 'FIVEHUBSMULTIFLOW':
+        cases_ns = fivehubsmultiflow()
     
     cases = list() # cases with scenarios specified
     for scenario in case_scenarios:
@@ -71,9 +73,24 @@ def handwrite_cases():
     
     return cases
 
+def fivehubsmultiflow():
+    
+    cases = list()
+    cases.append( \
+        {"model": "ThermalGridJBA.Networks.Validation.FiveHubsPlantMultiFlow",
+          "name": "fivehubsmultiflow_SCENARIO",
+          "building": 'FiveHubs',
+          "parameters": {'datDis.filNam' : [
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_SCENARIO.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_SCENARIO.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_SCENARIO.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_SCENARIO.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_SCENARIO.mos"]}})
+    
+    return cases 
+
+
 def fivehubsnoplant():
-    """ Manually write out cases.
-    """
     
     cases = list()
     cases.append( \

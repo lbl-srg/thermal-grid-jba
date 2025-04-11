@@ -137,7 +137,6 @@ model ChillerThreeUtilities
   Buildings.Fluid.Actuators.Valves.ThreeWayLinear valMixHea(
     redeclare package Medium = MediumBui,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    use_strokeTime=false,
     m_flow_nominal=datChi.mCon_flow_nominal,
     dpValve_nominal=dpCon_nominal*0.05,
     dpFixed_nominal=dpCon_nominal*0.05*{1,1},
