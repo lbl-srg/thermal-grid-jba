@@ -60,7 +60,7 @@ variables = [
                  },
                 {'name' : 'bui.ets.chi.chi.ySet',
                  'quantity': 'time',
-                 'action'  : lambda y: find_duration(t, y),
+                 'action'  : lambda y: condition_duration(t, y, lambda y: y > 0.99),
                  'caption' : 'Total duration of chiller speed > 0.99'}
             ]
 
@@ -94,9 +94,10 @@ def find_var(n, print_message = True):
         
     return y
 
-def find_duration(t, y):
-    
-    indices = np.where(y > 0.99)[0]
+def condition_duration(t, y, condition):
+    """ Duration of time during which y meets the condition.
+    """
+    indices = np.where(condition(y))[0]
     duration = 0.0
     for i in range(1, len(indices)):
         if indices[i] == indices[i-1] + 1:  # Check if the indices are consecutive
