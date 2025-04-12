@@ -14,7 +14,13 @@ from buildingspy.io.outputfile import Reader
 
 CWD = os.getcwd()
 
+PRINT_RESULTS = False
+WRITE_TO_XLSX = True
+PATH_XLSX = os.path.join(CWD, "seasonal_cop.xlsx")
+
 #%%
+if WRITE_TO_XLSX:
+    w = pd.ExcelWriter(PATH_XLSX, engine='xlsxwriter')
 
 for cas in ["ETS_All_futu",
             "cluster_A_futu",
@@ -63,6 +69,15 @@ for cas in ["ETS_All_futu",
     result.index = result.index.strftime('%B')
     result_count.index = result_count.index.strftime('%B')
     
-    print(cas)
-    print(result)
-    print(result_count)
+    if PRINT_RESULTS:
+        print(cas)
+        print(result)
+        print(result_count)
+    
+    if WRITE_TO_XLSX:
+        result.to_excel(w, sheet_name=f'{cas}_cop')
+        result_count.to_excel(w, sheet_name=f'{cas}_hours')
+
+if WRITE_TO_XLSX:
+    w.close()
+    print(f"Results wrote to {PATH_XLSX}.")
