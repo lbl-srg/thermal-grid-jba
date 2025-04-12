@@ -1,5 +1,5 @@
 within ThermalGridJBA.Networks.Controls;
-block HeatPump_2
+block HeatPump
   "Sequence for controlling heat pump and the associated valves, pumps"
 
   parameter Real mWat_flow_nominal(
@@ -706,4 +706,4 @@ annotation (defaultComponentName="heaPumCon",
           textColor={0,0,255})}),
                                 Diagram(coordinateSystem(preserveAspectRatio=
             false, extent={{-380,-520},{380,520}})));
-end HeatPump_2;
+end HeatPump;

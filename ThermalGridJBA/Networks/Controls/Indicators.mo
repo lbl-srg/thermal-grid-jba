@@ -366,8 +366,9 @@ equation
     annotation (Line(points={{-260,350},{-42,350}}, color={0,0,127}));
   connect(heaSetPlu.y, plaHeaLoa.x2) annotation (Line(points={{-158,320},{-140,320},
           {-140,346},{-42,346}}, color={0,0,127}));
-  connect(zer.y, plaHeaLoa.f2) annotation (Line(points={{-98,320},{-60,320},{-60,
-          342},{-42,342}}, color={0,0,127}));
+  connect(zer.y, plaHeaLoa.f2) annotation (Line(points={{-98,320},{-80,320},{
+          -80,342},{-42,342}},
+                           color={0,0,127}));
   connect(cooSetMin.y, plaCooLoa.x1) annotation (Line(points={{-158,280},{-60,280},
           {-60,258},{-42,258}}, color={0,0,127}));
   connect(TPlaOut, plaCooLoa.u) annotation (Line(points={{-260,350},{-220,350},{
@@ -388,6 +389,8 @@ equation
           180},{-160,180},{-160,140},{-142,140}}, color={0,0,127}));
   connect(absLoa.y, greThr.u) annotation (Line(points={{122,240},{140,240},{140,
           180},{-160,180},{-160,100},{-142,100}}, color={0,0,127}));
+  connect(zer.y, plaCooLoa.f1) annotation (Line(points={{-98,320},{-80,320},{
+          -80,254},{-42,254}}, color={0,0,127}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
