@@ -1155,6 +1155,8 @@ equation
           255,0,255}));
   connect(dryCooOut.T, dryCooCon.TDryCooOut) annotation (Line(points={{130,141},
           {130,166},{-388,166},{-388,222},{-382,222}}, color={0,0,127}));
+  connect(ind.yEleRat, yEleRat) annotation (Line(points={{-498,257},{500,257},{
+          500,270},{560,270}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
