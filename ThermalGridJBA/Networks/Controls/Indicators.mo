@@ -83,10 +83,10 @@ model Indicators "District load, electricity rate and season indicator"
     annotation (Placement(transformation(extent={{240,-260},{280,-220}}),
         iconTransformation(extent={{100,-100},{140,-60}})));
 
-  Buildings.Controls.OBC.CDL.Reals.LessThreshold lesThr(final t=1/3)
+  Buildings.Controls.OBC.CDL.Reals.LessThreshold lesThr(final t=1/3, h=0.1/3)
     "Check if the speed is less than 1/3"
     annotation (Placement(transformation(extent={{-140,130},{-120,150}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr(final t=2/3)
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr(final t=2/3, h=0.1/3)
     "Check if the speed is greater than 2/3"
     annotation (Placement(transformation(extent={{-140,90},{-120,110}})));
   Buildings.Controls.OBC.CDL.Integers.Switch intSwi3 "Check district load"
