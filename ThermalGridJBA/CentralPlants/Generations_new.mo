@@ -599,7 +599,7 @@ model Generations_new
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=true,
+    use_riseTime=false,
     final m_flow_nominal=mBorFieCen_flow_nominal,
     dp_nominal=dpBorFieCen_nominal,
     dpMax=Modelica.Constants.inf) "Pump for borefield center" annotation (
@@ -611,7 +611,7 @@ model Generations_new
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=true,
+    use_riseTime=false,
     final m_flow_nominal=mBorFiePer_flow_nominal,
     dp_nominal=dpBorFiePer_nominal,
     dpMax=Modelica.Constants.inf) "Pump for borefield perimeter" annotation (
