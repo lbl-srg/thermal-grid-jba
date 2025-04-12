@@ -31,7 +31,7 @@ data['datetime'] = pd.to_datetime(data['t'], unit='s', origin='2025-01-01')
 
 # Filter
 data = data[data['COP'] > 0.01]
-data = data[data['COP'] < 10.0] # start up transient
+data = data[data['COP'] < 15.0] # start up transient
 data = data[np.isclose(data['t'] % 3600, 0)] # only keep hourly sampled values
 
 # Section the data to each calendar month
