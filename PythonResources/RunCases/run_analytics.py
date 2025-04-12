@@ -66,15 +66,15 @@ variables = [
 
 scenarios = [
                 {'name'    : 'fTMY',
-                  'matFile' : 'ConnectedETSWithDHW_futu.mat',
+                  'matFile' : os.path.join('ETS_All_futu','ConnectedETSWithDHW.mat'),
                   'results' : {}
                   },
                 {'name'    : 'Heat wave',
-                  'matFile' : 'ConnectedETSWithDHW_heat.mat',
+                  'matFile' : os.path.join('ETS_All_heat','ConnectedETSWithDHW.mat'),
                   'results' : {}
                   },
                 {'name'    : 'Cold snap',
-                  'matFile' : 'ConnectedETSWithDHW_cold.mat',
+                  'matFile' : os.path.join('ETS_All_cold','ConnectedETSWithDHW.mat'),
                   'results' : {}
                   }
             ]
