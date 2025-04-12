@@ -17,17 +17,18 @@ CWD = os.getcwd()
 PRINT_RESULTS = False
 WRITE_TO_XLSX = True
 PATH_XLSX = os.path.join(CWD, "seasonal_cop.xlsx")
+CASE_LIST = ["ETS_All_futu",
+            "cluster_A_futu",
+            "cluster_B_futu",
+            "cluster_C_futu",
+            "cluster_D_futu",
+            "cluster_E_futu"]
 
 #%%
 if WRITE_TO_XLSX:
     w = pd.ExcelWriter(PATH_XLSX, engine='xlsxwriter')
 
-for cas in ["ETS_All_futu",
-            "cluster_A_futu",
-            "cluster_B_futu",
-            "cluster_C_futu",
-            "cluster_D_futu",
-            "cluster_E_futu"]:
+for cas in CASE_LIST:
 
     # mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", cas, "ConnectedETSWithDHW.mat"))
     mat_file_path = os.path.realpath(glob.glob(os.path.join(CWD, "simulations", cas, "*.mat"))[0])
