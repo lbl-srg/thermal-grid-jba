@@ -1077,7 +1077,7 @@ equation
   connect(entGenTem.T, dryCooCon.TPlaIn) annotation (Line(points={{-480,-149},{-480,
           196},{-404,196},{-404,232},{-382,232}}, color={0,0,127}));
   connect(uDisPum, borCon.uDisPum) annotation (Line(points={{-560,220},{-520,
-          220},{-520,200},{-260,200},{-260,222},{-242,222}},
+          220},{-520,200},{-260,200},{-260,228},{-242,228}},
                                                         color={0,0,127}));
   connect(entGenTem.T, heaPumCon.TPlaIn) annotation (Line(points={{-480,-149},{-480,
           196},{-160,196},{-160,232},{-122,232}}, color={0,0,127}));
@@ -1102,7 +1102,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(senMasFloPla.m_flow, heaPumCon.mPla_flow) annotation (Line(points={{-430,
-          -149},{-430,176},{-144,176},{-144,224},{-122,224}}, color={0,0,127}));
+          -149},{-430,170},{-144,170},{-144,224},{-122,224}}, color={0,0,127}));
   connect(senMasFloHeaPum.m_flow, heaPumCon.mHeaPum_flow) annotation (Line(
         points={{299,-102},{274,-102},{274,176},{-138,176},{-138,222},{-122,222}},
         color={0,0,127}));
@@ -1157,6 +1157,12 @@ equation
           {130,166},{-388,166},{-388,222},{-382,222}}, color={0,0,127}));
   connect(ind.yEleRat, yEleRat) annotation (Line(points={{-498,257},{500,257},{
           500,270},{560,270}}, color={0,0,127}));
+  connect(heaPumCon.y1On, borCon.u1HeaPum) annotation (Line(points={{-98,232},{
+          -80,232},{-80,204},{-256,204},{-256,224},{-242,224}}, color={255,0,
+          255}));
+  connect(senMasFloHeaPum.m_flow, borCon.mHeaPum_flow) annotation (Line(points=
+          {{299,-102},{274,-102},{274,176},{-252,176},{-252,222},{-242,222}},
+        color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
