@@ -251,6 +251,8 @@ model Indicators "District load, electricity rate and season indicator"
     "Absolute value of the plant load"
     annotation (Placement(transformation(extent={{100,230},{120,250}})));
 
+  Buildings.Controls.OBC.CDL.Discrete.Sampler sam(samplePeriod=5*60)
+    annotation (Placement(transformation(extent={{162,230},{182,250}})));
 equation
   connect(lesThr.y, intSwi3.u2)
     annotation (Line(points={{-118,140},{58,140}},color={255,0,255}));
@@ -385,12 +387,14 @@ equation
     annotation (Line(points={{62,300},{260,300}}, color={0,0,127}));
   connect(plaLoa.y, absLoa.u) annotation (Line(points={{62,300},{80,300},{80,240},
           {98,240}}, color={0,0,127}));
-  connect(absLoa.y, lesThr.u) annotation (Line(points={{122,240},{140,240},{140,
-          180},{-160,180},{-160,140},{-142,140}}, color={0,0,127}));
-  connect(absLoa.y, greThr.u) annotation (Line(points={{122,240},{140,240},{140,
-          180},{-160,180},{-160,100},{-142,100}}, color={0,0,127}));
   connect(zer.y, plaCooLoa.f1) annotation (Line(points={{-98,320},{-80,320},{
           -80,254},{-42,254}}, color={0,0,127}));
+  connect(absLoa.y, sam.u)
+    annotation (Line(points={{122,240},{160,240}}, color={0,0,127}));
+  connect(sam.y, lesThr.u) annotation (Line(points={{184,240},{200,240},{200,
+          180},{-160,180},{-160,140},{-142,140}}, color={0,0,127}));
+  connect(sam.y, greThr.u) annotation (Line(points={{184,240},{200,240},{200,
+          180},{-160,180},{-160,100},{-142,100}}, color={0,0,127}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(

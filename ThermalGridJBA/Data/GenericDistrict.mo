@@ -103,7 +103,7 @@ record GenericDistrict "District network design parameters"
   parameter Real offTim(unit="s")=6*3600
     "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real holOnTim(unit="s")=2*3600
+  parameter Real holOnTim(unit="s")=45*60
     "Heat pump hold on time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real holOffTim(unit="s")=1800
