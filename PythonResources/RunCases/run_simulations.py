@@ -132,9 +132,9 @@ def _simulate(spec):
 
     # Copy the models
 #    print("Copying models from {} to {}".format(CWD, wor_dir))
-    shutil.copytree(os.path.join(CWD, "JBACases"), os.path.join(wor_dir, "JBACases"))
+    # shutil.copytree(os.path.join(CWD, "JBACases"), os.path.join(wor_dir, "JBACases"))
     # Change the working directory so that the right checkout is loaded
-    os.chdir(os.path.join(wor_dir, "JBACases"))
+    # os.chdir(os.path.join(wor_dir, "JBACases"))
 
     # Write git information if the simulation is based on a github checkout
     #print(spec)
