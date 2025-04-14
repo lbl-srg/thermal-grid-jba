@@ -82,7 +82,10 @@ record GenericDistrict "District network design parameters"
   parameter Real TPlaConCoo_nominal(unit="K")=315.15
     "Nominal temperature used to size the heat pump in cooling mode (hot side maximum temperature)"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaCoo_nominal(unit="K")=TLooMax + TApp
+//   parameter Real TPlaEvaCoo_nominal(unit="K")=TLooMax + TApp
+//     "Nominal temperature of the heated fluid in cooling mode"
+//     annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real TPlaEvaCoo_nominal(unit="K")=TPlaConCoo_nominal + TApp
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConInMin(unit="K")=TLooMax - TApp - TAppSet
@@ -103,7 +106,7 @@ record GenericDistrict "District network design parameters"
   parameter Real offTim(unit="s")=6*3600
     "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real holOnTim(unit="s")=45*60
+  parameter Real holOnTim(unit="s")=3600
     "Heat pump hold on time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real holOffTim(unit="s")=1800
