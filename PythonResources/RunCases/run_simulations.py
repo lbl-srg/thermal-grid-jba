@@ -12,9 +12,10 @@ import os
 BRANCH="master"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
-CASE_LIST = 'fivehubsmultiflow'
+CASE_LIST = 'minimum'
 """ This parameter determines which model to run and which load files to load.
     See `cases.py`, case insensitive:
+        minimum: minimum test to see if things can run
         handwrite: explicitly listed cases
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
