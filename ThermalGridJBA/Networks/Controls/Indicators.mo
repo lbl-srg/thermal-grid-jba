@@ -83,10 +83,10 @@ model Indicators "District load, electricity rate and season indicator"
     annotation (Placement(transformation(extent={{240,-260},{280,-220}}),
         iconTransformation(extent={{100,-100},{140,-60}})));
 
-  Buildings.Controls.OBC.CDL.Reals.LessThreshold lesThr(final t=1/3, h=0.1/3)
+  Buildings.Controls.OBC.CDL.Reals.LessThreshold lesThr(final t=1/3, h=0.05)
     "Check if the speed is less than 1/3"
     annotation (Placement(transformation(extent={{-140,130},{-120,150}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr(final t=2/3, h=0.1/3)
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr(final t=2/3, h=0.05)
     "Check if the speed is greater than 2/3"
     annotation (Placement(transformation(extent={{-140,90},{-120,110}})));
   Buildings.Controls.OBC.CDL.Integers.Switch intSwi3 "Check district load"
@@ -251,8 +251,6 @@ model Indicators "District load, electricity rate and season indicator"
     "Absolute value of the plant load"
     annotation (Placement(transformation(extent={{100,230},{120,250}})));
 
-  Buildings.Controls.OBC.CDL.Discrete.Sampler sam(samplePeriod=5*60)
-    annotation (Placement(transformation(extent={{162,230},{182,250}})));
 equation
   connect(lesThr.y, intSwi3.u2)
     annotation (Line(points={{-118,140},{58,140}},color={255,0,255}));
@@ -389,12 +387,10 @@ equation
           {98,240}}, color={0,0,127}));
   connect(zer.y, plaCooLoa.f1) annotation (Line(points={{-98,320},{-80,320},{
           -80,254},{-42,254}}, color={0,0,127}));
-  connect(absLoa.y, sam.u)
-    annotation (Line(points={{122,240},{160,240}}, color={0,0,127}));
-  connect(sam.y, lesThr.u) annotation (Line(points={{184,240},{200,240},{200,
-          180},{-160,180},{-160,140},{-142,140}}, color={0,0,127}));
-  connect(sam.y, greThr.u) annotation (Line(points={{184,240},{200,240},{200,
+  connect(absLoa.y, greThr.u) annotation (Line(points={{122,240},{140,240},{140,
           180},{-160,180},{-160,100},{-142,100}}, color={0,0,127}));
+  connect(absLoa.y, lesThr.u) annotation (Line(points={{122,240},{140,240},{140,
+          180},{-160,180},{-160,140},{-142,140}}, color={0,0,127}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
