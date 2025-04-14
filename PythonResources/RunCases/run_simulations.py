@@ -12,9 +12,10 @@ import os
 BRANCH="master"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
-CASE_LIST = 'handwrite'
+CASE_LIST = 'minimum'
 """ This parameter determines which model to run and which load files to load.
     See `cases.py`, case insensitive:
+        minimum: minimum test to see if things can run
         handwrite: explicitly listed cases
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
@@ -49,6 +50,7 @@ if not KEEP_MAT_FILES:
     print("="*10 + "!"*10 + "="*10)
     print("Result mat files will be deleted because KEEP_MAT_FILES = False")
     print("="*10 + "!"*10 + "="*10)
+KEEP_DYMOLA_OPEN = True
 
 CWD = os.getcwd()
 package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
@@ -131,9 +133,9 @@ def _simulate(spec):
 
     # Copy the models
 #    print("Copying models from {} to {}".format(CWD, wor_dir))
-    shutil.copytree(os.path.join(CWD, "JBACases"), os.path.join(wor_dir, "JBACases"))
+    # shutil.copytree(os.path.join(CWD, "JBACases"), os.path.join(wor_dir, "JBACases"))
     # Change the working directory so that the right checkout is loaded
-    os.chdir(os.path.join(wor_dir, "JBACases"))
+    # os.chdir(os.path.join(wor_dir, "JBACases"))
 
     # Write git information if the simulation is based on a github checkout
     #print(spec)
@@ -163,8 +165,8 @@ def _simulate(spec):
     s.setStartTime(spec["start_time"])
     s.setStopTime(spec["stop_time"])
     s.setTolerance(1E-6)
-    s.showGUI(False)
-    s.exitSimulator(True)
+    s.showGUI(KEEP_DYMOLA_OPEN)
+    s.exitSimulator(not KEEP_DYMOLA_OPEN)
     print("Starting simulation in {}".format(out_dir))
     
     flag = False 

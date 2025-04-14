@@ -9,7 +9,9 @@ def get_cases(case_list : str,
     
     hup = case_list.upper()
     cases_ns = list() # cases without scenarios specified
-    if hup == 'HANDWRITE':
+    if hup == 'MINIMUM':
+        cases_ns = minimum_test()
+    elif hup == 'HANDWRITE':
         cases_ns = handwrite_cases()
     elif hup == 'EACHBUILDING':
         cases_ns = construct_buildings()
@@ -42,6 +44,22 @@ def get_cases(case_list : str,
     # add global specifications but does not override any existing ones
     for cas in cases:
         cas.update({key: value for key, value in case_specs.items() if key not in cas})
+    
+    return cases
+
+def minimum_test():
+    """ Minimum test case to see if things work.
+    """
+    
+    cases = list()
+    buil = 'minimum-test'
+    cases.append( \
+        {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
+          "name": f"nodhw_{buil}_SCENARIO",
+          "building": buil,
+          "parameters": {'filNam': "modelica://ThermalGridJBA/Resources/Data/Consumptions/B1045_futu.mos"},
+          'start_time' : 99 * 24 * 3600,
+          'stop_time'  : 100 * 24 * 3600})
     
     return cases
 
