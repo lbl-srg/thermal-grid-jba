@@ -58,6 +58,15 @@ model ConnectedETSNoDHW
   Modelica.Blocks.Continuous.Integrator dHFlo if bui.have_hotWat
     "Cumulative enthalpy difference across the ets hex"
     annotation (Placement(transformation(extent={{40,-90},{60,-70}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ENet(
+    nin=if bui.have_hotWat
+        then 3
+        else 2)
+    "Cumulative net energy consumption, heating + dhw (if present) - cooling"
+    annotation (Placement(transformation(extent={{80,40},{100,60}})));
+  Modelica.Blocks.Continuous.Integrator EChi
+    "Cumulative electricity consumption of the heat recovery chiller"
+    annotation (Placement(transformation(extent={{80,0},{100,20}})));
 equation
   connect(TDisSup.y,supAmbWat. T_in)
     annotation (Line(points={{-71,-6},{-62,-6}}, color={0,0,127}));
@@ -91,6 +100,9 @@ equation
           -10},{-30,-10},{-30,-24},{-20,-24}}, color={0,127,255}));
   connect(senHFlo.dH_flow, dHFlo.u) annotation (Line(points={{2,-27},{2,-28},{
           10,-28},{10,-80},{38,-80}}, color={0,0,127}));
+  connect(bui.PCoo, EChi.u) annotation (Line(points={{62,-3},{62,-4},{70,-4},{
+          70,10},{78,10}},
+                        color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(
