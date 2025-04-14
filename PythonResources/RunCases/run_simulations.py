@@ -48,6 +48,7 @@ if not KEEP_MAT_FILES:
     print("="*10 + "!"*10 + "="*10)
     print("Result mat files will be deleted because KEEP_MAT_FILES = False")
     print("="*10 + "!"*10 + "="*10)
+KEEP_DYMOLA_OPEN = True
 
 CWD = os.getcwd()
 package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
@@ -160,8 +161,8 @@ def _simulate(spec):
     s.setStartTime(spec["start_time"])
     s.setStopTime(spec["stop_time"])
     s.setTolerance(1E-6)
-    s.showGUI(False)
-    s.exitSimulator(True)
+    s.showGUI(KEEP_DYMOLA_OPEN)
+    s.exitSimulator(not KEEP_DYMOLA_OPEN)
     print("Starting simulation in {}".format(out_dir))
     
     flag = False 
