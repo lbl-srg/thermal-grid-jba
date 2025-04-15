@@ -4,15 +4,42 @@
 Created on Fri Mar 28 15:07:23 2025
 
 @author: casper
+
+This script compares numbers (min, max, duration of y>0.99, etc.)
+    from multiple model result files.
+
+Todo:
+    Wrap analysis scenarios in a different file.
 """
 
 import os
 import numpy as np
 import unyt as uy
 from buildingspy.io.outputfile import Reader
+from datetime import datetime, timedelta
 
-PRINT_COMPARISON = False # percentage comparison
-TABLE_WIDTH = 10
+PRINT_COMPARISON = True # percentage comparison
+TABLE_WIDTH = 15
+
+# from PythonResources/Data/Consumption/Anemoi.py
+_year = 2025 # dummy year, no effect
+hotday = datetime(_year, 8, 2)
+heat_wave_from = datetime(_year, 7, 27)
+heat_wave_to = datetime(_year, 8, 9)
+coldday = datetime(_year, 3, 1)
+cold_snap_from = datetime(_year, 2, 23)
+cold_snap_to = datetime(_year, 3, 8)
+
+def soy(dt):
+    # Second of year
+    start_of_year = datetime(dt.year, 1, 1)
+    return int((dt - start_of_year).total_seconds())
+
+SHORT_TERM_ANALYSIS = True # set true to only analyse data in the period below
+# ANALYSIS_START_SECONDS = soy(heat_wave_from)
+# ANALYSIS_END_SECONDS = soy(heat_wave_to)
+ANALYSIS_START_SECONDS = soy(cold_snap_from)
+ANALYSIS_END_SECONDS = soy(cold_snap_to)
 
 CWD = os.getcwd()
 
@@ -34,12 +61,12 @@ variables = [
                 {'name' : 'EChi.u',
                  'quantity': 'power',
                  'action'  : max,
-                 'caption' : 'ETS heat recovery chiller peak electric power input'
+                 'caption' : 'Peak electric power input of ETS heat recovery chiller '
                  },
                 {'name' : 'EChi.y',
                  'quantity': 'energy',
-                 'action'  : lambda y: y[-1],
-                 'caption' : 'ETS heat recovery chiller total electrical consumption'
+                 'action'  : lambda y: y[-1] - y[0],
+                 'caption' : 'Total electrical consumption of ETS heat recovery chiller '
                  },
                 {'name' : 'bui.bui.QReqHea_flow',
                  'quantity': 'power',
@@ -53,12 +80,12 @@ variables = [
                  },
                 {'name' : 'dHHeaWat.y',
                  'quantity': 'energy',
-                 'action'  : lambda y: y[-1],
+                 'action'  : lambda y: y[-1] - y[0],
                  'caption' : 'Total end-use space heating load'
                  },
                 {'name' : 'dHChiWat.y',
                  'quantity': 'energy',
-                 'action'  : lambda y: y[-1],
+                 'action'  : lambda y: y[-1] - y[0],
                  'caption' : 'Total end-use cooling load'
                  },
                 {'name' : 'bui.ets.chi.chi.ySet',
@@ -67,55 +94,42 @@ variables = [
                  'caption' : 'Total duration of chiller speed > 0.99'}
             ]
 
-# scenarios = [
-#                 {'name'    : 'fTMY',
-#                   'matFile' : os.path.join('cluster_B_futu','ConnectedETSWithDHW.mat'),
-#                   'results' : {}
-#                   },
-#                 {'name'    : 'Heat wave',
-#                   'matFile' : os.path.join('cluster_B_heat','ConnectedETSWithDHW.mat'),
-#                   'results' : {}
-#                   },
-#                 {'name'    : 'Cold snap',
-#                   'matFile' : os.path.join('cluster_B_cold','ConnectedETSWithDHW.mat'),
-#                   'results' : {}
-#                   }
-#             ]
-
+# Comparing results from 3 weather scenarios.
 scenarios = [
-                {'name'    : 'A',
-                  'matFile' : os.path.join('cluster_A_futu','ConnectedETSNoDHW.mat'),
+                {'name'    : 'fTMY',
+                  'matFile' : os.path.join('ETS_All_futu','ConnectedETSWithDHW.mat'),
                   'results' : {}
                   },
-                {'name'    : 'B',
-                  'matFile' : os.path.join('cluster_B_futu','ConnectedETSWithDHW.mat'),
+                {'name'    : 'Heat wave',
+                  'matFile' : os.path.join('ETS_All_heat','ConnectedETSWithDHW.mat'),
                   'results' : {}
                   },
-                {'name'    : 'C',
-                  'matFile' : os.path.join('cluster_C_futu','ConnectedETSWithDHW.mat'),
-                  'results' : {}
-                  },
-                {'name'    : 'D',
-                  'matFile' : os.path.join('cluster_D_futu','ConnectedETSWithDHW.mat'),
-                  'results' : {}
-                  },
-                {'name'    : 'E',
-                  'matFile' : os.path.join('cluster_E_futu','ConnectedETSWithDHW.mat'),
+                {'name'    : 'Cold snap',
+                  'matFile' : os.path.join('ETS_All_cold','ConnectedETSWithDHW.mat'),
                   'results' : {}
                   }
             ]
 
+# Listing results from the ETS based on building clusters.
 # scenarios = [
-#                 {'name'    : 'fTMY',
-#                   'matFile' : 'ETS_All_futu/ConnectedETSWithDHW.mat',
+#                 {'name'    : 'A',
+#                   'matFile' : os.path.join('cluster_A_futu','ConnectedETSNoDHW.mat'),
 #                   'results' : {}
 #                   },
-#                 {'name'    : 'Heat wave',
-#                   'matFile' : 'ETS_All_heat/ConnectedETSWithDHW.mat',
+#                 {'name'    : 'B',
+#                   'matFile' : os.path.join('cluster_B_futu','ConnectedETSWithDHW.mat'),
 #                   'results' : {}
 #                   },
-#                 {'name'    : 'Cold snap',
-#                   'matFile' : 'ETS_All_cold/ConnectedETSWithDHW.mat',
+#                 {'name'    : 'C',
+#                   'matFile' : os.path.join('cluster_C_futu','ConnectedETSWithDHW.mat'),
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'D',
+#                   'matFile' : os.path.join('cluster_D_futu','ConnectedETSWithDHW.mat'),
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'E',
+#                   'matFile' : os.path.join('cluster_E_futu','ConnectedETSWithDHW.mat'),
 #                   'results' : {}
 #                   }
 #             ]
@@ -145,8 +159,16 @@ def condition_duration(t, y, condition):
             duration += t[indices[i]] - t[indices[i-1]]
             
     return duration
+
+def section_data(t, y, seconds_start = 0, seconds_end = 365*24*3600):
+    """ Take out a section of the data.
+    """
+    mask = (t >= seconds_start) & (t < seconds_end)
+    t_sectioned = t[mask]
+    y_sectioned = y[mask]
     
-    
+    return t_sectioned, y_sectioned
+
 #%%
 for scenario in scenarios:
     mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", scenario['matFile']))
@@ -154,6 +176,8 @@ for scenario in scenarios:
     for var in variables:
         #y = find_var(var['name'])
         (t, y) = r.values(var['name'])
+        if SHORT_TERM_ANALYSIS:
+            t, y = section_data(t, y, ANALYSIS_START_SECONDS, ANALYSIS_END_SECONDS)
         if len(t) > 2 and not 'time' in scenario['results']:
             scenario['results']['time'] = t # writes the time stamp
         v = var['action'](y)
