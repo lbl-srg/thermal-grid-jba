@@ -13,6 +13,15 @@ model CentralPlant_new "Central plant"
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
+  parameter Real TPlaHeaSet(
+    unit="K",
+    displayUnit="degC")=TLooMin
+    "Design plant heating setpoint temperature";
+  parameter Real TPlaCooSet(
+    unit="K",
+    displayUnit="degC")=TLooMax
+    "Design plant cooling setpoint temperature";
+
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each generation module";
   parameter Real dpValve_nominal(unit="Pa")=6000
@@ -68,12 +77,12 @@ model CentralPlant_new "Central plant"
   parameter Real minFanSpe(unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TCooSet(unit="K")=TLooMin
-    "Heat pump tracking temperature setpoint in cooling mode"
-    annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=TLooMax
-    "Heat pump tracking temperature setpoint in heating mode"
-    annotation (Dialog(tab="Controls", group="Heat pump"));
+//   parameter Real TCooSet(unit="K")=TLooMin
+//     "Heat pump tracking temperature setpoint in cooling mode"
+//     annotation (Dialog(tab="Controls", group="Heat pump"));
+//   parameter Real THeaSet(unit="K")=TLooMax
+//     "Heat pump tracking temperature setpoint in heating mode"
+//     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K", displayUnit="degC")
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
@@ -193,8 +202,8 @@ model CentralPlant_new "Central plant"
   Generations_new                          gen(
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,
-    TPlaHeaSet=TLooMin,
-    TPlaCooSet=TLooMax,
+    final TPlaHeaSet=TPlaHeaSet,
+    final TPlaCooSet=TPlaCooSet,
     final mWat_flow_nominal=mWat_flow_nominal,
     mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
@@ -216,8 +225,6 @@ model CentralPlant_new "Central plant"
     final TAppSet=TAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
-    final TCooSet=TCooSet,
-    final THeaSet=THeaSet,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,

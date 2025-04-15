@@ -25,9 +25,19 @@ model FiveHubsPlantMultiFlow_new
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
   // Central plant
-  parameter Real samplePeriod(unit="s")=datDis.samplePeriod
-    "Sample period of district loop pump speed"
+  parameter Real TPlaHeaSet(
+    unit="K",
+    displayUnit="degC")=datDis.TPlaHeaSet
+    "Design plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
+  parameter Real TPlaCooSet(
+    unit="K",
+    displayUnit="degC")=datDis.TPlaCooSet
+    "Design plant cooling setpoint temperature"
+    annotation (Dialog(tab="Central plant"));
+//   parameter Real samplePeriod(unit="s")=datDis.samplePeriod
+//     "Sample period of district loop pump speed"
+//     annotation (Dialog(tab="Central plant"));
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
     annotation (Dialog(tab="Central plant"));
@@ -91,12 +101,12 @@ model FiveHubsPlantMultiFlow_new
   parameter Real minPlaComSpe(unit="1")=datDis.minPlaComSpe
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TCooSet(unit="K")=datDis.TCooSet
-    "Heat pump tracking temperature setpoint in cooling mode"
-    annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=datDis.THeaSet
-    "Heat pump tracking temperature setpoint in heating mode"
-    annotation (Dialog(tab="Central plant", group="Heat pump"));
+//   parameter Real TCooSet(unit="K")=datDis.TCooSet
+//     "Heat pump tracking temperature setpoint in cooling mode"
+//     annotation (Dialog(tab="Central plant", group="Heat pump"));
+//   parameter Real THeaSet(unit="K")=datDis.THeaSet
+//     "Heat pump tracking temperature setpoint in heating mode"
+//     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real offTim(unit="s")=datDis.offTim
     "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
@@ -244,6 +254,8 @@ model FiveHubsPlantMultiFlow_new
                              cenPla(
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
+    TPlaHeaSet=datDis.TPlaHeaSet,
+    TPlaCooSet=datDis.TPlaCooSet,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -261,8 +273,6 @@ model FiveHubsPlantMultiFlow_new
     final TAppSet=TAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
-    final TCooSet=TCooSet,
-    final THeaSet=THeaSet,
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,

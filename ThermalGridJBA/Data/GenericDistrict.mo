@@ -17,6 +17,7 @@ record GenericDistrict "District network design parameters"
     "Minimum loop temperature";
   parameter Modelica.Units.SI.Temperature TLooMax=273.15 + 24
     "Maximum loop temperature";
+
   parameter Real dp_length_nominal(unit="Pa/m")=250
     "Pressure drop per pipe length at nominal flow rate";
   parameter Modelica.Units.SI.Length lDis[nBui+1]=fill(100, nBui + 1)
@@ -25,8 +26,14 @@ record GenericDistrict "District network design parameters"
     "Length of each connection pipe (supply only, not counting return line)";
 
   // Central plant
-  parameter Real samplePeriod(unit="s")=1200
-    "Sample period of district loop pump speed"
+//   parameter Real samplePeriod(unit="s")=1200
+//     "Sample period of district loop pump speed"
+//     annotation (Dialog(tab="Central plant"));
+  parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+1
+    "Design plant heating setpoint temperature"
+    annotation (Dialog(tab="Central plant"));
+  parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-1
+    "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(mCon_flow_nominal)
     "Nominal water mass flow rate of plant"
