@@ -11,6 +11,9 @@ import numpy as np
 import unyt as uy
 from buildingspy.io.outputfile import Reader
 
+PRINT_COMPARISON = False # percentage comparison
+TABLE_WIDTH = 10
+
 CWD = os.getcwd()
 
 #%%
@@ -64,20 +67,44 @@ variables = [
                  'caption' : 'Total duration of chiller speed > 0.99'}
             ]
 
+# scenarios = [
+#                 {'name'    : 'fTMY',
+#                   'matFile' : os.path.join('cluster_B_futu','ConnectedETSWithDHW.mat'),
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'Heat wave',
+#                   'matFile' : os.path.join('cluster_B_heat','ConnectedETSWithDHW.mat'),
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'Cold snap',
+#                   'matFile' : os.path.join('cluster_B_cold','ConnectedETSWithDHW.mat'),
+#                   'results' : {}
+#                   }
+#             ]
+
 scenarios = [
-                {'name'    : 'fTMY',
-                  'matFile' : os.path.join('ETS_All_futu','ConnectedETSWithDHW.mat'),
+                {'name'    : 'A',
+                  'matFile' : os.path.join('cluster_A_futu','ConnectedETSNoDHW.mat'),
                   'results' : {}
                   },
-                {'name'    : 'Heat wave',
-                  'matFile' : os.path.join('ETS_All_heat','ConnectedETSWithDHW.mat'),
+                {'name'    : 'B',
+                  'matFile' : os.path.join('cluster_B_futu','ConnectedETSWithDHW.mat'),
                   'results' : {}
                   },
-                {'name'    : 'Cold snap',
-                  'matFile' : os.path.join('ETS_All_cold','ConnectedETSWithDHW.mat'),
+                {'name'    : 'C',
+                  'matFile' : os.path.join('cluster_C_futu','ConnectedETSWithDHW.mat'),
+                  'results' : {}
+                  },
+                {'name'    : 'D',
+                  'matFile' : os.path.join('cluster_D_futu','ConnectedETSWithDHW.mat'),
+                  'results' : {}
+                  },
+                {'name'    : 'E',
+                  'matFile' : os.path.join('cluster_E_futu','ConnectedETSWithDHW.mat'),
                   'results' : {}
                   }
             ]
+
 # scenarios = [
 #                 {'name'    : 'fTMY',
 #                   'matFile' : 'ETS_All_futu/ConnectedETSWithDHW.mat',
@@ -132,11 +159,10 @@ for scenario in scenarios:
         v = var['action'](y)
         scenario['results'][var['name']] = v
 
-#%% 
-tableWidth = 15
-row = f"{'Scenarios:':<{tableWidth}}"
+#%%
+row = f"{'Scenarios:':<{TABLE_WIDTH}}"
 for s in scenarios:
-    row += f" | {s['name']:<{tableWidth}}"
+    row += f" | {s['name']:<{TABLE_WIDTH}}"
 print(row)
 for var in variables:
     if 'caption' in var.keys():
@@ -149,18 +175,19 @@ for var in variables:
         unit_with_bracket = f"[{units[var['quantity']]['displayUnit']}]"
     else:
         unit_with_bracket = "[1]"
-    row = f"{unit_with_bracket:>{tableWidth}}"
+    row = f"{unit_with_bracket:>{TABLE_WIDTH}}"
     for i,scenario in enumerate(scenarios):
         v = scenario['results'][var['name']]
         if 'quantity' in var.keys():
             displayValue = f"{(v * units[var['quantity']]['unit']).to(units[var['quantity']]['displayUnit']).value:.0f}"
         else:
             displayValue = f"{v:.0f}"
-        if i == 0 :
-            vBase = v
-        else:
-            displayCompare = f"{v/vBase-1:+.1%}"
-            displayValue += f' ({displayCompare})'
-        row += f" | {displayValue:>{tableWidth}}"
+        if PRINT_COMPARISON:
+            if i == 0 :
+                vBase = v
+            else:
+                displayCompare = f"{v/vBase-1:+.1%}"
+                displayValue += f' ({displayCompare})'
+        row += f" | {displayValue:>{TABLE_WIDTH}}"
     print(row)
     
