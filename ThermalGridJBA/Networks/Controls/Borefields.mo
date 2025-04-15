@@ -116,9 +116,6 @@ block Borefields
   Buildings.Controls.OBC.CDL.Logical.Or onlPer1
     "Enable only perimeter borefield"
     annotation (Placement(transformation(extent={{80,60},{100,80}})));
-  Buildings.Controls.OBC.CDL.Logical.And higRatHig
-    "High rate and high plant load"
-    annotation (Placement(transformation(extent={{-100,10},{-80,30}})));
   Buildings.Controls.OBC.CDL.Logical.And norRatWin "Normal rate in Winter"
     annotation (Placement(transformation(extent={{40,-20},{60,0}})));
   Buildings.Controls.OBC.CDL.Logical.And norRatSum "Normal rate in Summer"
@@ -220,10 +217,6 @@ equation
     annotation (Line(points={{62,70},{78,70}},     color={255,0,255}));
   connect(norRatFal.y, onlPer1.u2) annotation (Line(points={{62,40},{70,40},{70,
           62},{78,62}},               color={255,0,255}));
-  connect(higEleRat.y, higRatHig.u2) annotation (Line(points={{-178,180},{-170,180},
-          {-170,12},{-102,12}},         color={255,0,255}));
-  connect(higPlaLoa.y, higRatHig.u1) annotation (Line(points={{-118,160},{-110,160},
-          {-110,20},{-102,20}},        color={255,0,255}));
   connect(norRat.y, norRatWin.u2) annotation (Line(points={{-118,60},{-20,60},{-20,
           -18},{38,-18}},      color={255,0,255}));
   connect(norRat.y, norRatSum.u2) annotation (Line(points={{-118,60},{-20,60},{-20,
@@ -236,8 +229,6 @@ equation
     annotation (Line(points={{62,-10},{78,-10}},     color={255,0,255}));
   connect(norRatSum.y, botBor.u2) annotation (Line(points={{62,-40},{70,-40},{70,
           -18},{78,-18}},         color={255,0,255}));
-  connect(higRatHig.y, botBor1.u1)
-    annotation (Line(points={{-78,20},{138,20}},     color={255,0,255}));
   connect(botBor.y, botBor1.u2) annotation (Line(points={{102,-10},{120,-10},{120,
           12},{138,12}},          color={255,0,255}));
   connect(uDisPum, gai.u) annotation (Line(points={{-280,-70},{38,-70}},
@@ -308,6 +299,8 @@ equation
           {-40,-300},{218,-300}}, color={255,0,255}));
   connect(secLooPum2.y, yPumSec)
     annotation (Line(points={{242,-300},{280,-300}}, color={0,0,127}));
+  connect(higPlaLoa.y, botBor1.u1) annotation (Line(points={{-118,160},{-110,
+          160},{-110,20},{138,20}}, color={255,0,255}));
 annotation (defaultComponentName="borCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(

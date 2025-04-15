@@ -357,7 +357,7 @@ block HeatPump
     annotation (Placement(transformation(extent={{160,210},{180,230}})));
   Buildings.Controls.OBC.CDL.Discrete.TriggeredSampler triSam(y_start=1)
     annotation (Placement(transformation(extent={{230,210},{250,230}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr(t=0.5)
     annotation (Placement(transformation(extent={{280,210},{300,230}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal glyPum(
     final realTrue=mHpGly_flow_nominal)
