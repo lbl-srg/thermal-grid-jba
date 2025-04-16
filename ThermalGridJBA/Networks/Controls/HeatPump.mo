@@ -238,7 +238,8 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Reals.Switch heaPumFlo
     "Heat pump water flow rate"
     annotation (Placement(transformation(extent={{-280,-160},{-260,-140}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant dumCon(final k=1e-3)
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant dumCon(final k=1.5*
+        mWat_flow_nominal)
     "Dummy constant to avoid zero division"
     annotation (Placement(transformation(extent={{-320,-190},{-300,-170}})));
   Buildings.Controls.OBC.CDL.Reals.Divide div1 "Input 1 divided by input 2"
@@ -248,7 +249,7 @@ block HeatPump
     annotation (Placement(transformation(extent={{-200,-30},{-180,-10}})));
   Buildings.Controls.OBC.CDL.Reals.Multiply mul "Multiply inputs"
     annotation (Placement(transformation(extent={{-160,-100},{-140,-80}})));
-  Buildings.Controls.OBC.CDL.Reals.Add leaWatSet
+  Buildings.Controls.OBC.CDL.Reals.Add leaWatSet(y(displayUnit="degC", unit="K"))
     "Heat pump leaving water temperature setpoint"
     annotation (Placement(transformation(extent={{-120,-30},{-100,-10}})));
 
@@ -345,7 +346,7 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Reals.Switch swi3
     "Heat pump leaving water temperature when the heat pump is used for charging borefields"
     annotation (Placement(transformation(extent={{0,170},{20,190}})));
-  Buildings.Controls.OBC.CDL.Reals.Switch swi4
+  Buildings.Controls.OBC.CDL.Reals.Switch swi4(y(displayUnit="degC", unit="K"))
     annotation (Placement(transformation(extent={{-20,10},{0,30}})));
   Buildings.Controls.OBC.CDL.Reals.Switch swi5
     "Heat pump leaving water temperature when the heat pump is used for charging borefields"
@@ -438,7 +439,7 @@ block HeatPump
     annotation (Placement(transformation(extent={{260,150},{280,170}})));
   Buildings.Controls.OBC.CDL.Reals.Switch swi8
     annotation (Placement(transformation(extent={{300,110},{320,130}})));
-  Buildings.Controls.OBC.CDL.Reals.Switch swi9
+  Buildings.Controls.OBC.CDL.Reals.Switch swi9(y(displayUnit="degC", unit="K"))
     annotation (Placement(transformation(extent={{-60,-50},{-40,-30}})));
   Buildings.Controls.OBC.CDL.Logical.Not norRat1
     "Normal electricity rate"
