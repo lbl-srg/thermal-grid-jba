@@ -36,13 +36,13 @@ block Borefields
         iconTransformation(extent={{-140,-40},{-100,0}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput u1HeaPum
     "Heat pump commanded on"
-    annotation (Placement(transformation(extent={{-300,-240},{-260,-200}}),
+    annotation (Placement(transformation(extent={{-300,-280},{-260,-240}}),
         iconTransformation(extent={{-140,-80},{-100,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput mHeaPum_flow(
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Heat pump mass flow rate"
-    annotation (Placement(transformation(extent={{-300,-280},{-260,-240}}),
+    annotation (Placement(transformation(extent={{-300,-220},{-260,-180}}),
         iconTransformation(extent={{-140,-100},{-100,-60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yValPriByp(
     final min=0,
@@ -72,13 +72,13 @@ block Borefields
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Speed setpoint for the pump of the center borefield"
-    annotation (Placement(transformation(extent={{260,-200},{300,-160}}),
+    annotation (Placement(transformation(extent={{260,-180},{300,-140}}),
         iconTransformation(extent={{100,-80},{140,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yPumSec(
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Speed setpoint for the pump of the secondary loop"
-    annotation (Placement(transformation(extent={{260,-320},{300,-280}}),
+    annotation (Placement(transformation(extent={{260,-240},{300,-200}}),
         iconTransformation(extent={{100,-110},{140,-70}})));
 
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant higRat(final k=1)
@@ -148,16 +148,16 @@ block Borefields
     annotation (Placement(transformation(extent={{40,-140},{60,-120}})));
   Buildings.Controls.OBC.CDL.Reals.Switch cenBorPum
     "Speed setpoint for the pump of center borfield "
-    annotation (Placement(transformation(extent={{180,-140},{200,-120}})));
+    annotation (Placement(transformation(extent={{180,-170},{200,-150}})));
   Buildings.Controls.OBC.CDL.Reals.Switch secLooPum
     "Speed setpoint for the pump of secondary loop"
-    annotation (Placement(transformation(extent={{180,-220},{200,-200}})));
+    annotation (Placement(transformation(extent={{180,-230},{200,-210}})));
   Buildings.Controls.OBC.CDL.Reals.Switch cenBorPum1
     "Speed setpoint for the pump of center borfield "
-    annotation (Placement(transformation(extent={{120,-240},{140,-220}})));
+    annotation (Placement(transformation(extent={{120,-250},{140,-230}})));
   Buildings.Controls.OBC.CDL.Reals.Switch secLooPum1
     "Speed setpoint for the pump of secondary loop"
-    annotation (Placement(transformation(extent={{120,-270},{140,-250}})));
+    annotation (Placement(transformation(extent={{120,-290},{140,-270}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con(final k=1)
     "Constant one"
     annotation (Placement(transformation(extent={{20,-220},{40,-200}})));
@@ -167,17 +167,10 @@ block Borefields
     annotation (Placement(transformation(extent={{60,-220},{80,-200}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con1(final k=0)
     "Constant zero"
-    annotation (Placement(transformation(extent={{40,-270},{60,-250}})));
-  Buildings.Controls.OBC.CDL.Reals.Switch cenBorPum2
-    "Speed setpoint for the pump of center borfield "
-    annotation (Placement(transformation(extent={{220,-190},{240,-170}})));
-  Buildings.Controls.OBC.CDL.Reals.Max max1
-    annotation (Placement(transformation(extent={{-140,-182},{-120,-162}})));
-  Buildings.Controls.OBC.CDL.Reals.Switch secLooPum2
-    "Speed setpoint for the pump of secondary loop"
-    annotation (Placement(transformation(extent={{220,-310},{240,-290}})));
-  Buildings.Controls.OBC.CDL.Reals.Max max2
-    annotation (Placement(transformation(extent={{-140,-310},{-120,-290}})));
+    annotation (Placement(transformation(extent={{-180,-310},{-160,-290}})));
+  Buildings.Controls.OBC.CDL.Reals.Switch heaPumFlo
+    "Speed setpoint for the pumps to ensure same flow"
+    annotation (Placement(transformation(extent={{-80,-270},{-60,-250}})));
 equation
   connect(higRat.y, higEleRat.u2) annotation (Line(points={{-218,300},{-210,300},
           {-210,172},{-202,172}}, color={255,127,0}));
@@ -249,58 +242,44 @@ equation
           {218,-20}},            color={255,0,255}));
   connect(uDisPum, gai2.u) annotation (Line(points={{-280,-70},{20,-70},{20,-130},
           {38,-130}},            color={0,0,127}));
-  connect(botBor1.y, cenBorPum.u2) annotation (Line(points={{162,20},{170,20},{170,
-          -130},{178,-130}},            color={255,0,255}));
-  connect(gai2.y, cenBorPum.u1) annotation (Line(points={{62,-130},{150,-130},{150,
-          -122},{178,-122}},      color={0,0,127}));
-  connect(botBor1.y, secLooPum.u2) annotation (Line(points={{162,20},{170,20},{170,
-          -210},{178,-210}},            color={255,0,255}));
-  connect(gai1.y, secLooPum.u1) annotation (Line(points={{62,-100},{140,-100},{140,
-          -202},{178,-202}},      color={0,0,127}));
-  connect(onlPer1.y, cenBorPum1.u2) annotation (Line(points={{102,70},{110,70},{
-          110,-230},{118,-230}},  color={255,0,255}));
-  connect(onlPer1.y, secLooPum1.u2) annotation (Line(points={{102,70},{110,70},{
-          110,-260},{118,-260}},  color={255,0,255}));
+  connect(botBor1.y, cenBorPum.u2) annotation (Line(points={{162,20},{170,20},{
+          170,-160},{178,-160}},        color={255,0,255}));
+  connect(gai2.y, cenBorPum.u1) annotation (Line(points={{62,-130},{120,-130},{
+          120,-152},{178,-152}},  color={0,0,127}));
+  connect(botBor1.y, secLooPum.u2) annotation (Line(points={{162,20},{170,20},{
+          170,-220},{178,-220}},        color={255,0,255}));
+  connect(gai1.y, secLooPum.u1) annotation (Line(points={{62,-100},{140,-100},{
+          140,-212},{178,-212}},  color={0,0,127}));
+  connect(onlPer1.y, cenBorPum1.u2) annotation (Line(points={{102,70},{110,70},
+          {110,-240},{118,-240}}, color={255,0,255}));
+  connect(onlPer1.y, secLooPum1.u2) annotation (Line(points={{102,70},{110,70},
+          {110,-280},{118,-280}}, color={255,0,255}));
   connect(con.y, gai3.u)
     annotation (Line(points={{42,-210},{58,-210}}, color={0,0,127}));
-  connect(gai3.y, cenBorPum1.u1) annotation (Line(points={{82,-210},{100,-210},{
-          100,-222},{118,-222}},  color={0,0,127}));
-  connect(gai3.y, secLooPum1.u1) annotation (Line(points={{82,-210},{100,-210},{
-          100,-252},{118,-252}},  color={0,0,127}));
-  connect(con1.y, cenBorPum1.u3) annotation (Line(points={{62,-260},{90,-260},{90,
-          -238},{118,-238}},      color={0,0,127}));
-  connect(con1.y, secLooPum1.u3) annotation (Line(points={{62,-260},{90,-260},{90,
-          -268},{118,-268}},      color={0,0,127}));
-  connect(cenBorPum1.y, cenBorPum.u3) annotation (Line(points={{142,-230},{150,-230},
-          {150,-138},{178,-138}},       color={0,0,127}));
-  connect(secLooPum1.y, secLooPum.u3) annotation (Line(points={{142,-260},{160,-260},
-          {160,-218},{178,-218}},       color={0,0,127}));
-  connect(cenBorPum.y, max1.u1) annotation (Line(points={{202,-130},{210,-130},{
-          210,-150},{-160,-150},{-160,-166},{-142,-166}}, color={0,0,127}));
-  connect(u1HeaPum, cenBorPum2.u2) annotation (Line(points={{-280,-220},{-40,-220},
-          {-40,-180},{218,-180}}, color={255,0,255}));
-  connect(max1.y, cenBorPum2.u1)
-    annotation (Line(points={{-118,-172},{218,-172}}, color={0,0,127}));
-  connect(cenBorPum.y, cenBorPum2.u3) annotation (Line(points={{202,-130},{210,-130},
-          {210,-188},{218,-188}}, color={0,0,127}));
-  connect(cenBorPum2.y, yPumCenBor)
-    annotation (Line(points={{242,-180},{280,-180}}, color={0,0,127}));
-  connect(secLooPum.y, secLooPum2.u3) annotation (Line(points={{202,-210},{210,-210},
-          {210,-308},{218,-308}}, color={0,0,127}));
-  connect(mHeaPum_flow, max1.u2) annotation (Line(points={{-280,-260},{-180,-260},
-          {-180,-178},{-142,-178}}, color={0,0,127}));
-  connect(mHeaPum_flow, max2.u2) annotation (Line(points={{-280,-260},{-180,-260},
-          {-180,-306},{-142,-306}}, color={0,0,127}));
-  connect(secLooPum.y, max2.u1) annotation (Line(points={{202,-210},{210,-210},{
-          210,-280},{-160,-280},{-160,-294},{-142,-294}}, color={0,0,127}));
-  connect(max2.y, secLooPum2.u1) annotation (Line(points={{-118,-300},{-100,-300},
-          {-100,-292},{218,-292}}, color={0,0,127}));
-  connect(u1HeaPum, secLooPum2.u2) annotation (Line(points={{-280,-220},{-40,-220},
-          {-40,-300},{218,-300}}, color={255,0,255}));
-  connect(secLooPum2.y, yPumSec)
-    annotation (Line(points={{242,-300},{280,-300}}, color={0,0,127}));
+  connect(gai3.y, cenBorPum1.u1) annotation (Line(points={{82,-210},{100,-210},
+          {100,-232},{118,-232}}, color={0,0,127}));
+  connect(gai3.y, secLooPum1.u1) annotation (Line(points={{82,-210},{100,-210},
+          {100,-272},{118,-272}}, color={0,0,127}));
+  connect(cenBorPum1.y, cenBorPum.u3) annotation (Line(points={{142,-240},{150,
+          -240},{150,-168},{178,-168}}, color={0,0,127}));
+  connect(secLooPum1.y, secLooPum.u3) annotation (Line(points={{142,-280},{160,
+          -280},{160,-228},{178,-228}}, color={0,0,127}));
   connect(higPlaLoa.y, botBor1.u1) annotation (Line(points={{-118,160},{-110,
           160},{-110,20},{138,20}}, color={255,0,255}));
+  connect(con1.y, heaPumFlo.u3) annotation (Line(points={{-158,-300},{-100,-300},
+          {-100,-268},{-82,-268}}, color={0,0,127}));
+  connect(u1HeaPum, heaPumFlo.u2)
+    annotation (Line(points={{-280,-260},{-82,-260}}, color={255,0,255}));
+  connect(mHeaPum_flow, heaPumFlo.u1) annotation (Line(points={{-280,-200},{
+          -100,-200},{-100,-252},{-82,-252}}, color={0,0,127}));
+  connect(heaPumFlo.y, cenBorPum1.u3) annotation (Line(points={{-58,-260},{90,
+          -260},{90,-248},{118,-248}}, color={0,0,127}));
+  connect(heaPumFlo.y, secLooPum1.u3) annotation (Line(points={{-58,-260},{90,
+          -260},{90,-288},{118,-288}}, color={0,0,127}));
+  connect(cenBorPum.y, yPumCenBor)
+    annotation (Line(points={{202,-160},{280,-160}}, color={0,0,127}));
+  connect(secLooPum.y, yPumSec)
+    annotation (Line(points={{202,-220},{280,-220}}, color={0,0,127}));
 annotation (defaultComponentName="borCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
