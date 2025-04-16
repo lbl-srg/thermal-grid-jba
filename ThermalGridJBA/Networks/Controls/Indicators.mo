@@ -252,20 +252,26 @@ model Indicators "District load, electricity rate and season indicator"
     annotation (Placement(transformation(extent={{100,230},{120,250}})));
 
   Buildings.Controls.OBC.CDL.Integers.Change cha
-    annotation (Placement(transformation(extent={{20,100},{40,120}})));
+    annotation (Placement(transformation(extent={{20,110},{40,130}})));
   Buildings.Controls.OBC.CDL.Logical.Latch lat
-    annotation (Placement(transformation(extent={{80,100},{100,120}})));
+    annotation (Placement(transformation(extent={{100,110},{120,130}})));
   Buildings.Controls.OBC.CDL.Logical.TrueFalseHold truFalHol(trueHoldDuration=
         3600, falseHoldDuration=0)
-    annotation (Placement(transformation(extent={{120,100},{140,120}})));
+    annotation (Placement(transformation(extent={{140,110},{160,130}})));
   Buildings.Controls.OBC.CDL.Integers.Switch intSwi
-    annotation (Placement(transformation(extent={{180,100},{200,120}})));
+    annotation (Placement(transformation(extent={{200,110},{220,130}})));
   Buildings.Controls.OBC.CDL.Conversions.IntegerToReal intToRea
     annotation (Placement(transformation(extent={{20,160},{40,180}})));
   Buildings.Controls.OBC.CDL.Discrete.TriggeredSampler triSam
     annotation (Placement(transformation(extent={{50,160},{70,180}})));
   Buildings.Controls.OBC.CDL.Conversions.RealToInteger reaToInt
     annotation (Placement(transformation(extent={{120,160},{140,180}})));
+  Buildings.Controls.OBC.CDL.Logical.Timer tim(t=3600)
+    annotation (Placement(transformation(extent={{200,80},{220,100}})));
+  Buildings.Controls.OBC.CDL.Logical.Or or2
+    annotation (Placement(transformation(extent={{60,70},{80,90}})));
+  Buildings.Controls.OBC.CDL.Logical.Pre pre
+    annotation (Placement(transformation(extent={{20,70},{40,90}})));
 equation
   connect(lesThr.y, intSwi3.u2)
     annotation (Line(points={{-178,140},{-42,140}},
@@ -411,18 +417,17 @@ equation
           200},{-220,200},{-220,100},{-202,100}}, color={0,0,127}));
   connect(absLoa.y, lesThr.u) annotation (Line(points={{122,240},{140,240},{140,
           200},{-220,200},{-220,140},{-202,140}}, color={0,0,127}));
-  connect(intSwi3.y, cha.u) annotation (Line(points={{-18,140},{0,140},{0,110},
-          {18,110}}, color={255,127,0}));
-  connect(cha.up, lat.u) annotation (Line(points={{42,116},{60,116},{60,110},{
-          78,110}}, color={255,0,255}));
-  connect(cha.down, lat.clr)
-    annotation (Line(points={{42,104},{78,104}}, color={255,0,255}));
+  connect(intSwi3.y, cha.u) annotation (Line(points={{-18,140},{0,140},{0,120},
+          {18,120}}, color={255,127,0}));
+  connect(cha.up, lat.u) annotation (Line(points={{42,126},{60,126},{60,120},{
+          98,120}}, color={255,0,255}));
   connect(lat.y, truFalHol.u)
-    annotation (Line(points={{102,110},{118,110}}, color={255,0,255}));
+    annotation (Line(points={{122,120},{138,120}}, color={255,0,255}));
   connect(truFalHol.y, intSwi.u2)
-    annotation (Line(points={{142,110},{178,110}}, color={255,0,255}));
+    annotation (Line(points={{162,120},{198,120}}, color={255,0,255}));
   connect(intSwi3.y, intSwi.u3) annotation (Line(points={{-18,140},{0,140},{0,
-          80},{160,80},{160,102},{178,102}}, color={255,127,0}));
+          100},{180,100},{180,112},{198,112}},
+                                             color={255,127,0}));
   connect(intSwi3.y, intToRea.u) annotation (Line(points={{-18,140},{0,140},{0,
           170},{18,170}}, color={255,127,0}));
   connect(intToRea.y, triSam.u)
@@ -430,9 +435,19 @@ equation
   connect(triSam.y, reaToInt.u)
     annotation (Line(points={{72,170},{118,170}}, color={0,0,127}));
   connect(cha.up, triSam.trigger)
-    annotation (Line(points={{42,116},{60,116},{60,158}}, color={255,0,255}));
-  connect(reaToInt.y, intSwi.u1) annotation (Line(points={{142,170},{160,170},{
-          160,118},{178,118}}, color={255,127,0}));
+    annotation (Line(points={{42,126},{60,126},{60,158}}, color={255,0,255}));
+  connect(reaToInt.y, intSwi.u1) annotation (Line(points={{142,170},{180,170},{
+          180,128},{198,128}}, color={255,127,0}));
+  connect(truFalHol.y, tim.u) annotation (Line(points={{162,120},{190,120},{190,
+          90},{198,90}}, color={255,0,255}));
+  connect(cha.down, or2.u1) annotation (Line(points={{42,114},{50,114},{50,80},
+          {58,80}}, color={255,0,255}));
+  connect(tim.passed, pre.u) annotation (Line(points={{222,82},{230,82},{230,60},
+          {10,60},{10,80},{18,80}}, color={255,0,255}));
+  connect(pre.y, or2.u2) annotation (Line(points={{42,80},{46,80},{46,72},{58,
+          72}}, color={255,0,255}));
+  connect(or2.y, lat.clr) annotation (Line(points={{82,80},{90,80},{90,112},{98,
+          112},{98,114}}, color={255,0,255}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
