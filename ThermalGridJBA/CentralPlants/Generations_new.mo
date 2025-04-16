@@ -85,6 +85,10 @@ model Generations_new
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
 
+  parameter Real staDowDel(
+    unit="s")=3600
+    "Minimum stage down delay, to avoid quickly staging down"
+    annotation (Dialog(tab="Controls"));
   parameter Real TAppSet(unit="K")=2
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
@@ -750,7 +754,8 @@ model Generations_new
         origin={-320,90})));
   ThermalGridJBA.Networks.Controls.Indicators ind(
     final TPlaHeaSet=TPlaHeaSet,
-    final TPlaCooSet=TPlaCooSet)
+    final TPlaCooSet=TPlaCooSet,
+    final staDowDel=staDowDel)
     annotation (Placement(transformation(extent={{-520,250},{-500,270}})));
   ThermalGridJBA.Networks.Controls.HeatExchanger hexCon(
     final mHexGly_flow_nominal=mHexGly_flow_nominal,
