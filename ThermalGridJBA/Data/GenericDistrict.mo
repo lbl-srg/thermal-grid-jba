@@ -101,7 +101,7 @@ record GenericDistrict "District network design parameters"
   parameter Real TPlaEvaInMax(unit="K")=TLooMin + TApp + TAppSet
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real minPlaComSpe(unit="1")=0.2
+  parameter Real minPlaComSpe(unit="1")=0.05
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TCooSet(unit="K")=TLooMin
