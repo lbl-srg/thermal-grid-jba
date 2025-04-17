@@ -19,8 +19,8 @@ CASE_LIST = 'minimum'
         handwrite: explicitly listed cases
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
-        fivehubsnoplant: runs ThermalGridJBA.Networks.Validation.SinglePlantFiveHubs
-        fivehubsmultiflow: runs ThermalGridJBA.Networks.Validation.FiveHubsPlantMultiFlow
+        fivehubsnoplant: runs ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs
+        fivehubsmultiflow: runs ThermalGridJBA.Networks.Validation.DesignedPlantFiveHubs
 """
 CASE_SPECS = {
      'start_time' : 0 * 24 * 3600,

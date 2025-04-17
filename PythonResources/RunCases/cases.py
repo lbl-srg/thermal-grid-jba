@@ -88,7 +88,7 @@ def fivehubsmultiflow():
     
     cases = list()
     cases.append( \
-        {"model": "ThermalGridJBA.Networks.Validation.FiveHubsPlantMultiFlow",
+        {"model": "ThermalGridJBA.Networks.Validation.DesignedPlantFiveHubs",
           "name": "fivehubsmultiflow_SCENARIO",
           "building": 'FiveHubs',
           "parameters": {'datDis.filNam' : [
@@ -105,7 +105,7 @@ def fivehubsnoplant():
     
     cases = list()
     cases.append( \
-        {"model": "ThermalGridJBA.Networks.Validation.SinglePlantFiveHubs",
+        {"model": "ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs",
           "name": "fivehubsnoplant_SCENARIO",
           "building": 'FiveHubs',
           "parameters": {'datDis.filNam' : [
