@@ -193,24 +193,23 @@ model FiveHubsPlantMultiFlow
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,-10})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup(redeclare final package
-      Medium = Medium,
+  Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup(
+    redeclare final package Medium = Medium,
     allowFlowReversal=false,
-                       final m_flow_nominal=datDis.mPumDis_flow_nominal)
+    final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water supply temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,150})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet(redeclare final package
-      Medium = Medium,
+  Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet(
+    redeclare final package Medium = Medium,
     allowFlowReversal=false,
-                       final m_flow_nominal=datDis.mPumDis_flow_nominal)
+   final m_flow_nominal=datDis.mPumDis_flow_nominal)
     "District water return temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-80,-80})));
-  ThermalGridJBA.Hubs.ConnectedETS
-    bui[nBui](
+  ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
     final filNam = datDis.filNam,
     bui(each final facMul=1),
     redeclare each final package MediumBui = Medium,
@@ -220,28 +219,51 @@ model FiveHubsPlantMultiFlow
     each final TDisWatMin=datDis.TLooMin,
     each final TDisWatMax=datDis.TLooMax) "Building and ETS"
     annotation (Placement(transformation(extent={{-10,230},{10,250}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(
+    nin=nBui,
+    u(each unit="W"),
+    y(each unit="W"))
     "ETS pump power"
     annotation (Placement(transformation(extent={{180,230},{200,250}})));
   Modelica.Blocks.Continuous.Integrator EPumETS(
-    initType=Modelica.Blocks.Types.Init.InitialState)
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "ETS pump electric energy"
     annotation (Placement(transformation(extent={{240,230},{260,250}})));
   Modelica.Blocks.Continuous.Integrator EPumDis(
-    initType=Modelica.Blocks.Types.Init.InitialState)
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Distribution pump electric energy"
     annotation (Placement(transformation(extent={{220,-90},{240,-70}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum EPum(nin=3)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum EPum(
+    nin=3,
+    u(each unit="J",
+     each displayUnit="Wh"),
+    y(each unit="J",
+      each displayUnit="Wh"))
     "Total pump electric energy"
     annotation (Placement(transformation(extent={{300,150},{320,170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PHeaPump(nin=nBui)
     "Heat pump power"
     annotation (Placement(transformation(extent={{180,190},{200,210}})));
   Modelica.Blocks.Continuous.Integrator EHeaPum(
-    initType=Modelica.Blocks.Types.Init.InitialState)
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Heat pump electric energy"
     annotation (Placement(transformation(extent={{240,190},{260,210}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=3) "Total electric energy"
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(
+    nin=3,
+    u(each unit="J",
+      each displayUnit="Wh"),
+    y(each unit="J",
+      each displayUnit="Wh"))
+    "Total electric energy"
     annotation (Placement(transformation(extent={{362,90},{382,110}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
@@ -294,36 +316,70 @@ model FiveHubsPlantMultiFlow
   Buildings.BoundaryConditions.WeatherData.Bus weaBus annotation (Placement(
         transformation(extent={{-320,-40},{-280,0}}), iconTransformation(extent
           ={{-364,-80},{-344,-60}})));
-  Modelica.Blocks.Continuous.Integrator EPumDryCoo(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EPumDryCoo(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Dry cooler pump electric energy"
     annotation (Placement(transformation(extent={{100,118},{120,138}})));
-  Modelica.Blocks.Continuous.Integrator EPumHeaPumGly(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EPumHeaPumGly(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Heat pump glycol side pump electric energy"
     annotation (Placement(transformation(extent={{180,80},{200,100}})));
-  Modelica.Blocks.Continuous.Integrator EPumHexGly(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EPumHexGly(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Heat exchanger glycol side pump electric energy"
     annotation (Placement(transformation(extent={{140,100},{160,120}})));
-  Modelica.Blocks.Continuous.Integrator EComPla(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EComPla(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Plant heat pumps compressor electric energy"
     annotation (Placement(transformation(extent={{240,20},{260,40}})));
-  Modelica.Blocks.Continuous.Integrator EPumHeaPumWat(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EPumHeaPumWat(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Heat pump water side pump electric energy"
     annotation (Placement(transformation(extent={{180,0},{200,20}})));
-  Modelica.Blocks.Continuous.Integrator EPumCirPum(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EPumCirPum(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Circulation pump electric energy"
     annotation (Placement(transformation(extent={{180,-40},{200,-20}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum EPumPla(nin=7)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum EPumPla(
+    nin=7,
+    u(each unit="J",
+      each displayUnit="Wh"),
+    y(each unit="J",
+      each displayUnit="Wh"))
     "Plant pumps electricity energy"
     annotation (Placement(transformation(extent={{240,60},{260,80}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiMax looMaxTem(nin=nBui, y(unit="K",
-        displayUnit="degC")) "Maximum mixing temperature"
+  Buildings.Controls.OBC.CDL.Reals.MultiMax looMaxTem(
+    nin=nBui,
+    y(unit="K",
+      displayUnit="degC")) "Maximum mixing temperature"
     annotation (Placement(transformation(extent={{-300,-150},{-280,-130}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiMin looMinTem(nin=nBui, y(unit="K",
-        displayUnit="degC")) "Minimum mixing temperature"
+  Buildings.Controls.OBC.CDL.Reals.MultiMin looMinTem(
+    nin=nBui,
+    y(unit="K",
+    displayUnit="degC")) "Minimum mixing temperature"
     annotation (Placement(transformation(extent={{-300,-190},{-280,-170}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum mulSum(nin=nBui)
-    annotation (Placement(transformation(extent={{-300,50},{-280,70}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter looMeaTem(k=1/nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter looMeaTem(
+    k=1/nBui,
+    y(final unit="K",
+      displayUnit="degC"))
     "Average mixing points temperature"
     annotation (Placement(transformation(extent={{-260,50},{-240,70}})));
   BoundaryConditions.WeatherData weaDat[nBui](
@@ -331,7 +387,11 @@ model FiveHubsPlantMultiFlow
     "Weather data reader"
     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
 
-  Modelica.Blocks.Continuous.Integrator EBorPer(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EBorPer(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Borefield energy for perimeter"
     annotation (Placement(transformation(extent={{180,-220},{200,-200}})));
   Buildings.Controls.OBC.CDL.Reals.Subtract sub
@@ -342,24 +402,52 @@ model FiveHubsPlantMultiFlow
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter plaHeaSup(final k=4184)
     "Heat flow rate supply from central plant"
     annotation (Placement(transformation(extent={{280,-180},{300,-160}})));
-  Modelica.Blocks.Continuous.Integrator EPlaHea(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EPlaHea(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Energy supply from central plant"
     annotation (Placement(transformation(extent={{320,-180},{340,-160}})));
-  Modelica.Blocks.Continuous.Integrator Eets[nBui](each initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator Eets[nBui](
+    each initType=Modelica.Blocks.Types.Init.InitialState,
+    u(each final unit="W"),
+    y(each final unit="J",
+      each displayUnit="Wh"))
     "Heat flow through each ETS"
     annotation (Placement(transformation(extent={{120,150},{140,170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum ETotEts(nin=nBui)
     "Sum of all the ETS heat flow"
     annotation (Placement(transformation(extent={{180,150},{200,170}})));
-  Modelica.Blocks.Continuous.Integrator EBorCen(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EBorCen(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Borefield energy for center"
     annotation (Placement(transformation(extent={{180,-250},{200,-230}})));
-  Modelica.Blocks.Continuous.Integrator EPumBorFiePer(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EPumBorFiePer(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Pump electric energy for borefield perimeter"
     annotation (Placement(transformation(extent={{140,60},{160,80}})));
-  Modelica.Blocks.Continuous.Integrator EPumBorFieCen(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EPumBorFieCen(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J",
+      displayUnit="Wh"))
     "Pump electric energy for borefield center"
     annotation (Placement(transformation(extent={{100,40},{120,60}})));
+protected
+  Buildings.Controls.OBC.CDL.Reals.MultiSum mulSum(
+    nin=nBui,
+    u(each unit="K",
+      each displayUnit="degC"),
+    y(each unit="K",
+      each displayUnit="degC"))
+    annotation (Placement(transformation(extent={{-300,50},{-280,70}})));
 equation
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
           {-14,210},{-14,240},{-10,240}},color={0,127,255}));

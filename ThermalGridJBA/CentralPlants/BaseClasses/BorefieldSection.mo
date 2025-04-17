@@ -66,9 +66,9 @@ model BorefieldSection "Section for a core or an edge of the borefield"
     "Average borehole wall temperatures perimeter elements" annotation (Placement(transformation(
           extent={{200,-120},{240,-80}}),iconTransformation(extent={{100,-50},{140,
             -10}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput TAveBorWalCor(
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput TAveBorWalCen(
     final unit="K",
-    displayUnit="degC") "Average borehole wall temperatures core elements"
+    displayUnit="degC") "Average borehole wall temperatures center elements"
                                                          annotation (
       Placement(transformation(extent={{200,-150},{240,-110}}),
                                                              iconTransformation(
@@ -78,29 +78,31 @@ model BorefieldSection "Section for a core or an edge of the borefield"
     "Fluid connector for perimeter of borefield"                                      annotation (
       Placement(transformation(extent={{-210,50},{-190,70}}),
         iconTransformation(extent={{-110,70},{-90,90}})));
-  Modelica.Fluid.Interfaces.FluidPort_a portCor_a(redeclare final package
-      Medium = Medium) "Fluid connector for core of borefield" annotation (
+  Modelica.Fluid.Interfaces.FluidPort_a portCen_a(redeclare final package
+      Medium = Medium) "Fluid connector for center of borefield"
+                                                               annotation (
       Placement(transformation(extent={{-210,-70},{-190,-50}}),
         iconTransformation(extent={{-110,-90},{-90,-70}})));
   Modelica.Fluid.Interfaces.FluidPort_b portPer_b(redeclare final package
       Medium = Medium) "Fluid connector outlet of perimeter borefield zones"
     annotation (Placement(transformation(extent={{190,50},{210,70}}),
         iconTransformation(extent={{90,70},{110,90}})));
-  Modelica.Fluid.Interfaces.FluidPort_b portCor_b(redeclare final package
-      Medium = Medium) "Fluid connector for core of the borefield" annotation
+  Modelica.Fluid.Interfaces.FluidPort_b portCen_b(redeclare final package
+      Medium = Medium) "Fluid connector for center of the borefield"
+                                                                   annotation
     (Placement(transformation(extent={{190,-70},{210,-50}}),iconTransformation(
           extent={{88,-90},{108,-70}})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort senTemEntCor(
+  Buildings.Fluid.Sensors.TemperatureTwoPort senTemEntCen(
     redeclare final package Medium = Medium,
     allowFlowReversal=false,
     m_flow_nominal=borFieDat.conDat.mZon_flow_nominal[2],
-    tau=0)
-    "Temperature of waterflow entering borefield core" annotation (Placement(
+    tau=0) "Temperature of waterflow entering borefield center"
+                                                       annotation (Placement(
         transformation(
         extent={{-10,-10},{10,10}},
         rotation=0,
         origin={-110,-60})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFloCor(redeclare each package
+  Buildings.Fluid.Sensors.MassFlowRate senMasFloCen(redeclare each package
       Medium = Medium, each allowFlowReversal=false)
     "Mass flow rate entering borefield"
     annotation (Placement(transformation(extent={{-90,-70},{-70,-50}})));
@@ -110,7 +112,7 @@ model BorefieldSection "Section for a core or an edge of the borefield"
     m_flow_nominal=borFieDat.conDat.mZon_flow_nominal[1],
     tau=0) "Heat flow rate sensor"
     annotation (Placement(transformation(extent={{150,-10},{170,10}})));
-  Buildings.Fluid.Sensors.HeatMeter senHeaFloCor(
+  Buildings.Fluid.Sensors.HeatMeter senHeaFloCen(
     redeclare package Medium = Medium,
     allowFlowReversal=false,
     m_flow_nominal=borFieDat.conDat.mZon_flow_nominal[2],
@@ -134,44 +136,44 @@ equation
   connect(TAveBorWalPer, borFie.TBorAve[1]) annotation (Line(points={{220,-100},
           {70,-100},{70,4.4},{61,4.4}},
                                     color={0,0,127}));
-  connect(TAveBorWalCor, borFie.TBorAve[2]) annotation (Line(points={{220,-130},
+  connect(TAveBorWalCen, borFie.TBorAve[2]) annotation (Line(points={{220,-130},
           {180,-130},{180,-110},{70,-110},{70,4.4},{61,4.4}},
                                                      color={0,0,127}));
   connect(senMasFloPer.m_flow, floGai[1].u)
     annotation (Line(points={{-80,11},{-80,62},{-52,62}}, color={0,0,127}));
-  connect(senMasFloCor.m_flow, floGai[2].u) annotation (Line(points={{-80,-49},{
+  connect(senMasFloCen.m_flow, floGai[2].u) annotation (Line(points={{-80,-49},{
           -80,-40},{-64,-40},{-64,62},{-52,62}}, color={0,0,127}));
   connect(senMasFloPer.port_b, borFie.port_a[1])
     annotation (Line(points={{-70,0},{40,0}}, color={0,127,255}));
-  connect(senMasFloCor.port_b, borFie.port_a[2]) annotation (Line(points={{-70,-60},
+  connect(senMasFloCen.port_b, borFie.port_a[2]) annotation (Line(points={{-70,-60},
           {12,-60},{12,0},{40,0}}, color={0,127,255}));
   connect(senTemEntPer.T, sou[1].T_in) annotation (Line(points={{-110,11},{-110,
           40},{-20,40},{-20,58},{-12,58}}, color={0,0,127}));
-  connect(senTemEntCor.T, sou[2].T_in) annotation (Line(points={{-110,-49},{-110,
+  connect(senTemEntCen.T, sou[2].T_in) annotation (Line(points={{-110,-49},{-110,
           -34},{-20,-34},{-20,58},{-12,58}}, color={0,0,127}));
-  connect(senTemEntCor.port_b, senMasFloCor.port_a)
+  connect(senTemEntCen.port_b,senMasFloCen. port_a)
     annotation (Line(points={{-100,-60},{-90,-60}}, color={0,127,255}));
   connect(senTemEntPer.port_b, senMasFloPer.port_a)
     annotation (Line(points={{-100,0},{-90,0}}, color={0,127,255}));
   connect(senHeaFloPer.port_b, portPer_b) annotation (Line(points={{170,0},{180,
           0},{180,60},{200,60}}, color={0,127,255}));
-  connect(senHeaFloCor.port_b, portCor_b)
+  connect(senHeaFloCen.port_b,portCen_b)
     annotation (Line(points={{172,-60},{200,-60}}, color={0,127,255}));
   connect(senHeaFloPer.TExt, senTemEntPer.T) annotation (Line(points={{148,6},{
           144,6},{144,28},{-110,28},{-110,11}}, color={0,0,127}));
-  connect(senHeaFloCor.TExt, senTemEntCor.T) annotation (Line(points={{150,-54},
+  connect(senHeaFloCen.TExt,senTemEntCen. T) annotation (Line(points={{150,-54},
           {144,-54},{144,-34},{-110,-34},{-110,-49}}, color={0,0,127}));
   connect(senTemEntPer.port_a, portPer_a) annotation (Line(points={{-120,0},{
           -160,0},{-160,60},{-200,60}}, color={0,127,255}));
-  connect(senTemEntCor.port_a, portCor_a)
+  connect(senTemEntCen.port_a,portCen_a)
     annotation (Line(points={{-120,-60},{-200,-60}}, color={0,127,255}));
   connect(senHeaFloPer.port_a, borFie.port_b[1])
     annotation (Line(points={{150,0},{60,0}}, color={0,127,255}));
-  connect(senHeaFloCor.port_a, borFie.port_b[2]) annotation (Line(points={{152,
+  connect(senHeaFloCen.port_a, borFie.port_b[2]) annotation (Line(points={{152,
           -60},{80,-60},{80,0},{60,0}}, color={0,127,255}));
   connect(senHeaFloPer.Q_flow, QPer_flow)
     annotation (Line(points={{160,11},{160,140},{220,140}}, color={0,0,127}));
-  connect(senHeaFloCor.Q_flow, QCor_flow) annotation (Line(points={{162,-49},{
+  connect(senHeaFloCen.Q_flow, QCor_flow) annotation (Line(points={{162,-49},{
           162,-34},{186,-34},{186,110},{220,110}}, color={0,0,127}));
   annotation (Diagram(coordinateSystem(extent={{-200,-160},{200,160}})),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
