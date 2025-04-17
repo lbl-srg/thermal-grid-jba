@@ -126,8 +126,8 @@ model Borefield "Borefield model"
     "Nominal water mass flow rate for all bores in center"
       annotation (Dialog(group="Borefield"));
 
-  final parameter Modelica.Units.SI.Temperature T_start=289.65
-    "Initial temperature of the soil";
+  parameter Modelica.Units.SI.Temperature T_start = 273.15+16
+    "Initial temperature of the soil of borefield";
 
   /////////////////////////////////////////////////
   // Connectors
@@ -205,7 +205,7 @@ model Borefield "Borefield model"
     annotation (Placement(transformation(extent={{-40,82},{-20,102}})));
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Filling.Bentonite filDat(kFil=1.0)
     "Borehole filling data"
-    annotation (Placement(transformation(extent={{-88,84},{-68,104}})));
+    annotation (Placement(transformation(extent={{-90,82},{-70,102}})));
 
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template corConDat(
     borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
@@ -388,9 +388,9 @@ equation
           48},{-60,48},{-60,40},{-68,40}}, color={0,127,255}));
   connect(corSec.portPer_a, masFloMulEntPer.port_b) annotation (Line(points={{-50,
           -32},{-60,-32},{-60,40},{-68,40}}, color={0,127,255}));
-  connect(masFloMulEntCen.port_b, edgSec.portCor_a) annotation (Line(points={{-70,
+  connect(masFloMulEntCen.port_b,edgSec.portCen_a)  annotation (Line(points={{-70,
           -40},{-56,-40},{-56,32},{-50,32}}, color={0,127,255}));
-  connect(masFloMulEntCen.port_b, corSec.portCor_a) annotation (Line(points={{-70,
+  connect(masFloMulEntCen.port_b,corSec.portCen_a)  annotation (Line(points={{-70,
           -40},{-56,-40},{-56,-48},{-50,-48}}, color={0,127,255}));
   connect(sumQPer_flow.y, QPer_flow)
     annotation (Line(points={{31,20},{120,20}}, color={0,0,127}));
@@ -398,9 +398,9 @@ equation
           {-10,48},{-10,70},{40,70}},       color={0,127,255}));
   connect(corSec.portPer_b, masFloMulLeaCorPer.port_a) annotation (Line(points=
           {{-30,-32},{-4,-32},{-4,40},{40,40}}, color={0,127,255}));
-  connect(edgSec.portCor_b, masFloMulLeaEdgCen.port_a) annotation (Line(points=
+  connect(edgSec.portCen_b, masFloMulLeaEdgCen.port_a) annotation (Line(points=
           {{-30.2,32},{-6,32},{-6,-30},{40,-30}}, color={0,127,255}));
-  connect(corSec.portCor_b, masFloMulLeaCorCen.port_a) annotation (Line(points={{-30.2,
+  connect(corSec.portCen_b, masFloMulLeaCorCen.port_a) annotation (Line(points={{-30.2,
           -48},{20,-48},{20,-60},{40,-60}},         color={0,127,255}));
   connect(masFloMulLeaEdgCen.port_b, portCen_b) annotation (Line(points={{60,
           -30},{80,-30},{80,-40},{100,-40}}, color={0,127,255}));
