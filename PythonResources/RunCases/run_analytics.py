@@ -103,9 +103,14 @@ for var in analysis['variables']:
     for i,scenario in enumerate(analysis['scenarios']):
         v = scenario['results'][var['name']]
         if 'quantity' in var.keys():
-            displayValue = f"{(v * units[var['quantity']]['unit']).to(units[var['quantity']]['displayUnit']).value:.0f}"
+            v_converted = (v * units[var['quantity']]['unit']).to(units[var['quantity']]['displayUnit']).value
+            if abs(v_converted) >= 1000:
+                format_string = r',.0f'
+            else:
+                format_string = r'.3g'
+            displayValue = f"{v_converted:{format_string}}"
         else:
-            displayValue = f"{v:.0f}"
+            displayValue = f"{v:.3g}"
         if PRINT_COMPARISON:
             if i == 0 :
                 vBase = v

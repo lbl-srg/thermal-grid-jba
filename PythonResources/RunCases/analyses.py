@@ -38,12 +38,12 @@ def cluster_results():
                     {'name' : 'EChi.u',
                      'quantity': 'power',
                      'action'  : lambda t, y: max(y),
-                     'caption' : 'Peak electric power input of ETS heat recovery chiller '
+                     'caption' : 'Peak electric power input of ETS heat recovery chiller'
                      },
                     {'name' : 'EChi.y',
                      'quantity': 'energy',
                      'action'  : lambda t, y: y[-1] - y[0],
-                     'caption' : 'Total electrical consumption of ETS heat recovery chiller '
+                     'caption' : 'Total electrical consumption of ETS heat recovery chiller'
                      },
                     {'name' : 'bui.bui.QReqHea_flow',
                      'quantity': 'power',
@@ -114,7 +114,7 @@ def heat_wave():
                     {'name' : 'EChi.y',
                      'quantity': 'energy',
                      'action'  : lambda t, y: y[-1] - y[0],
-                     'caption' : 'Total electrical consumption of ETS heat recovery chiller '
+                     'caption' : 'Total electrical consumption of ETS heat recovery chiller'
                      },
                     {'name' : 'dHHeaWat.y',
                      'quantity': 'energy',
@@ -129,7 +129,10 @@ def heat_wave():
                     {'name' : 'bui.ets.chi.chi.ySet',
                      'quantity': 'time',
                      'action'  : lambda t, y: condition_duration(t, y, lambda y: y > 0.99),
-                     'caption' : 'Total duration of chiller speed > 0.99'}
+                     'caption' : 'Total duration of chiller speed > 0.99'},
+                    {'name' : 'bui.ets.chi.chi.COP',
+                     'action'  : lambda t, y: np.mean(y[(np.isclose(t % 3600, 0)) & (y > 0.01)]),
+                     'caption' : 'ETS chiller average COP when on'}
                 ]
 
     scenarios = [
@@ -163,7 +166,7 @@ def cold_snap():
                     {'name' : 'EChi.y',
                      'quantity': 'energy',
                      'action'  : lambda t, y: y[-1] - y[0],
-                     'caption' : 'Total electrical consumption of ETS heat recovery chiller '
+                     'caption' : 'Total electrical consumption of ETS heat recovery chiller'
                      },
                     {'name' : 'dHHeaWat.y',
                      'quantity': 'energy',
@@ -178,7 +181,10 @@ def cold_snap():
                     {'name' : 'bui.ets.chi.chi.ySet',
                      'quantity': 'time',
                      'action'  : lambda t, y: condition_duration(t, y, lambda y: y > 0.99),
-                     'caption' : 'Total duration of chiller speed > 0.99'}
+                     'caption' : 'Total duration of chiller speed > 0.99'},
+                    {'name' : 'bui.ets.chi.chi.COP',
+                     'action'  : lambda t, y: np.mean(y[(np.isclose(t % 3600, 0)) & (y > 0.01)]),
+                     'caption' : 'ETS chiller average COP when on'}
                 ]
 
     scenarios = [
