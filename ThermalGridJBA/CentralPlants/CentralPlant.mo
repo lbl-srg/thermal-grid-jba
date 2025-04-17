@@ -13,6 +13,15 @@ model CentralPlant "Central plant"
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
+  parameter Real TPlaHeaSet(
+    unit="K",
+    displayUnit="degC")=TLooMin
+    "Design plant heating setpoint temperature";
+  parameter Real TPlaCooSet(
+    unit="K",
+    displayUnit="degC")=TLooMax
+    "Design plant cooling setpoint temperature";
+
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each generation module";
   parameter Real dpValve_nominal(unit="Pa")=6000
@@ -59,9 +68,6 @@ model CentralPlant "Central plant"
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
 
-  parameter Real samplePeriod(unit="s")=7200
-     "Sample period of district loop pump speed"
-    annotation (Dialog(tab="Controls", group="Indicators"));
   parameter Real TAppSet(unit="K")=2
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
@@ -71,12 +77,12 @@ model CentralPlant "Central plant"
   parameter Real minFanSpe(unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TCooSet(unit="K")=TLooMin
-    "Heat pump tracking temperature setpoint in cooling mode"
-    annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=TLooMax
-    "Heat pump tracking temperature setpoint in heating mode"
-    annotation (Dialog(tab="Controls", group="Heat pump"));
+//   parameter Real TCooSet(unit="K")=TLooMin
+//     "Heat pump tracking temperature setpoint in cooling mode"
+//     annotation (Dialog(tab="Controls", group="Heat pump"));
+//   parameter Real THeaSet(unit="K")=TLooMax
+//     "Heat pump tracking temperature setpoint in heating mode"
+//     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K", displayUnit="degC")
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
@@ -101,14 +107,17 @@ model CentralPlant "Central plant"
     "Fluid connector for waterflow from the district"
     annotation (Placement(transformation(extent={{-250,-10},{-230,10}}),
       iconTransformation(extent={{-110,-10},{-90,10}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TPlaOut(
+    final unit="K",
+    final quantity="ThermodynamicTemperature",
+    displayUnit="degC")
+    "Central plant outlet water temperature"
+    annotation (Placement(transformation(extent={{-280,120},{-240,160}}),
+        iconTransformation(extent={{-140,60},{-100,100}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput uDisPum
     "District loop pump speed"
-    annotation (Placement(transformation(extent={{-280,100},{-240,140}}),
-        iconTransformation(extent={{-140,70},{-100,110}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput uSolTim
-    "Solar time. An output from weather data"
-    annotation (Placement(transformation(extent={{-280,60},{-240,100}}),
-        iconTransformation(extent={{-140,50},{-100,90}})));
+    annotation (Placement(transformation(extent={{-280,70},{-240,110}}),
+        iconTransformation(extent={{-140,40},{-100,80}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TMixAve(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -135,8 +144,8 @@ model CentralPlant "Central plant"
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Ambient dry bulb temperature"
-    annotation (Placement(transformation(extent={{-280,180},{-240,220}}),
-        iconTransformation(extent={{-140,90},{-100,130}})));
+    annotation (Placement(transformation(extent={{-280,40},{-240,80}}),
+        iconTransformation(extent={{-140,20},{-100,60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(quantity="Power",
       final unit="W")
     "Electrical power consumed by circulation pump"
@@ -190,9 +199,11 @@ model CentralPlant "Central plant"
     annotation (Placement(transformation(extent={{320,220},{360,260}}),
         iconTransformation(extent={{100,70},{140,110}})));
 
-  ThermalGridJBA.CentralPlants.Generations gen(
+  Generations gen(
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,
+    final TPlaHeaSet=TPlaHeaSet,
+    final TPlaCooSet=TPlaCooSet,
     final mWat_flow_nominal=mWat_flow_nominal,
     mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
@@ -211,12 +222,9 @@ model CentralPlant "Central plant"
     final QHeaPumCoo_flow_nominal=QHeaPumCoo_flow_nominal,
     final TConCoo_nominal=TConCoo_nominal,
     final TEvaCoo_nominal=TEvaCoo_nominal,
-    final samplePeriod=samplePeriod,
     final TAppSet=TAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
-    final TCooSet=TCooSet,
-    final THeaSet=THeaSet,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,
@@ -258,16 +266,13 @@ model CentralPlant "Central plant"
 
 equation
 
-  connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},{
-          -170,9},{-162,9}}, color={0,0,127}));
-  connect(uSolTim, gen.uSolTim) annotation (Line(points={{-260,80},{-180,80},{-180,
-          6},{-162,6}}, color={0,0,127}));
+  connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,
+          5},{-162,5}},      color={0,0,127}));
   connect(TMixAve, gen.TMixAve) annotation (Line(points={{-260,-80},{-190,-80},{
           -190,-4.2},{-162,-4.2}},
                         color={0,0,127}));
-  connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,200},{-180,200},{
-          -180,1.8},{-162,1.8}},
-                               color={0,0,127}));
+  connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,60},{-186,60},{-186,
+          1.8},{-162,1.8}},    color={0,0,127}));
   connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-130,9},{-130,
           240},{340,240}}, color={0,0,127}));
   connect(heaPumHea.y, EHeaPumEne.u)
@@ -312,6 +317,8 @@ equation
           -140},{-186,-8.2},{-162,-8.2}}, color={0,0,127}));
   connect(TLooMinMea, gen.TLooMinMea) annotation (Line(points={{-260,-200},{-182,
           -200},{-182,-12.2},{-162,-12.2}}, color={0,0,127}));
+  connect(TPlaOut, gen.TPlaOut) annotation (Line(points={{-260,140},{-174,140},{
+          -174,8},{-162,8}}, color={0,0,127}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

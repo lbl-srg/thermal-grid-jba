@@ -19,8 +19,7 @@ model CentralPlant "Validation model for central plant"
     QHeaPumCoo_flow_nominal=-mPlaWat_flow_nominal*4186*dT_nominal,
     TConCoo_nominal=315.15,
     TConInMin=291.15,
-    TEvaInMax=289.65)
-    "Central plant"
+    TEvaInMax=289.65) "Central plant"
     annotation (Placement(transformation(extent={{20,-50},{40,-30}})));
   Buildings.Fluid.Sources.MassFlowSource_T
                                       sou(
@@ -41,8 +40,6 @@ model CentralPlant "Validation model for central plant"
     offset=0.6)
     "District pump speed"
     annotation (Placement(transformation(extent={{-90,60},{-70,80}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.CivilTime civTim
-    annotation (Placement(transformation(extent={{-90,20},{-70,40}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Sin mixWatTem(
     amplitude=8,
     freqHz=1/(24*365*3600),
@@ -80,16 +77,14 @@ equation
   connect(disPum.y, gai.u)
     annotation (Line(points={{-68,70},{18,70}}, color={0,0,127}));
   connect(disPum.y, cenPla.uDisPum) annotation (Line(points={{-68,70},{10,70},{
-          10,-31},{18,-31}},
+          10,-34},{18,-34}},
                            color={0,0,127}));
-  connect(civTim.y, cenPla.uSolTim) annotation (Line(points={{-68,30},{4,30},{4,
-          -33},{18,-33}},   color={0,0,127}));
   connect(mixWatTem.y, sou.T_in) annotation (Line(points={{-68,-20},{-60,-20},{-60,
           4},{-50,4}},                     color={0,0,127}));
   connect(mixWatTem.y, cenPla.TMixAve) annotation (Line(points={{-68,-20},{6,-20},
           {6,-44},{18,-44}},color={0,0,127}));
   connect(dryBul.y, cenPla.TDryBul) annotation (Line(points={{-68,-50},{10,-50},
-          {10,-29},{18,-29}},                color={0,0,127}));
+          {10,-36},{18,-36}},                color={0,0,127}));
   connect(sou.ports[1], jun.port_1)
     annotation (Line(points={{-28,0},{-20,0}}, color={0,127,255}));
   connect(jun.port_2, jun1.port_1)

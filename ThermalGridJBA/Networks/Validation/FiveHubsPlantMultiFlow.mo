@@ -25,9 +25,19 @@ model FiveHubsPlantMultiFlow
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
   // Central plant
-  parameter Real samplePeriod(unit="s")=datDis.samplePeriod
-    "Sample period of district loop pump speed"
+  parameter Real TPlaHeaSet(
+    unit="K",
+    displayUnit="degC")=datDis.TPlaHeaSet
+    "Design plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
+  parameter Real TPlaCooSet(
+    unit="K",
+    displayUnit="degC")=datDis.TPlaCooSet
+    "Design plant cooling setpoint temperature"
+    annotation (Dialog(tab="Central plant"));
+//   parameter Real samplePeriod(unit="s")=datDis.samplePeriod
+//     "Sample period of district loop pump speed"
+//     annotation (Dialog(tab="Central plant"));
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
     annotation (Dialog(tab="Central plant"));
@@ -91,12 +101,12 @@ model FiveHubsPlantMultiFlow
   parameter Real minPlaComSpe(unit="1")=datDis.minPlaComSpe
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TCooSet(unit="K")=datDis.TCooSet
-    "Heat pump tracking temperature setpoint in cooling mode"
-    annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=datDis.THeaSet
-    "Heat pump tracking temperature setpoint in heating mode"
-    annotation (Dialog(tab="Central plant", group="Heat pump"));
+//   parameter Real TCooSet(unit="K")=datDis.TCooSet
+//     "Heat pump tracking temperature setpoint in cooling mode"
+//     annotation (Dialog(tab="Central plant", group="Heat pump"));
+//   parameter Real THeaSet(unit="K")=datDis.THeaSet
+//     "Heat pump tracking temperature setpoint in heating mode"
+//     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real offTim(unit="s")=datDis.offTim
     "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
@@ -243,6 +253,8 @@ model FiveHubsPlantMultiFlow
   CentralPlants.CentralPlant cenPla(
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
+    TPlaHeaSet=datDis.TPlaHeaSet,
+    TPlaCooSet=datDis.TPlaCooSet,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -257,12 +269,9 @@ model FiveHubsPlantMultiFlow
     final QHeaPumCoo_flow_nominal=QPlaHeaPumCoo_flow_nominal,
     final TConCoo_nominal=TPlaConCoo_nominal,
     final TEvaCoo_nominal=TPlaEvaCoo_nominal,
-    final samplePeriod=samplePeriod,
     final TAppSet=TAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
-    final TCooSet=TCooSet,
-    final THeaSet=THeaSet,
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,
@@ -412,15 +421,7 @@ equation
   connect(gai.y, pumDis.m_flow_in) annotation (Line(points={{22,-160},{40,-160},
           {40,-60},{78,-60}}, color={0,0,127}));
   connect(looPumSpe.yDisPum, cenPla.uDisPum) annotation (Line(points={{-38,-160},
-          {-20,-160},{-20,-200},{-180,-200},{-180,9},{-162,9}}, color={0,0,127}));
-  connect(weaBus.solTim, cenPla.uSolTim) annotation (Line(
-      points={{-299.9,-19.9},{-260,-19.9},{-260,7},{-162,7}},
-      color={255,204,51},
-      thickness=0.5), Text(
-      string="%first",
-      index=-1,
-      extent={{-6,3},{-6,3}},
-      horizontalAlignment=TextAlignment.Right));
+          {-20,-160},{-20,-200},{-180,-200},{-180,6},{-162,6}}, color={0,0,127}));
   connect(weaDat[1].weaBus, weaBus) annotation (Line(
       points={{-360,-20},{-300,-20}},
       color={255,204,51},
@@ -456,8 +457,8 @@ equation
           {-80,-180},{-80,-166},{-62,-166}}, color={0,0,127}));
   connect(mulSum.y, looMeaTem.u)
     annotation (Line(points={{-278,60},{-262,60}}, color={0,0,127}));
-  connect(looMeaTem.y, cenPla.TMixAve) annotation (Line(points={{-238,60},{-170,
-          60},{-170,-4},{-162,-4}},
+  connect(looMeaTem.y, cenPla.TMixAve) annotation (Line(points={{-238,60},{-190,
+          60},{-190,-4},{-162,-4}},
                                   color={0,0,127}));
   connect(cenPla.PPumDryCoo, EPumDryCoo.u) annotation (Line(points={{-138,5},{
           -128,5},{-128,128},{98,128}},
@@ -492,7 +493,7 @@ equation
   connect(plaHeaSup.y, EPlaHea.u)
     annotation (Line(points={{302,-170},{318,-170}}, color={0,0,127}));
   connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
-      points={{-299.9,-19.9},{-260,-19.9},{-260,11},{-162,11}},
+      points={{-299.9,-19.9},{-260,-19.9},{-260,4},{-162,4}},
       color={255,204,51},
       thickness=0.5), Text(
       string="%first",
@@ -519,6 +520,8 @@ equation
           -260,-8},{-260,-140},{-278,-140}}, color={0,0,127}));
   connect(cenPla.TLooMinMea, looMinTem.y) annotation (Line(points={{-162,-12},{
           -256,-12},{-256,-180},{-278,-180}}, color={0,0,127}));
+  connect(TDisWatSup.T, cenPla.TPlaOut) annotation (Line(points={{-91,150},{
+          -220,150},{-220,8},{-162,8}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
@@ -526,7 +529,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=1296000,
+      StopTime=31536000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
