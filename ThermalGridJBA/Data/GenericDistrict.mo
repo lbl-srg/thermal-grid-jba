@@ -76,7 +76,7 @@ record GenericDistrict "District network design parameters"
     *TApp
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConHea_nominal(unit="K")=TLooMin + TApp
+  parameter Real TPlaConHea_nominal(unit="K")=TLooMin
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaEvaHea_nominal(unit="K")=260.15
@@ -86,13 +86,13 @@ record GenericDistrict "District network design parameters"
     QPlaHeaPumHea_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConCoo_nominal(unit="K")=315.15
+  parameter Real TPlaConCoo_nominal(unit="K")=22+273.15
     "Nominal temperature used to size the heat pump in cooling mode (hot side maximum temperature)"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 //   parameter Real TPlaEvaCoo_nominal(unit="K")=TLooMax + TApp
 //     "Nominal temperature of the heated fluid in cooling mode"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaCoo_nominal(unit="K")=TPlaConCoo_nominal + TApp
+  parameter Real TPlaEvaCoo_nominal(unit="K")=42+273.15
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConInMin(unit="K")=TLooMax - TApp - TAppSet

@@ -480,17 +480,15 @@ model Generations
     final QHea_flow_nominal=QHeaPumHea_flow_nominal,
     final QCoo_flow_nominal=QHeaPumCoo_flow_nominal,
     redeclare model RefrigerantCycleHeatPumpHeating =
-        Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness(
-          redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
-            iceFacCal,
-          TAppCon_nominal=0,
-          TAppEva_nominal=0),
+        Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness
+        (redeclare
+          Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
+          iceFacCal),
     redeclare model RefrigerantCycleHeatPumpCooling =
-        Buildings.Fluid.Chillers.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness(
-          redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
-            iceFacCal,
-          TAppCon_nominal=0,
-          TAppEva_nominal=0),
+        Buildings.Fluid.Chillers.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness
+        (redeclare
+          Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
+          iceFacCal),
     final TConHea_nominal=TConHea_nominal,
     final TEvaHea_nominal=TEvaHea_nominal,
     final TConCoo_nominal=TConCoo_nominal,
