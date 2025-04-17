@@ -1,6 +1,6 @@
 within ThermalGridJBA.Networks.Validation;
-model SinglePlantSingleHub
-  "District network with a single plant and a single combined hub"
+model IdealPlantCombinedHub
+  "District network with an ideal plant and a single combined hub"
   extends Modelica.Icons.Example;
 
   parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
@@ -294,4 +294,4 @@ The pressurisation point of the loop is moved to upstream the main pump.
 </ul>
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
-end SinglePlantSingleHub;
+end IdealPlantCombinedHub;

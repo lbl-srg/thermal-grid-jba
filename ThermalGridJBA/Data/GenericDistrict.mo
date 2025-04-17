@@ -87,13 +87,13 @@ record GenericDistrict "District network design parameters"
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConCoo_nominal(unit="K")=22+273.15
-    "Nominal temperature used to size the heat pump in cooling mode (hot side maximum temperature)"
+    "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 //   parameter Real TPlaEvaCoo_nominal(unit="K")=TLooMax + TApp
 //     "Nominal temperature of the heated fluid in cooling mode"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaEvaCoo_nominal(unit="K")=42+273.15
-    "Nominal temperature of the heated fluid in cooling mode"
+    "Nominal temperature used to size the heat pump in cooling mode (hot side maximum temperature)"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConInMin(unit="K")=TLooMax - TApp - TAppSet
     "Minimum condenser inlet temperature"
