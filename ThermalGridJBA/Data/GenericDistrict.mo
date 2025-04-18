@@ -1,6 +1,8 @@
 within ThermalGridJBA.Data;
 record GenericDistrict "District network design parameters"
   extends Modelica.Icons.Record;
+
+  constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
   parameter Integer nBui
     "Number of served buildings"
     annotation(Evaluate=true);
@@ -16,13 +18,13 @@ record GenericDistrict "District network design parameters"
   parameter Modelica.Units.SI.TemperatureDifference dTLoo_nominal=4
     "Design temperature difference of the district loop";
 
-  parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=
-    max(abs(QPlaPeaCoo_flow),QPlaPeaHea_flow)/(Buildings.Utilities.Psychrometrics.Constants.cpWatLiq * dTLoo_nominal)
-    "Nominal mass flow rate of main distribution pump";
-
 //   parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=
-//     sum(mCon_flow_nominal)
+//     max(abs(QPlaPeaCoo_flow),QPlaPeaHea_flow)/(Buildings.Utilities.Psychrometrics.Constants.cpWatLiq * dTLoo_nominal)
 //     "Nominal mass flow rate of main distribution pump";
+
+  parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=
+    sum(mCon_flow_nominal)
+    "Nominal mass flow rate of main distribution pump";
   parameter Modelica.Units.SI.MassFlowRate mPipDis_flow_nominal=
       mPumDis_flow_nominal "Nominal mass flow rate for main pipe sizing";
   parameter Modelica.Units.SI.MassFlowRate mCon_flow_nominal[nBui]
@@ -96,7 +98,11 @@ record GenericDistrict "District network design parameters"
   parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=QPlaPeaHea_flow
+//   parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=QPlaPeaHea_flow
+//     "Nominal heating capacity"
+//     annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=
+    mPlaWat_flow_nominal*cpWatLiq*dTLoo_nominal
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConHea_nominal(unit="K")=TLooMin
@@ -105,7 +111,10 @@ record GenericDistrict "District network design parameters"
   parameter Real TPlaEvaHea_nominal(unit="K")=260.15
     "Nominal temperature used to size the heat pump in heating mode (cold side minimum temperature)"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=QPlaPeaCoo_flow
+//   parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=QPlaPeaCoo_flow
+//     "Nominal cooling capacity"
+//     annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-QPlaHeaPumHea_flow_nominal
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaConCoo_nominal(unit="K")=22 + 273.15
