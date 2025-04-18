@@ -1,6 +1,7 @@
 within ThermalGridJBA.Networks.Validation;
-model SinglePlantFiveHubs "District with five hubs"
-  extends ThermalGridJBA.Networks.Validation.SinglePlantSingleHub(
+model IdealPlantFiveHubs "District with an ideal plant and five hubs"
+  extends ThermalGridJBA.Networks.Validation.IdealPlantCombinedHub
+                                                                 (
     redeclare ThermalGridJBA.Data.Districts.FiveHubs datDis(
       mCon_flow_nominal=bui.ets.hex.m1_flow_nominal),
     bui(ets(chi(pumEva(each use_riseTime=false)))));
@@ -20,4 +21,4 @@ District with five clustered hubs.
 </p>
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
-end SinglePlantFiveHubs;
+end IdealPlantFiveHubs;
