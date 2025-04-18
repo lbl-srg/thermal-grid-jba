@@ -1,4 +1,4 @@
 removePlots(true)
 
-simulateModel("ThermalGridJBA.BoundaryConditions.Validation.WeatherData", stopTime=31536000, method="Cvode", tolerance=1e-05, resultFile="WeatherData");
+simulateModel("ThermalGridJBA.BoundaryConditions.Validation.WeatherData", stopTime=31536000, outputInterval=3600, method="Cvode", tolerance=1e-05, resultFile="WeatherData");
 createPlot(id=1, position={43, 19, 1056, 489}, y={"weaDat_fTMY.weaBus.TDryBul", "weaDat_HeaWav.weaBus.TDryBul", "weaDat_ColSna.weaBus.TDryBul"}, range={0.0, 32000000.0, -15.0, 45.0}, grid=true, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="s", displayUnits={"degC", "degC", "degC"});

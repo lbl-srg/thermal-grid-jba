@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-epw_file = os.path.join('/home/casper/gitRepo/thermal-grid-jba/PythonResources/Data/Weather/USA_MD_Andrews.AFB.Extreme.epw')
+CWD = os.getcwd()
+
+epw_file = os.path.realpath(os.path.join(CWD,"../Weather/USA_MD_Andrews.AFB.745940_TMY3.epw"))
 
 df = pd.read_csv(epw_file, skiprows=8, header=None)
 
@@ -32,3 +34,5 @@ date_time = pd.to_datetime('2005' + '-' +
 fig, ax = plt.subplots(1,1,figsize=(10, 4))
 
 ax.plot(date_time, dry_bulb_temp,linewidth=0.5)
+
+    

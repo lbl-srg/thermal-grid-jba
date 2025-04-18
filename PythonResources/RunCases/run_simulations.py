@@ -24,14 +24,15 @@ CASE_LIST = 'minimum'
 """
 CASE_SPECS = {
      'start_time' : 0 * 24 * 3600,
-     'stop_time'  : 365 * 24 * 3600,
+     'stop_time'  : 365* 24 * 3600,
+     'number_of_intervals' : 365 * 24,
      'solver'     : 'cvode'}
 """ Sets simulation specifications for all cases,
         UNLESS such a specification is already in the case constructor,
         in which case this specification is ignored.
 """
-CASE_SCENARIOS = ['futu']
-#CASE_SCENARIOS = ['futu', 'heat', 'cold']
+# CASE_SCENARIOS = ['futu']
+CASE_SCENARIOS = ['futu', 'heat', 'cold']
 """ List of weather scenarios:
         'base', 'post' : TMY3, also chooses baseline or post-retrofit load files
         'futu' : fTMY
@@ -155,6 +156,8 @@ def _simulate(spec):
         s.setSolver(spec['solver'])
     else:
         s.setSolver("Cvode")
+    if 'number_of_intervals' in spec:
+        s.setNumberOfIntervals(n=spec['number_of_intervals'])
     if 'modifiers' in spec:
         s.addModelModifier(spec['modifiers'])
     if 'parameters' in spec:
