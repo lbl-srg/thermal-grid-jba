@@ -68,6 +68,10 @@ model CentralPlant "Central plant"
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
 
+  parameter Real staDowDel(
+    unit="s")=3600
+    "Minimum stage down delay, to avoid quickly staging down"
+    annotation (Dialog(tab="Controls"));
   parameter Real TAppSet(unit="K")=2
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
@@ -101,6 +105,9 @@ model CentralPlant "Central plant"
   parameter Real minComSpe(unit="1")=0.2
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real minHeaPumSpeHol=120
+    "Threshold time for checking if the compressor has been in the minimum speed"
+     annotation (Dialog(tab="Controls", group="Heat pump"));
 
   Modelica.Fluid.Interfaces.FluidPort_a port_a(
     redeclare final package Medium = MediumW)
@@ -195,7 +202,7 @@ model CentralPlant "Central plant"
     annotation (Placement(transformation(extent={{320,160},{360,200}}),
         iconTransformation(extent={{100,30},{140,70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
-    "Current electricity rate, cent per kWh"
+    "Current electricity rate, dollor per kWh"
     annotation (Placement(transformation(extent={{320,220},{360,260}}),
         iconTransformation(extent={{100,70},{140,110}})));
 
@@ -222,6 +229,7 @@ model CentralPlant "Central plant"
     final QHeaPumCoo_flow_nominal=QHeaPumCoo_flow_nominal,
     final TConCoo_nominal=TConCoo_nominal,
     final TEvaCoo_nominal=TEvaCoo_nominal,
+    final staDowDel=staDowDel,
     final TAppSet=TAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
@@ -231,6 +239,7 @@ model CentralPlant "Central plant"
     holOnTim=holOnTim,
     holOffTim=holOffTim,
     final minComSpe=minComSpe,
+    final minHeaPumSpeHol=minHeaPumSpeHol,
     kHeaPum=0.1,
     TiHeaPum=200,
     kVal=0.1,
@@ -264,6 +273,9 @@ model CentralPlant "Central plant"
         transformation(extent={{320,-250},{360,-210}}), iconTransformation(
           extent={{100,-200},{140,-160}})));
 
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=1/100)
+    "Convert cent to dollor"
+    annotation (Placement(transformation(extent={{140,230},{160,250}})));
 equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,
@@ -273,8 +285,6 @@ equation
                         color={0,0,127}));
   connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,60},{-186,60},{-186,
           1.8},{-162,1.8}},    color={0,0,127}));
-  connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-130,9},{-130,
-          240},{340,240}}, color={0,0,127}));
   connect(heaPumHea.y, EHeaPumEne.u)
     annotation (Line(points={{-79,220},{-62,220}}, color={0,0,127}));
   connect(hexHea.y, EHexEne.u)
@@ -319,6 +329,10 @@ equation
           -200},{-182,-12.2},{-162,-12.2}}, color={0,0,127}));
   connect(TPlaOut, gen.TPlaOut) annotation (Line(points={{-260,140},{-174,140},{
           -174,8},{-162,8}}, color={0,0,127}));
+  connect(gen.yEleRat, gai1.u) annotation (Line(points={{-138,9},{-130,9},{-130,
+          240},{138,240}}, color={0,0,127}));
+  connect(gai1.y, yEleRat)
+    annotation (Line(points={{162,240},{340,240}}, color={0,0,127}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
