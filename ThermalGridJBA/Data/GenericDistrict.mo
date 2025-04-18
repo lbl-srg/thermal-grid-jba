@@ -7,10 +7,10 @@ record GenericDistrict "District network design parameters"
   parameter String filNam[nBui]
     "Library paths of the files with thermal loads as time series";
 
-  parameter Real QPlaPeaHea_flow(unit="W")
+  parameter Real QPlaPeaHea_flow(unit="W") = 10
     "Peak heating load at all the ETS heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaPeaCoo_flow(unit="W")
+  parameter Real QPlaPeaCoo_flow(unit="W") = -10
     "Peak cooling load at all the ETS heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Modelica.Units.SI.TemperatureDifference dTLoo_nominal=4
