@@ -25,6 +25,10 @@ model DetailedPlantFiveHubs
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
   // Central plant
+  parameter Real staDowDel(
+    unit="s")=datDis.staDowDel
+    "Minimum stage down delay, to avoid quickly staging down"
+   annotation (Dialog(tab="Central plant"));
   parameter Real TPlaHeaSet(
     unit="K",
     displayUnit="degC")=datDis.TPlaHeaSet
@@ -101,6 +105,9 @@ model DetailedPlantFiveHubs
   parameter Real minPlaComSpe(unit="1")=datDis.minPlaComSpe
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
+  parameter Real minHeaPumSpeHol=datDis.minHeaPumSpeHol
+    "Threshold time for checking if the compressor has been in the minimum speed"
+     annotation (Dialog(tab="Central plant", group="Heat pump"));
 //   parameter Real TCooSet(unit="K")=datDis.TCooSet
 //     "Heat pump tracking temperature setpoint in cooling mode"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
@@ -264,7 +271,7 @@ model DetailedPlantFiveHubs
     y(each unit="J",
       each displayUnit="Wh"))
     "Total electric energy"
-    annotation (Placement(transformation(extent={{362,90},{382,110}})));
+    annotation (Placement(transformation(extent={{360,90},{380,110}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
     final uMax(final unit="K", displayUnit="degC")=datDis.TLooMax,
@@ -275,8 +282,8 @@ model DetailedPlantFiveHubs
   CentralPlants.CentralPlant cenPla(
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
-    TPlaHeaSet=datDis.TPlaHeaSet,
-    TPlaCooSet=datDis.TPlaCooSet,
+    final TPlaHeaSet=TPlaHeaSet,
+    final TPlaCooSet=TPlaCooSet,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -291,6 +298,7 @@ model DetailedPlantFiveHubs
     final QHeaPumCoo_flow_nominal=QPlaHeaPumCoo_flow_nominal,
     final TConCoo_nominal=TPlaConCoo_nominal,
     final TEvaCoo_nominal=TPlaEvaCoo_nominal,
+    final staDowDel=staDowDel,
     final TAppSet=TAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
@@ -300,7 +308,9 @@ model DetailedPlantFiveHubs
     final holOnTim=holOnTim,
     final holOffTim=holOffTim,
     final minComSpe=minPlaComSpe,
-    TSoi_start=datDis.TSoi_start) "Central plant"
+    final TSoi_start=datDis.TSoi_start,
+    final minHeaPumSpeHol=minHeaPumSpeHol)
+    "Central plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
@@ -351,7 +361,7 @@ model DetailedPlantFiveHubs
     y(final unit="J",
       displayUnit="Wh"))
     "Heat pump water side pump electric energy"
-    annotation (Placement(transformation(extent={{180,0},{200,20}})));
+    annotation (Placement(transformation(extent={{140,-2},{160,18}})));
   Modelica.Blocks.Continuous.Integrator EPumCirPum(
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
@@ -415,8 +425,7 @@ model DetailedPlantFiveHubs
     each initType=Modelica.Blocks.Types.Init.InitialState,
     u(each final unit="W"),
     y(each final unit="J",
-      each displayUnit="Wh"))
-    "Heat flow through each ETS"
+      each displayUnit="Wh")) "Heat flow through each ETS"
     annotation (Placement(transformation(extent={{120,150},{140,170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum ETotEts(nin=nBui)
     "Sum of all the ETS heat flow"
@@ -502,10 +511,10 @@ equation
   connect(PHeaPump.y, EHeaPum.u)
     annotation (Line(points={{202,200},{238,200}}, color={0,0,127}));
   connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{261,200},{350,200},{
-          350,99.3333},{360,99.3333}},
+          350,99.3333},{358,99.3333}},
                                    color={0,0,127}));
   connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,160},{340,160},{340,
-          100},{360,100}},     color={0,0,127}));
+          100},{358,100}},     color={0,0,127}));
   connect(TDisWatSup.T, conVio.u[1]) annotation (Line(points={{-91,150},{-220,
           150},{-220,-126},{160,-126},{160,-120.5},{318,-120.5}},
                                                                 color={0,0,127}));
@@ -551,15 +560,15 @@ equation
   connect(EPumHeaPumGly.y, EPumPla.u[3]) annotation (Line(points={{201,90},{220,
           90},{220,69.7143},{238,69.7143}},
                                   color={0,0,127}));
-  connect(EPumHeaPumWat.y, EPumPla.u[4]) annotation (Line(points={{201,10},{228,
-          10},{228,70},{238,70},{238,70}},   color={0,0,127}));
+  connect(EPumHeaPumWat.y, EPumPla.u[4]) annotation (Line(points={{161,8},{228,
+          8},{228,70},{238,70}},             color={0,0,127}));
   connect(EPumCirPum.y, EPumPla.u[5]) annotation (Line(points={{201,-30},{226,
           -30},{226,70.2857},{238,70.2857}},
                                        color={0,0,127}));
   connect(EPumPla.y, EPum.u[3]) annotation (Line(points={{262,70},{282,70},{282,
           160.667},{298,160.667}}, color={0,0,127}));
   connect(EComPla.y, ETot.u[3]) annotation (Line(points={{261,30},{320,30},{320,
-          100.667},{360,100.667}},
+          100.667},{358,100.667}},
                                  color={0,0,127}));
   connect(dis.TOut, mulSum.u) annotation (Line(points={{22,194},{40,194},{40,170},
           {-320,170},{-320,60},{-302,60}}, color={0,0,127}));
@@ -587,8 +596,7 @@ equation
   connect(cenPla.PCom, EComPla.u) annotation (Line(points={{-138,-10},{-114,-10},
           {-114,30},{238,30}},color={0,0,127}));
   connect(cenPla.PPumHeaPumWat, EPumHeaPumWat.u) annotation (Line(points={{-138,
-          -12},{-112,-12},{-112,10},{178,10}},
-                                             color={0,0,127}));
+          -12},{-112,-12},{-112,8},{138,8}}, color={0,0,127}));
   connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-138,-14},
           {-120,-14},{-120,-30},{178,-30}},
                                      color={0,0,127}));
@@ -609,7 +617,7 @@ equation
   connect(plaHeaSup.y, EPlaHea.u)
     annotation (Line(points={{302,-170},{318,-170}}, color={0,0,127}));
   connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
-      points={{-299.9,-19.9},{-260,-19.9},{-260,4},{-162,4}},
+      points={{-299.9,-19.9},{-266,-19.9},{-266,4},{-162,4}},
       color={255,204,51},
       thickness=0.5), Text(
       string="%first",
@@ -677,7 +685,7 @@ This model has a configuration of one single central plant in the loop
 instead of two.
 </li>
 <li>
-The plant is replaced with an idealised component.
+The plant is replaced with an idealized component.
 The plant pump control is replaced with a constant block.
 Parameters in the record class related to the plant are also removed.
 </li>
@@ -695,7 +703,7 @@ and <code>use_temperatureShift==false</code>.
 This means only the <code>TMix_in[]</code> input connectors are useful.
 </li>
 <li>
-The pressurisation point of the loop is moved to upstream the main pump.
+The pressurization point of the loop is moved to upstream the main pump.
 </li>
 </ul>
 </html>"),

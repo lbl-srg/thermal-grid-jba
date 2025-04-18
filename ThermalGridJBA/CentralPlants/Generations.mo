@@ -136,6 +136,9 @@ model Generations
   parameter Real minComSpe=0.2
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real minHeaPumSpeHol=120
+    "Threshold time for checking if the compressor has been in the minimum speed"
+     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Buildings.Controls.OBC.CDL.Types.SimpleController heaPumConTyp=
       Buildings.Controls.OBC.CDL.Types.SimpleController.PI
     "Heat pump controller type"
@@ -804,7 +807,8 @@ model Generations
     final thrWayValConTyp=thrWayValConTyp,
     final kVal=kVal,
     final TiVal=TiVal,
-    final TdVal=TdVal)
+    final TdVal=TdVal,
+    final del=minHeaPumSpeHol)
     annotation (Placement(transformation(extent={{-120,216},{-100,240}})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFloPla(redeclare each package
       Medium = MediumW, each allowFlowReversal=false)
