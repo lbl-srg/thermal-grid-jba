@@ -1,4 +1,4 @@
-within ThermalGridJBA.CentralPlants.BaseClasses;
+within ThermalGridJBA.CentralPlants;
 model Borefield "Borefield model"
   extends Modelica.Blocks.Icons.Block;
   replaceable package Medium = Buildings.Media.Water "Water";
@@ -83,7 +83,6 @@ model Borefield "Borefield model"
     "Design mass flow rate per borehole, to be distributed to the double U-pipe"
     annotation (Dialog(group="Borefield"));
 
-
   final parameter Modelica.Units.SI.Radius rTub=0.016
     "Outer radius of the tubes"
     annotation (Dialog(group="Borefield"));
@@ -126,7 +125,7 @@ model Borefield "Borefield model"
     "Nominal water mass flow rate for all bores in center"
       annotation (Dialog(group="Borefield"));
 
-  parameter Modelica.Units.SI.Temperature T_start = 273.15+16
+  parameter Modelica.Units.SI.Temperature TSoi_start
     "Initial temperature of the soil of borefield";
 
   /////////////////////////////////////////////////
@@ -177,31 +176,25 @@ model Borefield "Borefield model"
     k2=nBorSec - 2)    "Center borefield heat flow rates"
     annotation (Placement(transformation(extent={{10,-20},{30,0}})));
 
-  BorefieldSection edgSec(
+  BaseClasses.BorefieldSection edgSec(
     redeclare package Medium = Medium,
     final nDumSec=2,
     final borFieDat=edgBorFieDat,
     final nBorSec=nBorSec,
-    final T_start=T_start)
-    if not useDummy_borefield
-    "Edge section of borefield"
-    annotation (Placement(
-        transformation(rotation=0, extent={{-50,30},{-30,50}})));
+    final TSoi_start=TSoi_start) if not useDummy_borefield
+    "Edge section of borefield" annotation (Placement(transformation(rotation=0,
+          extent={{-50,30},{-30,50}})));
 
-  BorefieldSection corSec(
+  BaseClasses.BorefieldSection corSec(
     redeclare package Medium = Medium,
     final nDumSec=4,
     final borFieDat=corBorFieDat,
     final nBorSec=nBorSec,
-    final T_start=T_start)
-    if not useDummy_borefield
-    "Core section of borefield" annotation (Placement(
-        transformation(rotation=0, extent={{-50,-50},{-30,-30}})));
+    final TSoi_start=TSoi_start) if not useDummy_borefield
+    "Core section of borefield" annotation (Placement(transformation(rotation=0,
+          extent={{-50,-50},{-30,-30}})));
 
-  final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Soil.SandStone soiDat(
-    kSoi=1.1,
-    cSoi=1.4E6/1800,
-    dSoi=1800) "Soil data"
+  final parameter ThermalGridJBA.Data.SoilData soiDat "Soil data"
     annotation (Placement(transformation(extent={{-40,82},{-20,102}})));
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Filling.Bentonite filDat(kFil=1.0)
     "Borehole filling data"
@@ -351,14 +344,12 @@ model Borefield "Borefield model"
     k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
     annotation (Placement(transformation(extent={{40,-70},{60,-50}})));
 
-  DummyBorefield edgDummy(redeclare package Medium = Medium, final
-      m_flow_nominal=mPer_flow_nominal)
-    if useDummy_borefield
+  BaseClasses.DummyBorefield edgDummy(redeclare package Medium = Medium, final
+      m_flow_nominal=mPer_flow_nominal) if useDummy_borefield
     "Dummy borefield for edge (for development only)"
     annotation (Placement(transformation(extent={{-50,0},{-30,20}})));
-  DummyBorefield corDummy(redeclare package Medium = Medium, final
-      m_flow_nominal=mPer_flow_nominal)
-    if useDummy_borefield
+  BaseClasses.DummyBorefield corDummy(redeclare package Medium = Medium, final
+      m_flow_nominal=mPer_flow_nominal) if useDummy_borefield
     "Dummy borefield for core (for development only)"
     annotation (Placement(transformation(extent={{-50,-80},{-30,-60}})));
 equation
@@ -367,8 +358,6 @@ equation
   assert(not useDummy_borefield, "*** Warning. Borefield is not realistic, for debugging purposes only.",
     level = AssertionLevel.warning);
   end if;
-
-
 
   connect(edgSec.QPer_flow, sumQPer_flow.u1)
     annotation (Line(points={{-28,46},{4,46},{4,26},{8,26}}, color={0,0,127}));

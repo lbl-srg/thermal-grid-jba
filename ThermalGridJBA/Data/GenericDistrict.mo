@@ -62,6 +62,9 @@ record GenericDistrict "District network design parameters"
   parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
+  parameter Modelica.Units.SI.Temperature TSoi_start = 291.15
+    "Initial temperature of the soil of borefield";
+
   parameter Real minFanSpe(unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));

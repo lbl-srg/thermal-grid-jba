@@ -299,7 +299,8 @@ model DetailedPlantFiveHubs
     final offTim=offTim,
     final holOnTim=holOnTim,
     final holOffTim=holOffTim,
-    final minComSpe=minPlaComSpe) "Central plant"
+    final minComSpe=minPlaComSpe,
+    TSoi_start=datDis.TSoi_start) "Central plant"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
@@ -388,6 +389,7 @@ model DetailedPlantFiveHubs
     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
 
   Modelica.Blocks.Continuous.Integrator EBorPer(
+    k=-1,
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J",
@@ -409,7 +411,7 @@ model DetailedPlantFiveHubs
       displayUnit="Wh"))
     "Energy supply from central plant"
     annotation (Placement(transformation(extent={{320,-180},{340,-160}})));
-  Modelica.Blocks.Continuous.Integrator Eets[nBui](
+  Modelica.Blocks.Continuous.Integrator EEts[nBui](
     each initType=Modelica.Blocks.Types.Init.InitialState,
     u(each final unit="W"),
     y(each final unit="J",
@@ -420,6 +422,7 @@ model DetailedPlantFiveHubs
     "Sum of all the ETS heat flow"
     annotation (Placement(transformation(extent={{180,150},{200,170}})));
   Modelica.Blocks.Continuous.Integrator EBorCen(
+    k=-1,
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J",
@@ -440,6 +443,31 @@ model DetailedPlantFiveHubs
       displayUnit="Wh"))
     "Pump electric energy for borefield center"
     annotation (Placement(transformation(extent={{100,40},{120,60}})));
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiPer(
+    T_start=datDis.TSoi_start,
+    V=(63 - 39)*445.5*91) "Borefield temperature change for perimeter"
+    annotation (Placement(transformation(extent={{260,-220},{280,-200}})));
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiCen(
+    T_start=datDis.TSoi_start,
+    V=39*445.5*91) "Borefield temperature change for center"
+    annotation (Placement(transformation(extent={{260,-250},{280,-230}})));
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoi(
+    T_start=datDis.TSoi_start,
+    V=63*445.5*91) "Borefield temperature change on average"
+    annotation (Placement(transformation(extent={{260,-280},{280,-260}})));
+  Buildings.Controls.OBC.CDL.Reals.Add EBor(
+    u1(final unit="J", displayUnit="Wh"),
+    u2(final unit="J", displayUnit="Wh"),
+    y(final unit="J", displayUnit="Wh"))
+    "Total energy exchange with borehole"
+    annotation (Placement(transformation(extent={{220,-280},{240,-260}})));
+  Buildings.Utilities.IO.Files.Printer priBorFie(
+    samplePeriod(displayUnit="d") = 31536000,
+    header="Average center perimeter",
+    fileName="BorefieldTemperatureChanges.csv",
+    nin=3,
+    configuration=3) "Printer for borefield temperature changes"
+    annotation (Placement(transformation(extent={{300,-280},{320,-260}})));
 protected
   Buildings.Controls.OBC.CDL.Reals.MultiSum mulSum(
     nin=nBui,
@@ -588,9 +616,9 @@ equation
       index=-1,
       extent={{-6,3},{-6,3}},
       horizontalAlignment=TextAlignment.Right));
-  connect(dis.dH_flow, Eets.u) annotation (Line(points={{22,207},{100,207},{100,
+  connect(dis.dH_flow,EEts. u) annotation (Line(points={{22,207},{100,207},{100,
           160},{118,160}}, color={0,0,127}));
-  connect(Eets.y, ETotEts.u)
+  connect(EEts.y, ETotEts.u)
     annotation (Line(points={{141,160},{178,160}}, color={0,0,127}));
   connect(EPumBorFiePer.y, EPumPla.u[6]) annotation (Line(points={{161,70},{200,
           70},{200,70.5714},{238,70.5714}}, color={0,0,127}));
@@ -610,16 +638,31 @@ equation
           -256,-12},{-256,-180},{-278,-180}}, color={0,0,127}));
   connect(TDisWatSup.T, cenPla.TPlaOut) annotation (Line(points={{-91,150},{
           -220,150},{-220,8},{-162,8}}, color={0,0,127}));
+  connect(EBor.y, dTSoi.E)
+    annotation (Line(points={{242,-270},{258,-270}}, color={0,0,127}));
+  connect(EBorPer.y, dTSoiPer.E)
+    annotation (Line(points={{201,-210},{258,-210}}, color={0,0,127}));
+  connect(EBorCen.y, dTSoiCen.E)
+    annotation (Line(points={{201,-240},{258,-240}}, color={0,0,127}));
+  connect(EBorPer.y, EBor.u1) annotation (Line(points={{201,-210},{212,-210},{212,
+          -264},{218,-264}}, color={0,0,127}));
+  connect(EBor.u2, EBorCen.y) annotation (Line(points={{218,-276},{206,-276},{206,
+          -240},{201,-240}}, color={0,0,127}));
+  connect(dTSoi.dTSoi, priBorFie.x[1]) annotation (Line(points={{281,-264},{290,
+          -264},{290,-270.667},{298,-270.667}}, color={0,0,127}));
+  connect(dTSoiCen.dTSoi, priBorFie.x[2]) annotation (Line(points={{281,-234},{
+          290,-234},{290,-270},{298,-270}}, color={0,0,127}));
+  connect(dTSoiPer.dTSoi, priBorFie.x[3]) annotation (Line(points={{281,-204},{
+          290,-204},{290,-269.333},{298,-269.333}}, color={0,0,127}));
   annotation (
   Diagram(
-  coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
+  coordinateSystem(preserveAspectRatio=false, extent={{-400,-300},{400,260}})),
     __Dymola_Commands(
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StartTime=17971200,
-      StopTime=18576000,
-      Interval=3600.00288,
+      StopTime=31536000,
+      Interval=3600,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>

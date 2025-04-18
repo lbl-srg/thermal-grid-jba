@@ -102,6 +102,9 @@ model CentralPlant "Central plant"
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
 
+  parameter Modelica.Units.SI.Temperature TSoi_start
+    "Initial temperature of the soil of borefield";
+
   Modelica.Fluid.Interfaces.FluidPort_a port_a(
     redeclare final package Medium = MediumW)
     "Fluid connector for waterflow from the district"
@@ -257,12 +260,14 @@ model CentralPlant "Central plant"
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
 
-  BaseClasses.Borefield borFie                                   "Borefield"
+  Borefield borFie(TSoi_start=TSoi_start)
+                                       "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorCen_flow(unit="W")
     "Heat flow from borefield center to water" annotation (Placement(
         transformation(extent={{320,-250},{360,-210}}), iconTransformation(
           extent={{100,-200},{140,-160}})));
+
 
 equation
 
