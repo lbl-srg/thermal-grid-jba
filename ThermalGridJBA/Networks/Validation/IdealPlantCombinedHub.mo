@@ -253,7 +253,7 @@ equation
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
     __Dymola_Commands(
-  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
+  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/IdealPlantCombinedHub.mos"
   "Simulate and plot"),
   experiment(
       StartTime=7776000,
