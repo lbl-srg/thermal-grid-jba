@@ -100,9 +100,9 @@ model Chiller "Chiller controller"
   Buildings.DHC.ETS.Combined.Controls.PIDWithEnable conChi(
     final controllerType=Modelica.Blocks.Types.SimpleController.PI,
     final yMax=1,
-    final yMin=0,
+    final yMin=PLRMin,
     k=0.01,
-    y_reset=0,
+    y_reset=PLRMin,
     Ti(displayUnit="s"),
     final reverseActing=true) "Chiller compressor speed control"
     annotation (Placement(transformation(extent={{50,30},{70,50}})));
