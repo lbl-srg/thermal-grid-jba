@@ -217,7 +217,7 @@ model DetailedPlantFiveHubs
         rotation=90,
         origin={-80,-80})));
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
-    final filNam = datDis.filNam,
+    final filNam = datDis.filNamInd,
     bui(each final facMul=1),
     redeclare each final package MediumBui = Medium,
     redeclare each final package MediumSer = Medium,
@@ -390,8 +390,7 @@ model DetailedPlantFiveHubs
     y(final unit="K",
       displayUnit="degC")) "Average mixing points temperature"
     annotation (Placement(transformation(extent={{-260,50},{-240,70}})));
-  BoundaryConditions.WeatherData weaDat[nBui](
-    final weaFil = bui.weaFil)
+  BoundaryConditions.WeatherData weaDat(final weaFil=datDis.weaFil)
     "Weather data reader"
     annotation (Placement(transformation(extent={{-380,-30},{-360,-10}})));
 
@@ -467,6 +466,12 @@ protected
       each displayUnit="degC"))
     annotation (Placement(transformation(extent={{-300,50},{-280,70}})));
 equation
+ for i in 1:nBui loop
+   connect(weaDat.weaBus, bui[i].weaBus) annotation (Line(
+       points={{-360,-20},{-350,-20},{-350,250},{0,250}},
+       color={255,204,51},
+       thickness=0.5));
+ end for;
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{-12,210},
           {-14,210},{-14,240},{-10,240}},color={0,127,255}));
   connect(dis.ports_aCon, bui.port_bSerAmb) annotation (Line(points={{12,210},{
@@ -527,7 +532,7 @@ equation
           {40,-60},{78,-60}}, color={0,0,127}));
   connect(looPumSpe.yDisPum, cenPla.uDisPum) annotation (Line(points={{-198,-200},
           {-190,-200},{-190,6},{-182,6}},                       color={0,0,127}));
-  connect(weaDat[1].weaBus, weaBus) annotation (Line(
+  connect(weaDat.weaBus, weaBus) annotation (Line(
       points={{-360,-20},{-300,-20}},
       color={255,204,51},
       thickness=0.5));
@@ -581,10 +586,10 @@ equation
   connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-158,-14},{
           -108,-14},{-108,-30},{178,-30}},
                                      color={0,0,127}));
-  connect(weaDat.weaBus, bui.weaBus) annotation (Line(
-      points={{-360,-20},{-340,-20},{-340,250},{0,250}},
-      color={255,204,51},
-      thickness=0.5));
+//   connect(weaDat.weaBus, bui.weaBus) annotation (Line(
+//       points={{-360,-20},{-340,-20},{-340,250},{0,250}},
+//       color={255,204,51},
+//       thickness=0.5));
   connect(TDisWatSup.T, sub.u1) annotation (Line(points={{-91,150},{-220,150},{-220,
           -170},{60,-170},{60,-214},{78,-214}},         color={0,0,127}));
   connect(TDisWatRet.T, sub.u2) annotation (Line(points={{-91,-80},{-100,-80},{-100,
@@ -667,7 +672,7 @@ equation
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
     __Dymola_Commands(
-  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
+  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
       StopTime=864000,

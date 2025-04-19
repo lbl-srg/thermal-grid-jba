@@ -5,14 +5,35 @@ record GenericDistrict "District network design parameters"
   constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
   parameter Integer nBui
     "Number of served buildings"
-    annotation(Evaluate=true);
-  parameter String filNam[nBui]
-    "Library paths of the files with thermal loads as time series";
+    annotation(Evaluate=true, Dialog(group="Load"));
+  parameter String filNamInd[nBui]
+    "Library paths of the load files of each individual hub"
+    annotation (Dialog(group="Load"));
+  parameter String filNamCom
+    "Library paths of the combined load file"
+    annotation (Dialog(group="Load"));
+  final parameter String weaFil =
+    ThermalGridJBA.Hubs.BaseClasses.getWeatherFileName(
+      string="#Weather file name",
+      filNam=Modelica.Utilities.Files.loadResource(filNamCom))
+    "Weather file name";
 
-  parameter Real QPlaPeaHea_flow(unit="W") = 10
+  parameter ThermalGridJBA.Data.HexSize hexSiz(
+    QHeaLoa_flow_nominal =
+      Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+        string="#Peak space heating load",
+        filNam=Modelica.Utilities.Files.loadResource(filNamCom)),
+    QCooLoa_flow_nominal =
+      Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+        string="#Peak space cooling load",
+        filNam=Modelica.Utilities.Files.loadResource(filNamCom)));
+
+  parameter Modelica.Units.SI.HeatFlowRate QPlaPeaHea_flow(
+    min=Modelica.Constants.eps) = hexSiz.QHea_flow_nominal
     "Peak heating load at all the ETS heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real QPlaPeaCoo_flow(unit="W") = -10
+  parameter Modelica.Units.SI.HeatFlowRate QPlaPeaCoo_flow(
+    min=Modelica.Constants.eps) = hexSiz.QCoo_flow_nominal
     "Peak cooling load at all the ETS heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Modelica.Units.SI.TemperatureDifference dTLoo_nominal=4

@@ -1,0 +1,17 @@
+removePlots();
+simulateModel("ThermalGridJBA.Networks.Validation.IdealPlantCombinedHub",
+    method="radau",
+    tolerance=1e-6,
+    startTime=7776000,
+    stopTime=8640000,
+    outputInterval=3600,
+    resultFile="IdealPlantCombinedHub");
+createPlot(id=1, position={324, 3, 614, 567}, y={"ETot.y", "EHeaPum.y", "EPum.y"}, range={90.0, 100.0, -1000000000000.0, 4000000000000.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="d");
+createPlot(id=1, position={324, 3, 614, 567}, y={"EPumETS.y", "EPumPla.y", "EPumDis.y", "EPum.y"}, range={90.0, 100.0, -200000000000.0, 1000000000000.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}, {0,140,72}, {217,67,180}}, timeUnit="d");
+createPlot(id=2, position={282, 42, 658, 576}, y={"datDis.mPumDis_flow_nominal", "pumDis.m_flow"}, range={90.0, 100.0, 0.0, 500.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}}, timeUnit="d", displayUnits={"kg/s", "kg/s"});
+createPlot(id=2, position={282, 42, 658, 576}, y={"bui[1].ets.hex.m1_flow_nominal", "bui[1].ets.hex.m1_flow"}, range={90.0, 100.0, -100.0, 500.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}}, timeUnit="d", displayUnits={"kg/s", "kg/s"});
+createPlot(id=3, position={230, 77, 683, 388}, y={"bui[1].ets.chi.chi.COP"}, range={90.0, 100.0, 1.5, 6.0}, grid=true, colors={{28,108,200}}, timeUnit="d", displayUnits={"1"});
+createPlot(id=4, position={191, 112, 708, 531}, y={"TDisWatSup.T", "TDisWatRet.T"}, range={7750000.0, 8650000.0, 0.0, 30.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"degC", "degC"});
+createPlot(id=4, position={191, 112, 708, 531}, y={"pla.QHea_flow", "pla.QCoo_flow"}, range={7750000.0, 8650000.0, -10000000.0, 15000000.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"W", "W"});
+createPlot(id=5, position={164, 147, 723, 285}, y={"bui[1].ets.PCoo", "bui[1].ets.PPum"}, range={7750000.0, 8650000.0, 0.0, 3500000.0}, grid=true, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"W", "W"});
+
