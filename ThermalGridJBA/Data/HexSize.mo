@@ -23,13 +23,13 @@ record HexSize "Converting end use load to hex size"
       QHeaLoa_flow_nominal * COP_hexSizRejHea / (1 + COP_hexSizRejHea)
     "Nominal hex heat flow rate sized for heating (>=0)";
   final parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(
-    min=Modelica.Constants.eps) =
-      abs(QCooLoa_flow_nominal) * (1 + COP_hexSizRejCoo) / COP_hexSizRejCoo
-    "Nominal hex heat flow rate sized for cooling (>=0)";
+    max=-Modelica.Constants.eps) =
+      QCooLoa_flow_nominal * (1 + COP_hexSizRejCoo) / COP_hexSizRejCoo
+    "Nominal hex heat flow rate sized for cooling (<=0)";
 
   final parameter Modelica.Units.SI.HeatFlowRate Q_flow_nominal(
     min=Modelica.Constants.eps) =
-      max(QHea_flow_nominal, QCoo_flow_nominal)
+      max(QHea_flow_nominal, abs(QCoo_flow_nominal))
     "Nominal hex heat flow rate";
 
 annotation (
