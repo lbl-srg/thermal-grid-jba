@@ -272,33 +272,31 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer(final k=0) "Zero"
     annotation (Placement(transformation(extent={{160,80},{180,100}})));
   Buildings.Controls.OBC.CDL.Logical.Pre pre "Break loop"
-    annotation (Placement(transformation(extent={{-180,-230},{-160,-210}})));
+    annotation (Placement(transformation(extent={{-240,-230},{-220,-210}})));
   Buildings.Controls.OBC.CDL.Logical.TrueDelay delChe(
     final delayTime=holOnTim)
-    "Delay the check after holding time is passed"
-    annotation (Placement(transformation(extent={{-140,-230},{-120,-210}})));
+    "After the minimum on time is passed, then do the check"
+    annotation (Placement(transformation(extent={{-200,-230},{-180,-210}})));
   Buildings.Controls.OBC.CDL.Reals.LessThreshold lesThr(
     final t=minComSpe, final h=0.1*minComSpe)
     "Check if the compressor speed is lower than the minimum"
-    annotation (Placement(transformation(extent={{-140,-190},{-120,-170}})));
+    annotation (Placement(transformation(extent={{-180,-190},{-160,-170}})));
   Buildings.Controls.OBC.CDL.Logical.And disHeaPum
     "Check if the heat pump should be disabled"
-    annotation (Placement(transformation(extent={{-80,-190},{-60,-170}})));
+    annotation (Placement(transformation(extent={{-140,-190},{-120,-170}})));
   Buildings.Controls.OBC.CDL.Logical.TrueDelay truDel(
     final delayTime=del)
     "Check if the compressor has been in minimum speed for sufficient time"
-    annotation (Placement(transformation(extent={{-40,-190},{-20,-170}})));
+    annotation (Placement(transformation(extent={{-100,-190},{-80,-170}})));
   Buildings.Controls.OBC.CDL.Logical.Edge edg
     "Trigger the pulse to disable heat pump"
-    annotation (Placement(transformation(extent={{0,-190},{20,-170}})));
+    annotation (Placement(transformation(extent={{-60,-190},{-40,-170}})));
   Buildings.Controls.OBC.CDL.Logical.TrueFalseHold offHeaPum(
     final trueHoldDuration=offTim,
-    final falseHoldDuration=0)
-    "Keep heat pump being off for sufficient time"
-    annotation (Placement(transformation(extent={{58,-190},{78,-170}})));
-  Buildings.Controls.OBC.CDL.Logical.Not not1
-    "Not disabled"
-    annotation (Placement(transformation(extent={{100,-190},{120,-170}})));
+    final falseHoldDuration=0) "Keep heat pump being off for sufficient time"
+    annotation (Placement(transformation(extent={{-20,-190},{0,-170}})));
+  Buildings.Controls.OBC.CDL.Logical.Not not1 "Not disabled"
+    annotation (Placement(transformation(extent={{20,-190},{40,-170}})));
   Buildings.Controls.OBC.CDL.Logical.And and2
     "Enabled heat pump "
     annotation (Placement(transformation(extent={{160,-170},{180,-150}})));
@@ -441,8 +439,8 @@ block HeatPump
     annotation (Placement(transformation(extent={{300,110},{320,130}})));
   Buildings.Controls.OBC.CDL.Reals.Switch swi9(y(displayUnit="degC", unit="K"))
     annotation (Placement(transformation(extent={{-60,-50},{-40,-30}})));
-  Buildings.Controls.OBC.CDL.Logical.Not norRat1
-    "Normal electricity rate"
+  Buildings.Controls.OBC.CDL.Logical.Not expDis
+    "Heat pump is expected to be disabled"
     annotation (Placement(transformation(extent={{200,-140},{220,-120}})));
   Buildings.Controls.OBC.CDL.Logical.And and1
     "Enabled heat pump "
@@ -453,6 +451,18 @@ block HeatPump
     annotation (Placement(transformation(extent={{120,70},{140,90}})));
   Buildings.Controls.OBC.CDL.Logical.And higHeaLoa "High heating load"
     annotation (Placement(transformation(extent={{-140,30},{-120,50}})));
+  Buildings.Controls.OBC.CDL.Logical.TrueFalseHold minOff(final
+      trueHoldDuration=holOffTim, final falseHoldDuration=0)
+    "Keep heat pump being off for minimum off time"
+    annotation (Placement(transformation(extent={{-20,-230},{0,-210}})));
+  Buildings.Controls.OBC.CDL.Logical.Or enaHeaPum1
+    "Enable heat pump"
+    annotation (Placement(transformation(extent={{120,-190},{140,-170}})));
+  Buildings.Controls.OBC.CDL.Logical.And and3
+    "Passed minimum off time and the plant load is high"
+    annotation (Placement(transformation(extent={{80,-230},{100,-210}})));
+  Buildings.Controls.OBC.CDL.Logical.Not pasMinOff "Passed minimum off time"
+    annotation (Placement(transformation(extent={{20,-230},{40,-210}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-400,420},{-322,420}}, color={255,127,0}));
@@ -503,8 +513,8 @@ equation
                           color={0,0,127}));
   connect(sub.y, mul.u1) annotation (Line(points={{-178,-20},{-170,-20},{-170,-84},
           {-162,-84}},color={0,0,127}));
-  connect(div1.y, mul.u2) annotation (Line(points={{-218,-120},{-170,-120},{-170,
-          -96},{-162,-96}},
+  connect(div1.y, mul.u2) annotation (Line(points={{-218,-120},{-210,-120},{
+          -210,-96},{-162,-96}},
                         color={0,0,127}));
   connect(THeaPumIn, leaWatSet.u1) annotation (Line(points={{-400,-40},{-160,-40},
           {-160,-14},{-122,-14}},
@@ -524,28 +534,26 @@ equation
           {178,18}}, color={0,0,127}));
   connect(swi2.y, heaPumCon.u_m)
     annotation (Line(points={{202,10},{210,10},{210,78}}, color={0,0,127}));
-  connect(and2.y,pre. u) annotation (Line(points={{182,-160},{190,-160},{190,-240},
-          {-200,-240},{-200,-220},{-182,-220}},
+  connect(and2.y,pre. u) annotation (Line(points={{182,-160},{190,-160},{190,
+          -240},{-260,-240},{-260,-220},{-242,-220}},
                                             color={255,0,255}));
   connect(enaHeaPum.y, and2.u1) annotation (Line(points={{102,-140},{150,-140},{
           150,-160},{158,-160}},
                             color={255,0,255}));
   connect(lesThr.y, disHeaPum.u1)
-    annotation (Line(points={{-118,-180},{-82,-180}},  color={255,0,255}));
+    annotation (Line(points={{-158,-180},{-142,-180}}, color={255,0,255}));
   connect(disHeaPum.y, truDel.u)
-    annotation (Line(points={{-58,-180},{-42,-180}},   color={255,0,255}));
+    annotation (Line(points={{-118,-180},{-102,-180}}, color={255,0,255}));
   connect(truDel.y, edg.u)
-    annotation (Line(points={{-18,-180},{-2,-180}},    color={255,0,255}));
+    annotation (Line(points={{-78,-180},{-62,-180}},   color={255,0,255}));
   connect(edg.y, offHeaPum.u)
-    annotation (Line(points={{22,-180},{56,-180}},     color={255,0,255}));
+    annotation (Line(points={{-38,-180},{-22,-180}},   color={255,0,255}));
   connect(offHeaPum.y, not1.u)
-    annotation (Line(points={{80,-180},{98,-180}},   color={255,0,255}));
-  connect(not1.y, and2.u2) annotation (Line(points={{122,-180},{150,-180},{150,-168},
-          {158,-168}},color={255,0,255}));
+    annotation (Line(points={{2,-180},{18,-180}},    color={255,0,255}));
   connect(pre.y, delChe.u)
-    annotation (Line(points={{-158,-220},{-142,-220}}, color={255,0,255}));
-  connect(delChe.y, disHeaPum.u2) annotation (Line(points={{-118,-220},{-100,-220},
-          {-100,-188},{-82,-188}},        color={255,0,255}));
+    annotation (Line(points={{-218,-220},{-202,-220}}, color={255,0,255}));
+  connect(delChe.y, disHeaPum.u2) annotation (Line(points={{-178,-220},{-150,
+          -220},{-150,-188},{-142,-188}}, color={255,0,255}));
   connect(and2.y, holHeaPum.u)
     annotation (Line(points={{182,-160},{198,-160}},
                                                    color={255,0,255}));
@@ -555,8 +563,9 @@ equation
           78},{258,78}},       color={0,0,127}));
   connect(zer.y, swi1.u3) annotation (Line(points={{182,90},{190,90},{190,62},{258,
           62}},      color={0,0,127}));
-  connect(swi1.y, lesThr.u) annotation (Line(points={{282,70},{290,70},{290,-110},
-          {-160,-110},{-160,-180},{-142,-180}}, color={0,0,127}));
+  connect(swi1.y, lesThr.u) annotation (Line(points={{282,70},{290,70},{290,
+          -110},{-200,-110},{-200,-180},{-182,-180}},
+                                                color={0,0,127}));
   connect(holHeaPum.y, y1On) annotation (Line(points={{222,-160},{240,-160},{240,
           30},{400,30}}, color={255,0,255}));
   connect(higEleRat.y, norRat.u) annotation (Line(points={{-298,420},{-280,420},
@@ -709,9 +718,9 @@ equation
           -100,-48},{-62,-48}}, color={0,0,127}));
   connect(swi9.y, swi4.u1) annotation (Line(points={{-38,-40},{-30,-40},{-30,28},
           {-22,28}}, color={0,0,127}));
-  connect(enaHeaPum.y, norRat1.u) annotation (Line(points={{102,-140},{150,-140},
+  connect(enaHeaPum.y, expDis.u) annotation (Line(points={{102,-140},{150,-140},
           {150,-130},{198,-130}}, color={255,0,255}));
-  connect(norRat1.y, and1.u1)
+  connect(expDis.y, and1.u1)
     annotation (Line(points={{222,-130},{258,-130}}, color={255,0,255}));
   connect(holHeaPum.y, and1.u2) annotation (Line(points={{222,-160},{240,-160},
           {240,-138},{258,-138}}, color={255,0,255}));
@@ -741,6 +750,20 @@ equation
           150,220},{158,220}}, color={255,0,255}));
   connect(greThr.y, swi2.u2) annotation (Line(points={{302,220},{328,220},{328,40},
           {160,40},{160,10},{178,10}}, color={255,0,255}));
+  connect(minOff.y, pasMinOff.u)
+    annotation (Line(points={{2,-220},{18,-220}}, color={255,0,255}));
+  connect(pasMinOff.y, and3.u1)
+    annotation (Line(points={{42,-220},{78,-220}}, color={255,0,255}));
+  connect(edg.y, minOff.u) annotation (Line(points={{-38,-180},{-30,-180},{-30,
+          -220},{-22,-220}}, color={255,0,255}));
+  connect(higPlaLoa.y, and3.u2) annotation (Line(points={{-238,420},{50,420},{
+          50,-228},{78,-228}}, color={255,0,255}));
+  connect(not1.y, enaHeaPum1.u1)
+    annotation (Line(points={{42,-180},{118,-180}}, color={255,0,255}));
+  connect(and3.y, enaHeaPum1.u2) annotation (Line(points={{102,-220},{110,-220},
+          {110,-188},{118,-188}}, color={255,0,255}));
+  connect(enaHeaPum1.y, and2.u2) annotation (Line(points={{142,-180},{150,-180},
+          {150,-168},{158,-168}}, color={255,0,255}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
             {100,120}}), graphics={Rectangle(
