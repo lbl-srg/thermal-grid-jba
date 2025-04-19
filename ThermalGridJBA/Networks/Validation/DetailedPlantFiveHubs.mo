@@ -217,7 +217,7 @@ model DetailedPlantFiveHubs
         rotation=90,
         origin={-80,-80})));
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
-    final filNam = datDis.filNam,
+    final filNam = datDis.filNamInd,
     bui(each final facMul=1),
     redeclare each final package MediumBui = Medium,
     redeclare each final package MediumSer = Medium,
