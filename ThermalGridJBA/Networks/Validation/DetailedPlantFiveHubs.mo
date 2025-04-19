@@ -1,6 +1,6 @@
 within ThermalGridJBA.Networks.Validation;
-model DesignedPlantFiveHubs
-  "District network with five hubs and the designed plant"
+model DetailedPlantFiveHubs
+  "District network with five hubs and the detailed plant"
   extends Modelica.Icons.Example;
   package Medium = Buildings.Media.Water "Medium model";
 
@@ -625,7 +625,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StopTime=864000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
@@ -664,4 +664,4 @@ The pressurisation point of the loop is moved to upstream the main pump.
 </ul>
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
-end DesignedPlantFiveHubs;
+end DetailedPlantFiveHubs;
