@@ -3,12 +3,14 @@ record FiveHubsCold
   "District set up for five clustered hubs using the cold snap scenario"
   extends GenericDistrict(
     nBui=5,
-    filNam={
+    filNamInd={
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_cold.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_cold.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_cold.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_cold.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"},
+    filNamCom=
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos",
     lDis={34,688,347,401,1412,578},
     lCon={27,226,237,48,31});
   annotation (

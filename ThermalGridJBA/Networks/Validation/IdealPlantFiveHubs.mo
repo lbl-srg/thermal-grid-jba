@@ -9,7 +9,7 @@ model IdealPlantFiveHubs "District with an ideal plant and five hubs"
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
     __Dymola_Commands(
-  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantFiveHubs.mos"
+  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/IdealPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
       StartTime=7776000,

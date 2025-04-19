@@ -10,10 +10,7 @@ model ConnectedETS
       QHotWat_flow_nominal=QHot_flow_nominal,
       dp1Hex_nominal=40E3,
       dp2Hex_nominal=40E3,
-      QHex_flow_nominal=max(QHea_flow_nominal*datChi.COP_hexSizRejCoo
-                          /(1 + datChi.COP_hexSizRejCoo),
-                        abs(QCoo_flow_nominal*(1 + datChi.COP_hexSizRejHea)
-                          / datChi.COP_hexSizRejHea)),
+      final QHex_flow_nominal=hexSiz.Q_flow_nominal,
       T_a1Hex_nominal=283.65,
       T_b1Hex_nominal=279.65,
       T_a2Hex_nominal=276.65,
@@ -92,6 +89,9 @@ model ConnectedETS
         extent={{-20,-20},{20,20}},
         rotation=-90,
         origin={-60,-120})));
+  parameter Data.HexSize hexSiz(final QHeaLoa_flow_nominal=QHea_flow_nominal,
+      final QCooLoa_flow_nominal=QCoo_flow_nominal)
+    annotation (Placement(transformation(extent={{20,100},{40,120}})));
 equation
 
   connect(ets.QReqHotWat_flow, bui.QReqHotWat_flow) annotation (Line(points={{-34,-74},
