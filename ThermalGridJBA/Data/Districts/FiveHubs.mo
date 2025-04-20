@@ -2,12 +2,14 @@ within ThermalGridJBA.Data.Districts;
 record FiveHubs "District set up for five clustered hubs using fTMY"
   extends GenericDistrict(
     nBui=5,
-    filNam={
+    filNamInd={
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_futu.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_futu.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_futu.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_futu.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_futu.mos"},
+    filNamCom=
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_futu.mos",
     lDis={34,688,347,401,1412,578},
     lCon={27,226,237,48,31});
   annotation (

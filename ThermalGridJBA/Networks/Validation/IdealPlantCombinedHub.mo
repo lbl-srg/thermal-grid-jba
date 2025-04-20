@@ -29,10 +29,9 @@ model IdealPlantCombinedHub
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
-  ThermalGridJBA.BoundaryConditions.WeatherData wea[nBui](
-    final weaFil = bui.weaFil)
-                              "fTMY weather data reader"
-    annotation (Placement(transformation(extent={{-40,220},{-20,240}})));
+  ThermalGridJBA.BoundaryConditions.WeatherData wea(final weaFil=datDis.weaFil)
+    "Weather data reader"
+    annotation (Placement(transformation(extent={{-60,200},{-40,220}})));
 
   Buildings.DHC.Networks.Controls.MainPump1Pipe conPum(
     nMix=nBui,
@@ -121,7 +120,7 @@ model IdealPlantCombinedHub
         origin={-80,-40})));
   ThermalGridJBA.Hubs.ConnectedETS
     bui[nBui](
-    final filNam = datDis.filNam,
+    final filNam = datDis.filNamInd,
     bui(each final facMul=1),
     redeclare each final package MediumBui = Medium,
     redeclare each final package MediumSer = Medium,
@@ -170,6 +169,13 @@ model IdealPlantCombinedHub
     "Plant pump flow rate"
     annotation (Placement(transformation(extent={{-240,20},{-220,40}})));
 equation
+  for i in 1:nBui loop
+    connect(wea.weaBus, bui[i].weaBus) annotation (Line(
+      points={{-40,210},{0,210},{0,190}},
+      color={255,204,51},
+      thickness=0.5));
+  end for;
+
   connect(pumDis.m_flow_in, gai.y)
     annotation (Line(points={{68,-60},{60,-60},{60,-180},{46,-180}},
                                                  color={0,0,127}));
@@ -245,15 +251,11 @@ equation
     annotation (Line(points={{20,142},{80,142},{80,-50}}, color={0,127,255}));
   connect(pumDis.port_a, bou.ports[1]) annotation (Line(points={{80,-50},{80,
           -44},{128,-44},{128,-60},{140,-60}}, color={0,127,255}));
-  connect(wea.weaBus, bui.weaBus) annotation (Line(
-      points={{-20,230},{0,230},{0,190}},
-      color={255,204,51},
-      thickness=0.5));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
     __Dymola_Commands(
-  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/SinglePlantSingleHub.mos"
+  file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/IdealPlantCombinedHub.mos"
   "Simulate and plot"),
   experiment(
       StartTime=7776000,
