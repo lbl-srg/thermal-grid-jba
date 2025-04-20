@@ -60,14 +60,17 @@ model Generations
     annotation (Dialog(group="Borefield"));
 
   // Heat pump parameters
-  parameter Real mWat_flow_min(unit="kg/s")
+  parameter Real mHeaPumWat_flow_nominal(unit="kg/s")
+    "Heat pump nominal water mass flow rate"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real mHeaPumWat_flow_min(unit="kg/s")
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(group="Heat pump"));
   parameter Real mHpGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumHea_flow_nominal(unit="W")=cpWat*mWat_flow_nominal*TApp
-                             "Nominal heating capacity"
+  parameter Real QHeaPumHea_flow_nominal(unit="W")=cpWat*mHeaPumWat_flow*TApp
+    "Nominal heating capacity"
     annotation (Dialog(group="Heat pump"));
   parameter Real TConHea_nominal(unit="K")=TLooMin + TApp
     "Nominal temperature of the heated fluid in heating mode"
@@ -75,7 +78,7 @@ model Generations
   parameter Real TEvaHea_nominal(unit="K")
     "Nominal temperature of evaporator for heat pump design during heating"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumCoo_flow_nominal(unit="W")=-cpWat*mWat_flow_nominal*TApp
+  parameter Real QHeaPumCoo_flow_nominal(unit="W")=-cpWat*mHeaPumWat_flow*TApp
     "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
   parameter Real TConCoo_nominal(unit="K")
@@ -325,7 +328,7 @@ model Generations
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHeaPum(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
-    final m_flow_nominal=mWat_flow_nominal,
+    final m_flow_nominal=mHeaPumWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
     use_strokeTime=false)
     "Heat pump water loop valve"
@@ -336,7 +339,7 @@ model Generations
     allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=false,
-    final m_flow_nominal=mWat_flow_nominal,
+    final m_flow_nominal=mHeaPumWat_flow_nominal,
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-40})));
@@ -388,7 +391,7 @@ model Generations
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemHeaPumLea(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
-    final m_flow_nominal=mWat_flow_nominal)
+    final m_flow_nominal=mHeaPumWat_flow_nominal)
     "Temperature of waterflow leave heat pump" annotation (Placement(
         transformation(
         extent={{-10,-10},{10,10}},
@@ -451,7 +454,8 @@ model Generations
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-mWat_flow_nominal},
+    m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,-
+        mHeaPumWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{300,-150},{320,-170}})));
   Buildings.Fluid.FixedResistances.Junction jun3(
@@ -460,7 +464,8 @@ model Generations
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,mWat_flow_nominal},
+    m_flow_nominal={mWat_flow_nominal,-mWat_flow_nominal,
+        mHeaPumWat_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{360,-150},{380,-170}})));
   Buildings.Fluid.HeatPumps.ModularReversible.Modular heaPum(
@@ -787,7 +792,7 @@ model Generations
     annotation (Placement(transformation(extent={{-240,220},{-220,240}})));
   ThermalGridJBA.Networks.Controls.HeatPump heaPumCon(
     final mWat_flow_nominal=mWat_flow_nominal,
-    final mWat_flow_min=mWat_flow_min,
+    final mWat_flow_min=mHeaPumWat_flow_min,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
     final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal,
     final TLooMin=TLooMin,
@@ -823,7 +828,7 @@ model Generations
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemheaPumEnt(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
-    final m_flow_nominal=mWat_flow_nominal,
+    final m_flow_nominal=mHeaPumWat_flow_nominal,
     tau=0) "Temperature entering into heat pump" annotation (Placement(
         transformation(
         extent={{-10,-10},{10,10}},

@@ -43,7 +43,10 @@ model CentralPlant "Central plant"
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(group="Dry cooler"));
   // Heat pump parameters
-  parameter Real mWat_flow_min(unit="kg/s")
+  parameter Real mHeaPumWat_flow_nominal(unit="kg/s")
+    "Heat pump nominal water mass flow rate"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real mHeaPumWat_flow_min(unit="kg/s")
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(group="Heat pump"));
   parameter Real mHpGly_flow_nominal(unit="kg/s")
@@ -216,7 +219,8 @@ model CentralPlant "Central plant"
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
     dpBorFiePer_nominal=borFie.dp_nominal,
     dpBorFieCen_nominal=borFie.dp_nominal,
-    final mWat_flow_min=mWat_flow_min,
+    final mHeaPumWat_flow_nominal=mHeaPumWat_flow_nominal,
+    final mHeaPumWat_flow_min=mHeaPumWat_flow_min,
     final mHexGly_flow_nominal=mHexGly_flow_nominal,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
     final mDryCoo_flow_nominal=mDryCoo_flow_nominal,

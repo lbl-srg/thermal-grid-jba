@@ -25,18 +25,16 @@ model DetailedPlantFiveHubs
     start=0.05)
     "Hydraulic diameter of the distribution pipe before each connection";
   // Central plant
-  parameter Real staDowDel(
-    unit="s")=datDis.staDowDel
+  parameter Real staDowDel(unit="s")=datDis.staDowDel
     "Minimum stage down delay, to avoid quickly staging down"
    annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaHeaSet(
-    unit="K",
-    displayUnit="degC")=datDis.TPlaHeaSet
+  parameter Real TApp(unit="K")=4
+    "Approach temperature for sizing heat pump and the operational condition for dry cooler"
+    annotation (Dialog(tab="Central plant"));
+  parameter Real TPlaHeaSet(unit="K")=datDis.TPlaHeaSet
     "Design plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaCooSet(
-    unit="K",
-    displayUnit="degC")=datDis.TPlaCooSet
+  parameter Real TPlaCooSet(unit="K")=datDis.TPlaCooSet
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
 //   parameter Real samplePeriod(unit="s")=datDis.samplePeriod
@@ -65,13 +63,13 @@ model DetailedPlantFiveHubs
   parameter Real TAppSet(unit="K")=datDis.TAppSet
     "Dry cooler approch setpoint"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TApp(unit="K")=datDis.TApp
-    "Approach temperature for checking if the dry cooler should be enabled"
-    annotation (Dialog(tab="Central plant", group="Dry cooler"));
   parameter Real minFanSpe(unit="1")=datDis.minFanSpe
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   // Central plant: heat pumps
+  parameter Real mPlaHeaPumWat_flow_nominal(unit="kg/s")=datDis.mPlaHeaPumWat_flow_nominal
+    "Central Heat pump nominal water mass flow rate"
+    annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=datDis.mPlaHeaPumWat_flow_min
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
@@ -289,7 +287,8 @@ model DetailedPlantFiveHubs
     final mHexGly_flow_nominal=mPlaHexGly_flow_nominal,
     final dpDryCoo_nominal=dpDryCoo_nominal,
     final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
-    final mWat_flow_min=mPlaHeaPumWat_flow_min,
+    final mHeaPumWat_flow_nominal=mPlaHeaPumWat_flow_nominal,
+    final mHeaPumWat_flow_min=mPlaHeaPumWat_flow_min,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
     final QHeaPumHea_flow_nominal=QPlaHeaPumHea_flow_nominal,
     final TConHea_nominal=TPlaConHea_nominal,
