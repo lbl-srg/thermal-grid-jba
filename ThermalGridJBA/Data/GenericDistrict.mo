@@ -32,8 +32,7 @@ record GenericDistrict "District network design parameters"
     min=Modelica.Constants.eps) = hexSiz.QHea_flow_nominal
     "Peak heating load at all the ETS heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Modelica.Units.SI.HeatFlowRate QPlaPeaCoo_flow(
-    min=Modelica.Constants.eps) = hexSiz.QCoo_flow_nominal
+  parameter Modelica.Units.SI.HeatFlowRate QPlaPeaCoo_flow = hexSiz.QCoo_flow_nominal
     "Peak cooling load at all the ETS heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Modelica.Units.SI.TemperatureDifference dTLoo_nominal=4
