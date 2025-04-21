@@ -131,13 +131,6 @@ model CentralPlant "Central plant"
     "District loop pump speed"
     annotation (Placement(transformation(extent={{-280,70},{-240,110}}),
         iconTransformation(extent={{-140,40},{-100,80}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput TMixAve(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")
-    "Average temperature of mixing points after each energy transfer station"
-    annotation (Placement(transformation(extent={{-280,-100},{-240,-60}}),
-        iconTransformation(extent={{-140,-60},{-100,-20}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMaxMea(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -287,9 +280,6 @@ equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,
           5},{-162,5}},      color={0,0,127}));
-  connect(TMixAve, gen.TMixAve) annotation (Line(points={{-260,-80},{-190,-80},{
-          -190,-4.2},{-162,-4.2}},
-                        color={0,0,127}));
   connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,60},{-186,60},{-186,
           1.8},{-162,1.8}},    color={0,0,127}));
   connect(heaPumHea.y, EHeaPumEne.u)

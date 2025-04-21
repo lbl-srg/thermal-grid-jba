@@ -83,8 +83,6 @@ equation
                            color={0,0,127}));
   connect(mixWatTem.y, sou.T_in) annotation (Line(points={{-68,-20},{-60,-20},{-60,
           4},{-50,4}},                     color={0,0,127}));
-  connect(mixWatTem.y, cenPla.TMixAve) annotation (Line(points={{-68,-20},{6,-20},
-          {6,-44},{18,-44}},color={0,0,127}));
   connect(dryBul.y, cenPla.TDryBul) annotation (Line(points={{-68,-50},{10,-50},
           {10,-36},{18,-36}},                color={0,0,127}));
   connect(sou.ports[1], jun.port_1)

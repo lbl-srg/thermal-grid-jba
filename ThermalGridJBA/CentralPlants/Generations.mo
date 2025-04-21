@@ -199,13 +199,6 @@ model Generations
     "District loop pump speed"
     annotation (Placement(transformation(extent={{-580,200},{-540,240}}),
         iconTransformation(extent={{-140,30},{-100,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput TMixAve(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")
-    "Average temperature of mixing points after each energy transfer station"
-    annotation (Placement(transformation(extent={{-580,120},{-540,160}}),
-        iconTransformation(extent={{-140,-62},{-100,-22}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMaxMea(
     final quantity="ThermodynamicTemperature",
     final unit="K",
