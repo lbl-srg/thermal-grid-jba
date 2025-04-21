@@ -109,6 +109,9 @@ model CentralPlant "Central plant"
     "Threshold time for checking if the compressor has been in the minimum speed"
      annotation (Dialog(tab="Controls", group="Heat pump"));
 
+  parameter Modelica.Units.SI.Temperature TSoi_start
+    "Initial temperature of the soil of borefield";
+
   Modelica.Fluid.Interfaces.FluidPort_a port_a(
     redeclare final package Medium = MediumW)
     "Fluid connector for waterflow from the district"
@@ -266,7 +269,7 @@ model CentralPlant "Central plant"
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
 
-  BaseClasses.Borefield borFie                                   "Borefield"
+  Borefield borFie(TSoi_start=TSoi_start) "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorCen_flow(unit="W")
     "Heat flow from borefield center to water" annotation (Placement(
@@ -274,7 +277,7 @@ model CentralPlant "Central plant"
           extent={{100,-200},{140,-160}})));
 
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=1/100)
-    "Convert cent to dollor"
+    "Convert cents to dollars"
     annotation (Placement(transformation(extent={{140,230},{160,250}})));
 equation
 

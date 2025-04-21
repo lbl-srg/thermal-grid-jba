@@ -5,7 +5,7 @@ model BorefieldSection "Section for a core or an edge of the borefield"
   parameter Real nDumSec
     "Number of dummy borefield section to next to actual section (dummy sections are used to compute boundary temperatures). 2 for the edge, and 4 for the core.";
 
-  parameter Modelica.Units.SI.Temperature T_start
+  parameter Modelica.Units.SI.Temperature TSoi_start
     "Initial temperature of the soil";
   parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Borefield.Template borFieDat
     "Borefield data"
@@ -19,7 +19,8 @@ model BorefieldSection "Section for a core or an edge of the borefield"
           extent={{200,120},{240,160}}), iconTransformation(extent={{100,40},{140,
             80}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput QCor_flow(
-    final unit="W") "Heat flow rate for core elements"       annotation (
+    final unit="W") "Heat flow rate for core elements"
+    annotation (
       Placement(transformation(extent={{200,90},{240,130}}), iconTransformation(
           extent={{100,10},{140,50}})));
 
@@ -28,7 +29,7 @@ model BorefieldSection "Section for a core or an edge of the borefield"
     each allowFlowReversal=true,
     show_T=true,
     each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    each TExt0_start=T_start,
+    each TExt0_start=TSoi_start,
     each borFieDat=borFieDat,
     each dT_dz=0) "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
