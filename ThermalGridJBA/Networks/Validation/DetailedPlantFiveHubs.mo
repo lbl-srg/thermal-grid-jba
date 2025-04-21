@@ -628,7 +628,8 @@ equation
   connect(mul.y, plaHeaSup.u)
     annotation (Line(points={{162,-240},{178,-240}}, color={0,0,127}));
   connect(plaHeaSup.y, EPlaHea.u)
-    annotation (Line(points={{202,-240},{218,-240}}, color={0,0,127}));
+    annotation (Line(points={{202,-240},{260,-240},{260,-170},{318,-170}},
+                                                     color={0,0,127}));
   connect(weaBus.TDryBul, cenPla.TDryBul) annotation (Line(
       points={{-299.9,-19.9},{-266,-19.9},{-266,4},{-182,4}},
       color={255,204,51},
@@ -637,14 +638,15 @@ equation
       index=-1,
       extent={{-6,3},{-6,3}},
       horizontalAlignment=TextAlignment.Right));
-  connect(dis.dH_flow, Eets.u) annotation (Line(points={{22,207},{96,207},{96,152},
+  connect(dis.dH_flow, EEts.u) annotation (Line(points={{22,207},{96,207},{96,152},
           {138,152}},      color={0,0,127}));
-  connect(Eets.y, ETotEts.u)
+  connect(EEts.y, ETotEts.u)
     annotation (Line(points={{161,152},{178,152}}, color={0,0,127}));
   connect(dis.dH_flow,EEts. u) annotation (Line(points={{22,207},{100,207},{100,
-          160},{118,160}}, color={0,0,127}));
+          152},{138,152}}, color={0,0,127}));
   connect(EEts.y, ETotEts.u)
-    annotation (Line(points={{141,160},{178,160}}, color={0,0,127}));
+    annotation (Line(points={{161,152},{170,152},{170,152},{178,152}},
+                                                   color={0,0,127}));
   connect(EPumBorFiePer.y, EPumPla.u[6]) annotation (Line(points={{161,70},{200,
           70},{200,70.5714},{238,70.5714}}, color={0,0,127}));
   connect(EPumBorFieCen.y, EPumPla.u[7]) annotation (Line(points={{121,50},{220,
@@ -699,30 +701,31 @@ equation
           {280,-136},{298,-136}}, color={0,0,127}));
   connect(mul1.y, totEleCos.u)
     annotation (Line(points={{322,-130},{338,-130}}, color={0,0,127}));
-  connect(cenPla.PPumBorFiePer, EPumBorFiePer.u) annotation (Line(points={{-138,
-          -4},{-118,-4},{-118,70},{138,70}}, color={0,0,127}));
-  connect(cenPla.PPumBorFieCen, EPumBorFieCen.u) annotation (Line(points={{-138,
-          -6},{-116,-6},{-116,50},{98,50}}, color={0,0,127}));
-  connect(cenPla.QBorPer_flow, EBorPer.u) annotation (Line(points={{-138,-16},{
-          -124,-16},{-124,-210},{178,-210}}, color={0,0,127}));
-  connect(cenPla.QBorCen_flow, EBorCen.u) annotation (Line(points={{-138,-18},{
-          -126,-18},{-126,-240},{178,-240}}, color={0,0,127}));
-  connect(cenPla.TLooMaxMea, looMaxTem.y) annotation (Line(points={{-162,-8},{
-          -260,-8},{-260,-140},{-278,-140}}, color={0,0,127}));
-  connect(cenPla.TLooMinMea, looMinTem.y) annotation (Line(points={{-162,-12},{
-          -256,-12},{-256,-180},{-278,-180}}, color={0,0,127}));
-  connect(TDisWatSup.T, cenPla.TPlaOut) annotation (Line(points={{-91,150},{
-          -220,150},{-220,8},{-162,8}}, color={0,0,127}));
+  connect(cenPla.PPumBorFiePer, EPumBorFiePer.u) annotation (Line(points={{-158,-4},
+          {-118,-4},{-118,70},{138,70}},     color={0,0,127}));
+  connect(cenPla.PPumBorFieCen, EPumBorFieCen.u) annotation (Line(points={{-158,-6},
+          {-116,-6},{-116,50},{98,50}},     color={0,0,127}));
+  connect(cenPla.QBorPer_flow, EBorPer.u) annotation (Line(points={{-158,-16},{-124,
+          -16},{-124,-220},{-62,-220}},      color={0,0,127}));
+  connect(cenPla.QBorCen_flow, EBorCen.u) annotation (Line(points={{-158,-18},{-126,
+          -18},{-126,-240},{-102,-240}},     color={0,0,127}));
+  connect(cenPla.TLooMaxMea, looMaxTem.y) annotation (Line(points={{-182,-8},{-260,
+          -8},{-260,-190},{-278,-190}},      color={0,0,127}));
+  connect(cenPla.TLooMinMea, looMinTem.y) annotation (Line(points={{-182,-12},{-256,
+          -12},{-256,-220},{-238,-220}},      color={0,0,127}));
+  connect(TDisWatSup.T, cenPla.TPlaOut) annotation (Line(points={{-91,150},{-220,
+          150},{-220,8},{-182,8}},      color={0,0,127}));
   connect(EBor.y, dTSoi.E)
     annotation (Line(points={{242,-270},{258,-270}}, color={0,0,127}));
   connect(EBorPer.y, dTSoiPer.E)
-    annotation (Line(points={{201,-210},{258,-210}}, color={0,0,127}));
+    annotation (Line(points={{-39,-220},{110,-220},{110,-210},{258,-210}},
+                                                     color={0,0,127}));
   connect(EBorCen.y, dTSoiCen.E)
-    annotation (Line(points={{201,-240},{258,-240}}, color={0,0,127}));
-  connect(EBorPer.y, EBor.u1) annotation (Line(points={{201,-210},{212,-210},{212,
+    annotation (Line(points={{-79,-240},{258,-240}}, color={0,0,127}));
+  connect(EBorPer.y, EBor.u1) annotation (Line(points={{-39,-220},{212,-220},{212,
           -264},{218,-264}}, color={0,0,127}));
   connect(EBor.u2, EBorCen.y) annotation (Line(points={{218,-276},{206,-276},{206,
-          -240},{201,-240}}, color={0,0,127}));
+          -240},{-79,-240}}, color={0,0,127}));
   connect(dTSoi.dTSoi, priBorFie.x[1]) annotation (Line(points={{281,-264},{290,
           -264},{290,-270.667},{298,-270.667}}, color={0,0,127}));
   connect(dTSoiCen.dTSoi, priBorFie.x[2]) annotation (Line(points={{281,-234},{
