@@ -19,7 +19,9 @@ model CentralPlant "Validation model for central plant"
     QHeaPumCoo_flow_nominal=-mPlaWat_flow_nominal*4186*dT_nominal,
     TConCoo_nominal=315.15,
     TConInMin=291.15,
-    TEvaInMax=289.65) "Central plant"
+    TEvaInMax=289.65,
+    TSoi_start=289.15)
+                      "Central plant"
     annotation (Placement(transformation(extent={{20,-50},{40,-30}})));
   Buildings.Fluid.Sources.MassFlowSource_T
                                       sou(
@@ -103,7 +105,7 @@ equation
           -70},{-54,-70}}, color={0,0,127}));
   connect(mixWatTem.y, addPar1.u) annotation (Line(points={{-68,-20},{-62,-20},{
           -62,-100},{-54,-100}}, color={0,0,127}));
-  annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}})),                                        Diagram(
         coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})),
     experiment(

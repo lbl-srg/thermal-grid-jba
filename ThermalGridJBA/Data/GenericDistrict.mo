@@ -71,6 +71,8 @@ record GenericDistrict "District network design parameters"
   parameter Real TApp(unit="K")=4
     "Approach temperature for sizing heat pump and the operational condition for dry cooler"
     annotation (Dialog(tab="Central plant"));
+
+
   parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal*(QPlaPeaHea_flow/abs(QPlaPeaCoo_flow))
     "Design plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
