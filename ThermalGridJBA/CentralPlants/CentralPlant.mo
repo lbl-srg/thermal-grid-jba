@@ -247,7 +247,7 @@ model CentralPlant "Central plant"
     holOffTim=holOffTim,
     final minComSpe=minComSpe,
     final minHeaPumSpeHol=minHeaPumSpeHol,
-    kHeaPum=0.1,
+    kHeaPum=0.5,
     TiHeaPum=200,
     kVal=0.1,
     TiVal=200,
