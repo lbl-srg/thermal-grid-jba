@@ -227,7 +227,7 @@ model Generations
     annotation (Placement(transformation(extent={{-580,170},{-540,210}}),
         iconTransformation(extent={{-140,-2},{-100,38}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
-    "Current electricity rate, cent per kWh"
+    "Current electricity rate, dollar per kWh"
     annotation (Placement(transformation(extent={{540,250},{580,290}}),
         iconTransformation(extent={{100,70},{140,110}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo(
@@ -1094,10 +1094,12 @@ equation
       points={{-320,100},{-320,130},{-60,130}},
       color={0,127,255},
       thickness=0.5));
-  connect(ind.ySt, hexCon.uSt) annotation (Line(points={{-498,265},{-480,265},{-480,
-          236},{-462,236}}, color={255,127,0}));
-  connect(ind.yEle, hexCon.uEleRat) annotation (Line(points={{-498,259},{-476,259},
-          {-476,239},{-462,239}}, color={255,127,0}));
+  connect(ind.ySt, hexCon.uSt) annotation (Line(points={{-498,265},{-480,265},{
+          -480,236},{-462,236}},
+                            color={255,127,0}));
+  connect(ind.yEle, hexCon.uEleRat) annotation (Line(points={{-498,259},{-476,
+          259},{-476,239},{-462,239}},
+                                  color={255,127,0}));
   connect(ind.ySea, hexCon.uSea) annotation (Line(points={{-498,252},{-484,252},
           {-484,233},{-462,233}}, color={255,127,0}));
   connect(TDryBul, hexCon.TDryBul) annotation (Line(points={{-560,190},{-486,190},
@@ -1106,24 +1108,30 @@ equation
           -480,226},{-462,226}}, color={0,0,127}));
   connect(ind.ySt, dryCooCon.uSt) annotation (Line(points={{-498,265},{-400,265},
           {-400,237},{-382,237}}, color={255,127,0}));
-  connect(ind.yEle, dryCooCon.uEleRat) annotation (Line(points={{-498,259},{-396,
-          259},{-396,239},{-382,239}}, color={255,127,0}));
-  connect(ind.ySea, dryCooCon.uSea) annotation (Line(points={{-498,252},{-404,252},
-          {-404,235},{-382,235}}, color={255,127,0}));
+  connect(ind.yEle, dryCooCon.uEleRat) annotation (Line(points={{-498,259},{
+          -396,259},{-396,239},{-382,239}},
+                                       color={255,127,0}));
+  connect(ind.ySea, dryCooCon.uSea) annotation (Line(points={{-498,252},{-404,
+          252},{-404,235},{-382,235}},
+                                  color={255,127,0}));
   connect(TDryBul, dryCooCon.TDryBul) annotation (Line(points={{-560,190},{-400,
           190},{-400,230},{-382,230}}, color={0,0,127}));
-  connect(ind.ySt, borCon.uSt) annotation (Line(points={{-498,265},{-260,265},{-260,
-          236},{-242,236}}, color={255,127,0}));
-  connect(ind.yEle, borCon.uEleRat) annotation (Line(points={{-498,259},{-256,259},
-          {-256,239},{-242,239}}, color={255,127,0}));
+  connect(ind.ySt, borCon.uSt) annotation (Line(points={{-498,265},{-260,265},{
+          -260,236},{-242,236}},
+                            color={255,127,0}));
+  connect(ind.yEle, borCon.uEleRat) annotation (Line(points={{-498,259},{-256,
+          259},{-256,239},{-242,239}},
+                                  color={255,127,0}));
   connect(ind.ySea, borCon.uSea) annotation (Line(points={{-498,252},{-264,252},
           {-264,233},{-242,233}}, color={255,127,0}));
   connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-498,265},{-140,265},
           {-140,237},{-122,237}}, color={255,127,0}));
-  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-498,259},{-136,
-          259},{-136,239},{-122,239}}, color={255,127,0}));
-  connect(ind.ySea, heaPumCon.uSea) annotation (Line(points={{-498,252},{-360,252},
-          {-360,254},{-144,254},{-144,235},{-122,235}}, color={255,127,0}));
+  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-498,259},{
+          -136,259},{-136,239},{-122,239}},
+                                       color={255,127,0}));
+  connect(ind.ySea, heaPumCon.uSea) annotation (Line(points={{-498,252},{-360,
+          252},{-360,254},{-144,254},{-144,235},{-122,235}},
+                                                        color={255,127,0}));
   connect(senTemEntGen.T, dryCooCon.TPlaIn) annotation (Line(points={{-480,-149},
           {-480,196},{-404,196},{-404,232},{-382,232}}, color={0,0,127}));
   connect(uDisPum, borCon.uDisPum) annotation (Line(points={{-560,220},{-520,

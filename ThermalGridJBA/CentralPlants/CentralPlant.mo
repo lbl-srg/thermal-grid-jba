@@ -208,7 +208,7 @@ model CentralPlant "Central plant"
     annotation (Placement(transformation(extent={{320,160},{360,200}}),
         iconTransformation(extent={{100,30},{140,70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
-    "Current electricity rate, dollor per kWh"
+    "Current electricity rate, dollar per kWh"
     annotation (Placement(transformation(extent={{320,220},{360,260}}),
         iconTransformation(extent={{100,70},{140,110}})));
 
@@ -280,9 +280,6 @@ model CentralPlant "Central plant"
         transformation(extent={{320,-250},{360,-210}}), iconTransformation(
           extent={{100,-200},{140,-160}})));
 
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(k=1/100)
-    "Convert cents to dollars"
-    annotation (Placement(transformation(extent={{140,230},{160,250}})));
 equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,
@@ -336,10 +333,8 @@ equation
           -200},{-182,-12.2},{-162,-12.2}}, color={0,0,127}));
   connect(TPlaOut, gen.TPlaOut) annotation (Line(points={{-260,140},{-174,140},{
           -174,8},{-162,8}}, color={0,0,127}));
-  connect(gen.yEleRat, gai1.u) annotation (Line(points={{-138,9},{-130,9},{-130,
-          240},{138,240}}, color={0,0,127}));
-  connect(gai1.y, yEleRat)
-    annotation (Line(points={{162,240},{340,240}}, color={0,0,127}));
+  connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-128,9},{
+          -128,240},{340,240}}, color={0,127,255}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
