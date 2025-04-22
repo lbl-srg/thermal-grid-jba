@@ -143,50 +143,31 @@ model Generations
     "Threshold time for checking if the compressor has been in the minimum speed"
      annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Buildings.Controls.OBC.CDL.Types.SimpleController heaPumConTyp=
-      Buildings.Controls.OBC.CDL.Types.SimpleController.PI
     "Heat pump controller type"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real kHeaPum=1 "Gain of controller"
+  parameter Real kHeaPum "Gain of controller"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TiHeaPum=0.5 "Time constant of integrator block"
+  parameter Real TiHeaPum "Time constant of integrator block"
     annotation (Dialog(tab="Controls", group="Heat pump",
       enable=heaPumConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PI
           or heaPumConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
-  parameter Real TdHeaPum=0.1 "Time constant of derivative block"
+  parameter Real TdHeaPum "Time constant of derivative block"
     annotation (Dialog(tab="Controls", group="Heat pump",
-      enable=fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PD
-          or fanConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
-  parameter Buildings.Controls.OBC.CDL.Types.SimpleController thrWayValConTyp=
-      Buildings.Controls.OBC.CDL.Types.SimpleController.PI
+      enable=heaPumConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PD
+          or heaPumConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
+  parameter Buildings.Controls.OBC.CDL.Types.SimpleController thrWayValConTyp
     "Three-way valve controller type"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real kVal=1 "Gain of controller"
+  parameter Real kVal "Gain of controller"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TiVal=0.5 "Time constant of integrator block"
+  parameter Real TiVal "Time constant of integrator block"
     annotation (Dialog(tab="Controls", group="Heat pump",
       enable=thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PI
           or thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
-  parameter Real TdVal=0.1 "Time constant of derivative block"
+  parameter Real TdVal "Time constant of derivative block"
     annotation (Dialog(tab="Controls", group="Heat pump",
       enable=thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PD
           or thrWayValConTyp == Buildings.Controls.OBC.CDL.Types.SimpleController.PID));
-
-  final parameter Real cpWat(
-    final quantity="SpecificHeatCapacity",
-    final unit="J/(kg.K)")= 4184
-    "Water specific heat capacity";
-  final parameter Real rhoWat(
-    final quantity="Density",
-    final unit="kg/m3")=1000
-    "Water density";
-  final parameter Real cpGly(
-    final quantity="SpecificHeatCapacity",
-    final unit="J/(kg.K)")= 3620
-    "Glycol specific heat capacity at 20 degC";
-  final parameter Real rhoGly(
-    final quantity="Density",
-    final unit="kg/m3")=1044
-    "Glycol density at 20 degC";
 
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TPlaOut(
     final unit="K",
@@ -199,13 +180,6 @@ model Generations
     "District loop pump speed"
     annotation (Placement(transformation(extent={{-580,200},{-540,240}}),
         iconTransformation(extent={{-140,30},{-100,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput TMixAve(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")
-    "Average temperature of mixing points after each energy transfer station"
-    annotation (Placement(transformation(extent={{-580,120},{-540,160}}),
-        iconTransformation(extent={{-140,-62},{-100,-22}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMaxMea(
     final quantity="ThermodynamicTemperature",
     final unit="K",
