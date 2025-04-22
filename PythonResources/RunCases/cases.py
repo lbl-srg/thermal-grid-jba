@@ -98,12 +98,14 @@ def fivehubsmultiflow():
         {"model": "ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs",
           "name": "fivehubsmultiflow_SCENARIO",
           "building": 'FiveHubs',
-          "parameters": {'datDis.filNam' : [
+          "parameters": {'datDis.filNamInd' : [
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_SCENARIO.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_SCENARIO.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_SCENARIO.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_SCENARIO.mos"]}})
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_SCENARIO.mos"],
+                         'datDis.filNamCom' :
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_SCENARIO.mos"}})
 
     return cases
 
@@ -115,12 +117,14 @@ def fivehubsnoplant():
         {"model": "ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs",
           "name": "fivehubsnoplant_SCENARIO",
           "building": 'FiveHubs',
-          "parameters": {'datDis.filNam' : [
+          "parameters": {'datDis.filNamInd' : [
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_SCENARIO.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_SCENARIO.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_SCENARIO.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_SCENARIO.mos"]}})
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_SCENARIO.mos"],
+                         'datDis.filNamCom' :
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_SCENARIO.mos"}})
 
     return cases
 
