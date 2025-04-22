@@ -73,13 +73,16 @@ record GenericDistrict "District network design parameters"
     annotation (Dialog(tab="Central plant"));
   parameter Modelica.Units.SI.Temperature TSoi_start = 291.45
     "Initial temperature of the soil of borefield";
-  parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal*(QPlaPeaHea_flow/abs(QPlaPeaCoo_flow))
+  parameter Modelica.Units.SI.TemperatureDifference dTOveSho(min=0) = 1
+    "Temperature difference to allow for control over or undershoot. dTOveSho >= 0"
+   annotation (Dialog(tab="Central plant"));
+  parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal*(QPlaPeaHea_flow/abs(QPlaPeaCoo_flow))+dTOveSho
     "Design plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
 //   parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal
 //     "Design plant heating setpoint temperature"
 //     annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-dTLoo_nominal
+  parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-dTLoo_nominal-dTOveSho
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
 //   parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(mCon_flow_nominal)

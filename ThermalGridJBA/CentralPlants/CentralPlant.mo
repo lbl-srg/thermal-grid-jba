@@ -233,6 +233,7 @@ model CentralPlant "Central plant"
     final TAppSet=TAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
+    fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,
@@ -240,12 +241,16 @@ model CentralPlant "Central plant"
     holOffTim=holOffTim,
     final minComSpe=minComSpe,
     final minHeaPumSpeHol=minHeaPumSpeHol,
-    kHeaPum=0.5,
+    heaPumConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
+    kHeaPum=1,
     TiHeaPum=200,
+    TdHeaPum=0.1,
+    thrWayValConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
     kVal=0.1,
     TiVal=200,
     kFan=0.1,
-    TiFan=200) "Cooling and heating generation devices"
+    TiFan=200,
+    TdVal=0.1) "Cooling and heating generation devices"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Modelica.Fluid.Interfaces.FluidPort_b port_b(
     redeclare final package Medium = MediumW)

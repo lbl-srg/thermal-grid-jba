@@ -37,9 +37,7 @@ model DetailedPlantFiveHubs
   parameter Real TPlaCooSet(unit="K")=datDis.TPlaCooSet
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-//   parameter Real samplePeriod(unit="s")=datDis.samplePeriod
-//     "Sample period of district loop pump speed"
-//     annotation (Dialog(tab="Central plant"));
+
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
     annotation (Dialog(tab="Central plant"));
@@ -728,6 +726,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
+      StartTime=0,
       StopTime=31536000,
       Interval=3600,
       Tolerance=1e-06,
