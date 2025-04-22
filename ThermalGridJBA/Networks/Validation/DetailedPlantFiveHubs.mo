@@ -58,8 +58,8 @@ model DetailedPlantFiveHubs
   parameter Real mDryCoo_flow_nominal(unit="kg/s")=datDis.mDryCoo_flow_nominal
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TAppSet(unit="K")=datDis.TAppSet
-    "Dry cooler approch setpoint"
+  parameter Real TDryAppSet(unit="K")=datDis.TDryAppSet
+    "Dry cooler approach setpoint"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   parameter Real minFanSpe(unit="1")=datDis.minFanSpe
     "Minimum dry cooler fan speed"
@@ -295,7 +295,7 @@ model DetailedPlantFiveHubs
     final TConCoo_nominal=TPlaConCoo_nominal,
     final TEvaCoo_nominal=TPlaEvaCoo_nominal,
     final staDowDel=staDowDel,
-    final TAppSet=TAppSet,
+    final TDryAppSet=TDryAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
     final TConInMin=TPlaConInMin,

@@ -68,21 +68,21 @@ record GenericDistrict "District network design parameters"
   parameter Real staDowDel(unit="s")=3600
     "Minimum stage down delay, to avoid quickly staging down"
    annotation (Dialog(tab="Central plant"));
-  parameter Real TApp(unit="K")=4
-    "Approach temperature for sizing heat pump and the operational condition for dry cooler"
+  parameter Real dTEqu_nominal(unit="K") = 4
+    "Temperature difference for sizing heat pump and the operational condition for dry cooler"
     annotation (Dialog(tab="Central plant"));
   parameter Modelica.Units.SI.Temperature TSoi_start = 291.45
     "Initial temperature of the soil of borefield";
   parameter Modelica.Units.SI.TemperatureDifference dTOveSho(min=0) = 1
     "Temperature difference to allow for control over or undershoot. dTOveSho >= 0"
    annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal*(QPlaPeaHea_flow/abs(QPlaPeaCoo_flow))+dTOveSho
+  parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal*(QPlaPeaHea_flow/abs(QPlaPeaCoo_flow))
     "Design plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
 //   parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal
 //     "Design plant heating setpoint temperature"
 //     annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-dTLoo_nominal-dTOveSho
+  parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-dTLoo_nominal
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
 //   parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(mCon_flow_nominal)
@@ -109,15 +109,15 @@ record GenericDistrict "District network design parameters"
     mHpGly_flow_nominal
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TAppSet(unit="K")=2
-    "Dry cooler approch setpoint"
+  parameter Real TDryAppSet(unit="K")=2
+    "Dry cooler approach setpoint"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   parameter Real minFanSpe(unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   // Central plant: heat pumps
   parameter Real mPlaHeaPumWat_flow_nominal(unit="kg/s")=
-    max(abs(QPlaHeaPumCoo_flow_nominal), QPlaHeaPumHea_flow_nominal)/(cpWatLiq*TApp)
+    max(abs(QPlaHeaPumCoo_flow_nominal), QPlaHeaPumHea_flow_nominal)/(cpWatLiq*dTLoo_nominal)
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=mPlaWat_flow_nominal*0.2/
@@ -146,16 +146,16 @@ record GenericDistrict "District network design parameters"
 //   parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=-QPlaHeaPumHea_flow_nominal
 //     "Nominal cooling capacity"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConCoo_nominal(unit="K")=22 + 273.15
+  parameter Real TPlaConCoo_nominal(unit="K")=TLooMax
     "Nominal temperature of the cooled fluid in cooling mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real TPlaEvaCoo_nominal(unit="K")=42 + 273.15
     "Nominal temperature used to size the heat pump in cooling mode (hot side maximum temperature)"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConInMin(unit="K")=TLooMax - TApp - TAppSet
+  parameter Real TPlaConInMin(unit="K")=TLooMax -dTEqu_nominal - dTLoo_nominal
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaInMax(unit="K")=TLooMin + TApp + TAppSet
+  parameter Real TPlaEvaInMax(unit="K")=TLooMin +dTEqu_nominal + dTLoo_nominal
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real minPlaComSpe(unit="1")=0.2/nGen
@@ -164,12 +164,7 @@ record GenericDistrict "District network design parameters"
   parameter Real minHeaPumSpeHol=600
     "Threshold time for checking if the compressor has been in the minimum speed"
      annotation (Dialog(tab="Central plant", group="Heat pump"));
-//   parameter Real TCooSet(unit="K")=TLooMin
-//     "Heat pump tracking temperature setpoint in cooling mode"
-//     annotation (Dialog(tab="Central plant", group="Heat pump"));
-//   parameter Real THeaSet(unit="K")=TLooMax
-//     "Heat pump tracking temperature setpoint in heating mode"
-//     annotation (Dialog(tab="Central plant", group="Heat pump"));
+
   parameter Real offTim(unit="s")=3600
     "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
@@ -180,10 +175,10 @@ record GenericDistrict "District network design parameters"
     "Heat pump hold off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
-  parameter Real TUpp(unit="K")=TLooMax - 1
+  parameter Real TUpp(unit="K")=TLooMax - dTOveSho
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real TLow(unit="K")=TLooMin
+  parameter Real TLow(unit="K")=TLooMin + dTOveSho
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
   parameter Real dTSlo(unit="K")=2
