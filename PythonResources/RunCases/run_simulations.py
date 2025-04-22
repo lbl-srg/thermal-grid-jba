@@ -20,7 +20,7 @@ CASE_LIST = 'fivehubsmultiflow'
         eachbuilding: each building, differentiating with or without DHW
         eachcluster: each of the five clusters, all with DHW
         fivehubsnoplant: runs ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs
-        fivehubsmultiflow: runs ThermalGridJBA.Networks.Validation.DesignedPlantFiveHubs
+        fivehubsmultiflow: runs ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs
 """
 CASE_SPECS = {
      'start_time' : 0 * 24 * 3600,
