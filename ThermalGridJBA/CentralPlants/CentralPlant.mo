@@ -75,8 +75,8 @@ model CentralPlant "Central plant"
     unit="s")=3600
     "Minimum stage down delay, to avoid quickly staging down"
     annotation (Dialog(tab="Controls"));
-  parameter Real TAppSet(unit="K")=2
-    "Dry cooler approch setpoint"
+  parameter Real TDryAppSet(unit="K")=2
+    "Dry cooler approach setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
@@ -230,7 +230,7 @@ model CentralPlant "Central plant"
     final TConCoo_nominal=TConCoo_nominal,
     final TEvaCoo_nominal=TEvaCoo_nominal,
     final staDowDel=staDowDel,
-    final TAppSet=TAppSet,
+    final TDryAppSet=TDryAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,

@@ -58,8 +58,8 @@ model DetailedPlantFiveHubs
   parameter Real mDryCoo_flow_nominal(unit="kg/s")=datDis.mDryCoo_flow_nominal
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
-  parameter Real TAppSet(unit="K")=datDis.TAppSet
-    "Dry cooler approch setpoint"
+  parameter Real TDryAppSet(unit="K")=datDis.TDryAppSet
+    "Dry cooler approach setpoint"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   parameter Real minFanSpe(unit="1")=datDis.minFanSpe
     "Minimum dry cooler fan speed"
@@ -295,7 +295,7 @@ model DetailedPlantFiveHubs
     final TConCoo_nominal=TPlaConCoo_nominal,
     final TEvaCoo_nominal=TPlaEvaCoo_nominal,
     final staDowDel=staDowDel,
-    final TAppSet=TAppSet,
+    final TDryAppSet=TDryAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
     final TConInMin=TPlaConInMin,
@@ -480,6 +480,12 @@ model DetailedPlantFiveHubs
     y(each final unit="K", displayUnit="degC"))
     "Measured loop temperatures to be controlled. This does not include mixing after the last ETS"
     annotation (Placement(transformation(extent={{120,224},{140,244}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum QEtsHex_flow(
+    u(each final unit="W"),
+    y(final unit="W"),
+    nin=nBui)
+    "Sum of all heat exchanger heat flow rates"
+    annotation (Placement(transformation(extent={{40,216},{60,236}})));
 equation
  for i in 1:nBui loop
    connect(weaDat.weaBus, bui[i].weaBus) annotation (Line(
@@ -719,6 +725,8 @@ equation
           230},{-250,229.5},{-222,229.5}}, color={0,0,127}));
   connect(TLooMinMea.y, conVio.u[2]) annotation (Line(points={{-278,200},{-230,
           200},{-230,230.5},{-222,230.5}}, color={0,0,127}));
+  connect(dis.dH_flow, QEtsHex_flow.u) annotation (Line(points={{22,207},{30,
+          207},{30,226},{38,226}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-300},{400,260}})),
@@ -726,9 +734,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StartTime=0,
-      StopTime=31536000,
-      Interval=3600,
+      StopTime=864000,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>

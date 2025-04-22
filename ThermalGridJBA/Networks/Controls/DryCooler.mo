@@ -8,7 +8,7 @@ block DryCooler "Dry cooler and the associated pump control"
   parameter Real TAppSet(
     final quantity="TemperatureDifference",
     final unit="K")=2
-    "Dry cooler approch setpoint";
+    "Dry cooler approach setpoint";
   parameter Real TApp(
     final quantity="TemperatureDifference",
     final unit="K")=4

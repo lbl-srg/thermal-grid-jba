@@ -92,8 +92,8 @@ model Generations
     unit="s")=3600
     "Minimum stage down delay, to avoid quickly staging down"
     annotation (Dialog(tab="Controls"));
-  parameter Real TAppSet(unit="K")=2
-    "Dry cooler approch setpoint"
+  parameter Real TDryAppSet(unit="K")=2
+    "Dry cooler approach setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
@@ -121,10 +121,10 @@ model Generations
 //   parameter Real THeaSet(unit="K")=TLooMax
 //     "Heat pump tracking temperature setpoint in heating mode"
 //     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TConInMin(unit="K")=TLooMax - TApp - TAppSet
+  parameter Real TConInMin(unit="K")
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real TEvaInMax(unit="K")=TLooMin + TApp + TAppSet
+  parameter Real TEvaInMax(unit="K")
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real offTim(unit="s")=12*3600
@@ -749,7 +749,7 @@ model Generations
     annotation (Placement(transformation(extent={{-460,220},{-440,240}})));
   ThermalGridJBA.Networks.Controls.DryCooler dryCooCon(
     final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
-    final TAppSet=TAppSet,
+    final TAppSet=TDryAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
     final fanConTyp=fanConTyp,
