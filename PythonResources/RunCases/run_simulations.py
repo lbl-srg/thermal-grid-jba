@@ -9,10 +9,10 @@
 #       Manually deleting paths can help.
 #############################################################
 import os
-BRANCH="master"
+BRANCH="main"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
-CASE_LIST = 'minimum'
+CASE_LIST = 'fivehubsmultiflow'
 """ This parameter determines which model to run and which load files to load.
     See `cases.py`, case insensitive:
         minimum: minimum test to see if things can run
@@ -50,7 +50,8 @@ if not KEEP_MAT_FILES:
     print("="*10 + "!"*10 + "="*10)
     print("Result mat files will be deleted because KEEP_MAT_FILES = False")
     print("="*10 + "!"*10 + "="*10)
-KEEP_DYMOLA_OPEN = True
+SHOW_DYMOLA_GUI = False
+KEEP_DYMOLA_OPEN = False
 
 CWD = os.getcwd()
 package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
@@ -99,7 +100,7 @@ def checkout_repository(working_directory):
     des = os.path.join(working_directory, "ThermalGridJBA")
     print("*** Copying ThermalGridJBA library to {}".format(des))
     shutil.copytree("../../ThermalGridJBA", des)
-    
+
     ### Test code using Buildings
     # des = os.path.join(working_directory, "Buildings")
     # print("*** Copying Buildings library to {}".format(des))
@@ -144,7 +145,7 @@ def _simulate(spec):
         with open(os.path.join(out_dir, "version.txt"), "w+") as text_file:
             text_file.write("branch={}\n".format(spec['git']['branch']))
             text_file.write("commit={}\n".format(spec['git']['commit']))
-        
+
     print(out_dir)
     # s=Simulator(spec["model"], packagePath="/home/casper/gitRepo/modelica-buildings/Buildings")
     s=Simulator(spec["model"], packagePath=package_path)
@@ -165,11 +166,11 @@ def _simulate(spec):
     s.setStartTime(spec["start_time"])
     s.setStopTime(spec["stop_time"])
     s.setTolerance(1E-6)
-    s.showGUI(KEEP_DYMOLA_OPEN)
+    s.showGUI(SHOW_DYMOLA_GUI)
     s.exitSimulator(not KEEP_DYMOLA_OPEN)
     print("Starting simulation in {}".format(out_dir))
-    
-    flag = False 
+
+    flag = False
     """
     This flag checks if the try-except block ran without raising an exception.
     This avoids wrapping additional code inside the try block and potentially
@@ -190,19 +191,19 @@ def _simulate(spec):
 
     # Delete the working directory
     shutil.rmtree(wor_dir)
-    
+
     # Delete mat files if asked to
     if not KEEP_MAT_FILES:
         pattern = os.path.join(res_des,"*.mat")
         for f in glob.glob(pattern):
             os.remove(f)
-    
-    success = {'name' : spec["name"], 
+
+    success = {'name' : spec["name"],
                'flag' : flag}
     return success
 
 def summarise_tests(success):
-    
+
     num_cases = len(list_of_cases)
     num_success = sum(1 for item in success if item['flag'])
     print('='*30)
@@ -215,16 +216,16 @@ def summarise_tests(success):
                 print(" "*4 + f'The case "{cas["name"]}" failed.')
                 if not os.path.exists(os.path.join(CWD,'simulations',cas['name'],'dslog.txt')):
                     print(" "*8 + '"dslog.txt" was not generated, indicating the simulation did not initialise.')
-                
+
 def check_logs(CHECK_LOG_FILES,
                success,
-               output_warning_tags=True, 
-               output_error_vars=True, 
-               output_unaccounted=False, 
+               output_warning_tags=True,
+               output_error_vars=True,
+               output_unaccounted=False,
                output_warning_blocks=True):
-    
+
     import whofailed
-    
+
     flag = False
     if CHECK_LOG_FILES.upper() == "ALL":
         cases = [item['name'] for item in success]
@@ -232,7 +233,7 @@ def check_logs(CHECK_LOG_FILES,
     elif CHECK_LOG_FILES.upper() == "FAILED":
         cases = [item['name'] for item in success if item['flag'] is False]
         flag = len(cases)
-    
+
     if flag:
         print("="*30)
         print("Checking log files")
@@ -243,12 +244,12 @@ def check_logs(CHECK_LOG_FILES,
             path_dsmodelc = os.path.join(directory, cas, "dsmodel.c")
             whofailed.main(path_dslog,
                            path_dsmodelc,
-                           output_warning_tags, 
-                           output_error_vars, 
-                           output_unaccounted, 
+                           output_warning_tags,
+                           output_error_vars,
+                           output_unaccounted,
                            output_warning_blocks)
-            
-    
+
+
     else:
         print("="*30)
         print("Log file checking is skipped.")
@@ -290,12 +291,12 @@ if __name__=='__main__':
     success = po.map(_simulate, list_of_cases)
     # Delete the checked out repository
     shutil.rmtree(lib_dir)
-    
+
     print("="*10 + "TEST SUMMARY" + "="*10)
     summarise_tests(success)
     if CHECK_LOG_FILES.upper() in ['ALL', 'FAILED']:
         check_logs(CHECK_LOG_FILES, success)
-    
+
     if not KEEP_MAT_FILES:
         print("="*30)
         print("All mat files deleted because KEEP_MAT_FILES=False")
