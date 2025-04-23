@@ -53,6 +53,10 @@ model Borefield "Borefield model"
   constant Integer nBorCenSeg = sum(if iCorZon[i] == 2 then 1 else 0 for i in 1:size(iCorZon, 1))
     "Number of bores in center per segment. This counts the top and bottom edge"
     annotation (Dialog(group="Borefield"));
+  constant Integer nDumSecEdg = 1
+    "Number of dummy sections for core of borefield";
+  constant Integer nDumSecCor = 2
+    "Number of dummy sections for core of borefield";
   constant Integer nBorPerTot = nBorPerSeg * nBorSec
     "Number of bores in perimeter for whole borefield. This counts the top and bottom edge"
     annotation (Dialog(group="Borefield"));
@@ -134,7 +138,7 @@ model Borefield "Borefield model"
 
   Modelica.Fluid.Interfaces.FluidPort_a portCen_a(redeclare final package
       Medium = Medium) "Fluid connector for center of borefield"
-                                                               annotation (
+    annotation (
       Placement(transformation(extent={{-110,-50},{-90,-30}}),
         iconTransformation(extent={{-110,-90},{-90,-70}})));
   Modelica.Fluid.Interfaces.FluidPort_b portCen_b(redeclare final package
@@ -168,19 +172,25 @@ model Borefield "Borefield model"
 
   BaseClasses.BorefieldSection edgSec(
     redeclare package Medium = Medium,
-    final nDumSec=2,
+    final nDumSec=nDumSecEdg,
     final borFieDat=edgBorFieDat,
-    final nBorSec=nBorSec,
-    final TSoi_start=TSoi_start) if not useDummy_borefield
+    final TSoi_start=TSoi_start,
+    final dp_nominal=dp_nominal,
+    final mPer_flow_nominal=mPer_flow_nominal/nBorSec,
+    final mCen_flow_nominal=mCen_flow_nominal/nBorSec)
+    if not useDummy_borefield
     "Edge section of borefield" annotation (Placement(transformation(rotation=0,
           extent={{-50,30},{-30,50}})));
 
   BaseClasses.BorefieldSection corSec(
     redeclare package Medium = Medium,
-    final nDumSec=4,
+    final nDumSec=nDumSecCor,
     final borFieDat=corBorFieDat,
-    final nBorSec=nBorSec,
-    final TSoi_start=TSoi_start) if not useDummy_borefield
+    final TSoi_start=TSoi_start,
+    final dp_nominal=dp_nominal,
+    final mPer_flow_nominal=mPer_flow_nominal/nBorSec,
+    final mCen_flow_nominal=mCen_flow_nominal/nBorSec)
+    if not useDummy_borefield
     "Core section of borefield" annotation (Placement(transformation(rotation=0,
           extent={{-50,-50},{-30,-30}})));
 
@@ -192,7 +202,7 @@ model Borefield "Borefield model"
 
   final parameter Buildings.Fluid.Geothermal.ZonedBorefields.Data.Configuration.Template corConDat(
     borCon=Buildings.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel,
-    final mBor_flow_nominal=mBor_flow_nominal*ones(4),
+    final mBor_flow_nominal=mBor_flow_nominal*ones(4) "per borehole in each zone",
     final dp_nominal=dp_nominal*ones(4),
     final hBor=hBor,
     rBor=0.075,
