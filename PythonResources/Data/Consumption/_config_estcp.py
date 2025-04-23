@@ -38,9 +38,6 @@ dfBldg = pd.read_csv('buildings.csv',
                               'dhw_sup_f' : float,
                               'have_dhw' : str})
 buil_nos = dfBldg['buil_no'].tolist()
-util_cols = [16, 30, 31, 32]
-    # column numbers of the respective utilities
-    #   from the input file (base 0)
 
 #%% Directories
 dirWritSymp = 'Sympheny' # Sympheny input xlsx files
