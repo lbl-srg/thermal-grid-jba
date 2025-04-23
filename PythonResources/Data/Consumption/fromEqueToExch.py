@@ -20,9 +20,6 @@ if flag_deleteOldDirectory:
     shutil.rmtree(dirExch)
     os.makedirs(dirExch, exist_ok = True)
 
-stag = 'futu' # stage: 'base' baseline ,
-              #        'post' post-ECM ,
-              #        'futu' future .
 util_cols = [[4,5,6], 30, 31, 32]
     # column numbers of the respective utilities
     #   from the input file (base 0)
@@ -30,7 +27,7 @@ util_cols = [[4,5,6], 30, 31, 32]
 row_start = 10
 row_end = 8770
 
-for buil_no in buil_nos:
+for stag, buil_no in [(stag, buil_no) for stag in stags for buil_no in buil_nos]:
     if stag == 'base':
         filename = f'{buil_no}*Baseline*.csv'
     elif stag == 'post':
