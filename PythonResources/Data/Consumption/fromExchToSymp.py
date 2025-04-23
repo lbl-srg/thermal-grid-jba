@@ -55,7 +55,13 @@ if flag_deleteOldDirectory:
 main('base', 'ele', ['1380','1045'])
 """
 
+#%% Each building
+for stag, buil_no in [(stag, buil_no) for stag in stags for buil_no in buil_nos]:
+    for util in utils:
+        main(stag=stag, util=util, buil_nos=[buil_no])
+
 #%% Hub list
+#%% Customary list
 """
 # validation
 hub_dict = {'1058x1060':['1058x1060'],
