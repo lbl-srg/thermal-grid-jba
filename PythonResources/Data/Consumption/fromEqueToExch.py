@@ -20,11 +20,14 @@ if flag_deleteOldDirectory:
     shutil.rmtree(dirExch)
     os.makedirs(dirExch, exist_ok = True)
 
-stag = 'futu' # stage: 'base' baseline ,
-              #        'post' post-ECM ,
-              #        'futu' future .
+util_cols = [[4,5,6], 30, 31, 32]
+    # column numbers of the respective utilities
+    #   from the input file (base 0)
+    # ele needs to be summed up
+row_start = 10
+row_end = 8770
 
-for buil_no in buil_nos:
+for stag, buil_no in [(stag, buil_no) for stag in stags for buil_no in buil_nos]:
     if stag == 'base':
         filename = f'{buil_no}*Baseline*.csv'
     elif stag == 'post':
@@ -39,18 +42,17 @@ for buil_no in buil_nos:
         reader = csv.reader(fr, delimiter=',')
         rows = list(reader)
 
-    # For each utility type
-    for idxU in range(0,4):
-        util = utils[idxU]
+    for idxU, util in enumerate(utils):
+        
         util_col = util_cols[idxU]
-
-        if len(rows[10]) <= util_col:
-            # if column doesn't exist
-            continue
-            
-        if rows[10][util_col] == '':
-            # if column is empty
-            continue
+        
+        if util == 'dhw':
+            if len(rows[row_start]) <= util_col:
+                # if dhw column doesn't exist
+                continue
+            if rows[row_start][util_col] == '':
+                # if dhw column is empty
+                continue
 
         with open(os.path.join(dirExch, f'{stag}_{buil_no}_{util}.csv'),
                   'w',
@@ -61,11 +63,14 @@ for buil_no in buil_nos:
                 # Fields:
                 #   value           - float non-negative
             
-            for idxR in range(10,8770):
-                valu = abs(float(rows[idxR][util_col]))
-                if util != 'ele':
-                    # if ele, do nothing
-                    # all others, convert from Btu to kWh
-                    valu = valu / 3412.142
+            for idxR in range(row_start,row_end):
+                if util == 'ele':
+                    # ele: sum 3 columns
+                    valu = 0
+                    for c in util_col:
+                        valu += float(rows[idxR][c])
+                else:
+                    # all others: convert from Btu to kWh
+                    valu = abs(float(rows[idxR][util_col])) / 3412.142
                 
                 writer.writerow({'value' : valu})

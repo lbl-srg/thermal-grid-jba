@@ -17,6 +17,28 @@ utils = ['ele', 'coo', 'hea', 'dhw']
     # utility types:
     #   electricity, cooling, heating, domestic hot water
 delimiter = ','
+# list of hubs
+dict_hub = {'H01' : ['1500'],
+            'H02' : ['1560'],
+            'H03' : ['1569'],
+            'H04' : ['1690', '1691', '1692'],
+            'H05' : ['1800'],
+            'H06' : ['1676'],
+            'H07' : ['1657'],
+            'H08' : ['1631'],
+            'H09' : ['1359', '1380'],
+            'H10' : ['1045'],
+            'H11' : ['1065'],
+            'H12' : ['1058x1060'],
+            'H13' : ['1349'],
+            'H14' : ['1345']}
+
+# list of clusters
+dict_clu = {'CA' : ['1345', '1500'],
+            'CB' : ['1349', '1058x1060'],
+            'CC' : ['1045', '1065'],
+            'CD' : ['1359', '1380'],
+            'CE' : ['1560', '1569', '1631', '1657', '1676', '1690', '1691', '1692', '1800']}
 
 #%% exchange csv files
 dirExch = 'exchange'
@@ -38,9 +60,6 @@ dfBldg = pd.read_csv('buildings.csv',
                               'dhw_sup_f' : float,
                               'have_dhw' : str})
 buil_nos = dfBldg['buil_no'].tolist()
-util_cols = [16, 30, 31, 32]
-    # column numbers of the respective utilities
-    #   from the input file (base 0)
 
 #%% Directories
 dirWritSymp = 'Sympheny' # Sympheny input xlsx files
