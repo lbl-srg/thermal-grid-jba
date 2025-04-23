@@ -56,7 +56,7 @@ main('base', 'ele', ['1380','1045'])
 """
 
 #%% Each building
-for stag, buil_no, util in [(stag, buil_no, util) for stag in stags for buil_no in buil_nos for util in utils]:
+for stag, util, buil_no in [(stag, util, buil_no) for stag in stags for util in utils for buil_no in buil_nos]:
     main(stag=stag, util=util, buil_nos=[buil_no])
 
 for stag, buil_no in [(stag, buil_no) for stag in stags for buil_no in buil_nos]:
