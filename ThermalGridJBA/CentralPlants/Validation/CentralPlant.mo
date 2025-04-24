@@ -12,6 +12,8 @@ model CentralPlant "Validation model for central plant"
   ThermalGridJBA.CentralPlants.CentralPlant cenPla(
     mWat_flow_nominal=mPlaWat_flow_nominal,
     mHexGly_flow_nominal=mPlaWat_flow_nominal,
+    mHeaPumWat_flow_nominal=mPlaWat_flow_nominal,
+    mHeaPumWat_flow_min=0.05*mPlaWat_flow_nominal,
     mHpGly_flow_nominal=mPlaWat_flow_nominal,
     QHeaPumHea_flow_nominal=mPlaWat_flow_nominal*4186*dT_nominal,
     TEvaHea_nominal=260.15,
@@ -102,6 +104,8 @@ equation
           -70},{-54,-70}}, color={0,0,127}));
   connect(mixWatTem.y, addPar1.u) annotation (Line(points={{-68,-20},{-62,-20},{
           -62,-100},{-54,-100}}, color={0,0,127}));
+  connect(cenPla.TPlaOut, mixWatTem.y) annotation (Line(points={{18,-32},{-26,
+          -32},{-26,-20},{-68,-20}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}})),                                        Diagram(
         coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})),
