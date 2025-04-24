@@ -7,10 +7,15 @@ partial model PartialConnectedETS
       final T_bHeaWat_nominal=datBuiSet.THeaWatRet_nominal,
       final T_aChiWat_nominal=datBuiSet.TChiWatSup_nominal,
       final T_bChiWat_nominal=datBuiSet.TChiWatRet_nominal,
-      final have_hotWat=have_hotWat),
+      final have_hotWat=have_hotWat,
+      QHea_flow_nominal=sizFacBuiHea*
+        Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+          string="#Peak space heating load",
+          filNam=Modelica.Utilities.Files.loadResource(filNam))),
     nPorts_heaWat=1,
     nPorts_chiWat=1);
 
+  parameter Real sizFacBuiHea = 1.05 "Sizing factor for building heat load";
   parameter String filNam
     "File name for the load profile";
   parameter ThermalGridJBA.Data.BuildingSetPoints datBuiSet
