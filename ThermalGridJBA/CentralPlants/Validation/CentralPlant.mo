@@ -12,7 +12,6 @@ model CentralPlant "Validation model for central plant"
   ThermalGridJBA.CentralPlants.CentralPlant cenPla(
     mWat_flow_nominal=mPlaWat_flow_nominal,
     mHexGly_flow_nominal=mPlaWat_flow_nominal,
-    mWat_flow_min=0.105*mPlaWat_flow_nominal,
     mHpGly_flow_nominal=mPlaWat_flow_nominal,
     QHeaPumHea_flow_nominal=mPlaWat_flow_nominal*4186*dT_nominal,
     TEvaHea_nominal=260.15,
