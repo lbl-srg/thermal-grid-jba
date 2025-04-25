@@ -115,6 +115,7 @@ model Chiller "Base subsystem with heat recovery chiller"
     iconTransformation(extent={{100,-40},{140,0}})));
   // COMPONENTS
     Buildings.Fluid.HeatPumps.ModularReversible.LargeScaleWaterToWater chi(
+    show_T=true,
     allowDifferentDeviceIdentifiers=true,
     use_intSafCtr=false,
     final dTCon_nominal=dat.dTCon_nominal,
