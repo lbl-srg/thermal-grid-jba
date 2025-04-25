@@ -363,10 +363,6 @@ block HeatPump
     annotation (Placement(transformation(extent={{230,210},{250,230}})));
   Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThr(t=0.5)
     annotation (Placement(transformation(extent={{280,210},{300,230}})));
-  Buildings.Controls.OBC.CDL.Conversions.BooleanToReal glyPum(
-    final realTrue=mHpGly_flow_nominal)
-    "Heat pump glycol side pump speed"
-    annotation (Placement(transformation(extent={{340,-20},{360,0}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal isoVal
     "Heat pump isolation valve position"
     annotation (Placement(transformation(extent={{340,-60},{360,-40}})));
@@ -415,8 +411,7 @@ block HeatPump
     "Mass flow rate setpoint if the heat pump is enabeld due to the high load"
     annotation (Placement(transformation(extent={{320,-490},{340,-470}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(
-    final k=mWat_flow_nominal)
-    "Convert mass flow rate"
+    final k=mWat_flow_nominal) "Convert mass flow rate"
     annotation (Placement(transformation(extent={{-340,-430},{-320,-410}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant minWatRat(
     final k=mWat_flow_min)
@@ -469,6 +464,10 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Logical.Not pasMinOff "Passed minimum off time"
     annotation (Placement(transformation(extent={{20,-230},{40,-210}})));
 
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter mSetHPGly_flow(final k=
+        mHpGly_flow_nominal/mWat_flow_nominal)
+    "Set point for heat pump glycol pump mass flow rate"
+    annotation (Placement(transformation(extent={{340,-20},{360,0}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-400,420},{-322,420}}, color={255,127,0}));
@@ -617,10 +616,6 @@ equation
     annotation (Line(points={{302,220},{400,220}}, color={255,0,255}));
   connect(holHeaPum.y, triSam.trigger) annotation (Line(points={{222,-160},{240,
           -160},{240,208}}, color={255,0,255}));
-  connect(glyPum.y, yPumGly)
-    annotation (Line(points={{362,-10},{400,-10}}, color={0,0,127}));
-  connect(holHeaPum.y, glyPum.u) annotation (Line(points={{222,-160},{240,-160},
-          {240,-10},{338,-10}}, color={255,0,255}));
   connect(holHeaPum.y, isoVal.u) annotation (Line(points={{222,-160},{240,-160},
           {240,-50},{338,-50}}, color={255,0,255}));
   connect(isoVal.y, yVal)
@@ -775,6 +770,10 @@ equation
                       color={0,0,127}));
   connect(conPID.y, swi1.u1) annotation (Line(points={{162,22},{226,22},{226,78},
           {258,78}}, color={0,0,127}));
+  connect(yPumGly, mSetHPGly_flow.y)
+    annotation (Line(points={{400,-10},{362,-10}}, color={0,0,127}));
+  connect(higLoaModFlo1.y, mSetHPGly_flow.u) annotation (Line(points={{342,-480},
+          {360,-480},{360,-138},{310,-138},{310,-10},{338,-10}}, color={0,0,127}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
             {100,120}}), graphics={Rectangle(
