@@ -145,65 +145,76 @@ model CentralPlant "Central plant"
     "Minimum temperature of mixing points after each energy transfer station"
     annotation (Placement(transformation(extent={{-280,-220},{-240,-180}}),
         iconTransformation(extent={{-140,-140},{-100,-100}})));
-
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
+    "Current electricity rate, dollar per kWh"
+    annotation (Placement(transformation(extent={{320,220},{360,260}}),
+        iconTransformation(extent={{100,70},{140,110}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Ambient dry bulb temperature"
     annotation (Placement(transformation(extent={{-280,40},{-240,80}}),
         iconTransformation(extent={{-140,20},{-100,60}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(quantity="Power",
-      final unit="W")
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo(
+    final quantity="Power",
+    final unit="W")
+    "Electrical power consumed by dry cool fan"
+    annotation (Placement(transformation(extent={{320,160},{360,200}}),
+        iconTransformation(extent={{100,50},{140,90}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(
+    final quantity="Power",
+    final unit="W")
     "Electrical power consumed by circulation pump"
     annotation (Placement(transformation(extent={{320,-190},{360,-150}}),
         iconTransformation(extent={{100,-160},{140,-120}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat(quantity="Power",
-      final unit="W")
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat(
+    final quantity="Power",
+    final unit="W")
     "Electrical power consumed by heat pump waterside pump"
     annotation (Placement(transformation(extent={{320,-160},{360,-120}}),
         iconTransformation(extent={{100,-140},{140,-100}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorPer_flow(unit="W")
-    "Heat flow from borefield perimeter to water"
-    annotation (Placement(transformation(extent={{320,-220},{360,-180}}),
-        iconTransformation(extent={{100,-180},{140,-140}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PCom(quantity="Power",
       final unit="W")
     "Electric power consumed by compressor"
     annotation (Placement(transformation(extent={{320,-130},{360,-90}}),
         iconTransformation(extent={{100,-120},{140,-80}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly(quantity="Power",
-      final unit="W")
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly(
+    final quantity="Power",
+    final unit="W")
     "Electrical power consumed by glycol pump of heat pump"
     annotation (Placement(transformation(extent={{320,-100},{360,-60}}),
         iconTransformation(extent={{100,-40},{140,0}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHexGly(quantity="Power",
       final unit="W")
     "Electrical power consumed by the glycol pump of heat exchanger"
-    annotation (Placement(transformation(extent={{320,130},{360,170}}),
+    annotation (Placement(transformation(extent={{320,100},{360,140}}),
         iconTransformation(extent={{100,10},{140,50}})));
-
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumBorFiePer(
     final quantity="Power",
     final unit="W")
     "Electrical power consumed by pump for borefield perimeter"
-    annotation (Placement(transformation(extent={{320,90},{360,130}}),
+    annotation (Placement(transformation(extent={{320,60},{360,100}}),
         iconTransformation(extent={{100,-60},{140,-20}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumBorFieCen(
     final quantity="Power",
     final unit="W")
     "Electrical power consumed by pump for borefield center"
-    annotation (Placement(transformation(extent={{320,60},{360,100}}),
+    annotation (Placement(transformation(extent={{320,30},{360,70}}),
         iconTransformation(extent={{100,-80},{140,-40}})));
-
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo(quantity="Power",
-      final unit="W")
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo(
+    final quantity="Power",
+    final unit="W")
     "Electrical power consumed by dry cool pump"
-    annotation (Placement(transformation(extent={{320,160},{360,200}}),
+    annotation (Placement(transformation(extent={{320,130},{360,170}}),
         iconTransformation(extent={{100,30},{140,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
-    "Current electricity rate, dollar per kWh"
-    annotation (Placement(transformation(extent={{320,220},{360,260}}),
-        iconTransformation(extent={{100,70},{140,110}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorPer_flow(unit="W")
+    "Heat flow from borefield perimeter to water"
+    annotation (Placement(transformation(extent={{320,-220},{360,-180}}),
+        iconTransformation(extent={{100,-180},{140,-140}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorCen_flow(unit="W")
+    "Heat flow from borefield center to water"
+    annotation (Placement(transformation(extent={{320,-250},{360,-210}}),
+        iconTransformation(extent={{100,-200},{140,-160}})));
 
   Generations gen(
     final TLooMin=TLooMin,
@@ -270,13 +281,8 @@ model CentralPlant "Central plant"
   Modelica.Blocks.Continuous.Integrator EHexEne(initType=Modelica.Blocks.Types.Init.InitialState)
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
-
   Borefield borFie(TSoi_start=TSoi_start) "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorCen_flow(unit="W")
-    "Heat flow from borefield center to water" annotation (Placement(
-        transformation(extent={{320,-250},{360,-210}}), iconTransformation(
-          extent={{100,-200},{140,-160}})));
 
 equation
 
@@ -289,10 +295,10 @@ equation
   connect(hexHea.y, EHexEne.u)
     annotation (Line(points={{-79,200},{18,200}}, color={0,0,127}));
 
-  connect(gen.PPumDryCoo, PPumDryCoo) annotation (Line(points={{-138,5},{-120,5},
-          {-120,180},{340,180}}, color={0,0,127}));
-  connect(gen.PPumHexGly, PPumHexGly) annotation (Line(points={{-138,3},{-110,3},
-          {-110,150},{340,150}}, color={0,0,127}));
+  connect(gen.PPumDryCoo, PPumDryCoo) annotation (Line(points={{-138,5},{-112,5},
+          {-112,150},{340,150}}, color={0,0,127}));
+  connect(gen.PPumHexGly, PPumHexGly) annotation (Line(points={{-138,3},{-102,3},
+          {-102,120},{340,120}}, color={0,0,127}));
   connect(port_a, gen.port_a)
     annotation (Line(points={{-240,0},{-200,0},{-200,-16},{-160,-16}},
                                                  color={0,127,255}));
@@ -319,9 +325,9 @@ equation
   connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,1},{96,1},
           {96,-230},{340,-230}}, color={0,0,127}));
   connect(gen.PPumBorFiePer, PPumBorFiePer) annotation (Line(points={{-138,-1},
-          {-104,-1},{-104,110},{340,110}}, color={0,0,127}));
+          {-96,-1},{-96,80},{340,80}},     color={0,0,127}));
   connect(gen.PPumBorFieCen, PPumBorFieCen) annotation (Line(points={{-138,-3},
-          {-102,-3},{-102,80},{340,80}}, color={0,0,127}));
+          {-90,-3},{-90,50},{340,50}},   color={0,0,127}));
   connect(TLooMaxMea, gen.TLooMaxMea) annotation (Line(points={{-260,-140},{-186,
           -140},{-186,-8.2},{-162,-8.2}}, color={0,0,127}));
   connect(TLooMinMea, gen.TLooMinMea) annotation (Line(points={{-260,-200},{-182,
@@ -330,6 +336,8 @@ equation
           -174,8},{-162,8}}, color={0,0,127}));
   connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-128,9},{
           -128,240},{340,240}}, color={0,127,255}));
+  connect(gen.PFanDryCoo, PFanDryCoo) annotation (Line(points={{-138,7},{-120,7},
+          {-120,180},{340,180}}, color={0,0,127}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
