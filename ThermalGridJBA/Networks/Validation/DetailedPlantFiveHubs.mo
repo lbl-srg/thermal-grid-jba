@@ -152,7 +152,7 @@ model DetailedPlantFiveHubs
       each k=2.3,
       each c=1000,
       each d=2600))
-    annotation (Placement(transformation(extent={{-10,160},{12,140}})));
+    annotation (Placement(transformation(extent={{-10,180},{12,160}})));
 
   Buildings.DHC.Networks.Distribution1PipePlugFlow_v dis(
     nCon=nBui,
@@ -183,7 +183,7 @@ model DetailedPlantFiveHubs
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=180,
-        origin={150,-60})));
+        origin={128,-40})));
   Buildings.DHC.Networks.Connections.Connection1Pipe_R conPla(
     redeclare final package Medium = Medium,
     final mDis_flow_nominal=datDis.mPipDis_flow_nominal,
@@ -203,7 +203,7 @@ model DetailedPlantFiveHubs
     "District water supply temperature" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
-        origin={-80,150})));
+        origin={-80,170})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatRet(
     redeclare final package Medium = Medium,
     allowFlowReversal=false,
@@ -251,7 +251,7 @@ model DetailedPlantFiveHubs
     annotation (Placement(transformation(extent={{300,120},{320,140}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PHeaPump(nin=nBui)
     "Heat pump power"
-    annotation (Placement(transformation(extent={{200,170},{220,190}})));
+    annotation (Placement(transformation(extent={{180,170},{200,190}})));
   Modelica.Blocks.Continuous.Integrator EHeaPum(
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
@@ -260,7 +260,7 @@ model DetailedPlantFiveHubs
     "Heat pump electric energy"
     annotation (Placement(transformation(extent={{240,150},{260,170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(
-    nin=3,
+    nin=4,
     u(each unit="J",
       each displayUnit="Wh"),
     y(each unit="J",
@@ -327,8 +327,7 @@ model DetailedPlantFiveHubs
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J",
-      displayUnit="Wh"))
-    "Dry cooler pump electric energy"
+      displayUnit="Wh")) "Dry cooler pump electric energy"
     annotation (Placement(transformation(extent={{100,118},{120,138}})));
   Modelica.Blocks.Continuous.Integrator EPumHeaPumGly(
     initType=Modelica.Blocks.Types.Init.InitialState,
@@ -357,14 +356,14 @@ model DetailedPlantFiveHubs
     y(final unit="J",
       displayUnit="Wh"))
     "Heat pump water side pump electric energy"
-    annotation (Placement(transformation(extent={{140,-2},{160,18}})));
+    annotation (Placement(transformation(extent={{140,0},{160,20}})));
   Modelica.Blocks.Continuous.Integrator EPumCirPum(
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J",
       displayUnit="Wh"))
     "Circulation pump electric energy"
-    annotation (Placement(transformation(extent={{180,-40},{200,-20}})));
+    annotation (Placement(transformation(extent={{180,-38},{200,-18}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum EPumPla(
     nin=7,
     u(each unit="J",
@@ -411,10 +410,10 @@ model DetailedPlantFiveHubs
     u(each final unit="W"),
     y(each final unit="J",
       each displayUnit="Wh")) "Heat flow through each ETS"
-    annotation (Placement(transformation(extent={{140,142},{160,162}})));
+    annotation (Placement(transformation(extent={{100,150},{120,170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum ETotEts(nin=nBui)
     "Sum of all the ETS heat flow"
-    annotation (Placement(transformation(extent={{180,142},{200,162}})));
+    annotation (Placement(transformation(extent={{140,150},{160,170}})));
   Modelica.Blocks.Continuous.Integrator EBorCen(
     k=-1,
     initType=Modelica.Blocks.Types.Init.InitialState,
@@ -446,7 +445,7 @@ model DetailedPlantFiveHubs
     initType=Modelica.Blocks.Types.Init.InitialState)
     "Total electricity cost, in dollar"
     annotation (Placement(transformation(extent={{340,-140},{360,-120}})));
-  Modelica.Blocks.Math.MultiSum multiSum(nu=11)
+  Modelica.Blocks.Math.MultiSum multiSum(nu=12)
     annotation (Placement(transformation(extent={{240,-160},{260,-140}})));
   CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiPer(
     T_start=datDis.TSoi_start,
@@ -486,6 +485,11 @@ model DetailedPlantFiveHubs
     nin=nBui)
     "Sum of all heat exchanger heat flow rates"
     annotation (Placement(transformation(extent={{40,216},{60,236}})));
+  Modelica.Blocks.Continuous.Integrator EFanDryCoo(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh")) "Dry cooler fan electric energy"
+    annotation (Placement(transformation(extent={{40,140},{60,160}})));
 equation
  for i in 1:nBui loop
    connect(weaDat.weaBus, bui[i].weaBus) annotation (Line(
@@ -498,10 +502,10 @@ equation
   connect(dis.ports_aCon, bui.port_bSerAmb) annotation (Line(points={{12,210},{
           16,210},{16,240},{10,240}}, color={0,127,255}));
   connect(pipeGroundCouplingMulti[1:(nBui+1)].heatPorts[1], dis.heatPorts)
-    annotation (Line(points={{1,155},{1,156},{0.4,156},{0.4,197.8}},
+    annotation (Line(points={{1,175},{1,156},{0.4,156},{0.4,197.8}},
         color={127,0,0}));
   connect(conPla.port_bDis, TDisWatSup.port_a)
-    annotation (Line(points={{-80,0},{-80,140}},color={0,127,255},
+    annotation (Line(points={{-80,0},{-80,160}},color={0,127,255},
       thickness=0.5));
   connect(TDisWatRet.port_b, conPla.port_aDis)
     annotation (Line(points={{-80,-70},{-80,-20}}, color={0,127,255},
@@ -516,28 +520,27 @@ equation
   connect(EPumDis.y, EPum.u[2]) annotation (Line(points={{221,-80},{286,-80},{286,
           130},{298,130}},     color={0,0,127}));
   connect(PHeaPump.y, EHeaPum.u)
-    annotation (Line(points={{222,180},{230,180},{230,160},{238,160}},
+    annotation (Line(points={{202,180},{230,180},{230,160},{238,160}},
                                                    color={0,0,127}));
   connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{261,160},{350,160},{
-          350,99.3333},{358,99.3333}},
-                                   color={0,0,127}));
-  connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,130},{340,130},{340,100},
-          {358,100}},          color={0,0,127}));
+          350,99.25},{358,99.25}}, color={0,0,127}));
+  connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,130},{340,130},{340,
+          99.75},{358,99.75}}, color={0,0,127}));
   connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-90},
           {-80,-100},{90,-100},{90,-70}},color={0,127,255},
       thickness=0.5));
   connect(bui.PPum, PPumETS.u) annotation (Line(points={{12,243},{100,243},{100,
           200},{118,200}}, color={0,0,127}));
-  connect(bui.PCoo, PHeaPump.u) annotation (Line(points={{12,247},{106,247},{106,
-          180},{198,180}},     color={0,0,127}));
+  connect(bui.PCoo, PHeaPump.u) annotation (Line(points={{12,247},{106,247},{
+          106,180},{178,180}}, color={0,0,127}));
   connect(dis.port_aDisSup, TDisWatSup.port_b) annotation (Line(points={{-20,200},
-          {-80,200},{-80,160}},color={0,127,255},
+          {-80,200},{-80,180}},color={0,127,255},
       thickness=0.5));
   connect(dis.port_bDisSup, pumDis.port_a)
     annotation (Line(points={{20,200},{90,200},{90,-50}}, color={0,127,255},
       thickness=0.5));
   connect(pumDis.port_a, bou.ports[1]) annotation (Line(points={{90,-50},{90,
-          -44},{128,-44},{128,-60},{140,-60}}, color={0,127,255},
+          -40},{118,-40}},                     color={0,127,255},
       thickness=0.5));
   connect(conPla.port_bCon, cenPla.port_a) annotation (Line(points={{-90,-10},{-100,
           -10},{-100,-26},{-208,-26},{-208,0},{-180,0}}, color={0,127,255}));
@@ -560,19 +563,18 @@ equation
   connect(EPumHexGly.y, EPumPla.u[2]) annotation (Line(points={{161,110},{220,
           110},{220,69.4286},{238,69.4286}},
                                   color={0,0,127}));
-  connect(EPumHeaPumGly.y, EPumPla.u[3]) annotation (Line(points={{201,90},{220,
-          90},{220,69.7143},{238,69.7143}},
+  connect(EPumHeaPumGly.y, EPumPla.u[3]) annotation (Line(points={{201,90},{214,
+          90},{214,69.7143},{238,69.7143}},
                                   color={0,0,127}));
-  connect(EPumHeaPumWat.y, EPumPla.u[4]) annotation (Line(points={{161,8},{228,
-          8},{228,70},{238,70}},             color={0,0,127}));
-  connect(EPumCirPum.y, EPumPla.u[5]) annotation (Line(points={{201,-30},{226,
-          -30},{226,70.2857},{238,70.2857}},
+  connect(EPumHeaPumWat.y, EPumPla.u[4]) annotation (Line(points={{161,10},{228,
+          10},{228,70},{238,70}},            color={0,0,127}));
+  connect(EPumCirPum.y, EPumPla.u[5]) annotation (Line(points={{201,-28},{226,
+          -28},{226,70.2857},{238,70.2857}},
                                        color={0,0,127}));
   connect(EPumPla.y, EPum.u[3]) annotation (Line(points={{262,70},{280,70},{280,
           130.667},{298,130.667}}, color={0,0,127}));
   connect(EComPla.y, ETot.u[3]) annotation (Line(points={{261,30},{320,30},{320,
-          100.667},{358,100.667}},
-                                 color={0,0,127}));
+          100.25},{358,100.25}}, color={0,0,127}));
   connect(TLooMaxMea.y, looPumSpe.TMixMax) annotation (Line(points={{-278,230},
           {-260,230},{-260,196},{-220,196}}, color={0,0,127}));
   connect(TLooMinMea.y, looPumSpe.TMixMin) annotation (Line(points={{-278,200},
@@ -587,16 +589,17 @@ equation
   connect(cenPla.PCom, EComPla.u) annotation (Line(points={{-158,-10},{-114,-10},
           {-114,30},{238,30}},color={0,0,127}));
   connect(cenPla.PPumHeaPumWat, EPumHeaPumWat.u) annotation (Line(points={{-158,
-          -12},{-112,-12},{-112,8},{138,8}}, color={0,0,127}));
-  connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-158,-14},{
-          -108,-14},{-108,-30},{178,-30}},
+          -12},{-112,-12},{-112,10},{138,10}},
+                                             color={0,0,127}));
+  connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-158,-14},
+          {-108,-14},{-108,-28},{178,-28}},
                                      color={0,0,127}));
 //   connect(weaDat.weaBus, bui.weaBus) annotation (Line(
 //       points={{-360,-20},{-340,-20},{-340,250},{0,250}},
 //       color={255,204,51},
 //       thickness=0.5));
-  connect(TDisWatSup.T, sub.u1) annotation (Line(points={{-91,150},{-220,150},{-220,
-          -170},{60,-170},{60,-214},{78,-214}},         color={0,0,127}));
+  connect(TDisWatSup.T, sub.u1) annotation (Line(points={{-91,170},{-220,170},{
+          -220,-170},{60,-170},{60,-214},{78,-214}},    color={0,0,127}));
   connect(TDisWatRet.T, sub.u2) annotation (Line(points={{-91,-80},{-100,-80},{-100,
           -180},{54,-180},{54,-226},{78,-226}},         color={0,0,127}));
   connect(sub.y, mul.u1) annotation (Line(points={{102,-220},{120,-220},{120,
@@ -617,15 +620,14 @@ equation
       index=-1,
       extent={{-6,3},{-6,3}},
       horizontalAlignment=TextAlignment.Right));
-  connect(dis.dH_flow, EEts.u) annotation (Line(points={{22,207},{96,207},{96,152},
-          {138,152}},      color={0,0,127}));
+  connect(dis.dH_flow, EEts.u) annotation (Line(points={{22,207},{84,207},{84,
+          160},{98,160}},  color={0,0,127}));
   connect(EEts.y, ETotEts.u)
-    annotation (Line(points={{161,152},{178,152}}, color={0,0,127}));
-  connect(dis.dH_flow,EEts. u) annotation (Line(points={{22,207},{100,207},{100,
-          152},{138,152}}, color={0,0,127}));
+    annotation (Line(points={{121,160},{138,160}}, color={0,0,127}));
+  connect(dis.dH_flow,EEts. u) annotation (Line(points={{22,207},{84,207},{84,
+          160},{98,160}},  color={0,0,127}));
   connect(EEts.y, ETotEts.u)
-    annotation (Line(points={{161,152},{170,152},{170,152},{178,152}},
-                                                   color={0,0,127}));
+    annotation (Line(points={{121,160},{138,160}}, color={0,0,127}));
   connect(EPumBorFiePer.y, EPumPla.u[6]) annotation (Line(points={{161,70},{200,
           70},{200,70.5714},{238,70.5714}}, color={0,0,127}));
   connect(EPumBorFieCen.y, EPumPla.u[7]) annotation (Line(points={{121,50},{220,
@@ -642,37 +644,38 @@ equation
           -260,-8},{-260,230},{-278,230}}, color={0,0,127}));
   connect(cenPla.TLooMinMea, TLooMinMea.y) annotation (Line(points={{-182,-12},
           {-230,-12},{-230,200},{-278,200}}, color={0,0,127}));
-  connect(TDisWatSup.T, cenPla.TPlaOut) annotation (Line(points={{-91,150},{-220,
-          150},{-220,8},{-182,8}},      color={0,0,127}));
+  connect(TDisWatSup.T, cenPla.TPlaOut) annotation (Line(points={{-91,170},{
+          -220,170},{-220,8},{-182,8}}, color={0,0,127}));
   connect(pumDis.P, multiSum.u[1]) annotation (Line(points={{81,-71},{81,
-          -153.182},{240,-153.182}},
+          -153.208},{240,-153.208}},
                            color={0,0,127}));
   connect(cenPla.PPumCirPum, multiSum.u[2]) annotation (Line(points={{-158,-14},
-          {-108,-14},{-108,-152.545},{240,-152.545}}, color={0,0,127}));
+          {-108,-14},{-108,-152.625},{240,-152.625}}, color={0,0,127}));
   connect(cenPla.PCom, multiSum.u[3]) annotation (Line(points={{-158,-10},{-114,
-          -10},{-114,-151.909},{240,-151.909}}, color={0,0,127}));
+          -10},{-114,-152.042},{240,-152.042}}, color={0,0,127}));
   connect(cenPla.PPumHeaPumWat, multiSum.u[4]) annotation (Line(points={{-158,
-          -12},{-112,-12},{-112,-151.273},{240,-151.273}},
+          -12},{-112,-12},{-112,-151.458},{240,-151.458}},
                                                       color={0,0,127}));
   connect(cenPla.PPumBorFieCen, multiSum.u[5]) annotation (Line(points={{-158,-6},
-          {-116,-6},{-116,-150.636},{240,-150.636}}, color={0,0,127}));
+          {-116,-6},{-116,-150.875},{240,-150.875}}, color={0,0,127}));
   connect(cenPla.PPumBorFiePer, multiSum.u[6]) annotation (Line(points={{-158,-4},
-          {-118,-4},{-118,-150},{240,-150}}, color={0,0,127}));
+          {-118,-4},{-118,-150.292},{240,-150.292}},
+                                             color={0,0,127}));
   connect(cenPla.PPumHeaPumGly, multiSum.u[7]) annotation (Line(points={{-158,-2},
-          {-120,-2},{-120,-149.364},{240,-149.364}}, color={0,127,255}));
+          {-120,-2},{-120,-149.708},{240,-149.708}}, color={0,127,255}));
   connect(cenPla.PPumHexGly, multiSum.u[8]) annotation (Line(points={{-158,3},{
-          -124,3},{-124,-148.727},{240,-148.727}},
+          -124,3},{-124,-149.125},{240,-149.125}},
                                               color={0,127,255}));
   connect(cenPla.PPumDryCoo, multiSum.u[9]) annotation (Line(points={{-158,5},{
-          -128,5},{-128,-148.091},{240,-148.091}},
+          -128,5},{-128,-148.542},{240,-148.542}},
                                               color={0,0,127}));
   connect(cenPla.yEleRat, eleRat.u) annotation (Line(points={{-158,9},{-132,9},{
           -132,-120},{118,-120}}, color={0,0,127}));
   connect(PPumETS.y, multiSum.u[10]) annotation (Line(points={{142,200},{168,
-          200},{168,-147.455},{240,-147.455}},
+          200},{168,-147.958},{240,-147.958}},
                                           color={0,0,127}));
-  connect(PHeaPump.y, multiSum.u[11]) annotation (Line(points={{222,180},{230,
-          180},{230,-146.818},{240,-146.818}},
+  connect(PHeaPump.y, multiSum.u[11]) annotation (Line(points={{202,180},{230,
+          180},{230,-147.375},{240,-147.375}},
                                           color={0,0,127}));
   connect(eleRat.y, mul1.u1) annotation (Line(points={{142,-120},{280,-120},{280,
           -124},{298,-124}}, color={0,0,127}));
@@ -692,8 +695,8 @@ equation
           -260,-8},{-260,230},{-278,230}}, color={0,0,127}));
   connect(cenPla.TLooMinMea, TLooMinMea.y) annotation (Line(points={{-182,-12},
           {-230,-12},{-230,200},{-278,200}}, color={0,0,127}));
-  connect(TDisWatSup.T, cenPla.TPlaOut) annotation (Line(points={{-91,150},{-220,
-          150},{-220,8},{-182,8}},      color={0,0,127}));
+  connect(TDisWatSup.T, cenPla.TPlaOut) annotation (Line(points={{-91,170},{
+          -220,170},{-220,8},{-182,8}}, color={0,0,127}));
   connect(EBor.y, dTSoi.E)
     annotation (Line(points={{242,-270},{258,-270}}, color={0,0,127}));
   connect(EBorPer.y, dTSoiPer.E)
@@ -727,6 +730,12 @@ equation
           200},{-230,230.5},{-222,230.5}}, color={0,0,127}));
   connect(dis.dH_flow, QEtsHex_flow.u) annotation (Line(points={{22,207},{30,
           207},{30,226},{38,226}}, color={0,0,127}));
+  connect(cenPla.PFanDryCoo, EFanDryCoo.u) annotation (Line(points={{-158,7},{
+          -136,7},{-136,150},{38,150}}, color={0,0,127}));
+  connect(cenPla.PFanDryCoo, multiSum.u[12]) annotation (Line(points={{-158,7},
+          {-136,7},{-136,-146.792},{240,-146.792}}, color={0,0,127}));
+  connect(EFanDryCoo.y, ETot.u[4]) annotation (Line(points={{61,150},{80,150},{
+          80,144},{292,144},{292,100.75},{358,100.75}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-300},{400,260}})),
