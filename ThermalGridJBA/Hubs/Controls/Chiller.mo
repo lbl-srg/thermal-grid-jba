@@ -104,7 +104,8 @@ model Chiller "Chiller controller"
     k=0.01,
     y_reset=PLRMin,
     Ti(displayUnit="s"),
-    final reverseActing=true) "Chiller compressor speed control"
+    final reverseActing=true,
+    final y_neutral=0)        "Chiller compressor speed control"
     annotation (Placement(transformation(extent={{50,30},{70,50}})));
 equation
   connect(TEvaWatEnt,conValEva.u_m)

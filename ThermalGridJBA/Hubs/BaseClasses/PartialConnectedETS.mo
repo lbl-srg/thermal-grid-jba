@@ -22,7 +22,7 @@ partial model PartialConnectedETS
     "Building set points" annotation (Placement(
       transformation(extent={{20,140},{40,160}})));
   parameter ThermalGridJBA.Data.Chiller datChi(
-    PLRMin=0,
+    PLRMin=0.2/3 "20%, and assume 3 chillers in parallel",
     QHea_flow_nominal=max(QHea_flow_nominal, QCoo_flow_nominal*1.5),
     QCoo_flow_nominal=QCoo_flow_nominal,
     TConEntMin=298.15,
