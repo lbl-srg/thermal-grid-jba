@@ -38,6 +38,11 @@ block HeatExchanger
     "Ambient dry bulb temperature"
     annotation (Placement(transformation(extent={{-320,-80},{-280,-40}}),
         iconTransformation(extent={{-140,-100},{-100,-60}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput on
+    "Output true if heat exchanger is commanded on" annotation (Placement(
+        transformation(extent={{280,80},{320,120}}), iconTransformation(extent=
+            {{100,60},{140,100}})));
+
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yValHexByp(
     final min=0,
     final max=1,
@@ -129,6 +134,7 @@ block HeatExchanger
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal hexGlyPum(final realTrue
       =mHexGly_flow_nominal) "Heat exchanger glyco side pump speed setpoint"
     annotation (Placement(transformation(extent={{240,-50},{260,-30}})));
+
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-300,150},{-202,150}}, color={255,127,0}));
@@ -223,6 +229,9 @@ equation
   connect(byPasVal.y, yValHexByp)
     annotation (Line(points={{262,40},{300,40}}, color={0,0,127}));
 
+  connect(ena2.y, on) annotation (Line(points={{222,0},{230,0},{230,100},{300,
+          100}},
+        color={255,0,255}));
 annotation (defaultComponentName="hexCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}), graphics={Rectangle(

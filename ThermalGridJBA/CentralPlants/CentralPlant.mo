@@ -219,7 +219,7 @@ model CentralPlant "Central plant"
     final mHeaPumWat_flow_min=mHeaPumWat_flow_min,
     final mHexGly_flow_nominal=mHexGly_flow_nominal,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
-    final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
+    final mGly_flow_nominal=mDryCoo_flow_nominal,
     final dpHex_nominal=dpHex_nominal,
     final dpValve_nominal=dpValve_nominal,
     final dpDryCoo_nominal=dpDryCoo_nominal,
