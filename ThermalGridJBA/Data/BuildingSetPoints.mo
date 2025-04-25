@@ -2,44 +2,41 @@ within ThermalGridJBA.Data;
 record BuildingSetPoints "Set points for the buildings"
   extends Modelica.Icons.Record;
 
-  parameter Modelica.Units.SI.ThermodynamicTemperature TChiWatSup_nominal =
-    Modelica.Units.Conversions.from_degF(44)
+  parameter Modelica.Units.SI.ThermodynamicTemperature TChiWatSup_nominal = 7+273.15
     "Nominal chilled water supply temperature"
     annotation (Dialog(group="Chilled water"));
-  parameter Modelica.Units.SI.TemperatureDifference dTChiWat_nominal =
-    10/9*5 "Nominal chilled water temperature difference"
+  parameter Modelica.Units.SI.TemperatureDifference dTChiWat_nominal = 5
+    "Nominal chilled water temperature difference"
     annotation (Dialog(group="Chilled water"));
   final parameter Modelica.Units.SI.ThermodynamicTemperature TChiWatRet_nominal
     = TChiWatSup_nominal + dTChiWat_nominal
     "Nominal chilled water return temperature";
-  parameter Real tabChiWatRes[2,2]=
-    [Modelica.Units.Conversions.from_degF(60), Modelica.Units.Conversions.from_degF(54);
-     Modelica.Units.Conversions.from_degF(80), TChiWatSup_nominal]
+  parameter Modelica.Units.SI.ThermodynamicTemperature tabChiWatRes[2,2](each displayUnit="degC")=
+    [16+273.15, 12+273.15; 300, TChiWatSup_nominal]
     "Chilled water supply temperature reset schedule"
     annotation (Dialog(group="Chilled water"));
-  parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatSup_nominal =
-    Modelica.Units.Conversions.from_degF(140)
+  parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatSup_nominal(displayUnit="degC") = 333.15
     "Nominal heating hot water supply temperature"
     annotation (Dialog(group="Heating hot water"));
-  parameter Modelica.Units.SI.TemperatureDifference dTHeaWat_nominal =
-    20/9*5
+  parameter Modelica.Units.SI.TemperatureDifference dTHeaWat_nominal = 10
     "Nominal heating hot water temperature difference"
     annotation (Dialog(group="Heating hot water"));
-  final parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatRet_nominal
-  = THeaWatSup_nominal - dTHeaWat_nominal
+  final parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatRet_nominal =
+    THeaWatSup_nominal - dTHeaWat_nominal
     "Nominal heating hot water supply temperature";
-  parameter Real tabHeaWatRes[2,2]=
-    [Modelica.Units.Conversions.from_degF(20), THeaWatSup_nominal;
-     Modelica.Units.Conversions.from_degF(50), Modelica.Units.Conversions.from_degF(120)]
+  parameter Modelica.Units.SI.ThermodynamicTemperature tabHeaWatRes[2,2](
+    each displayUnit="degC")=
+    [266.45, THeaWatSup_nominal;
+     283.15, 293.15]
     "Heating hot water supply temperature reset schedule"
     annotation (Dialog(group="Heating hot water"));
-  parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSupTan_nominal =
+  parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSupTan_nominal(displayUnit="degC") =
     50 + 273.15 "Nominal domestic hot water supply temperature to the tank"
     annotation (Dialog(group="Domestic hot water"));
-  parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSupFix_nominal =
+  parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSupFix_nominal(displayUnit="degC") =
     40 + 273.15 "Nominal domestic hot water supply temperature to the fixture"
     annotation (Dialog(group="Domestic hot water"));
-  parameter Modelica.Units.SI.ThermodynamicTemperature TColWat_nominal =
+  parameter Modelica.Units.SI.ThermodynamicTemperature TColWat_nominal(displayUnit="degC") =
     15 + 273.15 "Nominal domestic cold water temperature"
     annotation (Dialog(group="Domestic hot water"));
     annotation(defaultComponentName="datBuiSet",
