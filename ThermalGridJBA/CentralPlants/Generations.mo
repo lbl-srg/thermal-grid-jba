@@ -2,7 +2,8 @@ within ThermalGridJBA.CentralPlants;
 model Generations
   "Cooling and heating generation from the heat pump and heat exchanger"
   package MediumW = Buildings.Media.Water "Water";
-//   package MediumG = Modelica.Media.Incompressible.Examples.Glycol47 "Glycol";
+  //   package MediumG = Modelica.Media.Incompressible.Examples.Glycol47 "Glycol";
+  package MediumA = Buildings.Media.Air "Air";
   package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.40) "Glycol";
   parameter Real TLooMin(
     unit="K",
@@ -23,6 +24,9 @@ model Generations
 
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate";
+  parameter Real mFan_flow_nominal(unit="kg/s")=
+    mGly_flow_nominal*MediumG.cp_const/Buildings.Utilities.Psychrometrics.Constants.cpAir
+    "Design flow rate for dry cooler fan";
   parameter Modelica.Units.SI.PressureDifference dpValve_nominal(
     displayUnit="Pa")=6000
     "Nominal pressure drop of fully open 2-way valve";
@@ -36,11 +40,13 @@ model Generations
   // Heat exchanger parameters
   parameter Modelica.Units.SI.PressureDifference dpDryCoo_nominal(
     displayUnit="Pa")=10000
-    "Nominal pressure drop of dry cooler"
+    "Nominal pressure drop of dry cooler on glycol side"
     annotation (Dialog(group="Dry cooler"));
-  parameter Real mDryCoo_flow_nominal(unit="kg/s")=mHexGly_flow_nominal +
-    mHpGly_flow_nominal
-    "Nominal glycol mass flow rate for dry cooler"
+  parameter Modelica.Units.SI.PressureDifference dpDryCooFan_nominal=200
+    "Design pressure drop on air side of dry cooler"
+    annotation (Dialog(group="Dry cooler"));
+  parameter Real mGly_flow_nominal(unit="kg/s") = mHexGly_flow_nominal +
+    mHpGly_flow_nominal "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(group="Dry cooler"));
 
   // Borefield parameters
@@ -296,8 +302,8 @@ model Generations
     final m2_flow_nominal=mWat_flow_nominal,
     show_T=true,
     final dp1_nominal=dpHex_nominal,
-    final dp2_nominal=dpHex_nominal)
-    "Economizer"
+    final dp2_nominal=dpHex_nominal,
+    eps=0.9)                         "Economizer"
     annotation (Placement(transformation(extent={{-280,-40},{-300,-20}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHeaPum(
     redeclare final package Medium = MediumW,
@@ -317,26 +323,14 @@ model Generations
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-40})));
-  Buildings.Fluid.HeatExchangers.CoolingTowers.FixedApproach
-                                                        dryCoo(
-    redeclare final package Medium = MediumG,
-    allowFlowReversal=false,
-    final m_flow_nominal=mDryCoo_flow_nominal,
-    final show_T=true,
-    final dp_nominal=dpDryCoo_nominal,
-    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    final TApp=0)
-    "Dry cooler"
-    annotation (Placement(transformation(extent={{70,120},{90,140}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo(
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=false,
-    final m_flow_nominal=mDryCoo_flow_nominal,
-    dpMax=Modelica.Constants.inf)
-    "Dry cooler pump"
-    annotation (Placement(transformation(extent={{-60,120},{-40,140}})));
+    final m_flow_nominal=mGly_flow_nominal,
+    dpMax=Modelica.Constants.inf) "Dry cooler pump"
+    annotation (Placement(transformation(extent={{-98,54},{-78,74}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumGly(
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
@@ -389,11 +383,11 @@ model Generations
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemDryCooOut(
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
-    final m_flow_nominal=mDryCoo_flow_nominal)
-    "Temperature of dry cooler outlet" annotation (Placement(transformation(
+    final m_flow_nominal=mGly_flow_nominal) "Temperature of dry cooler outlet"
+    annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=0,
-        origin={130,130})));
+        origin={136,64})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo1(
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
@@ -683,10 +677,9 @@ model Generations
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    m_flow_nominal={mDryCoo_flow_nominal,-mHpGly_flow_nominal,-
-        mDryCoo_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+    m_flow_nominal={mGly_flow_nominal,-mHpGly_flow_nominal,-mGly_flow_nominal},
+    dp_nominal={0,0,0}) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
         rotation=-90,
         origin={370,100})));
   Buildings.Fluid.FixedResistances.Junction jun13(
@@ -695,10 +688,9 @@ model Generations
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    m_flow_nominal={mDryCoo_flow_nominal,-mDryCoo_flow_nominal,-
-        mHexGly_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{10,-10},{-10,10}},
+    m_flow_nominal={mGly_flow_nominal,-mGly_flow_nominal,-mHexGly_flow_nominal},
+    dp_nominal={0,0,0}) annotation (Placement(transformation(
+        extent={{10,-10},{-10,10}},
         rotation=0,
         origin={-260,50})));
   Buildings.Fluid.FixedResistances.Junction jun14(
@@ -707,10 +699,9 @@ model Generations
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    m_flow_nominal={mHexGly_flow_nominal,-mDryCoo_flow_nominal,
-        mDryCoo_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+    m_flow_nominal={mHexGly_flow_nominal,-mGly_flow_nominal,mGly_flow_nominal},
+    dp_nominal={0,0,0}) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-320,50})));
   Buildings.Fluid.FixedResistances.Junction jun15(
@@ -731,10 +722,9 @@ model Generations
     portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
     portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    m_flow_nominal={mDryCoo_flow_nominal,-mDryCoo_flow_nominal,
-        mDryCoo_flow_nominal},
-    dp_nominal={0,0,0})
-    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+    m_flow_nominal={mGly_flow_nominal,-mGly_flow_nominal,mGly_flow_nominal},
+    dp_nominal={0,0,0}) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-320,90})));
   ThermalGridJBA.Networks.Controls.Indicators ind(
@@ -754,7 +744,8 @@ model Generations
     final fanConTyp=fanConTyp,
     final kFan=kFan,
     final TiFan=TiFan,
-    final TdFan=TdFan)
+    final TdFan=TdFan,
+    final mFan_flow_nominal=mFan_flow_nominal)
     "Dry cooler and the associated pump control"
     annotation (Placement(transformation(extent={{20,220},{40,240}})));
   ThermalGridJBA.Networks.Controls.Borefields borCon(
@@ -846,11 +837,43 @@ model Generations
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemDryCooIn(
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
-    final m_flow_nominal=mDryCoo_flow_nominal)
-    "Temperature of dry cooler inlet" annotation (Placement(transformation(
+    final m_flow_nominal=mGly_flow_nominal) "Temperature of dry cooler inlet"
+    annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=0,
-        origin={0,130})));
+        origin={-50,64})));
+  Buildings.Fluid.HeatExchangers.ConstantEffectiveness dryCoo(
+    redeclare package Medium1 = MediumA,
+    redeclare package Medium2 = MediumG,
+    allowFlowReversal1=false,
+    allowFlowReversal2=false,
+    final m1_flow_nominal=mFan_flow_nominal,
+    final m2_flow_nominal=mGly_flow_nominal,
+    show_T=true,
+    final dp1_nominal=dpDryCooFan_nominal,
+    final dp2_nominal=dpDryCoo_nominal,
+    eps=0.9) "Dry cooler"
+    annotation (Placement(transformation(extent={{80,60},{60,80}})));
+  Buildings.Fluid.Sources.Boundary_pT      bouAirIn(
+    redeclare package Medium = MediumA,
+    use_T_in=true,
+    nPorts=1) "Inlet air into dry cooler"
+    annotation (Placement(transformation(extent={{122,80},{102,100}})));
+  Buildings.Fluid.Sources.Boundary_pT bouAirOut(redeclare package Medium =
+        MediumA, nPorts=1) "Pressure boundary condition for air"
+    annotation (Placement(transformation(extent={{-20,80},{0,100}})));
+
+  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow fanDryCoo(
+    redeclare package Medium = MediumA,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
+    allowFlowReversal=false,
+    final addPowerToMedium=false,
+    use_riseTime=false,
+    final m_flow_nominal=mFan_flow_nominal,
+    final dp_nominal=dpDryCooFan_nominal,
+    dpMax=Modelica.Constants.inf) "Dry cooler fan"
+    annotation (Placement(transformation(extent={{40,80},{20,100}})));
+
 protected
   Buildings.Controls.OBC.CDL.Reals.Add PPumCirAdd
     "Adder for circulation pump power"
@@ -872,16 +895,12 @@ equation
       points={{-300,-24},{-334,-24}},
       color={0,127,255},
       thickness=0.5));
-  connect(dryCoo.port_b, senTemDryCooOut.port_a) annotation (Line(
-      points={{90,130},{120,130}},
-      color={0,127,255},
-      thickness=0.5));
   connect(hex.port_a1, pumDryCoo1.port_b) annotation (Line(
       points={{-280,-24},{-260,-24},{-260,6}},
       color={0,127,255},
       thickness=0.5));
-  connect(pumDryCoo.P, PPumDryCoo) annotation (Line(points={{-39,139},{-22,139},
-          {-22,140},{-20,140},{-20,196},{416,196},{416,200},{560,200}},
+  connect(pumDryCoo.P, PPumDryCoo) annotation (Line(points={{-77,73},{-72,73},{-72,
+          74},{-70,74},{-70,196},{416,196},{416,200},{560,200}},
                                 color={0,0,127}));
   connect(pumDryCoo1.P, PPumHexGly) annotation (Line(points={{-251,5},{-251,-8},
           {-240,-8},{-240,144},{480,144},{480,170},{560,170}},
@@ -1028,7 +1047,7 @@ equation
           171,-88},{156,-88},{156,140},{516,140},{516,78},{560,78}},
                                              color={0,0,127}));
   connect(senTemDryCooOut.port_b, jun12.port_1) annotation (Line(
-      points={{140,130},{370,130},{370,110}},
+      points={{146,64},{236,64},{236,114},{370,114},{370,110}},
       color={0,127,255},
       thickness=0.5));
   connect(jun12.port_2, valHeaPumByp.port_1) annotation (Line(
@@ -1044,7 +1063,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(jun12.port_3, jun13.port_1) annotation (Line(
-      points={{360,100},{80,100},{80,50},{-250,50}},
+      points={{360,100},{248,100},{248,14},{-222,14},{-222,50},{-250,50}},
       color={0,127,255},
       thickness=0.5));
   connect(jun13.port_3, pumDryCoo1.port_a) annotation (Line(
@@ -1064,11 +1083,12 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(jun15.port_2, jun16.port_3) annotation (Line(
-      points={{310,80},{310,90},{-310,90}},
+      points={{310,80},{310,94},{308,94},{308,106},{240,106},{240,24},{-212,24},
+          {-212,90},{-310,90}},
       color={0,127,255},
       thickness=0.5));
   connect(jun16.port_2, pumDryCoo.port_a) annotation (Line(
-      points={{-320,100},{-320,130},{-60,130}},
+      points={{-320,100},{-320,104},{-120,104},{-120,64},{-98,64}},
       color={0,127,255},
       thickness=0.5));
   connect(ind.ySt, hexCon.uSt) annotation (Line(points={{-498,265},{-480,265},{
@@ -1135,10 +1155,8 @@ equation
           {-416,-100},{-332,-100}}, color={0,0,127}));
   connect(hexCon.yPumHex, pumDryCoo1.m_flow_in) annotation (Line(points={{-438,226},
           {-422,226},{-422,32},{-234,32},{-234,16},{-248,16}}, color={0,0,127}));
-  connect(dryCooCon.TAirDryCooIn, dryCoo.TAir) annotation (Line(points={{42,238},
-          {50,238},{50,134},{68,134}},                       color={0,0,127}));
-  connect(dryCooCon.yPumDryCoo, pumDryCoo.m_flow_in) annotation (Line(points={{42,230},
-          {48,230},{48,160},{-50,160},{-50,142}},          color={0,0,127}));
+  connect(dryCooCon.mSetPumDryCoo_flow, pumDryCoo.m_flow_in) annotation (Line(
+        points={{42,236},{48,236},{48,160},{-88,160},{-88,76}},  color={0,0,127}));
   connect(borCon.yValPriByp, valPriByp.y) annotation (Line(points={{-218,238},{-174,
           238},{-174,-200},{-22,-200}}, color={0,0,127}));
   connect(borCon.yValIso, valIsoPriSec.y) annotation (Line(points={{-218,235},{-180,
@@ -1174,11 +1192,8 @@ equation
   connect(heaPumCon.y1On, dryCooCon.u1HeaPum) annotation (Line(points={{142,232},
           {146,232},{146,210},{-10,210},{-10,236},{18,236}},     color={255,0,
           255}));
-  connect(heaPumCon.y1Mod, dryCooCon.u1HeaPumMod) annotation (Line(points={{142,238},
-          {150,238},{150,198},{-6,198},{-6,233},{18,233}},            color={
-          255,0,255}));
-  connect(senTemDryCooOut.T, dryCooCon.TDryCooOut) annotation (Line(points={{130,141},
-          {130,170},{4,170},{4,223},{18,223}},                  color={0,0,127}));
+  connect(senTemDryCooOut.T, dryCooCon.TDryCooOut) annotation (Line(points={{136,75},
+          {136,166},{4,166},{4,223},{18,223}},                  color={0,0,127}));
   connect(ind.yEleRat, yEleRat) annotation (Line(points={{-498,257},{500,257},{
           500,270},{560,270}}, color={0,0,127}));
   connect(heaPumCon.y1On, borCon.u1HeaPum) annotation (Line(points={{142,232},{
@@ -1233,11 +1248,11 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(pumDryCoo.port_b, senTemDryCooIn.port_a)
-    annotation (Line(points={{-40,130},{-10,130}}, color={0,127,255}));
-  connect(senTemDryCooIn.port_b, dryCoo.port_a)
-    annotation (Line(points={{10,130},{70,130}}, color={0,127,255}));
+    annotation (Line(points={{-78,64},{-60,64}},   color={0,127,255},
+      thickness=0.5));
   connect(senTemDryCooIn.T, dryCooCon.TDyrCooIn)
-    annotation (Line(points={{0,141},{0,227},{18,227}}, color={0,0,127}));
+    annotation (Line(points={{-50,75},{-50,227},{18,227}},
+                                                        color={0,0,127}));
   connect(hexCon.on, dryCooCon.u1Eco) annotation (Line(points={{-438,238},{-400,
           238},{-400,248},{-10,248},{-10,239},{18,239}}, color={255,0,255}));
   connect(heaPumCon.yPumGly, dryCooCon.mDryCooLoa_flow[1]) annotation (Line(
@@ -1246,6 +1261,31 @@ equation
   connect(hexCon.yPumHex, dryCooCon.mDryCooLoa_flow[2]) annotation (Line(points
         ={{-438,226},{-422,226},{-422,218},{-30,218},{-30,230.5},{18,230.5}},
         color={0,0,127}));
+  connect(senTemDryCooIn.port_b, dryCoo.port_a2) annotation (Line(
+      points={{-40,64},{60,64}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(dryCoo.port_b2, senTemDryCooOut.port_a) annotation (Line(
+      points={{80,64},{126,64}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(dryCoo.port_a1, bouAirIn.ports[1]) annotation (Line(
+      points={{80,76},{94,76},{94,90},{102,90}},
+      color={0,127,255},
+      thickness=0.5));
+
+  connect(bouAirIn.T_in, TDryBul) annotation (Line(points={{124,94},{132,94},{132,
+          190},{-560,190}}, color={0,0,127}));
+  connect(bouAirOut.ports[1], fanDryCoo.port_b) annotation (Line(
+      points={{0,90},{20,90}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(fanDryCoo.port_a, dryCoo.port_b1) annotation (Line(
+      points={{40,90},{50,90},{50,76},{60,76}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(fanDryCoo.m_flow_in, dryCooCon.mSetFanDryCoo_flow) annotation (Line(
+        points={{30,102},{30,130},{56,130},{56,230},{42,230}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
