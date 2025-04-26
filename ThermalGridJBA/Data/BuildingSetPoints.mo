@@ -8,15 +8,14 @@ record BuildingSetPoints "Set points for the buildings"
   parameter Modelica.Units.SI.TemperatureDifference dTChiWat_nominal = 5
     "Nominal chilled water temperature difference"
     annotation (Dialog(group="Chilled water"));
-  final parameter Modelica.Units.SI.ThermodynamicTemperature TChiWatRet_nominal
-    = TChiWatSup_nominal + dTChiWat_nominal
+  final parameter Modelica.Units.SI.ThermodynamicTemperature TChiWatRet_nominal = TChiWatSup_nominal + dTChiWat_nominal
     "Nominal chilled water return temperature";
   parameter Modelica.Units.SI.ThermodynamicTemperature tabChiWatRes[2,2](each displayUnit="degC")=
     [16+273.15, 12+273.15;
      27+273.15, TChiWatSup_nominal]
     "Chilled water supply temperature reset schedule"
     annotation (Dialog(group="Chilled water"));
-  parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatSup_nominal(displayUnit="degC") = 60
+  parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatSup_nominal(displayUnit="degC") = 60+273.15
     "Nominal heating hot water supply temperature"
     annotation (Dialog(group="Heating hot water"));
   parameter Modelica.Units.SI.TemperatureDifference dTHeaWat_nominal = 10
