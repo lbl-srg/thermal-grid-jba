@@ -18,6 +18,7 @@ record BuildingSetPoints "Set points for the buildings"
      27+273.15, TChiWatSup_nominal]
     "Chilled water supply temperature reset schedule"
     annotation (Dialog(group="Chilled water"));
+
   parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatSup_nominal(displayUnit="degC") = 60+273.15
     "Nominal heating hot water supply temperature"
     annotation (Dialog(group="Heating hot water"));
@@ -29,8 +30,8 @@ record BuildingSetPoints "Set points for the buildings"
   parameter Modelica.Units.SI.ThermodynamicTemperature tabHeaWatRes[2,2](
     each displayUnit="degC")=
     [-6.7+273.15, THeaWatSup_nominal;
-       16+273.15, 20+273.15]
-    "Heating hot water supply temperature reset schedule"
+       16+273.15, 30+273.15]
+    "Heating hot water supply temperature reset schedule. Don't set below 30 as the isolation valve is open only at 30 degC"
     annotation (Dialog(group="Heating hot water"));
   parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSupTan_nominal(displayUnit="degC") =
     50 + 273.15 "Nominal domestic hot water supply temperature to the tank"
