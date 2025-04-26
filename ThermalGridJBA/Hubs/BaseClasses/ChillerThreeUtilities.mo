@@ -343,8 +343,6 @@ equation
           -144,50},{-144,-34},{-140,-34}}, color={0,127,255}));
   connect(parPip.port_a1, colHeaWat.port_bDisRet) annotation (Line(points={{
           -156,50},{-156,-40},{-140,-40}}, color={0,127,255}));
-  connect(parPip.port_a2, valMixHea.port_1) annotation (Line(points={{-144,70},{
-          -144,76},{-90,76}},                        color={0,127,255}));
   connect(twoTanCoo.yDiv, valDivCon.y) annotation (Line(points={{-118,184},{-108,
           184},{-108,90},{-132,90}}, color={0,0,127}));
   connect(parPip.port_a2, valDivCon.port_2)
@@ -371,6 +369,8 @@ equation
           116},{-180,116}}, color={0,127,255}));
   connect(parPip.port_b1, tanHeaWat.port_aTop) annotation (Line(points={{-156,70},
           {-156,116},{-180,116}}, color={0,127,255}));
+  connect(valDivCon.port_2, valMixHea.port_1) annotation (Line(points={{-144,80},
+          {-144,76},{-90,76}}, color={0,127,255}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},
