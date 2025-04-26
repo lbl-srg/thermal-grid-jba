@@ -1,8 +1,8 @@
 within ThermalGridJBA.Hubs;
 model ConnectedETS
   "Load connected to the network via ETS with or without DHW integration"
-  extends ThermalGridJBA.Hubs.BaseClasses.PartialConnectedETS(redeclare
-      ThermalGridJBA.Hubs.BaseClasses.ChillerThreeUtilities ets(
+  extends ThermalGridJBA.Hubs.BaseClasses.PartialConnectedETS(
+    redeclare ThermalGridJBA.Hubs.BaseClasses.ChillerThreeUtilities ets(
       final have_hotWat= QHotWat_flow_nominal > Modelica.Constants.eps,
       have_weaBus=true,
       QChiWat_flow_nominal=QCoo_flow_nominal,
@@ -26,8 +26,8 @@ model ConnectedETS
                  else datBuiSet.THeaWatSup_nominal,
       TEva_start=datBuiSet.TChiWatSup_nominal,
       TConLvgHotSet(final k=datBuiSet.THotWatSupTan_nominal)));
-  parameter
-    Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
+
+  parameter Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
     VTan=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
     mDom_flow_nominal=datDhw.QHex_flow_nominal/4200/(datDhw.TDom_nominal -
         datDhw.TCol_nominal),
@@ -68,7 +68,7 @@ model ConnectedETS
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant TColWat(
     final k=datBuiSet.TColWat_nominal,
     y(final unit="K", displayUnit="degC")) if have_hotWat
-                                             "Domestic cold water temperature"
+    "Domestic cold water temperature"
     annotation (Placement(transformation(extent={{-140,-60},{-120,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput dHHeaWat_flow(final unit="W")
     "Heating water distributed energy flow rate"
