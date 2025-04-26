@@ -23,7 +23,7 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
     "Temperature start value"
     annotation(Dialog(tab = "Initialization"));
   parameter Boolean isHotWat
-    "True if the tank supplies hot water, False for chilled water";
+    "True if the tank supplies hot water, false for chilled water";
 
   // IO CONNECTORS
   Modelica.Fluid.Interfaces.FluidPort_a port_aTop(
@@ -36,8 +36,7 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
           0),
     h_outflow(
       start=Medium.h_default,
-      nominal=Medium.h_default))
-    "Inlet fluid port at tank top"
+      nominal=Medium.h_default)) "Inlet fluid port at tank top"
     annotation (Placement(transformation(extent={{90,50},{110,70}}),iconTransformation(extent={{90,50},{110,70}})));
   Modelica.Fluid.Interfaces.FluidPort_b port_bBot(
     redeclare final package Medium=Medium,
@@ -134,6 +133,12 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
   Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(
     p=if isHotWat then -2 else 0.5) "Offset"
     annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
+  Modelica.Fluid.Interfaces.FluidPort_a port_med(
+    redeclare final package Medium = Medium,
+    m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0),
+    h_outflow(start=Medium.h_default, nominal=Medium.h_default))
+    "Fluid port at tank middle" annotation (Placement(transformation(extent={{90,
+            -10},{110,10}}), iconTransformation(extent={{90,-10},{110,10}})));
 protected
   Modelica.Thermal.HeatTransfer.Components.ThermalCollector theCol(
     m=3)
@@ -178,6 +183,13 @@ equation
           24,90},{-58,90}}, color={0,0,127}));
   connect(dTOff.u, TTanSet)
     annotation (Line(points={{-82,90},{-120,90}}, color={0,0,127}));
+  if isHotWat then
+    // For heating tank, connect close to the top
+    connect(port_med, tan.fluPorVol[2]) annotation (Line(points={{100,0},{40,0},
+            {40,-16},{-12,-16},{-12,0},{-5,0}},       color={0,127,255}));
+  else  connect(port_med, tan.fluPorVol[nSeg-1]) annotation (Line(points={{100,0},
+            {40,0},{40,-16},{-12,-16},{-12,0},{-5,0}},color={0,127,255}));
+  end if;
   annotation (
     Icon(
       coordinateSystem(
@@ -256,7 +268,13 @@ equation
         Text(
           extent={{-139,-106},{161,-146}},
           textColor={0,0,255},
-          textString="%name")}),
+          textString="%name"),
+        Rectangle(
+          extent={{100,4},{50,-4}},
+          lineColor={0,0,255},
+          pattern=LinePattern.None,
+          fillColor={0,0,127},
+          fillPattern=FillPattern.Solid)}),
     defaultComponentName="tan",
     Diagram(
       coordinateSystem(

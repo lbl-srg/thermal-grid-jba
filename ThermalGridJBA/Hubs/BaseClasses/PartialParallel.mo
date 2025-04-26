@@ -132,7 +132,7 @@ model PartialParallel
     final hTan=hTanChiWat,
     final dIns=dInsTanChiWat,
     final nSeg=nSegTan) "Chilled water tank"
-    annotation (Placement(transformation(extent={{180,100},{200,120}})));
+    annotation (Placement(transformation(extent={{200,100},{180,120}})));
   ThermalGridJBA.Hubs.BaseClasses.StratifiedTankWithCommand tanHeaWat(
     redeclare final package Medium = MediumBui,
     final isHotWat=true,
@@ -196,7 +196,7 @@ equation
   connect(hex.PPum,totPPum.u[1])
     annotation (Line(points={{12,-254},{36,-254},{36,-60},{258,-60}},color={0,0,127}));
   connect(tanChiWat.TBot,conSup.TChiWatBot)
-    annotation (Line(points={{201,101},{206,101},{206,0},{-274,0},{-274,19},{
+    annotation (Line(points={{179,101},{172,101},{172,0},{-274,0},{-274,19},{
           -262,19}},                                                                   color={0,0,127}));
   connect(hex.port_b2,colAmbWat.ports_aCon[1])
     annotation (Line(points={{-10,-248},{-20,-248},{-20,-160},{12,-160},{12,-116}},color={0,127,255}));
@@ -243,11 +243,11 @@ equation
                                                 color={0,0,127}));
   connect(bou.ports[1], colChiWat.port_aDisSup)
     annotation (Line(points={{180,-34},{140,-34}},            color={0,127,255}));
-  connect(tanChiWat.charge, conSup.uCoo) annotation (Line(points={{202,107},{206,
-          107},{206,130},{-264,130},{-264,30},{-262,30},{-262,29}},     color={
+  connect(tanChiWat.charge, conSup.uCoo) annotation (Line(points={{178,107},{
+          172,107},{172,126},{-264,126},{-264,26},{-262,26},{-262,29}}, color={
           255,0,255}));
   connect(TChiWatSupSet, tanChiWat.TTanSet) annotation (Line(points={{-320,-60},
-          {-290,-60},{-290,72},{-266,72},{-266,128},{170,128},{170,119},{179,
+          {-290,-60},{-290,72},{-266,72},{-266,128},{208,128},{208,119},{201,
           119}}, color={0,0,127}));
   annotation (
     Icon(
