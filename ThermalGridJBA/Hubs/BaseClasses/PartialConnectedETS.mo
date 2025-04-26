@@ -8,12 +8,14 @@ partial model PartialConnectedETS
       final T_aChiWat_nominal=datBuiSet.TChiWatSup_nominal,
       final T_bChiWat_nominal=datBuiSet.TChiWatRet_nominal,
       final have_hotWat=have_hotWat,
-      QHea_flow_nominal=Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+      QHea_flow_nominal=facTerUniSizHea*Buildings.DHC.Loads.BaseClasses.getPeakLoad(
           string="#Peak space heating load",
           filNam=Modelica.Utilities.Files.loadResource(filNam))),
     nPorts_heaWat=1,
     nPorts_chiWat=1);
 
+   parameter Real facTerUniSizHea(final unit="1")
+    "Factor to increase design capacity of space terminal units for heating";
   parameter String filNam "File name for the load profile";
   parameter ThermalGridJBA.Data.BuildingSetPoints datBuiSet
     "Building set points" annotation (Placement(
