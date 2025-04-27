@@ -51,13 +51,15 @@ model ConnectedETS
   Buildings.Controls.SetPoints.Table THeaWatSupSet(
     final table=datBuiSet.tabHeaWatRes,
     final offset=0,
-    final constantExtrapolation=true)
+    final constantExtrapolation=true,
+    y(final unit="K", displayUnit="degC"))
     "Heating water supply temperature set point"
     annotation (Placement(transformation(extent={{-140,60},{-120,80}})));
   Buildings.Controls.SetPoints.Table TChiWatSupSet(
     final table=datBuiSet.tabChiWatRes,
     final offset=0,
-    final constantExtrapolation=true)
+    final constantExtrapolation=true,
+    y(final unit="K", displayUnit="degC"))
     "Chilled water supply temperature set point"
     annotation (Placement(transformation(extent={{-140,20},{-120,40}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant THotWatSupSet(
