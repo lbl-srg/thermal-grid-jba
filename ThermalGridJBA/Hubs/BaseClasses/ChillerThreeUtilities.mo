@@ -291,11 +291,10 @@ equation
   connect(QReqHotWat_flow, dhw.QReqHotWat_flow) annotation (Line(points={{-320,
           -180},{-278,-180},{-278,60},{-220,60},{-220,226},{-202,226}},
                                                                   color={0,0,127}));
-  connect(dHFloHeaWat.port_a1, tanHeaWat.port_bTop) annotation (Line(points={{-268,
-          120},{-268,116},{-200,116}}, color={0,127,255}));
-  connect(tanHeaWat.port_aBot, dHFloHeaWat.port_b2) annotation (Line(points={{-200,
-          104},{-280,104},{-280,120}},
-                                     color={0,127,255}));
+  connect(dHFloHeaWat.port_a1, tanHeaWat.port_loaTop) annotation (Line(points={
+          {-268,120},{-268,116},{-200,116}}, color={0,127,255}));
+  connect(tanHeaWat.port_loaBot, dHFloHeaWat.port_b2) annotation (Line(points={
+          {-200,104},{-280,104},{-280,120}}, color={0,127,255}));
   connect(reaPasDhwPum.y, totPPum.u[3]) annotation (Line(points={{-59,240},{-48,
           240},{-48,252},{210,252},{210,-60},{258,-60}}, color={0,0,127}));
   connect(THeaWatSupSet, tanHeaWat.TTanSet) annotation (Line(points={{-320,-20},
@@ -347,28 +346,28 @@ equation
           184},{-108,90},{-132,90}}, color={0,0,127}));
   connect(parPip.port_a2, valDivCon.port_2)
     annotation (Line(points={{-144,70},{-144,80}}, color={0,127,255}));
-  connect(valDivCon.port_1, tanHeaWat.port_bBot) annotation (Line(points={{-144,
+  connect(valDivCon.port_1, tanHeaWat.port_genBot) annotation (Line(points={{-144,
           100},{-144,104},{-180,104}}, color={0,127,255}));
-  connect(valDivCon.port_3, tanHeaWat.port_med) annotation (Line(points={{-154,
+  connect(valDivCon.port_3, tanHeaWat.port_genMed) annotation (Line(points={{-154,
           90},{-162,90},{-162,110},{-180,110}}, color={0,127,255}));
   connect(conDivVal.y, valDivEva.y)
     annotation (Line(points={{122,90},{134,90}}, color={0,0,127}));
-  connect(tanChiWat.port_bTop, dHFloChiWat.port_b2) annotation (Line(points={{
-          200,116},{268,116},{268,120}}, color={0,127,255}));
-  connect(tanChiWat.port_aBot, dHFloChiWat.port_a1) annotation (Line(points={{
-          200,104},{280,104},{280,120}}, color={0,127,255}));
-  connect(colChiWat.port_bDisRet, tanChiWat.port_bBot) annotation (Line(points=
-          {{140,-40},{168,-40},{168,104},{180,104}}, color={0,127,255}));
+  connect(tanChiWat.port_loaTop, dHFloChiWat.port_b2) annotation (Line(points={
+          {200,116},{268,116},{268,120}}, color={0,127,255}));
+  connect(tanChiWat.port_loaBot, dHFloChiWat.port_a1) annotation (Line(points={
+          {200,104},{280,104},{280,120}}, color={0,127,255}));
+  connect(colChiWat.port_bDisRet, tanChiWat.port_genBot) annotation (Line(
+        points={{140,-40},{168,-40},{168,104},{180,104}}, color={0,127,255}));
   connect(colChiWat.port_aDisSup, valDivEva.port_2) annotation (Line(points={{
           140,-34},{146,-34},{146,80}}, color={0,127,255}));
-  connect(valDivEva.port_1, tanChiWat.port_aTop) annotation (Line(points={{146,
-          100},{146,116},{180,116}}, color={0,127,255}));
-  connect(valDivEva.port_3, tanChiWat.port_med) annotation (Line(points={{156,
-          90},{160,90},{160,110},{180,110}}, color={0,127,255}));
-  connect(jun.port_2, tanHeaWat.port_aTop) annotation (Line(points={{-116,70},{-116,
-          116},{-180,116}}, color={0,127,255}));
-  connect(parPip.port_b1, tanHeaWat.port_aTop) annotation (Line(points={{-156,70},
-          {-156,116},{-180,116}}, color={0,127,255}));
+  connect(valDivEva.port_1, tanChiWat.port_genTop) annotation (Line(points={{
+          146,100},{146,116},{180,116}}, color={0,127,255}));
+  connect(valDivEva.port_3, tanChiWat.port_genMed) annotation (Line(points={{
+          156,90},{160,90},{160,110},{180,110}}, color={0,127,255}));
+  connect(jun.port_2, tanHeaWat.port_genTop) annotation (Line(points={{-116,70},
+          {-116,116},{-180,116}}, color={0,127,255}));
+  connect(parPip.port_b1, tanHeaWat.port_genTop) annotation (Line(points={{-156,
+          70},{-156,116},{-180,116}}, color={0,127,255}));
   connect(valDivCon.port_2, valMixHea.port_1) annotation (Line(points={{-144,80},
           {-144,76},{-90,76}}, color={0,127,255}));
   annotation (Icon(graphics={

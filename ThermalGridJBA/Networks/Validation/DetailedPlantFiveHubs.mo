@@ -749,7 +749,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StopTime=1728000,
       Interval=3600,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
