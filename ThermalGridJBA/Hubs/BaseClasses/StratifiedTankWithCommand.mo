@@ -109,13 +109,6 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
   Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(
     p=if isHotWat then -2 else 0.5) "Offset"
     annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
-  Modelica.Fluid.Interfaces.FluidPort_a port_genMed(
-    redeclare final package Medium = Medium,
-    m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0),
-    h_outflow(start=Medium.h_default, nominal=Medium.h_default))
-    "Tank port on medium on generation side" annotation (Placement(
-        transformation(extent={{90,-10},{110,10}}), iconTransformation(extent={
-            {90,-10},{110,10}})));
 protected
   Modelica.Thermal.HeatTransfer.Components.ThermalCollector theCol(
     m=3)
@@ -158,14 +151,7 @@ equation
           24,90},{-58,90}}, color={0,0,127}));
   connect(dTOff.u, TTanSet)
     annotation (Line(points={{-82,90},{-120,90}}, color={0,0,127}));
-  if isHotWat then
-    // For heating tank, connect close to the top
-    connect(port_genMed, tan.fluPorVol[2]) annotation (Line(points={{100,0},{40,
-            0},{40,-16},{-12,-16},{-12,0},{-5,0}}, color={0,127,255}));
-  else
-    connect(port_genMed, tan.fluPorVol[nSeg - 1]) annotation (Line(points={{100,
-            0},{40,0},{40,-16},{-12,-16},{-12,0},{-5,0}}, color={0,127,255}));
-  end if;
+
   annotation (
     Icon(
       coordinateSystem(

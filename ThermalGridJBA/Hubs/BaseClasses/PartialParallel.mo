@@ -6,7 +6,6 @@ model PartialParallel
     final have_heaWat=true,
     final have_chiWat=true,
     final have_pum=true,
-    have_hotWat=false,
     have_eleHea=false,
     have_weaBus=false);
 
@@ -150,7 +149,7 @@ model PartialParallel
         transformation(
         extent={{-20,10},{20,-10}},
         rotation=180,
-        origin={120,-34})));
+        origin={120,-50})));
   Buildings.DHC.ETS.BaseClasses.CollectorDistributor colHeaWat(
     redeclare final package Medium = MediumBui,
     final nCon=1 + nSysHea,
@@ -159,7 +158,7 @@ model PartialParallel
         transformation(
         extent={{20,10},{-20,-10}},
         rotation=180,
-        origin={-120,-34})));
+        origin={-120,-50})));
   Buildings.DHC.ETS.BaseClasses.CollectorDistributor colAmbWat(
     redeclare final package Medium = MediumBui,
     final nCon=nSouAmb,
@@ -187,17 +186,15 @@ model PartialParallel
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=180,
-        origin={190,-34})));
+        origin={190,-50})));
 protected
   parameter Boolean have_val1Hex=
     conCon ==Buildings.DHC.ETS.Types.ConnectionConfiguration.TwoWayValve
     "True in case of control valve on district side, false in case of a pump";
 equation
   connect(hex.PPum,totPPum.u[1])
-    annotation (Line(points={{12,-254},{36,-254},{36,-60},{258,-60}},color={0,0,127}));
-  connect(tanChiWat.TBot,conSup.TChiWatBot)
-    annotation (Line(points={{179,101},{172,101},{172,0},{-274,0},{-274,19},{
-          -262,19}},                                                                   color={0,0,127}));
+    annotation (Line(points={{12,-254},{44,-254},{44,-140},{240,-140},{240,-60},
+          {258,-60}},                                                color={0,0,127}));
   connect(hex.port_b2,colAmbWat.ports_aCon[1])
     annotation (Line(points={{-10,-248},{-20,-248},{-20,-160},{12,-160},{12,-116}},color={0,127,255}));
   connect(hex.port_a2,colAmbWat.ports_bCon[1])
@@ -218,11 +215,8 @@ equation
   connect(TChiWatSupSet,conSup.TChiWatSupPreSet)
     annotation (Line(points={{-320,-60},{-290,-60},{-290,21},{-262,21}},color={0,0,127}));
   connect(valIsoEva.port_a,colChiWat.ports_aCon[1])
-    annotation (Line(points={{70,-120},{90,-120},{90,-24},{108,-24}},
-                                                             color={0,127,255}));
-  connect(colAmbWat.port_aDisRet,colChiWat.ports_bCon[1])
-    annotation (Line(points={{20,-100},{150,-100},{150,-24},{132,-24}},
-                                                             color={0,127,255}));
+    annotation (Line(points={{70,-120},{90,-120},{90,-34},{106,-34},{106,-40},{
+          108,-40}},                                         color={0,127,255}));
   connect(conSup.yValIsoEva,valIsoEva.y)
     annotation (Line(points={{-238,21},{-220,21},{-220,-80},{60,-80},{60,-108}},color={0,0,127}));
   connect(conSup.yValIsoCon,valIsoCon.y)
@@ -230,11 +224,8 @@ equation
   connect(conSup.yAmb[nSouAmb],hex.u)
     annotation (Line(points={{-238,25},{-200,25},{-200,-256},{-12,-256}},color={0,0,127}));
   connect(valIsoCon.port_a,colHeaWat.ports_aCon[1])
-    annotation (Line(points={{-70,-120},{-90,-120},{-90,-24},{-108,-24}},
-                                                                color={0,127,255}));
-  connect(colAmbWat.port_bDisRet,colHeaWat.ports_bCon[1])
-    annotation (Line(points={{-20,-100},{-150,-100},{-150,-24},{-132,-24}},
-                                                                color={0,127,255}));
+    annotation (Line(points={{-70,-120},{-90,-120},{-90,-34},{-108,-34},{-108,
+          -40}},                                                color={0,127,255}));
   connect(totPHea.y,PHea)
     annotation (Line(points={{282,60},{290,60},{290,80},{320,80}},
                                                 color={0,0,127}));
@@ -242,13 +233,19 @@ equation
     annotation (Line(points={{282,20},{290,20},{290,40},{320,40}},
                                                 color={0,0,127}));
   connect(bou.ports[1], colChiWat.port_aDisSup)
-    annotation (Line(points={{180,-34},{140,-34}},            color={0,127,255}));
+    annotation (Line(points={{180,-50},{140,-50}},            color={0,127,255}));
   connect(tanChiWat.charge, conSup.uCoo) annotation (Line(points={{178,107},{
           172,107},{172,126},{-264,126},{-264,26},{-262,26},{-262,29}}, color={
           255,0,255}));
   connect(TChiWatSupSet, tanChiWat.TTanSet) annotation (Line(points={{-320,-60},
           {-290,-60},{-290,72},{-266,72},{-266,128},{208,128},{208,119},{201,
           119}}, color={0,0,127}));
+  connect(colAmbWat.port_bDisRet, colHeaWat.ports_bCon[1]) annotation (Line(
+        points={{-20,-100},{-150,-100},{-150,-34},{-132,-34},{-132,-40}}, color
+        ={0,127,255}));
+  connect(colAmbWat.port_aDisRet, colChiWat.ports_bCon[1]) annotation (Line(
+        points={{20,-100},{154,-100},{154,-34},{132,-34},{132,-40}}, color={0,
+          127,255}));
   annotation (
     Icon(
       coordinateSystem(
