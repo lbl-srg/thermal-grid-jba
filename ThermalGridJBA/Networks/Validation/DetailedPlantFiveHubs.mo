@@ -136,10 +136,14 @@ model DetailedPlantFiveHubs
   final parameter Integer nBui=datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
-  inner replaceable parameter ThermalGridJBA.Data.Districts.FiveHubs datDis(
+  parameter ThermalGridJBA.Data.Districts.FiveHubs datDis(
     mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-380,180},{-360,200}})));
+
+  parameter ThermalGridJBA.Data.BuildingSetPoints datBuiSet
+    "Parameter for the building set points"
+    annotation (Placement(transformation(extent={{-380,142},{-360,162}})));
 
   Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 1](
     lPip=datDis.lDis,
@@ -213,6 +217,7 @@ model DetailedPlantFiveHubs
         rotation=90,
         origin={-80,-80})));
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
+    final facTerUniSizHea=datBuiSet.facTerUniSizHea,
     final filNam = datDis.filNamInd,
     bui(each final facMul=1),
     redeclare each final package MediumBui = Medium,
@@ -490,6 +495,7 @@ model DetailedPlantFiveHubs
     u(final unit="W"),
     y(final unit="J", displayUnit="Wh")) "Dry cooler fan electric energy"
     annotation (Placement(transformation(extent={{40,140},{60,160}})));
+
 equation
  for i in 1:nBui loop
    connect(weaDat.weaBus, bui[i].weaBus) annotation (Line(
@@ -743,7 +749,8 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=864000,
+      StopTime=1728000,
+      Interval=3600,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
