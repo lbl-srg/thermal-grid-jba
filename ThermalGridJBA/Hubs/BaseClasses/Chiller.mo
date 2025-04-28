@@ -120,6 +120,8 @@ model Chiller "Base subsystem with heat recovery chiller"
     use_intSafCtr=false,
     final dTCon_nominal=dat.dTCon_nominal,
     final dTEva_nominal=dat.dTEva_nominal,
+    final allowFlowReversalEva=allowFlowReversal,
+    final allowFlowReversalCon=allowFlowReversal,
     final QHea_flow_nominal=-dat.QCoo_flow_nominal*1.5,
     TConHea_nominal=dat.TConLvg_nominal,
     TEvaHea_nominal=dat.TEvaLvg_nominal,
@@ -187,16 +189,34 @@ model Chiller "Base subsystem with heat recovery chiller"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=90,origin={-20,-20})));
   Buildings.DHC.ETS.BaseClasses.Junction splEva(
     redeclare final package Medium=Medium,
-    final m_flow_nominal=dat.mEva_flow_nominal .* {1,-1,-1})
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    m_flow_nominal=dat.mCon_flow_nominal*{1,-1,-1})
     "Flow splitter for the evaporator water circuit"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=0,origin={-140,-60})));
   Buildings.DHC.ETS.BaseClasses.Junction splConMix(
     redeclare final package Medium=Medium,
-    final m_flow_nominal=dat.mCon_flow_nominal .* {1,-1,-1})
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    m_flow_nominal=dat.mEva_flow_nominal*{1,-1,-1})
     "Flow splitter"
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},rotation=0,origin={120,60})));
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valEva(
     redeclare final package Medium = Medium,
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     from_dp=false,
     use_strokeTime=false,
@@ -210,6 +230,12 @@ model Chiller "Base subsystem with heat recovery chiller"
         origin={120,-60})));
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valCon(
     redeclare final package Medium = Medium,
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     from_dp=false,
     use_strokeTime=false,
