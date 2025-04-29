@@ -242,14 +242,18 @@ model ChillerThreeUtilities
         rotation=90,
         origin={150,80})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTChiWatRet(redeclare package
-      Medium = MediumBui, final m_flow_nominal=datChi.mCon_flow_nominal)
+    Medium = MediumBui,
+    allowFlowReversal=false,
+    final m_flow_nominal=datChi.mCon_flow_nominal)
     "Return chilled water temperature to chiller, prior to chiller valve"
     annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
         rotation=0,
         origin={70,-12})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTHeaWatRet(redeclare package
-      Medium = MediumBui, final m_flow_nominal=datChi.mCon_flow_nominal)
+    Medium = MediumBui,
+    allowFlowReversal=false,
+    final m_flow_nominal=datChi.mCon_flow_nominal)
     "Return heating water temperature to chiller, prior to chiller valve"
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
