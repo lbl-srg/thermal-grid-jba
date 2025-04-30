@@ -145,7 +145,7 @@ model Chiller "Base subsystem with heat recovery chiller"
     redeclare final package Medium=Medium,
     final allowFlowReversal=allowFlowReversal,
     final m_flow_nominal=dat.mCon_flow_nominal,
-    final dp_nominal=dpCon_nominal+dpValCon_nominal,
+    final dp_nominal=dpCon_nominal + dpValCon_nominal + 2*0.05*dpValCon_nominal,
     dpMax=Modelica.Constants.inf)
     "Condenser pump"
     annotation (Placement(transformation(extent={{-110,50},{-90,70}})));
@@ -153,7 +153,7 @@ model Chiller "Base subsystem with heat recovery chiller"
     redeclare final package Medium=Medium,
     final allowFlowReversal=allowFlowReversal,
     final m_flow_nominal=dat.mEva_flow_nominal,
-    final dp_nominal=dpEva_nominal+dpValEva_nominal)
+    final dp_nominal=dpEva_nominal + dpValEva_nominal + dpEva_nominal*0.05)
     "Evaporator pump"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=0,origin={-100,-60})));
   ThermalGridJBA.Hubs.Controls.Chiller con(
@@ -222,7 +222,7 @@ model Chiller "Base subsystem with heat recovery chiller"
     use_strokeTime=false,
     final m_flow_nominal=dat.mEva_flow_nominal,
     final dpValve_nominal=dpValEva_nominal,
-    final dpFixed_nominal=fill(dpEva_nominal, 2))
+    linearized={false,false})
     "Control valve for maximum evaporator water entering temperature"
     annotation (Placement(transformation(
         extent={{-10,10},{10,-10}},
@@ -241,7 +241,7 @@ model Chiller "Base subsystem with heat recovery chiller"
     use_strokeTime=false,
     final m_flow_nominal=dat.mCon_flow_nominal,
     final dpValve_nominal=dpValCon_nominal,
-    final dpFixed_nominal=fill(dpCon_nominal, 2))
+    linearized={false,false})
     "Control valve for minimum condenser water entering temperature"
     annotation (Placement(transformation(
         extent={{-10,10},{10,-10}},

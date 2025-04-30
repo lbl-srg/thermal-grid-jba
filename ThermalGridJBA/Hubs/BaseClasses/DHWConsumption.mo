@@ -37,6 +37,9 @@ model DHWConsumption
       origin={-50,30})));
   Buildings.DHC.ETS.BaseClasses.Junction dcwSpl(
     redeclare final package Medium = Medium,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     final m_flow_nominal=m_flow_nominal*{1,-1,-1})
                                              "Splitter for domestic cold water"
     annotation (Placement(transformation(
@@ -96,7 +99,8 @@ model DHWConsumption
   Buildings.DHC.Networks.BaseClasses.DifferenceEnthalpyFlowRate dHFlow(
     redeclare final package Medium1 = Medium,
     redeclare final package Medium2 = Medium,
-    final m_flow_nominal=m_flow_nominal) "Variation of enthalpy flow rate"
+    final m_flow_nominal=m_flow_nominal,
+    allowFlowReversal=false)             "Variation of enthalpy flow rate"
     annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
         rotation=-90,
