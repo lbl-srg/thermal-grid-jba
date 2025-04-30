@@ -715,8 +715,6 @@ equation
           {298,152}}, color={0,0,127}));
   connect(zer.y, swi8.u3) annotation (Line(points={{182,120},{260,120},{260,136},
           {298,136}},color={0,0,127}));
-  connect(holHeaPum.y, swi8.u2) annotation (Line(points={{222,-160},{240,-160},{
-          240,144},{298,144}}, color={255,0,255}));
   connect(holHeaPum.y, swi9.u2) annotation (Line(points={{222,-160},{240,-160},
           {240,-100},{-80,-100},{-80,-40},{-62,-40}}, color={255,0,255}));
   connect(leaWatSet.y, swi9.u1) annotation (Line(points={{-98,-20},{-80,-20},{
@@ -819,6 +817,8 @@ equation
           {264,-350},{264,-320}}, color={255,0,255}));
   connect(holHeaPum.y, delBypVal.u) annotation (Line(points={{222,-160},{240,
           -160},{240,-330},{190,-330},{190,-350},{198,-350}}, color={255,0,255}));
+  connect(delHeaPumOn.y, swi8.u2) annotation (Line(points={{282,30},{300,30},{
+          300,120},{280,120},{280,144},{298,144}}, color={255,0,255}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
             {100,120}}), graphics={Rectangle(
