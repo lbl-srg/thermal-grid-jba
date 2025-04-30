@@ -27,6 +27,9 @@ model ConnectedETS
       TEva_start=datBuiSet.TChiWatSup_nominal,
       TConLvgHotSet(final k=datBuiSet.THotWatSupTan_nominal)));
 
+  parameter Boolean have_eleNonHva
+    "The ETS has non-hvac electricity load";
+
   parameter Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
     VTan=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
     mDom_flow_nominal=datDhw.QHex_flow_nominal/4200/(datDhw.TDom_nominal -
@@ -94,6 +97,27 @@ model ConnectedETS
   parameter Data.HexSize hexSiz(final QHeaLoa_flow_nominal=QHea_flow_nominal,
       final QCooLoa_flow_nominal=QCoo_flow_nominal)
     annotation (Placement(transformation(extent={{20,100},{40,120}})));
+  Modelica.Blocks.Sources.CombiTimeTable loaEleNonHva(
+    final tableOnFile=true,
+    tableName="tab1",
+    final fileName=Modelica.Utilities.Files.loadResource(filNam),
+    extrapolation=bui.loa.extrapolation,
+    y(each unit="W"),
+    timeScale=bui.loa.timeScale,
+    offset={0},
+    columns={5},
+    smoothness=bui.loa.smoothness) if have_eleNonHva
+                                   "Reader for non-hvac electricity load"
+    annotation (Placement(transformation(extent={{160,-10},{180,10}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PEleNonHva(final unit="W")
+    if have_eleNonHva
+                "Power drawn by non-hvac electricity load" annotation (
+      Placement(transformation(extent={{300,-20},{340,20}}), iconTransformation(
+          extent={{100,-40},{140,0}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter mulPEleNonHva(u(final
+        unit="W"), final k=facMul) if have_eleNonHva
+                                               "Scaling"
+    annotation (Placement(transformation(extent={{270,-10},{290,10}})));
 equation
 
   connect(ets.QReqHotWat_flow, bui.QReqHotWat_flow) annotation (Line(points={{-34,-74},
@@ -130,6 +154,10 @@ equation
       index=-1,
       extent={{-3,6},{-3,6}},
       horizontalAlignment=TextAlignment.Right));
+  connect(mulPEleNonHva.y, PEleNonHva)
+    annotation (Line(points={{292,0},{320,0}}, color={0,0,127}));
+  connect(loaEleNonHva.y[1], mulPEleNonHva.u)
+    annotation (Line(points={{181,0},{268,0}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
         defaultComponentName = "bui");
