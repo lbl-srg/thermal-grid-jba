@@ -27,8 +27,8 @@ model ConnectedETS
       TEva_start=datBuiSet.TChiWatSup_nominal,
       TConLvgHotSet(final k=datBuiSet.THotWatSupTan_nominal)));
 
-  parameter Boolean have_eleNonHva
-    "The ETS has non-hvac electricity load";
+  parameter Boolean have_eleNonHva "The ETS has non-hvac electricity load"
+    annotation (Dialog(group="Configuration"));
 
   parameter Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
     VTan=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,

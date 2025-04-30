@@ -39,7 +39,8 @@ model ConnectedETSNoDHW
     redeclare package MediumBui = Medium,
     facTerUniSizHea=1,
     final filNam=filNam,
-    allowFlowReversalSer=true)
+    allowFlowReversalSer=true,
+    have_eleNonHva=true)
     annotation (Placement(transformation(extent={{40,-20},{60,0}})));
   Modelica.Blocks.Continuous.Integrator dHHeaWat
     "Cumulative enthalpy difference of heating hot water"

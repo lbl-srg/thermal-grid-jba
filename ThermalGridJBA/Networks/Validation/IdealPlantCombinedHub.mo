@@ -129,7 +129,8 @@ model IdealPlantCombinedHub
     each final allowFlowReversalSer=allowFlowReversalSer,
     each final TDisWatMin=datDis.TLooMin,
     each final TDisWatMax=datDis.TLooMax,
-    ets(chi(pumEva(each use_riseTime=true)))) "Building and ETS"
+    ets(chi(pumEva(each use_riseTime=true))),
+    each have_eleNonHva=true)                 "Building and ETS"
     annotation (Placement(transformation(extent={{-10,170},{10,190}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)
     "ETS pump power"
@@ -155,7 +156,7 @@ model IdealPlantCombinedHub
     initType=Modelica.Blocks.Types.Init.InitialState)
     "Heat pump electric energy"
     annotation (Placement(transformation(extent={{220,150},{240,170}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=2) "Total electric energy"
+  Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(nin=3) "Total electric energy"
     annotation (Placement(transformation(extent={{320,150},{340,170}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
@@ -169,6 +170,12 @@ model IdealPlantCombinedHub
     y(quantity="MassFlowRate"))
     "Plant pump flow rate"
     annotation (Placement(transformation(extent={{-240,20},{-220,40}})));
+  Modelica.Blocks.Continuous.Integrator EEleNonHva(initType=Modelica.Blocks.Types.Init.InitialState)
+    "Non-HVAC electric use"
+    annotation (Placement(transformation(extent={{220,110},{240,130}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PEleNonHva(nin=nBui)
+    "Non-HVAC electric power"
+    annotation (Placement(transformation(extent={{140,110},{160,130}})));
 equation
   for i in 1:nBui loop
     connect(wea.weaBus, bui[i].weaBus) annotation (Line(
@@ -228,11 +235,10 @@ equation
   connect(PHeaPump.y, EHeaPum.u)
     annotation (Line(points={{162,160},{218,160}}, color={0,0,127}));
   connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{241,160},{300,160},{
-          300,159.5},{318,159.5}},
+          300,159.333},{318,159.333}},
                                color={0,0,127}));
   connect(EPum.y, ETot.u[2]) annotation (Line(points={{302,120},{310,120},{310,
-          160.5},{318,160.5}},
-                           color={0,0,127}));
+          160},{318,160}}, color={0,0,127}));
   connect(TDisWatSup.T, conVio.u[1]) annotation (Line(points={{-91,20},{-100,20},
           {-100,12},{-60,12},{-60,19.5},{318,19.5}},       color={0,0,127}));
   connect(TDisWatRet.T, conVio.u[2]) annotation (Line(points={{-91,-40},{-100,-40},
@@ -252,6 +258,12 @@ equation
     annotation (Line(points={{20,142},{80,142},{80,-50}}, color={0,127,255}));
   connect(pumDis.port_a, bou.ports[1]) annotation (Line(points={{80,-50},{80,
           -44},{128,-44},{128,-60},{140,-60}}, color={0,127,255}));
+  connect(PEleNonHva.y, EEleNonHva.u)
+    annotation (Line(points={{162,120},{218,120}}, color={0,0,127}));
+  connect(bui.PEleNonHva, PEleNonHva.u) annotation (Line(points={{12,178},{116,
+          178},{116,120},{138,120}}, color={0,0,127}));
+  connect(EEleNonHva.y, ETot.u[3]) annotation (Line(points={{241,120},{252,120},
+          {252,160.667},{318,160.667}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
