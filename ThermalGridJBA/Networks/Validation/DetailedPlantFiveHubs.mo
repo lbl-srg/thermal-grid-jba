@@ -480,8 +480,8 @@ model DetailedPlantFiveHubs
   Buildings.Controls.OBC.CDL.Routing.RealExtractSignal TLooMea(
     nin=5,
     nout=4,
-    u(each final unit="K", displayUnit="degC"),
-    y(each final unit="K", displayUnit="degC"))
+    u(each final unit="K", each displayUnit="degC"),
+    y(each final unit="K", each displayUnit="degC"))
     "Measured loop temperatures to be controlled. This does not include mixing after the last ETS"
     annotation (Placement(transformation(extent={{120,224},{140,244}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum QEtsHex_flow(
