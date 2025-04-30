@@ -31,7 +31,9 @@ model ChillerThreeUtilities
     totPCoo(nin=1),
     totPPum(nin=if have_hotWat then 3 else 2),
     tanHeaWat(final T_start=TCon_start),
-    tanChiWat(final T_start=TEva_start));
+    tanChiWat(final T_start=TEva_start),
+    valIsoCon(linearized=true),
+    valIsoEva(linearized=true));
 
   parameter ThermalGridJBA.Data.Chiller datChi
     "Chiller performance data" annotation (
