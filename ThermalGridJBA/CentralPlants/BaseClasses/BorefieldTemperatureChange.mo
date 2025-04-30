@@ -53,7 +53,7 @@ First implementation.
           fillPattern=FillPattern.Solid,
           fillColor=DynamicSelect({0, 127, 255},
           min(1, max(0, (1-(T-273.15)/20)))*{28,108,200}+
-          min(1, max(0, ((T-273.15)/20))*{255,0,0}))),
+          min(1, max(0, ((T-273.15)/20)))*{255,0,0})),
         Text(
           extent={{96,70},{134,94}},
           textColor={0,0,127},
