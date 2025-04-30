@@ -37,6 +37,7 @@ model ConnectedETSNoDHW
   ThermalGridJBA.Hubs.ConnectedETS bui(
     redeclare package MediumSer = Medium,
     redeclare package MediumBui = Medium,
+    facTerUniSizHea=1,
     final filNam=filNam,
     allowFlowReversalSer=true)
     annotation (Placement(transformation(extent={{40,-20},{60,0}})));
