@@ -309,7 +309,6 @@ model Generations
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={-320,-100})));
   Buildings.Fluid.HeatExchangers.ConstantEffectiveness hex(
-    allowFlowReversal1=false,
     allowFlowReversal2=false,
     redeclare final package Medium1 = MediumG,
     redeclare final package Medium2 = MediumW,
@@ -342,7 +341,6 @@ model Generations
         rotation=90, origin={310,-40})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo(
     redeclare final package Medium = MediumG,
-    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=true,
     riseTime=heaPumPumRis,
@@ -351,7 +349,6 @@ model Generations
     annotation (Placement(transformation(extent={{-98,54},{-78,74}})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumGly(
     redeclare final package Medium = MediumG,
-    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=true,
     final riseTime=heaPumPumRis,
@@ -365,7 +362,6 @@ model Generations
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     use_strokeTime=true,
     strokeTime=heaPumIsoValStrTim,
-    final m_flow_nominal=mHpGly_flow_nominal,
     final dpValve_nominal=dpValve_nominal)
     "Heat pump bypass valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -387,7 +383,6 @@ model Generations
         origin={370,-100})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemHeaPumGlyIn(
     redeclare final package Medium = MediumG,
-    allowFlowReversal=false,
     final m_flow_nominal=mHpGly_flow_nominal)
     "Temperature of glycol entering heat pump" annotation (Placement(
         transformation(
@@ -402,23 +397,22 @@ model Generations
         rotation=180, origin={-344,-24})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemDryCooOut(
     redeclare final package Medium = MediumG,
-    allowFlowReversal=false,
     final m_flow_nominal=mGly_flow_nominal) "Temperature of dry cooler outlet"
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=0,
         origin={136,64})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo1(
+  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHexGly(
     redeclare final package Medium = MediumG,
-    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=true,
     riseTime=heaPumPumRis,
     final m_flow_nominal=mHexGly_flow_nominal,
-    dpMax=Modelica.Constants.inf)
-    "Dry cooler pump"
-    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
-        rotation=-90, origin={-260,16})));
+    dpMax=Modelica.Constants.inf) "Pump economizer heat exchanger glycol side"
+    annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=-90,
+        origin={-260,16})));
   Buildings.Fluid.FixedResistances.Junction jun(
     redeclare final package Medium = MediumW,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
@@ -476,7 +470,6 @@ model Generations
     dTEva_nominal=TApp,
     dpEva_nominal=30000,
     use_evaCap=false,
-    allowFlowReversalEva=false,
     allowFlowReversalCon=false,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final QHea_flow_nominal=QHeaPumHea_flow_nominal,
@@ -695,9 +688,6 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun12(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     m_flow_nominal={mGly_flow_nominal,-mHpGly_flow_nominal,-mGly_flow_nominal},
     dp_nominal={0,0,0}) annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
@@ -706,10 +696,6 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun13(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    m_flow_nominal={mGly_flow_nominal,-mGly_flow_nominal,-mHexGly_flow_nominal},
     dp_nominal={0,0,0}) annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
         rotation=0,
@@ -717,10 +703,6 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun14(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    m_flow_nominal={mHexGly_flow_nominal,-mGly_flow_nominal,mGly_flow_nominal},
     dp_nominal={0,0,0}) annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
@@ -728,11 +710,6 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun15(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    m_flow_nominal={mHpGly_flow_nominal,-mHpGly_flow_nominal,-
-        mHpGly_flow_nominal},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{10,10},{-10,-10}},
         rotation=-90,
@@ -740,9 +717,6 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun16(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
-    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal={mGly_flow_nominal,-mGly_flow_nominal,mGly_flow_nominal},
     dp_nominal={0,0,0}) annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
@@ -860,7 +834,6 @@ model Generations
         origin={-320,-70})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemDryCooIn(
     redeclare final package Medium = MediumG,
-    allowFlowReversal=false,
     final m_flow_nominal=mGly_flow_nominal) "Temperature of dry cooler inlet"
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
@@ -920,16 +893,15 @@ equation
       points={{-300,-24},{-334,-24}},
       color={0,127,255},
       thickness=0.5));
-  connect(hex.port_a1, pumDryCoo1.port_b) annotation (Line(
+  connect(hex.port_a1, pumHexGly.port_b) annotation (Line(
       points={{-280,-24},{-260,-24},{-260,6}},
       color={0,127,255},
       thickness=0.5));
   connect(pumDryCoo.P, PPumDryCoo) annotation (Line(points={{-77,73},{-72,73},{-72,
           74},{-70,74},{-70,196},{416,196},{416,200},{560,200}},
                                 color={0,0,127}));
-  connect(pumDryCoo1.P, PPumHexGly) annotation (Line(points={{-251,5},{-251,-8},
-          {-240,-8},{-240,144},{480,144},{480,170},{560,170}},
-                                        color={0,0,127}));
+  connect(pumHexGly.P, PPumHexGly) annotation (Line(points={{-251,5},{-251,-8},
+          {-240,-8},{-240,144},{480,144},{480,170},{560,170}}, color={0,0,127}));
   connect(pumHeaPumGly.P, PPumHeaPumGly) annotation (Line(points={{379,-1},{379,
           -12},{520,-12},{520,140},{560,140}}, color={0,0,127}));
   connect(pumCenPlaPri.port_b, jun.port_1) annotation (Line(
@@ -1090,7 +1062,7 @@ equation
       points={{360,100},{248,100},{248,14},{-220,14},{-220,50},{-250,50}},
       color={0,127,255},
       thickness=0.5));
-  connect(jun13.port_3, pumDryCoo1.port_a) annotation (Line(
+  connect(jun13.port_3, pumHexGly.port_a) annotation (Line(
       points={{-260,40},{-260,26}},
       color={0,127,255},
       thickness=0.5));
@@ -1176,8 +1148,9 @@ equation
           234},{-410,-120},{-280,-120},{-280,-148}}, color={0,0,127}));
   connect(hexCon.yValHex, valHex.y) annotation (Line(points={{-438,230},{-416,230},
           {-416,-100},{-332,-100}}, color={0,0,127}));
-  connect(hexCon.yPumHex, pumDryCoo1.m_flow_in) annotation (Line(points={{-438,226},
-          {-422,226},{-422,32},{-234,32},{-234,16},{-248,16}}, color={0,0,127}));
+  connect(hexCon.yPumHex, pumHexGly.m_flow_in) annotation (Line(points={{-438,
+          226},{-422,226},{-422,32},{-234,32},{-234,16},{-248,16}}, color={0,0,
+          127}));
   connect(dryCooCon.mSetPumDryCoo_flow, pumDryCoo.m_flow_in) annotation (Line(
         points={{62,236},{68,236},{68,126},{-88,126},{-88,76}},  color={0,0,127}));
   connect(borCon.yValPriByp, valPriByp.y) annotation (Line(points={{-218,238},{-174,
