@@ -12,15 +12,15 @@ import os
 BRANCH="main"
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
-CASE_LIST = 'fivehubsmultiflow'
+CASE_LIST = 'detailedPlantFiveHubs'
 """ This parameter determines which model to run and which load files to load.
     See `cases.py`, case insensitive:
         minimum: minimum test to see if things can run
         handwrite: explicitly listed cases
-        eachbuilding: each building, differentiating with or without DHW
-        eachcluster: each of the five clusters, all with DHW
-        fivehubsnoplant: runs ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs
-        fivehubsmultiflow: runs ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs
+        eachBuilding: each building, differentiating with or without DHW
+        eachCluster: each of the five clusters, differentiating with or without DHW
+        idealPlantFiveHubs: runs ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs
+        detailedPlantFiveHubs: runs ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs
 """
 CASE_SPECS = {
      'start_time' : 0 * 24 * 3600,
