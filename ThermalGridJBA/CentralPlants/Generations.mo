@@ -362,6 +362,7 @@ model Generations
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     use_strokeTime=true,
     strokeTime=heaPumIsoValStrTim,
+    m_flow_nominal=mGly_flow_nominal,
     final dpValve_nominal=dpValve_nominal)
     "Heat pump bypass valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -696,6 +697,7 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun13(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    m_flow_nominal=mGly_flow_nominal*{1,-1,-1},
     dp_nominal={0,0,0}) annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
         rotation=0,
@@ -703,6 +705,7 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun14(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    m_flow_nominal=mGly_flow_nominal*{1,-1,1},
     dp_nominal={0,0,0}) annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
@@ -710,6 +713,7 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun15(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    m_flow_nominal=mGly_flow_nominal*{1,-1,-1},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{10,10},{-10,-10}},
         rotation=-90,
