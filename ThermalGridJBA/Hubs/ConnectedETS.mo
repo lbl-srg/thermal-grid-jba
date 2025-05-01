@@ -27,7 +27,7 @@ model ConnectedETS
       TEva_start=datBuiSet.TChiWatSup_nominal,
       TConLvgHotSet(final k=datBuiSet.THotWatSupTan_nominal)));
 
-  parameter Boolean have_eleNonHva "The ETS has non-hvac electricity load"
+  parameter Boolean have_eleNonHva "The ETS has non-HVAC electricity load"
     annotation (Dialog(group="Configuration"));
 
   parameter Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
@@ -107,11 +107,11 @@ model ConnectedETS
     offset={0},
     columns={5},
     smoothness=bui.loa.smoothness) if have_eleNonHva
-                                   "Reader for non-hvac electricity load"
+                                   "Reader for non-HVAC electricity load"
     annotation (Placement(transformation(extent={{160,-10},{180,10}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PEleNonHva(final unit="W")
     if have_eleNonHva
-                "Power drawn by non-hvac electricity load" annotation (
+                "Power drawn by non-HVAC electricity load" annotation (
       Placement(transformation(extent={{300,-20},{340,20}}), iconTransformation(
           extent={{100,-40},{140,0}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter mulPEleNonHva(u(final
