@@ -99,6 +99,18 @@ block HeatPump
     final unit="K")=0.1
     "Hysteresis for comparing temperature"
     annotation (Dialog(tab="Advanced"));
+  parameter Real isoValStrTim(
+    unit="s")=30
+    "Time needed to fully open or close heat pump waterside isolation valve"
+    annotation (Dialog(tab="Advanced"));
+  parameter Real watPumRis(
+    unit="s")=30
+    "Time needed to change motor speed between zero and full speed for the heat pump waterside pump"
+    annotation (Dialog(tab="Advanced"));
+  parameter Real heaPumRisTim(
+    unit="s")=30
+    "Time needed to change motor speed between zero and full speed for the heat pump compressor"
+    annotation (Dialog(tab="Advanced"));
 
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uEleRat
     "Electricity rate indicator. 0-normal rate; 1-high rate"
@@ -154,7 +166,7 @@ block HeatPump
     final min=0,
     final max=1)
     "District pump norminal speed"
-    annotation (Placement(transformation(extent={{-420,-440},{-380,-400}}),
+    annotation (Placement(transformation(extent={{-420,-430},{-380,-390}}),
         iconTransformation(extent={{-140,-130},{-100,-90}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1Mod
     "=true for heating, =false for cooling"
@@ -165,10 +177,10 @@ block HeatPump
     final max=1,
     final unit="1")
     "Heat pump compression speed setpoint"
-    annotation (Placement(transformation(extent={{380,-120},{420,-80}}),
+    annotation (Placement(transformation(extent={{380,-210},{420,-170}}),
         iconTransformation(extent={{100,50},{140,90}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1On
-    "Heat pump commanded on"
+    "Heat pump valves commanded open"
     annotation (Placement(transformation(extent={{380,10},{420,50}}),
         iconTransformation(extent={{100,20},{140,60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yPumGly(
@@ -195,7 +207,7 @@ block HeatPump
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Waterside pump speed setpoint"
-    annotation (Placement(transformation(extent={{380,-500},{420,-460}}),
+    annotation (Placement(transformation(extent={{380,-490},{420,-450}}),
         iconTransformation(extent={{100,-120},{140,-80}})));
 
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant higRat(final k=1)
@@ -273,9 +285,9 @@ block HeatPump
     annotation (Placement(transformation(extent={{80,-50},{100,-30}})));
   Buildings.Controls.OBC.CDL.Reals.Switch conPID
     "Switch to select output from heating or cooling PID controller"
-    annotation (Placement(transformation(extent={{140,12},{160,32}})));
+    annotation (Placement(transformation(extent={{140,10},{160,30}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer(final k=0) "Zero"
-    annotation (Placement(transformation(extent={{160,130},{180,150}})));
+    annotation (Placement(transformation(extent={{160,110},{180,130}})));
   Buildings.Controls.OBC.CDL.Logical.Pre pre "Break loop"
     annotation (Placement(transformation(extent={{-240,-230},{-220,-210}})));
   Buildings.Controls.OBC.CDL.Logical.TrueDelay delChe(
@@ -388,7 +400,7 @@ block HeatPump
     annotation (Placement(transformation(extent={{140,-380},{160,-360}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer2(final k=0)
     "Zero"
-    annotation (Placement(transformation(extent={{140,-330},{160,-310}})));
+    annotation (Placement(transformation(extent={{140,-318},{160,-298}})));
   Buildings.Controls.OBC.CDL.Reals.PIDWithReset thrWayValCon(
     final controllerType=thrWayValConTyp,
     final k=kVal,
@@ -397,36 +409,36 @@ block HeatPump
     reverseActing=false,
     final y_reset=1)
     "Three way valve controller, larger output means larger bypass flow"
-    annotation (Placement(transformation(extent={{260,-330},{280,-310}})));
+    annotation (Placement(transformation(extent={{260,-318},{280,-298}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant one3(final k=1)
     "One"
-    annotation (Placement(transformation(extent={{260,-400},{280,-380}})));
+    annotation (Placement(transformation(extent={{260,-410},{280,-390}})));
   Buildings.Controls.OBC.CDL.Reals.Switch thrWayVal
     "Heat pump glycol side 3-way valve"
     annotation (Placement(transformation(extent={{320,-360},{340,-340}})));
   Buildings.Controls.OBC.CDL.Reals.Switch higLoaModFlo
     "Mass flow rate setpoint if the heat pump is enabeld due to the high load"
-    annotation (Placement(transformation(extent={{100,-450},{120,-430}})));
+    annotation (Placement(transformation(extent={{100,-440},{120,-420}})));
   Buildings.Controls.OBC.CDL.Reals.Switch higLoaModFlo1
     "Mass flow rate setpoint if the heat pump is enabeld due to the high load"
-    annotation (Placement(transformation(extent={{320,-490},{340,-470}})));
+    annotation (Placement(transformation(extent={{320,-480},{340,-460}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(
     final k=mWat_flow_nominal) "Convert mass flow rate"
-    annotation (Placement(transformation(extent={{-340,-430},{-320,-410}})));
+    annotation (Placement(transformation(extent={{-340,-420},{-320,-400}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant minWatRat(
     final k=mWat_flow_min)
     "Minimum water flow through heat pump"
-    annotation (Placement(transformation(extent={{100,-490},{120,-470}})));
+    annotation (Placement(transformation(extent={{100,-480},{120,-460}})));
   Buildings.Controls.OBC.CDL.Reals.Max max2
     "Ensure minimum flow through heat pump"
-    annotation (Placement(transformation(extent={{162,-470},{182,-450}})));
+    annotation (Placement(transformation(extent={{160,-460},{180,-440}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con(final k=1)
     "Constant one"
-    annotation (Placement(transformation(extent={{-80,-470},{-60,-450}})));
+    annotation (Placement(transformation(extent={{-80,-460},{-60,-440}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai3(
     final k=mBorFieCen_flow_nominal)
     "Convert to mass flow rate"
-    annotation (Placement(transformation(extent={{-20,-470},{0,-450}})));
+    annotation (Placement(transformation(extent={{-20,-460},{0,-440}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant one1(final k=0) "zero"
     annotation (Placement(transformation(extent={{260,-510},{280,-490}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant minSpe(final k=minComSpe)
@@ -468,6 +480,21 @@ block HeatPump
         mHpGly_flow_nominal/mWat_flow_nominal)
     "Set point for heat pump glycol pump mass flow rate"
     annotation (Placement(transformation(extent={{340,-20},{360,0}})));
+  FalseDelay delValDis(final delayTime=watPumRis + heaPumRisTim)
+    "Delay disabling the valve"
+    annotation (Placement(transformation(extent={{260,-60},{280,-40}})));
+  Buildings.Controls.OBC.CDL.Logical.TrueDelay delHeaPumOn(delayTime=
+        isoValStrTim + watPumRis) "Delay enabling heat pum"
+    annotation (Placement(transformation(extent={{260,20},{280,40}})));
+  Buildings.Controls.OBC.CDL.Reals.LimitSlewRate ramLim(final raisingSlewRate=1/
+        heaPumRisTim) "Limit the change rate of the heat pump compressor speed"
+    annotation (Placement(transformation(extent={{300,-200},{320,-180}})));
+  TrueFalseDelay delWatPum(final delayTrueTime=isoValStrTim, final
+      delayFalseTime=heaPumRisTim) "Delay waterside pump"
+    annotation (Placement(transformation(extent={{260,-480},{280,-460}})));
+  Buildings.Controls.OBC.CDL.Logical.TrueDelay delBypVal(delayTime=isoValStrTim
+         + watPumRis) "Delay enabling bypass valve"
+    annotation (Placement(transformation(extent={{200,-360},{220,-340}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-400,420},{-322,420}}, color={255,127,0}));
@@ -549,15 +576,11 @@ equation
   connect(and2.y, holHeaPum.u)
     annotation (Line(points={{182,-160},{198,-160}},
                                                    color={255,0,255}));
-  connect(holHeaPum.y, swi1.u2) annotation (Line(points={{222,-160},{240,-160},{
-          240,70},{258,70}},   color={255,0,255}));
-  connect(zer.y, swi1.u3) annotation (Line(points={{182,140},{190,140},{190,62},
+  connect(zer.y, swi1.u3) annotation (Line(points={{182,120},{200,120},{200,62},
           {258,62}}, color={0,0,127}));
   connect(swi1.y, lesThr.u) annotation (Line(points={{282,70},{290,70},{290,
           -110},{-200,-110},{-200,-180},{-182,-180}},
                                                 color={0,0,127}));
-  connect(holHeaPum.y, y1On) annotation (Line(points={{222,-160},{240,-160},{240,
-          30},{400,30}}, color={255,0,255}));
   connect(higEleRat.y, norRat.u) annotation (Line(points={{-298,420},{-280,420},
           {-280,320},{-262,320}}, color={255,0,255}));
   connect(norRat.y, norRatSpr.u2) annotation (Line(points={{-238,320},{-140,320},
@@ -594,9 +617,6 @@ equation
           320},{40,-148},{78,-148}}, color={255,0,255}));
   connect(higPlaLoa.y, enaHeaPum.u1) annotation (Line(points={{-238,420},{50,420},
           {50,-140},{78,-140}}, color={255,0,255}));
-  connect(holHeaPum.y,conPIDHea. trigger) annotation (Line(points={{222,-160},{
-          240,-160},{240,-20},{84,-20},{84,-12}},
-                                             color={255,0,255}));
   connect(higPlaLoa.y, swi4.u2) annotation (Line(points={{-238,420},{-210,420},
           {-210,0},{-22,0}},  color={255,0,255}));
   connect(swi3.y, swi5.u1) annotation (Line(points={{22,180},{60,180},{60,148},{
@@ -614,10 +634,6 @@ equation
     annotation (Line(points={{252,220},{278,220}}, color={0,0,127}));
   connect(greThr.y, y1Mod)
     annotation (Line(points={{302,220},{400,220}}, color={255,0,255}));
-  connect(holHeaPum.y, triSam.trigger) annotation (Line(points={{222,-160},{240,
-          -160},{240,208}}, color={255,0,255}));
-  connect(holHeaPum.y, isoVal.u) annotation (Line(points={{222,-160},{240,-160},
-          {240,-50},{338,-50}}, color={255,0,255}));
   connect(isoVal.y, yVal)
     annotation (Line(points={{362,-50},{400,-50}}, color={0,0,127}));
   connect(greThr.y, swi7.u2) annotation (Line(points={{302,220},{328,220},{328,
@@ -631,8 +647,6 @@ equation
           -40,-322},{-2,-322}}, color={0,0,127}));
   connect(TGlyIn, entGlyTem.u3) annotation (Line(points={{-400,-370},{-80,-370},
           {-80,-338},{-2,-338}}, color={0,0,127}));
-  connect(holHeaPum.y, entGlyTem.u2) annotation (Line(points={{222,-160},{240,-160},
-          {240,-290},{-20,-290},{-20,-330},{-2,-330}}, color={255,0,255}));
   connect(entGlyTem.y, sub2.u1) annotation (Line(points={{22,-330},{32,-330},{32,
           -344},{58,-344}}, color={0,0,127}));
   connect(TGlyIn, sub2.u2) annotation (Line(points={{-400,-370},{-80,-370},{-80,
@@ -647,54 +661,48 @@ equation
           -270},{120,-270},{120,-370},{138,-370}},
                                              color={255,0,255}));
   connect(zer2.y, thrWayValCon.u_s)
-    annotation (Line(points={{162,-320},{258,-320}}, color={0,0,127}));
-  connect(swi6.y, thrWayValCon.u_m) annotation (Line(points={{162,-370},{270,-370},
-          {270,-332}}, color={0,0,127}));
-  connect(holHeaPum.y, thrWayValCon.trigger) annotation (Line(points={{222,-160},
-          {240,-160},{240,-350},{264,-350},{264,-332}}, color={255,0,255}));
-  connect(holHeaPum.y, thrWayVal.u2) annotation (Line(points={{222,-160},{240,-160},
-          {240,-350},{318,-350}}, color={255,0,255}));
-  connect(thrWayValCon.y, thrWayVal.u1) annotation (Line(points={{282,-320},{300,
-          -320},{300,-342},{318,-342}}, color={0,0,127}));
-  connect(one3.y, thrWayVal.u3) annotation (Line(points={{282,-390},{300,-390},{
-          300,-358},{318,-358}}, color={0,0,127}));
+    annotation (Line(points={{162,-308},{258,-308}}, color={0,0,127}));
+  connect(swi6.y, thrWayValCon.u_m) annotation (Line(points={{162,-370},{270,
+          -370},{270,-320}},
+                       color={0,0,127}));
+  connect(thrWayValCon.y, thrWayVal.u1) annotation (Line(points={{282,-308},{
+          300,-308},{300,-342},{318,-342}},
+                                        color={0,0,127}));
+  connect(one3.y, thrWayVal.u3) annotation (Line(points={{282,-400},{300,-400},
+          {300,-358},{318,-358}},color={0,0,127}));
   connect(thrWayVal.y, yValByp)
     annotation (Line(points={{342,-350},{400,-350}}, color={0,0,127}));
   connect(higLoaModFlo1.y, yPum)
-    annotation (Line(points={{342,-480},{400,-480}}, color={0,0,127}));
+    annotation (Line(points={{342,-470},{400,-470}}, color={0,0,127}));
   connect(higPlaLoa.y, higLoaModFlo.u2) annotation (Line(points={{-238,420},{50,
-          420},{50,-440},{98,-440}}, color={255,0,255}));
+          420},{50,-430},{98,-430}}, color={255,0,255}));
   connect(uDisPum, gai2.u)
-    annotation (Line(points={{-400,-420},{-342,-420}}, color={0,0,127}));
-  connect(gai2.y, higLoaModFlo.u1) annotation (Line(points={{-318,-420},{20,-420},
-          {20,-432},{98,-432}}, color={0,0,127}));
+    annotation (Line(points={{-400,-410},{-342,-410}}, color={0,0,127}));
+  connect(gai2.y, higLoaModFlo.u1) annotation (Line(points={{-318,-410},{20,
+          -410},{20,-422},{98,-422}},
+                                color={0,0,127}));
   connect(con.y, gai3.u)
-    annotation (Line(points={{-58,-460},{-22,-460}}, color={0,0,127}));
-  connect(gai3.y, higLoaModFlo.u3) annotation (Line(points={{2,-460},{20,-460},{
-          20,-448},{98,-448}}, color={0,0,127}));
-  connect(higLoaModFlo.y, max2.u1) annotation (Line(points={{122,-440},{142,-440},
-          {142,-454},{160,-454}}, color={0,0,127}));
-  connect(minWatRat.y, max2.u2) annotation (Line(points={{122,-480},{140,-480},{
-          140,-466},{160,-466}}, color={0,0,127}));
-  connect(max2.y, higLoaModFlo1.u1) annotation (Line(points={{184,-460},{300,-460},
-          {300,-472},{318,-472}}, color={0,0,127}));
-  connect(holHeaPum.y, higLoaModFlo1.u2) annotation (Line(points={{222,-160},{240,
-          -160},{240,-480},{318,-480}}, color={255,0,255}));
-  connect(one1.y, higLoaModFlo1.u3) annotation (Line(points={{282,-500},{300,-500},
-          {300,-488},{318,-488}}, color={0,0,127}));
-  connect(holHeaPum.y, heaPumFlo.u2) annotation (Line(points={{222,-160},{240,-160},
-          {240,-260},{-340,-260},{-340,-150},{-282,-150}}, color={255,0,255}));
+    annotation (Line(points={{-58,-450},{-22,-450}}, color={0,0,127}));
+  connect(gai3.y, higLoaModFlo.u3) annotation (Line(points={{2,-450},{20,-450},
+          {20,-438},{98,-438}},color={0,0,127}));
+  connect(higLoaModFlo.y, max2.u1) annotation (Line(points={{122,-430},{142,
+          -430},{142,-444},{158,-444}},
+                                  color={0,0,127}));
+  connect(minWatRat.y, max2.u2) annotation (Line(points={{122,-470},{140,-470},
+          {140,-456},{158,-456}},color={0,0,127}));
+  connect(max2.y, higLoaModFlo1.u1) annotation (Line(points={{182,-450},{300,
+          -450},{300,-462},{318,-462}},
+                                  color={0,0,127}));
+  connect(one1.y, higLoaModFlo1.u3) annotation (Line(points={{282,-500},{300,
+          -500},{300,-478},{318,-478}},
+                                  color={0,0,127}));
   connect(minSpe.y, max3.u1) annotation (Line(points={{182,180},{250,180},{250,
           166},{258,166}},
                       color={0,0,127}));
   connect(max3.y, swi8.u1) annotation (Line(points={{282,160},{290,160},{290,152},
           {298,152}}, color={0,0,127}));
-  connect(zer.y, swi8.u3) annotation (Line(points={{182,140},{280,140},{280,136},
+  connect(zer.y, swi8.u3) annotation (Line(points={{182,120},{200,120},{200,136},
           {298,136}},color={0,0,127}));
-  connect(holHeaPum.y, swi8.u2) annotation (Line(points={{222,-160},{240,-160},{
-          240,144},{298,144}}, color={255,0,255}));
-  connect(holHeaPum.y, swi9.u2) annotation (Line(points={{222,-160},{240,-160},
-          {240,-100},{-80,-100},{-80,-40},{-62,-40}}, color={255,0,255}));
   connect(leaWatSet.y, swi9.u1) annotation (Line(points={{-98,-20},{-80,-20},{
           -80,-32},{-62,-32}}, color={0,0,127}));
   connect(THeaPumOut, swi9.u3) annotation (Line(points={{-400,-70},{-100,-70},{
@@ -705,14 +713,10 @@ equation
           {150,-130},{198,-130}}, color={255,0,255}));
   connect(expDis.y, and1.u1)
     annotation (Line(points={{222,-130},{258,-130}}, color={255,0,255}));
-  connect(holHeaPum.y, and1.u2) annotation (Line(points={{222,-160},{240,-160},
-          {240,-138},{258,-138}}, color={255,0,255}));
   connect(and1.y, swi10.u2) annotation (Line(points={{282,-130},{300,-130},{300,
           -100},{338,-100}}, color={255,0,255}));
   connect(swi8.y, swi10.u3) annotation (Line(points={{322,144},{340,144},{340,60},
           {320,60},{320,-108},{338,-108}},     color={0,0,127}));
-  connect(swi10.y, yComSet)
-    annotation (Line(points={{362,-100},{400,-100}}, color={0,0,127}));
   connect(minSpe.y, swi10.u1) annotation (Line(points={{182,180},{250,180},{250,
           -92},{338,-92}}, color={0,0,127}));
   connect(higPlaLoa.y, heaPumMod.u2) annotation (Line(points={{-238,420},{-210,420},
@@ -732,7 +736,7 @@ equation
   connect(heaPumMod.y, heaModInd.u) annotation (Line(points={{122,80},{130,80},{
           130,220},{158,220}}, color={255,0,255}));
   connect(greThr.y, conPID.u2) annotation (Line(points={{302,220},{328,220},{
-          328,0},{132,0},{132,22},{138,22}}, color={255,0,255}));
+          328,0},{132,0},{132,20},{138,20}}, color={255,0,255}));
   connect(minOff.y, pasMinOff.u)
     annotation (Line(points={{2,-220},{18,-220}}, color={255,0,255}));
   connect(pasMinOff.y, and3.u1)
@@ -747,9 +751,6 @@ equation
           {110,-188},{118,-188}}, color={255,0,255}));
   connect(enaHeaPum1.y, and2.u2) annotation (Line(points={{142,-180},{150,-180},
           {150,-168},{158,-168}}, color={255,0,255}));
-  connect(holHeaPum.y, conPIDCoo.trigger) annotation (Line(points={{222,-160},{
-          240,-160},{240,-60},{84,-60},{84,-52}},
-                                             color={255,0,255}));
   connect(swi4.y, conPIDHea.u_s) annotation (Line(points={{2,0},{78,0}},
                       color={0,0,127}));
   connect(swi4.y, conPIDCoo.u_s) annotation (Line(points={{2,0},{60,0},{60,-40},
@@ -760,20 +761,66 @@ equation
   connect(THeaPumOut, conPIDCoo.u_m) annotation (Line(points={{-400,-70},{90,
           -70},{90,-52}},              color={0,0,127}));
   connect(conPIDHea.y, conPID.u1)
-    annotation (Line(points={{102,0},{120,0},{120,30},{138,30}},
+    annotation (Line(points={{102,0},{120,0},{120,28},{138,28}},
                                                    color={0,0,127}));
-  connect(conPID.u3, conPIDCoo.y) annotation (Line(points={{138,14},{126,14},{
+  connect(conPID.u3, conPIDCoo.y) annotation (Line(points={{138,12},{126,12},{
           126,-40},{102,-40}},
                          color={0,0,127}));
-  connect(conPID.y, max3.u2) annotation (Line(points={{162,22},{226,22},{226,
+  connect(conPID.y, max3.u2) annotation (Line(points={{162,20},{226,20},{226,
           154},{258,154}},
                       color={0,0,127}));
-  connect(conPID.y, swi1.u1) annotation (Line(points={{162,22},{226,22},{226,78},
+  connect(conPID.y, swi1.u1) annotation (Line(points={{162,20},{226,20},{226,78},
           {258,78}}, color={0,0,127}));
   connect(yPumGly, mSetHPGly_flow.y)
     annotation (Line(points={{400,-10},{362,-10}}, color={0,0,127}));
-  connect(higLoaModFlo1.y, mSetHPGly_flow.u) annotation (Line(points={{342,-480},
-          {360,-480},{360,-138},{310,-138},{310,-10},{338,-10}}, color={0,0,127}));
+  connect(higLoaModFlo1.y, mSetHPGly_flow.u) annotation (Line(points={{342,-470},
+          {360,-470},{360,-140},{310,-140},{310,-10},{338,-10}}, color={0,0,127}));
+  connect(holHeaPum.y, delValDis.u) annotation (Line(points={{222,-160},{240,-160},
+          {240,-50},{258,-50}}, color={255,0,255}));
+  connect(delValDis.y, isoVal.u)
+    annotation (Line(points={{282,-50},{338,-50}}, color={255,0,255}));
+  connect(holHeaPum.y, delHeaPumOn.u) annotation (Line(points={{222,-160},{240,-160},
+          {240,30},{258,30}}, color={255,0,255}));
+  connect(delHeaPumOn.y, and1.u2) annotation (Line(points={{282,30},{300,30},{300,
+          10},{230,10},{230,-138},{258,-138}}, color={255,0,255}));
+  connect(swi10.y, ramLim.u) annotation (Line(points={{362,-100},{370,-100},{
+          370,-160},{290,-160},{290,-190},{298,-190}},
+                                                   color={0,0,127}));
+  connect(ramLim.y, yComSet)
+    annotation (Line(points={{322,-190},{400,-190}}, color={0,0,127}));
+  connect(holHeaPum.y, delWatPum.u) annotation (Line(points={{222,-160},{240,
+          -160},{240,-470},{258,-470}}, color={255,0,255}));
+  connect(delWatPum.y, higLoaModFlo1.u2)
+    annotation (Line(points={{282,-470},{318,-470}}, color={255,0,255}));
+  connect(delBypVal.y, thrWayVal.u2)
+    annotation (Line(points={{222,-350},{318,-350}}, color={255,0,255}));
+  connect(delBypVal.y, thrWayValCon.trigger) annotation (Line(points={{222,-350},
+          {264,-350},{264,-320}}, color={255,0,255}));
+  connect(holHeaPum.y, delBypVal.u) annotation (Line(points={{222,-160},{240,
+          -160},{240,-330},{190,-330},{190,-350},{198,-350}}, color={255,0,255}));
+  connect(delHeaPumOn.y, swi8.u2) annotation (Line(points={{282,30},{300,30},{
+          300,120},{280,120},{280,144},{298,144}}, color={255,0,255}));
+  connect(delHeaPumOn.y, heaPumFlo.u2) annotation (Line(points={{282,30},{300,
+          30},{300,10},{230,10},{230,-260},{-340,-260},{-340,-150},{-282,-150}},
+        color={255,0,255}));
+  connect(delHeaPumOn.y, triSam.trigger) annotation (Line(points={{282,30},{300,
+          30},{300,120},{240,120},{240,208}}, color={255,0,255}));
+  connect(delHeaPumOn.y, conPIDHea.trigger) annotation (Line(points={{282,30},{
+          300,30},{300,10},{230,10},{230,-20},{84,-20},{84,-12}}, color={255,0,
+          255}));
+  connect(delHeaPumOn.y, conPIDCoo.trigger) annotation (Line(points={{282,30},{
+          300,30},{300,10},{230,10},{230,-60},{84,-60},{84,-52}}, color={255,0,
+          255}));
+  connect(delHeaPumOn.y, swi9.u2) annotation (Line(points={{282,30},{300,30},{
+          300,10},{230,10},{230,-80},{-80,-80},{-80,-40},{-62,-40}}, color={255,
+          0,255}));
+  connect(delHeaPumOn.y, entGlyTem.u2) annotation (Line(points={{282,30},{300,
+          30},{300,10},{230,10},{230,-260},{-20,-260},{-20,-330},{-2,-330}},
+        color={255,0,255}));
+  connect(delHeaPumOn.y, swi1.u2) annotation (Line(points={{282,30},{300,30},{
+          300,50},{240,50},{240,70},{258,70}}, color={255,0,255}));
+  connect(delValDis.y, y1On) annotation (Line(points={{282,-50},{306,-50},{306,
+          30},{400,30}}, color={255,0,255}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
             {100,120}}), graphics={Rectangle(
