@@ -1,3 +1,5 @@
+scenario_placeholder = "%%SCENARIO%%"
+
 def get_cases(case_list : str,
               case_specs,
               case_scenarios = ['futu']):
@@ -22,7 +24,7 @@ def get_cases(case_list : str,
         cases_ns = fivehubsmultiflow()
     
     def replace_scenario(d : dict, scenario : str):
-        to_replace = "SCENARIO"
+        to_replace = scenario_placeholder
         replace_by = f"{scenario}"
         if isinstance(d, dict):
             return {k: replace_scenario(v, replace_by) for k, v in d.items()}
@@ -50,7 +52,7 @@ def minimum_test():
     buil = 'minimum-test'
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-          "name": f"nodhw_{buil}_SCENARIO",
+          "name": f"nodhw_{buil}_{scenario_placeholder}",
           "building": buil,
           "parameters": {'filNam': "modelica://ThermalGridJBA/Resources/Data/Consumptions/B1045_futu.mos"},
           'start_time' : 99 * 24 * 3600,
@@ -65,24 +67,24 @@ def handwrite_cases():
     cases = list()
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-          "name": "ETS_All_SCENARIO",
+          "name": "ETS_All_{scenario_placeholder}",
           "building": 'All',
-          "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_SCENARIO.mos"}})
+          "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
 
 #     cases = list()
 #     buil = '1045'
 #     cases.append( \
 #         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-#           "name": f"nodhw_{buil}_SCENARIO",
+#           "name": f"nodhw_{buil}_{scenario_placeholder}",
 #           "building": buil,
-#           "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
+#           "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_{scenario_placeholder}.mos"}})
 
 #     buil = '1065'
 #     cases.append( \
 #         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-#           "name": f"widhw_{buil}_SCENARIO",
+#           "name": f"widhw_{buil}_{scenario_placeholder}",
 #           "building": buil,
-#           "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
+#           "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_{scenario_placeholder}.mos"}})
 
     return cases
 
@@ -91,16 +93,16 @@ def fivehubsmultiflow():
     cases = list()
     cases.append( \
         {"model": "ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs",
-          "name": "fivehubsmultiflow_SCENARIO",
+          "name": "fivehubsmultiflow_{scenario_placeholder}",
           "building": 'FiveHubs',
           "parameters": {'datDis.filNamInd' : [
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_SCENARIO.mos"],
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_{scenario_placeholder}.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_{scenario_placeholder}.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_{scenario_placeholder}.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_{scenario_placeholder}.mos"],
                          'datDis.filNamCom' :
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_SCENARIO.mos"}})
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
 
     return cases
 
@@ -110,16 +112,16 @@ def fivehubsnoplant():
     cases = list()
     cases.append( \
         {"model": "ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs",
-          "name": "fivehubsnoplant_SCENARIO",
+          "name": "fivehubsnoplant_{scenario_placeholder}",
           "building": 'FiveHubs',
           "parameters": {'datDis.filNamInd' : [
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_SCENARIO.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_SCENARIO.mos"],
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_{scenario_placeholder}.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_{scenario_placeholder}.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_{scenario_placeholder}.mos",
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_{scenario_placeholder}.mos"],
                          'datDis.filNamCom' :
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_SCENARIO.mos"}})
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
 
     return cases
 
@@ -141,9 +143,9 @@ def construct_buildings():
     for buil in buil_nos:
         cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-              "name": f"nodhw_{buil}_SCENARIO",
+              "name": f"nodhw_{buil}_{scenario_placeholder}",
               "building": buil,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_{scenario_placeholder}.mos"}})
 
     buil_nos = ['1058x1060',
                 '1065',
@@ -157,9 +159,9 @@ def construct_buildings():
     for buil in buil_nos:
         cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-              "name": f"widhw_{buil}_SCENARIO",
+              "name": f"widhw_{buil}_{scenario_placeholder}",
               "building": buil,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_SCENARIO.mos"}})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B{buil}_{scenario_placeholder}.mos"}})
 
     return cases
 
@@ -172,9 +174,9 @@ def construct_clusters():
 
     cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-              "name": "cluster_A_SCENARIO",
+              "name": "cluster_A_{scenario_placeholder}",
               "building": 'A',
-              "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_SCENARIO.mos"}})
+              "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos"}})
 
     clusters = ['B',
                 'C',
@@ -183,9 +185,9 @@ def construct_clusters():
     for buil in clusters:
         cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-              "name": f"cluster_{buil}_SCENARIO",
+              "name": f"cluster_{buil}_{scenario_placeholder}",
               "building": buil,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}_SCENARIO.mos"}})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}_{scenario_placeholder}.mos"}})
 
     return cases
 
