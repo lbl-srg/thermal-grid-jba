@@ -352,7 +352,7 @@ model Generations
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=false,
+    use_riseTime=true,
     final riseTime=heaPumPumRis,
     final m_flow_nominal=mHpGly_flow_nominal,
     dpMax=Modelica.Constants.inf)
@@ -362,7 +362,8 @@ model Generations
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valHeaPumByp(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    use_strokeTime=false,
+    use_strokeTime=true,
+    strokeTime=heaPumIsoValStrTim,
     final m_flow_nominal=mHpGly_flow_nominal,
     final dpValve_nominal=dpValve_nominal)
     "Heat pump bypass valve"
