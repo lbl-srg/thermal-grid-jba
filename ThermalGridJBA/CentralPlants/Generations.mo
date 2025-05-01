@@ -178,7 +178,7 @@ model Generations
   parameter Modelica.Units.SI.Time heaPumIsoValStrTim=30
     "Time needed to fully open or close heat pump waterside isolation valve"
     annotation (Dialog(tab="Dynamics", group="Heat pum"));
-  parameter Modelica.Units.SI.Time heaPumWatPumRis=30
+  parameter Modelica.Units.SI.Time heaPumPumRis=30
     "Time needed to change motor speed between zero and full speed for the heat pump waterside pump"
     annotation (Dialog(tab="Dynamics", group="Heat pum"));
   parameter Modelica.Units.SI.Time heaPumRisTim=30
@@ -335,7 +335,7 @@ model Generations
     allowFlowReversal=false,
     final addPowerToMedium=false,
     final use_riseTime=true,
-    riseTime=heaPumWatPumRis,
+    riseTime=heaPumPumRis,
     final m_flow_nominal=mHeaPumWat_flow_nominal,
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -352,7 +352,8 @@ model Generations
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=false,
+    use_riseTime=true,
+    final riseTime=heaPumPumRis,
     final m_flow_nominal=mHpGly_flow_nominal,
     dpMax=Modelica.Constants.inf)
     "Pump for heat pump glycol loop"
@@ -796,7 +797,7 @@ model Generations
     final TdVal=TdVal,
     final del=minHeaPumSpeHol,
     final isoValStrTim=heaPumIsoValStrTim,
-    final watPumRis=heaPumWatPumRis,
+    final watPumRis=heaPumPumRis,
     final heaPumRisTim=heaPumRisTim)
     annotation (Placement(transformation(extent={{120,216},{140,240}})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFloPla(redeclare each package
