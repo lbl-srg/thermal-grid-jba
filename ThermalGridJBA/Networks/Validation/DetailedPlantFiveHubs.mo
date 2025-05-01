@@ -515,7 +515,7 @@ equation
   connect(dis.ports_aCon, bui.port_bSerAmb) annotation (Line(points={{12,210},{
           16,210},{16,240},{10,240}}, color={0,127,255}));
   connect(pipeGroundCouplingMulti[1:(nBui+1)].heatPorts[1], dis.heatPorts)
-    annotation (Line(points={{1,175},{1,156},{0.4,156},{0.4,197.8}},
+    annotation (Line(points={{1,175},{1,196},{0.4,196},{0.4,197.8}},
         color={127,0,0}));
   connect(conPla.port_bDis, TDisWatSup.port_a)
     annotation (Line(points={{-80,0},{-80,160}},color={0,127,255},
