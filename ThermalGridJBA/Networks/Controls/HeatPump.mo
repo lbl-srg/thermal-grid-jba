@@ -180,7 +180,7 @@ block HeatPump
     annotation (Placement(transformation(extent={{380,-210},{420,-170}}),
         iconTransformation(extent={{100,50},{140,90}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1On
-    "Heat pump commanded on"
+    "Heat pump valves commanded open"
     annotation (Placement(transformation(extent={{380,10},{420,50}}),
         iconTransformation(extent={{100,20},{140,60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yPumGly(
@@ -484,8 +484,7 @@ block HeatPump
     "Delay disabling the valve"
     annotation (Placement(transformation(extent={{260,-60},{280,-40}})));
   Buildings.Controls.OBC.CDL.Logical.TrueDelay delHeaPumOn(delayTime=
-        isoValStrTim + watPumRis + 5)
-                                  "Delay enabling heat pum"
+        isoValStrTim + watPumRis + 5) "Delay enabling heat pump"
     annotation (Placement(transformation(extent={{260,20},{280,40}})));
   Buildings.Controls.OBC.CDL.Reals.LimitSlewRate ramLim(final raisingSlewRate=1/
         heaPumRisTim) "Limit the change rate of the heat pump compressor speed"
@@ -783,8 +782,6 @@ equation
     annotation (Line(points={{282,-50},{338,-50}}, color={255,0,255}));
   connect(holHeaPum.y, delHeaPumOn.u) annotation (Line(points={{222,-160},{240,-160},
           {240,30},{258,30}}, color={255,0,255}));
-  connect(delHeaPumOn.y, y1On)
-    annotation (Line(points={{282,30},{400,30}}, color={255,0,255}));
   connect(delHeaPumOn.y, and1.u2) annotation (Line(points={{282,30},{300,30},{300,
           10},{230,10},{230,-138},{258,-138}}, color={255,0,255}));
   connect(swi10.y, ramLim.u) annotation (Line(points={{362,-100},{370,-100},{
@@ -823,6 +820,8 @@ equation
         color={255,0,255}));
   connect(delHeaPumOn.y, swi1.u2) annotation (Line(points={{282,30},{300,30},{
           300,50},{240,50},{240,70},{258,70}}, color={255,0,255}));
+  connect(delValDis.y, y1On) annotation (Line(points={{282,-50},{306,-50},{306,
+          30},{400,30}}, color={255,0,255}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
             {100,120}}), graphics={Rectangle(

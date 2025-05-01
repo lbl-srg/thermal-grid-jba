@@ -344,7 +344,8 @@ model Generations
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=false,
+    use_riseTime=true,
+    riseTime=heaPumPumRis,
     final m_flow_nominal=mGly_flow_nominal,
     dpMax=Modelica.Constants.inf) "Dry cooler pump"
     annotation (Placement(transformation(extent={{-98,54},{-78,74}})));
@@ -411,7 +412,8 @@ model Generations
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=false,
+    use_riseTime=true,
+    riseTime=heaPumPumRis,
     final m_flow_nominal=mHexGly_flow_nominal,
     dpMax=Modelica.Constants.inf)
     "Dry cooler pump"
@@ -890,7 +892,8 @@ model Generations
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=false,
+    use_riseTime=true,
+    riseTime=heaPumPumRis,
     final m_flow_nominal=mFan_flow_nominal,
     final dp_nominal=dpDryCooFan_nominal,
     dpMax=Modelica.Constants.inf) "Dry cooler fan"
@@ -1210,7 +1213,7 @@ equation
   connect(TPlaOut, ind.TPlaOut)
     annotation (Line(points={{-560,260},{-522,260}}, color={0,0,127}));
   connect(heaPumCon.y1On, dryCooCon.u1HeaPum) annotation (Line(points={{142,232},
-          {146,232},{146,210},{-10,210},{-10,236},{38,236}},     color={255,0,
+          {148,232},{148,202},{-10,202},{-10,236},{38,236}},     color={255,0,
           255}));
   connect(senTemDryCooOut.T, dryCooCon.TDryCooOut) annotation (Line(points={{136,75},
           {136,154},{0,154},{0,223},{38,223}},                  color={0,0,127}));
