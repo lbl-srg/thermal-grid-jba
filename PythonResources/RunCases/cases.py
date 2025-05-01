@@ -5,7 +5,6 @@ def get_cases(case_list : str,
 
         For inputs see `run_simulations.py`.
     '''
-    # import copy
 
     hup = case_list.upper()
     cases_ns = list() # cases without scenarios specified
@@ -21,25 +20,21 @@ def get_cases(case_list : str,
         cases_ns = fivehubsnoplant()
     elif hup == 'FIVEHUBSMULTIFLOW':
         cases_ns = fivehubsmultiflow()
-
+    
+    def replace_scenario(d : dict, scenario : str):
+        to_replace = "SCENARIO"
+        replace_by = f"{scenario}"
+        if isinstance(d, dict):
+            return {k: replace_scenario(v, replace_by) for k, v in d.items()}
+        elif isinstance(d, list):
+            return [replace_scenario(item, replace_by) for item in d]
+        elif isinstance(d, str):
+            return d.replace(to_replace, replace_by)
+        else:
+            return d
     cases = list() # cases with scenarios specified
     for scenario in case_scenarios:
-        cases +=[
-                    {
-                        **cas,
-                        "name": cas["name"].replace('_SCENARIO', f'_{scenario}'),
-                        "parameters": {
-                            **cas["parameters"],
-                            **({
-                                "filNam": cas["parameters"]["filNam"].replace('_SCENARIO', f'_{scenario}')
-                            } if "filNam" in cas["parameters"] and isinstance(cas["parameters"]["filNam"], str) else {}),
-                            **({
-                                "datDis.filNam": [fn.replace('_SCENARIO', f'_{scenario}') for fn in cas["parameters"]["datDis.filNam"]]
-                            } if "datDis.filNam" in cas["parameters"] and isinstance(cas["parameters"]["datDis.filNam"], list) else {})
-                        }
-                    }
-                    for cas in cases_ns
-                ]
+        cases +=[replace_scenario(cas, scenario) for cas in cases_ns]
 
     # add global specifications but does not override any existing ones
     for cas in cases:
