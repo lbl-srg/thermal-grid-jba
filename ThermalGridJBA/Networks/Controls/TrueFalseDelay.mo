@@ -21,12 +21,14 @@ block TrueFalseDelay "Delay the rising and falling edge of the input"
     annotation (Placement(transformation(extent={{100,40},{140,80}}),
         iconTransformation(extent={{100,-20},{140,20}})));
 
-  Buildings.Controls.OBC.CDL.Logical.TrueDelay truDel(final delayTime=
-        delayTrueTime,
-    final delayOnInit=delayOnInit) "True delay"
+  Buildings.Controls.OBC.CDL.Logical.TrueDelay truDel(
+    final delayTime=delayTrueTime,
+    final delayOnInit=delayOnInit)
+    "True delay"
     annotation (Placement(transformation(extent={{0,50},{20,70}})));
-  FalseDelay falDel(delayTime=delayFalseTime,
-                    final delayOnInit=delayOnInit) "False daley"
+  ThermalGridJBA.Networks.Controls.FalseDelay falDel(
+    final delayTime=delayFalseTime,
+    final delayOnInit=delayOnInit) "False daley"
     annotation (Placement(transformation(extent={{-80,-70},{-60,-50}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToInteger booToInt
     "Boolean to integer"
