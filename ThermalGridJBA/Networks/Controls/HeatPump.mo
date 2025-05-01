@@ -484,8 +484,7 @@ block HeatPump
     "Delay disabling the valve"
     annotation (Placement(transformation(extent={{260,-60},{280,-40}})));
   Buildings.Controls.OBC.CDL.Logical.TrueDelay delHeaPumOn(delayTime=
-        isoValStrTim + watPumRis + 5)
-                                  "Delay enabling heat pum"
+        isoValStrTim + watPumRis) "Delay enabling heat pum"
     annotation (Placement(transformation(extent={{260,20},{280,40}})));
   Buildings.Controls.OBC.CDL.Reals.LimitSlewRate ramLim(final raisingSlewRate=1/
         heaPumRisTim) "Limit the change rate of the heat pump compressor speed"
@@ -494,8 +493,7 @@ block HeatPump
       delayFalseTime=heaPumRisTim) "Delay waterside pump"
     annotation (Placement(transformation(extent={{260,-480},{280,-460}})));
   Buildings.Controls.OBC.CDL.Logical.TrueDelay delBypVal(delayTime=isoValStrTim
-         + watPumRis + 5)
-                      "Delay enabling bypass valve"
+         + watPumRis) "Delay enabling bypass valve"
     annotation (Placement(transformation(extent={{200,-360},{220,-340}})));
 equation
   connect(uEleRat, higEleRat.u1)
