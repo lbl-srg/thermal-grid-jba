@@ -18,10 +18,10 @@ def get_cases(case_list : str,
         cases_ns = construct_buildings()
     elif hup == 'EACHCLUSTER':
         cases_ns = construct_clusters()
-    elif hup == 'FIVEHUBSNOPLANT':
-        cases_ns = fivehubsnoplant()
-    elif hup == 'FIVEHUBSMULTIFLOW':
-        cases_ns = fivehubsmultiflow()
+    elif hup == 'IDEALPLANTFIVEHUBS':
+        cases_ns = ideal_plant_five_hubs()
+    elif hup == 'DETAILEDPLANTFIVEHUBS':
+        cases_ns = detailed_plant_five_hubs()
     
     def replace_scenario(d : dict, scenario : str):
         to_replace = scenario_placeholder
@@ -88,7 +88,7 @@ def handwrite_cases():
 
     return cases
 
-def fivehubsmultiflow():
+def detailed_plant_five_hubs():
 
     cases = list()
     cases.append( \
@@ -107,7 +107,7 @@ def fivehubsmultiflow():
     return cases
 
 
-def fivehubsnoplant():
+def ideal_plant_five_hubs():
 
     cases = list()
     cases.append( \
