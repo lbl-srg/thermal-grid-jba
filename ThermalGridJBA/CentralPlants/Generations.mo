@@ -352,7 +352,7 @@ model Generations
     redeclare final package Medium = MediumG,
     allowFlowReversal=false,
     final addPowerToMedium=false,
-    use_riseTime=true,
+    use_riseTime=false,
     final riseTime=heaPumPumRis,
     final m_flow_nominal=mHpGly_flow_nominal,
     dpMax=Modelica.Constants.inf)
