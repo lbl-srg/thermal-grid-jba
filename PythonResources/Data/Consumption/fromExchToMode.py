@@ -31,6 +31,7 @@ def main(stag, buil_nos, hubname = ''):
     """
 
     df = pd.DataFrame({'time' : np.linspace(0,8759,8760,dtype = float)*3600,
+                       'ele' : np.zeros(8760),
                        'coo' : np.zeros(8760),
                        'hea' : np.zeros(8760),
                        'dhw' : np.zeros(8760)})
@@ -38,34 +39,21 @@ def main(stag, buil_nos, hubname = ''):
     
     flag = False # flag when data found to generate output files
     for buil_no in buil_nos:
+        MID_ele = f'{stag}_{buil_no}_ele'
+        df['ele'] += np.array(readMID(MID_ele)) * 1000
         MID_coo = f'{stag}_{buil_no}_coo'
-        df['coo'] = df['coo'] - np.array(readMID(MID_coo)) * 1000
+        df['coo'] -= np.array(readMID(MID_coo)) * 1000
         MID_hea = f'{stag}_{buil_no}_hea'
-        df['hea'] = df['hea'] + np.array(readMID(MID_hea)) * 1000
+        df['hea'] += np.array(readMID(MID_hea)) * 1000
         MID_dhw = f'{stag}_{buil_no}_dhw'
         if os.path.isfile(os.path.join(dirExch, f'{MID_dhw}.csv')):
-            df['dhw'] = df['dhw'] + np.array(readMID(MID_dhw)) * 1000        
-        
-        # MID = f'{stag}_{buil_no}_{util}' # meter ID
-        # fni = os.path.join(dirExch, f'{MID}.csv')
-        # if os.path.isfile(fni):
-        #     df['value'] = df['value'] + readMID(MID)
-
-        #     flag = True
-        # else:
-        #     print(f'Not found: {MID}')
+            df['dhw'] += np.array(readMID(MID_dhw)) * 1000        
 
     if hubname == '':
         # construct file name from buil list if no hub name provided
         buillist = '-'.join(filter(None,[buillist,buil_no]))
     fno = '_'.join(filter(None,[buillist,hubname,stag])) + '.mos'
         # file name output; either buillist or hubname would be '' and omitted
-        
-    # df.to_excel(os.path.join(dirWritSymp,fno),
-    #             engine = 'xlsxwriter',
-    #             header = False,
-    #             index = False)
-    # print(f'Output file generated: {fno}')
 
     with open(os.path.join(dirWritMode,fno), 'w') as f:
         # head
@@ -74,23 +62,26 @@ def main(stag, buil_nos, hubname = ''):
 #First column: Seconds in the year (loads are hourly)
 #Second column: cooling loads in Watts (as negative numbers).
 #Third column: space heating loads in Watts
-#Fourth column: domestic water heating loads in Watts\n''')
+#Fourth column: domestic water heating loads in Watts
+#Fifth column: non-hvac electricity load in Watts\n''')
         
         # peak
         f.write('#\n')
         f.write(f'#Peak space cooling load = {min(df["coo"]):.0f} Watts\n')
         f.write(f'#Peak space heating load = {max(df["hea"]):.0f} Watts\n')
         f.write(f'#Peak water heating load = {max(df["dhw"]):.0f} Watts\n')
+        f.write(f'#Peak non-hvac electricity load = {max(df["ele"]):.0f} Watts\n')
         
         # weather file name
         f.write('#\n')
         f.write(f'#Weather file name = "{weatherfile[stag]}"\n')
         
         # data
-        f.write('double tab1(8760,4)\n')
+        f.write('double tab1(8760,5)\n')
         f.write(df.to_csv(path_or_buf=None,
                           header=None,
                           index=False,
+                          columns=['time','coo','hea','dhw','ele'],
                           float_format='%.0f'))
         
         print(f'Output file generated: {fno}')

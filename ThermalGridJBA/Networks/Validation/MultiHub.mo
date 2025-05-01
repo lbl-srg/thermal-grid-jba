@@ -19,6 +19,7 @@ model MultiHub "Multiple prosumer hubs in a district loop"
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
     redeclare final package MediumSer = Medium,
     redeclare final package MediumBui = Medium,
+    facTerUniSizHea={1,1.3,1},
     final filNam = filNam,
     each allowFlowReversalSer=true)
     annotation (Placement(transformation(extent={{40,40},{60,60}})));
@@ -57,10 +58,16 @@ model MultiHub "Multiple prosumer hubs in a district loop"
         extent={{-10,-10},{10,10}},
         rotation=0,
         origin={-80,10})));
-  BoundaryConditions.WeatherData                wea[nBui](final weaFil=bui.weaFil)
-                              "fTMY weather data reader"
+  BoundaryConditions.WeatherData wea(final weaFil=bui[1].weaFil)
+    "Weather data reader"
     annotation (Placement(transformation(extent={{0,60},{20,80}})));
 equation
+  for i in 1:nBui loop
+    connect(wea.weaBus, bui[i].weaBus) annotation (Line(
+        points={{20,70},{50,70},{50,60}},
+        color={255,204,51},
+        thickness=0.5));
+  end for;
   connect(dis.ports_bCon, bui.port_aSerAmb) annotation (Line(points={{38,20},{34,
           20},{34,50},{40,50}},
                            color={0,127,255}));
@@ -80,10 +87,6 @@ equation
                                         color={0,0,127}));
   connect(bou.ports[1], senTPlaEnt.port_a) annotation (Line(points={{-50,-70},{-94,
           -70},{-94,10},{-90,10}}, color={0,127,255}));
-  connect(wea.weaBus, bui.weaBus) annotation (Line(
-      points={{20,70},{50,70},{50,60}},
-      color={255,204,51},
-      thickness=0.5));
 annotation(experiment(
       StartTime=7776000,
       StopTime=8640000,
