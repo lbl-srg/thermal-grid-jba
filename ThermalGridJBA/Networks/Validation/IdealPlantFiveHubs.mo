@@ -4,7 +4,8 @@ model IdealPlantFiveHubs "District with an ideal plant and five hubs"
                                                                  (
     redeclare ThermalGridJBA.Data.Districts.FiveHubs datDis(
       mCon_flow_nominal=bui.ets.hex.m1_flow_nominal),
-    bui(ets(chi(pumEva(each use_riseTime=false)))));
+    bui(ets(chi(pumEva(each use_riseTime=false))),
+    facTerUniSizHea={1,1.3,1.3,1,1}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-260},{400,260}})),
