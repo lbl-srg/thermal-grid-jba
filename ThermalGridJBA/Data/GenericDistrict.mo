@@ -71,7 +71,7 @@ record GenericDistrict "District network design parameters"
   parameter Real dTEqu_nominal(unit="K") = 4
     "Temperature difference for sizing heat pump and the operational condition for dry cooler"
     annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TSoi_start(displayUnit="degC") = 16+273.15
+  parameter Modelica.Units.SI.Temperature TSoi_start(displayUnit="degC") = 17.15+273.15
     "Initial temperature of the soil of borefield";
   parameter Modelica.Units.SI.TemperatureDifference dTOveSho(min=0) = 2
     "Temperature difference to allow for control over or undershoot. dTOveSho >= 0"
