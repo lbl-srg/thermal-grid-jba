@@ -54,7 +54,7 @@ def minimum_test():
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
           "name": f"nodhw_{buil}_{scenario_placeholder}",
           "building": buil,
-          "parameters": {'filNam': "modelica://ThermalGridJBA/Resources/Data/Consumptions/B1045_futu.mos"},
+          "parameters": {'filNam': f"modelica://ThermalGridJBA/Resources/Data/Consumptions/B1045_{scenario_placeholder}.mos"},
           'start_time' : 99 * 24 * 3600,
           'stop_time'  : 100 * 24 * 3600})
 
@@ -67,9 +67,9 @@ def handwrite_cases():
     cases = list()
     cases.append( \
         {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
-          "name": "ETS_All_{scenario_placeholder}",
+          "name": f"ETS_All_{scenario_placeholder}",
           "building": 'All',
-          "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
+          "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
 
 #     cases = list()
 #     buil = '1045'
@@ -93,16 +93,16 @@ def fivehubsmultiflow():
     cases = list()
     cases.append( \
         {"model": "ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs",
-          "name": "fivehubsmultiflow_{scenario_placeholder}",
+          "name": f"detailed_plant_five_hubs_{scenario_placeholder}",
           "building": 'FiveHubs',
           "parameters": {'datDis.filNamInd' : [
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_{scenario_placeholder}.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_{scenario_placeholder}.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_{scenario_placeholder}.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_{scenario_placeholder}.mos"],
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos",
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_{scenario_placeholder}.mos",
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_{scenario_placeholder}.mos",
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_{scenario_placeholder}.mos",
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_{scenario_placeholder}.mos"],
                          'datDis.filNamCom' :
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
 
     return cases
 
@@ -112,16 +112,16 @@ def fivehubsnoplant():
     cases = list()
     cases.append( \
         {"model": "ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs",
-          "name": "fivehubsnoplant_{scenario_placeholder}",
+          "name": f"ideal_plant_five_hubs_{scenario_placeholder}",
           "building": 'FiveHubs',
           "parameters": {'datDis.filNamInd' : [
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_{scenario_placeholder}.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_{scenario_placeholder}.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_{scenario_placeholder}.mos",
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_{scenario_placeholder}.mos"],
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos",
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_{scenario_placeholder}.mos",
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_{scenario_placeholder}.mos",
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_{scenario_placeholder}.mos",
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_{scenario_placeholder}.mos"],
                          'datDis.filNamCom' :
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
+      f"modelica://ThermalGridJBA/Resources/Data/Consumptions/All_{scenario_placeholder}.mos"}})
 
     return cases
 
@@ -174,9 +174,9 @@ def construct_clusters():
 
     cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSNoDHW",
-              "name": "cluster_A_{scenario_placeholder}",
+              "name": f"cluster_A_{scenario_placeholder}",
               "building": 'A',
-              "parameters": {'filNam' : "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos"}})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_{scenario_placeholder}.mos"}})
 
     clusters = ['B',
                 'C',
