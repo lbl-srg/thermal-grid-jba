@@ -846,8 +846,6 @@ model Generations
   Buildings.Fluid.HeatExchangers.ConstantEffectiveness dryCoo(
     redeclare package Medium1 = MediumA,
     redeclare package Medium2 = MediumG,
-    allowFlowReversal1=false,
-    allowFlowReversal2=false,
     final m1_flow_nominal=mFan_flow_nominal,
     final m2_flow_nominal=mGly_flow_nominal,
     show_T=true,
@@ -867,7 +865,6 @@ model Generations
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow fanDryCoo(
     redeclare package Medium = MediumA,
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
-    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=true,
     riseTime=heaPumPumRis,
