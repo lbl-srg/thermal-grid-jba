@@ -1,8 +1,9 @@
 within ThermalGridJBA.Data;
 record GenericDistrict "District network design parameters"
   extends Modelica.Icons.Record;
-
+  final package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.40) "Glycol";
   constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
+  constant Real cpGly=MediumG.cp_const;
   parameter Integer nBui
     "Number of served buildings"
     annotation(Evaluate=true, Dialog(group="Load"));
@@ -98,7 +99,7 @@ record GenericDistrict "District network design parameters"
   parameter Real dpPlaHex_nominal(unit="Pa")=10000
     "Pressure difference across heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
-  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
+  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*cpWatLiq/cpGly
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
@@ -120,11 +121,11 @@ record GenericDistrict "District network design parameters"
     max(abs(QPlaHeaPumCoo_flow_nominal), QPlaHeaPumHea_flow_nominal)/(cpWatLiq*dTLoo_nominal)
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=mPlaWat_flow_nominal*0.2/
+  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=mPlaHeaPumWat_flow_nominal*0.2/
     nGen
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mPlaHeaPumGly_flow_nominal(unit="kg/s") = mPlaWat_flow_nominal
+  parameter Real mPlaHeaPumGly_flow_nominal(unit="kg/s") = mPlaHeaPumWat_flow_nominal*cpWatLiq/cpGly
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
