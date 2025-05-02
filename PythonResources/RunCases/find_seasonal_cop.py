@@ -39,15 +39,19 @@ for cas in CASE_LIST:
     (t, COP) = r.values('bui.ets.chi.chi.COP')
     (t, uCoo) = r.values('bui.ets.chi.uCoo')
     (t, uHea) = r.values('bui.ets.chi.uHea')
-    (t, TEvaEnt) = r.values('bui.ets.chi.senTEvaEnt.T')
-    (t, TEvaLvg) = r.values('bui.ets.chi.senTEvaLvg.T')
-    (t, TConEnt) = r.values('bui.ets.chi.senTConEnt.T')
-    (t, TConLvg) = r.values('bui.ets.chi.senTConLvg.T')
+    (t, QCon) = r.values('bui.ets.chi.chi.QCon_flow')  # chiller condenser heat, W
+    (t, PChi) = r.values('bui.ets.chi.chi.P')          # chiller electric input, W
+    (t, TEvaEnt) = r.values('bui.ets.chi.senTEvaEnt.T') # K
+    (t, TEvaLvg) = r.values('bui.ets.chi.senTEvaLvg.T') # K
+    (t, TConEnt) = r.values('bui.ets.chi.senTConEnt.T') # K
+    (t, TConLvg) = r.values('bui.ets.chi.senTConLvg.T') # K
     
     data = pd.DataFrame({'t': t,
                          'COP': COP,
                          'uCoo': uCoo,
                          'uHea': uHea,
+                         'QCon': QCon,
+                         'PChi': PChi,
                          'TEvaEnt' : TEvaEnt,
                          'TEvaLvg' : TEvaLvg,
                          'TConEnt' : TConEnt,
@@ -74,26 +78,62 @@ for cas in CASE_LIST:
     modes = ['simultaneous', 'coolingonly', 'heatingonly']
     data['mode'] = np.select(conditions, modes, default='other')
     
-    # Calculate the average of the specified columns by month and mode
-    avg_data = data.groupby(['month', 'mode'])[['COP', 'TEvaEnt', 'TEvaLvg', 'TConEnt', 'TConLvg']].mean().unstack(fill_value=np.nan)
+    # Group by month and mode
+    grouped = data.groupby(['month', 'mode'])
     
-    # Count the number of occurrences of each month & mode combination
-    count_data = data.groupby(['month', 'mode']).size().unstack(fill_value=0)
+    # Calculate COP_mon, averages, and size for each group
+    cop_mon_results = []
+    for (month, mode), group in grouped:
+        QCon_sum = group['QCon'].sum()
+        PChi_sum = group['PChi'].sum()
+        
+        if PChi_sum != 0:
+            COP_mon = QCon_sum / PChi_sum
+        else:
+            COP_mon = np.nan  # or some other value indicating undefined COP
+        
+        TEvaEnt_avg = group['TEvaEnt'].mean()
+        TEvaLvg_avg = group['TEvaLvg'].mean()
+        TConEnt_avg = group['TConEnt'].mean()
+        TConLvg_avg = group['TConLvg'].mean()
+        size = len(group)
+        
+        cop_mon_results.append((month, mode, COP_mon, TEvaEnt_avg, TEvaLvg_avg, TConEnt_avg, TConLvg_avg, size))
     
-    avg_data.index = avg_data.index.strftime('%B')
-    count_data.index = count_data.index.strftime('%B')
+    cop_mon_df = pd.DataFrame(cop_mon_results, columns=['month', 'mode', 'COP_mon', 'TEvaEnt_avg', 'TEvaLvg_avg', 'TConEnt_avg', 'TConLvg_avg', 'size'])
+    
+    # Calculate COP, averages, and size for the entire dataset for each mode
+    overall_cop_results = []
+    for mode in modes:
+        QCon_sum = data[data['mode'] == mode]['QCon'].sum()
+        PChi_sum = data[data['mode'] == mode]['PChi'].sum()
+        
+        if PChi_sum != 0:
+            COP_overall = QCon_sum / PChi_sum
+        else:
+            COP_overall = np.nan  # or some other value indicating undefined COP
+        
+        TEvaEnt_avg = data[data['mode'] == mode]['TEvaEnt'].mean()
+        TEvaLvg_avg = data[data['mode'] == mode]['TEvaLvg'].mean()
+        TConEnt_avg = data[data['mode'] == mode]['TConEnt'].mean()
+        TConLvg_avg = data[data['mode'] == mode]['TConLvg'].mean()
+        size = len(data[data['mode'] == mode])
+        
+        overall_cop_results.append((mode, COP_overall, TEvaEnt_avg, TEvaLvg_avg, TConEnt_avg, TConLvg_avg, size))
+    
+    overall_cop_df = pd.DataFrame(overall_cop_results, columns=['mode', 'COP_overall', 'TEvaEnt_avg', 'TEvaLvg_avg', 'TConEnt_avg', 'TConLvg_avg', 'size'])
     
     if PRINT_RESULTS:
-        print('='*10)
-        print(cas)
-        print(avg_data)
-        print('')
-        print(count_data)
+        print(f"Results for case {cas}:")
+        print("Monthly COP:")
+        print(cop_mon_df)
+        print("\nOverall COP:")
+        print(overall_cop_df)
     
     if WRITE_TO_XLSX:
         sheet_name = cas.split(os.sep)[-1]
-        avg_data.to_excel(w, sheet_name=f'{sheet_name}_cop')
-        count_data.to_excel(w, sheet_name=f'{sheet_name}_hours')
+        cop_mon_df.to_excel(w, sheet_name=f'{sheet_name}_monthly', index=False)
+        overall_cop_df.to_excel(w, sheet_name=f'{sheet_name}_overall', index=False)
 
 if WRITE_TO_XLSX:
     w.close()
