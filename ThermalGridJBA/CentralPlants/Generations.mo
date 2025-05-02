@@ -331,10 +331,9 @@ model Generations
         rotation=90, origin={310,-130})));
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumWat(
     redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
     final addPowerToMedium=false,
     final use_riseTime=true,
-    riseTime=heaPumPumRis,
+    final riseTime=heaPumPumRis,
     final m_flow_nominal=mHeaPumWat_flow_nominal,
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
