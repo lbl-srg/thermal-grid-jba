@@ -248,7 +248,7 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Reals.Switch plaSet "Plant setpoint"
     annotation (Placement(transformation(extent={{-240,-10},{-220,10}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant minFloDivZer(final k=
-        minComSpe/2*mWat_flow_nominal)
+        mWat_flow_min)
     "Minimum flow rate to avoid a division by zero if mass flow measurement is zero"
     annotation (Placement(transformation(extent={{-320,-166},{-300,-146}})));
   Buildings.Controls.OBC.CDL.Reals.Divide ratFlo
