@@ -46,7 +46,7 @@ model Generations
     "Design pressure drop on air side of dry cooler"
     annotation (Dialog(group="Dry cooler"));
   parameter Real mGly_flow_nominal(unit="kg/s") = mHexGly_flow_nominal +
-    mHpGly_flow_nominal "Nominal glycol mass flow rate for dry cooler"
+    mHeaPumGly_flow_nominal "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(group="Dry cooler"));
 
   // Borefield parameters
@@ -72,7 +72,7 @@ model Generations
   parameter Real mHeaPumWat_flow_min(unit="kg/s")
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")
+  parameter Real mHeaPumGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
   parameter Real QHeaPumHea_flow_nominal(unit="W")=cpWat*mHeaPumWat_flow*TApp
@@ -349,9 +349,9 @@ model Generations
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumGly(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
-    use_riseTime=true,
+    final use_riseTime=true,
     final riseTime=heaPumPumRis,
-    final m_flow_nominal=mHpGly_flow_nominal,
+    final m_flow_nominal=mHeaPumGly_flow_nominal,
     dpMax=Modelica.Constants.inf)
     "Pump for heat pump glycol loop"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -383,7 +383,7 @@ model Generations
         origin={370,-100})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemHeaPumGlyIn(
     redeclare final package Medium = MediumG,
-    final m_flow_nominal=mHpGly_flow_nominal)
+    final m_flow_nominal=mHeaPumGly_flow_nominal)
     "Temperature of glycol entering heat pump" annotation (Placement(
         transformation(
         extent={{-10,-10},{10,10}},
@@ -686,7 +686,7 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun12(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    m_flow_nominal={mGly_flow_nominal,-mHpGly_flow_nominal,-mGly_flow_nominal},
+    m_flow_nominal={mGly_flow_nominal,-mHeaPumGly_flow_nominal,-mGly_flow_nominal},
     dp_nominal={0,0,0}) annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=-90,
@@ -753,7 +753,7 @@ model Generations
   ThermalGridJBA.Networks.Controls.HeatPump heaPumCon(
     final mWat_flow_nominal=mWat_flow_nominal,
     final mWat_flow_min=mHeaPumWat_flow_min,
-    final mHpGly_flow_nominal=mHpGly_flow_nominal,
+    final mHeaPumGly_flow_nominal=mHeaPumGly_flow_nominal,
     final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal,
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,

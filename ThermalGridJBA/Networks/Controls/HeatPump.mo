@@ -10,10 +10,8 @@ block HeatPump
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Heat pump minimum water mass flow rate";
-  parameter Real mHpGly_flow_nominal(
-    final quantity="MassFlowRate",
-    final unit="kg/s")
-    "Nominal glycol mass flow rate for heat pump";
+  parameter Real mHeaPumGly_flow_nominal(final quantity="MassFlowRate", final
+      unit="kg/s") "Nominal glycol mass flow rate for heat pump";
   parameter Real mBorFieCen_flow_nominal(
     final quantity="MassFlowRate",
     final unit="kg/s")
@@ -475,7 +473,7 @@ block HeatPump
     annotation (Placement(transformation(extent={{20,-230},{40,-210}})));
 
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter mSetHPGly_flow(final k=
-        mHpGly_flow_nominal/mWat_flow_nominal)
+        mHeaPumGly_flow_nominal/mWat_flow_nominal)
     "Set point for heat pump glycol pump mass flow rate"
     annotation (Placement(transformation(extent={{340,-20},{360,0}})));
   FalseDelay delValDis(final delayTime=watPumRis + heaPumRisTim)

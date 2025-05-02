@@ -106,7 +106,7 @@ record GenericDistrict "District network design parameters"
     "Nominal pressure drop of dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   parameter Real mDryCoo_flow_nominal(unit="kg/s")=mPlaHexGly_flow_nominal +
-    mHpGly_flow_nominal
+    mPlaHeaPumGly_flow_nominal
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   parameter Real TDryAppSet(unit="K")=2
@@ -124,7 +124,7 @@ record GenericDistrict "District network design parameters"
     nGen
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal
+  parameter Real mPlaHeaPumGly_flow_nominal(unit="kg/s") = mPlaWat_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 

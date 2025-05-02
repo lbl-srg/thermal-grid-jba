@@ -71,7 +71,7 @@ model DetailedPlantFiveHubs
   parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=datDis.mPlaHeaPumWat_flow_min
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=datDis.mHpGly_flow_nominal
+  parameter Real mHeaPumGly_flow_nominal(unit="kg/s") = datDis.mPlaHeaPumGly_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=datDis.QPlaHeaPumHea_flow_nominal
@@ -293,7 +293,7 @@ model DetailedPlantFiveHubs
     final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
     final mHeaPumWat_flow_nominal=mPlaHeaPumWat_flow_nominal,
     final mHeaPumWat_flow_min=mPlaHeaPumWat_flow_min,
-    final mHpGly_flow_nominal=mHpGly_flow_nominal,
+    final mHeaPumGly_flow_nominal=mHeaPumGly_flow_nominal,
     final QHeaPumHea_flow_nominal=QPlaHeaPumHea_flow_nominal,
     final TConHea_nominal=TPlaConHea_nominal,
     final TEvaHea_nominal=TPlaEvaHea_nominal,
@@ -311,8 +311,7 @@ model DetailedPlantFiveHubs
     final holOffTim=holOffTim,
     final minComSpe=minPlaComSpe,
     final TSoi_start=datDis.TSoi_start,
-    final minHeaPumSpeHol=minHeaPumSpeHol)
-                                  "Central plant"
+    final minHeaPumSpeHol=minHeaPumSpeHol) "Central plant"
     annotation (Placement(transformation(extent={{-180,-10},{-160,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,

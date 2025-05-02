@@ -14,15 +14,14 @@ model CentralPlant "Validation model for central plant"
     mHexGly_flow_nominal=mPlaWat_flow_nominal,
     mHeaPumWat_flow_nominal=mPlaWat_flow_nominal,
     mHeaPumWat_flow_min=0.05*mPlaWat_flow_nominal,
-    mHpGly_flow_nominal=mPlaWat_flow_nominal,
+    mHeaPumGly_flow_nominal=mPlaWat_flow_nominal,
     QHeaPumHea_flow_nominal=mPlaWat_flow_nominal*4186*dT_nominal,
     TEvaHea_nominal=260.15,
     QHeaPumCoo_flow_nominal=-mPlaWat_flow_nominal*4186*dT_nominal,
     TConCoo_nominal=315.15,
     TConInMin=291.15,
     TEvaInMax=289.65,
-    TSoi_start=289.15)
-                      "Central plant"
+    TSoi_start=289.15) "Central plant"
     annotation (Placement(transformation(extent={{20,-50},{40,-30}})));
   Buildings.Fluid.Sources.MassFlowSource_T
                                       sou(
