@@ -495,10 +495,13 @@ block HeatPump
     "Heat pump mass flow rate, bounded away from zero"
     annotation (Placement(transformation(extent={{-320,-110},{-300,-90}})));
   Buildings.Controls.OBC.CDL.Discrete.TriggeredSampler triSam1
-    annotation (Placement(transformation(extent={{322,-460},{342,-440}})));
+    annotation (Placement(transformation(extent={{320,-460},{340,-440}})));
   Buildings.Controls.OBC.CDL.Reals.Switch higLoaModFlo2
     "Mass flow rate setpoint if the heat pump is enabeld due to the high load"
     annotation (Placement(transformation(extent={{360,-490},{380,-470}})));
+  Buildings.Controls.OBC.CDL.Logical.And and4
+    "Enabled heat pump "
+    annotation (Placement(transformation(extent={{220,-120},{240,-100}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-440,470},{-362,470}}, color={255,127,0}));
@@ -802,20 +805,25 @@ equation
     annotation (Line(points={{-338,-106},{-322,-106}}, color={0,0,127}));
   connect(mHeaPum_flow_nonZero.y, ratFlo.u2) annotation (Line(points={{-298,-100},
           {-290,-100},{-290,-76},{-282,-76}},         color={0,0,127}));
-  connect(higLoaModFlo1.y, triSam1.u) annotation (Line(points={{302,-420},{310,-420},
-          {310,-450},{320,-450}}, color={0,0,127}));
-  connect(and1.y, triSam1.trigger) annotation (Line(points={{242,-80},{260,-80},
-          {260,-470},{332,-470},{332,-462}}, color={255,0,255}));
-  connect(triSam1.y, higLoaModFlo2.u1) annotation (Line(points={{344,-450},{350,
+  connect(higLoaModFlo1.y, triSam1.u) annotation (Line(points={{302,-420},{310,
+          -420},{310,-450},{318,-450}},
+                                  color={0,0,127}));
+  connect(triSam1.y, higLoaModFlo2.u1) annotation (Line(points={{342,-450},{350,
           -450},{350,-472},{358,-472}}, color={0,0,127}));
   connect(higLoaModFlo1.y, higLoaModFlo2.u3) annotation (Line(points={{302,-420},
           {310,-420},{310,-488},{358,-488}}, color={0,0,127}));
-  connect(and1.y, higLoaModFlo2.u2) annotation (Line(points={{242,-80},{260,-80},
-          {260,-480},{358,-480}}, color={255,0,255}));
   connect(higLoaModFlo2.y, yPum)
     annotation (Line(points={{382,-480},{440,-480}}, color={0,0,127}));
   connect(higLoaModFlo2.y, mSetHPGly_flow.u) annotation (Line(points={{382,-480},
           {400,-480},{400,-180},{350,-180},{350,40},{378,40}}, color={0,0,127}));
+  connect(expDis.y, and4.u2) annotation (Line(points={{182,-80},{210,-80},{210,
+          -118},{218,-118}}, color={255,0,255}));
+  connect(holHeaPum.y, and4.u1)
+    annotation (Line(points={{182,-110},{218,-110}}, color={255,0,255}));
+  connect(and4.y, higLoaModFlo2.u2) annotation (Line(points={{242,-110},{260,
+          -110},{260,-480},{358,-480}}, color={255,0,255}));
+  connect(and4.y, triSam1.trigger) annotation (Line(points={{242,-110},{260,
+          -110},{260,-480},{330,-480},{330,-462}}, color={255,0,255}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(
