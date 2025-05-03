@@ -334,7 +334,7 @@ model Generations
     final addPowerToMedium=false,
     final use_riseTime=true,
     final riseTime=heaPumPumRis,
-    final m_flow_nominal=mHeaPumWat_flow_nominal,
+    final m_flow_nominal=max(mBorFieCen_flow_nominal, mHeaPumWat_flow_nominal),
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-40})));
@@ -751,7 +751,7 @@ model Generations
     "Borefield pumps and the valves control"
     annotation (Placement(transformation(extent={{-240,220},{-220,240}})));
   ThermalGridJBA.Networks.Controls.HeatPump heaPumCon(
-    final mWat_flow_nominal=mWat_flow_nominal,
+    final mWat_flow_nominal=mHeaPumWat_flow_nominal,
     final mWat_flow_min=mHeaPumWat_flow_min,
     final mHeaPumGly_flow_nominal=mHeaPumGly_flow_nominal,
     final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal,
