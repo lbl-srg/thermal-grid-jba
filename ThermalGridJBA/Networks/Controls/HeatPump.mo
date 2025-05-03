@@ -808,8 +808,8 @@ equation
           {260,-480},{358,-480}}, color={255,0,255}));
   connect(higLoaModFlo1.y, higLoaModFlo2.u3) annotation (Line(points={{302,-420},
           {320,-420},{320,-488},{358,-488}}, color={0,0,127}));
-  connect(gai2.y, higLoaModFlo2.u1) annotation (Line(points={{-358,-360},{-20,
-          -360},{-20,-472},{358,-472}}, color={0,0,127}));
+  connect(minWatRat.y, higLoaModFlo2.u1) annotation (Line(points={{82,-420},{
+          100,-420},{100,-472},{358,-472}}, color={0,0,127}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(
