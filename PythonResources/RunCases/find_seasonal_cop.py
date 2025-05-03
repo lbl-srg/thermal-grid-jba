@@ -14,7 +14,7 @@ from buildingspy.io.outputfile import Reader
 
 CWD = os.getcwd()
 
-PRINT_RESULTS = False
+PRINT_RESULTS = True
 WRITE_TO_XLSX = True
 PATH_XLSX = os.path.join(CWD, "seasonal_cop.xlsx")
 # CASE_LIST = ["ETS_All_futu",
@@ -102,6 +102,17 @@ for cas in CASE_LIST:
     
     cop_mon_df = pd.DataFrame(cop_mon_results, columns=['month', 'mode', 'COP_mon', 'TEvaEnt_avg', 'TEvaLvg_avg', 'TConEnt_avg', 'TConLvg_avg', 'size'])
     
+    # Convert the 'month' column to abbreviated month names
+    cop_mon_df['month'] = cop_mon_df['month'].dt.strftime('%b')
+    
+    # Pivot the DataFrame
+    cop_mon_df_pivot = cop_mon_df.pivot_table(
+        index='month',
+        columns='mode',
+        values=['COP_mon', 'TEvaEnt_avg', 'TEvaLvg_avg', 'TConEnt_avg', 'TConLvg_avg', 'size'],
+        aggfunc='first'
+    ).swaplevel(axis=1).sort_index(axis=1)
+    
     # Calculate COP, averages, and size for the entire dataset for each mode
     overall_cop_results = []
     for mode in modes:
@@ -126,13 +137,13 @@ for cas in CASE_LIST:
     if PRINT_RESULTS:
         print(f"Results for case {cas}:")
         print("Monthly COP:")
-        print(cop_mon_df)
+        print(cop_mon_df_pivot)
         print("\nOverall COP:")
         print(overall_cop_df)
     
     if WRITE_TO_XLSX:
         sheet_name = cas.split(os.sep)[-1]
-        cop_mon_df.to_excel(w, sheet_name=f'{sheet_name}_monthly', index=False)
+        cop_mon_df_pivot.to_excel(w, sheet_name=f'{sheet_name}_monthly', index=True)
         overall_cop_df.to_excel(w, sheet_name=f'{sheet_name}_overall', index=False)
 
 if WRITE_TO_XLSX:
