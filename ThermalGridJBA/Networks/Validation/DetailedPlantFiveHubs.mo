@@ -266,7 +266,7 @@ model DetailedPlantFiveHubs
     "Heat pump electric energy"
     annotation (Placement(transformation(extent={{240,150},{260,170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(
-    nin=5,
+    nin=6,
     u(each unit="J",
       each displayUnit="Wh"),
     y(each unit="J",
@@ -534,9 +534,10 @@ equation
     annotation (Line(points={{202,180},{230,180},{230,160},{238,160}},
                                                    color={0,0,127}));
   connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{261,160},{350,160},{
-          350,99.2},{358,99.2}},   color={0,0,127}));
+          350,99.1667},{358,99.1667}},
+                                   color={0,0,127}));
   connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,130},{340,130},{340,
-          99.6},{358,99.6}},   color={0,0,127}));
+          99.5},{358,99.5}},   color={0,0,127}));
   connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-90},
           {-80,-100},{90,-100},{90,-70}},color={0,127,255},
       thickness=0.5));
@@ -585,7 +586,8 @@ equation
   connect(EPumPla.y, EPum.u[2]) annotation (Line(points={{262,70},{280,70},{280,
           130.5},{298,130.5}},     color={0,0,127}));
   connect(EComPla.y, ETot.u[3]) annotation (Line(points={{261,30},{320,30},{320,
-          100},{358,100}},       color={0,0,127}));
+          99.8333},{358,99.8333}},
+                                 color={0,0,127}));
   connect(TLooMaxMea.y, looPumSpe.TMixMax) annotation (Line(points={{-278,230},
           {-260,230},{-260,196},{-220,196}}, color={0,0,127}));
   connect(TLooMinMea.y, looPumSpe.TMixMin) annotation (Line(points={{-278,200},
@@ -728,13 +730,16 @@ equation
   connect(cenPla.PFanDryCoo, multiSum.u[12]) annotation (Line(points={{-158,7},
           {-136,7},{-136,-146.792},{240,-146.792}}, color={0,0,127}));
   connect(EFanDryCoo.y, ETot.u[4]) annotation (Line(points={{61,150},{80,150},{
-          80,144},{292,144},{292,100.4},{358,100.4}},   color={0,0,127}));
+          80,144},{292,144},{292,100.167},{358,100.167}},
+                                                        color={0,0,127}));
   connect(PEleNonHva.y, EEleNonHvaETS.u)
     annotation (Line(points={{202,240},{238,240}}, color={0,0,127}));
   connect(bui.PEleNonHva, PEleNonHva.u) annotation (Line(points={{12,238},{20,
           238},{20,252},{160,252},{160,240},{178,240}}, color={0,0,127}));
   connect(EPumETS.y, ETot.u[5]) annotation (Line(points={{261,200},{350,200},{
-          350,100.8},{358,100.8}}, color={0,0,127}));
+          350,100.5},{358,100.5}}, color={0,0,127}));
+  connect(EEleNonHvaETS.y, ETot.u[6]) annotation (Line(points={{261,240},{350,
+          240},{350,100},{358,100},{358,100.833}}, color={0,0,127}));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-300},{400,260}})),
