@@ -247,22 +247,20 @@ block HeatPump
     annotation (Placement(transformation(extent={{-280,90},{-260,110}})));
   Buildings.Controls.OBC.CDL.Reals.Switch plaSet "Plant setpoint"
     annotation (Placement(transformation(extent={{-240,-10},{-220,10}})));
-  Buildings.Controls.OBC.CDL.Reals.Switch heaPumFlo
-    "Heat pump water flow rate"
-    annotation (Placement(transformation(extent={{-280,-160},{-260,-140}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant dumCon(final k=1.5*
-        mWat_flow_nominal)
-    "Dummy constant to avoid zero division"
-    annotation (Placement(transformation(extent={{-320,-190},{-300,-170}})));
-  Buildings.Controls.OBC.CDL.Reals.Divide div1 "Input 1 divided by input 2"
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant minFloDivZer(final k=
+        mWat_flow_min)
+    "Minimum flow rate to avoid a division by zero if mass flow measurement is zero"
+    annotation (Placement(transformation(extent={{-320,-166},{-300,-146}})));
+  Buildings.Controls.OBC.CDL.Reals.Divide ratFlo
+    "Ratio of plant over heat pump flow rate"
     annotation (Placement(transformation(extent={{-240,-130},{-220,-110}})));
-  Buildings.Controls.OBC.CDL.Reals.Subtract sub
-    "Find difference"
+  Buildings.Controls.OBC.CDL.Reals.Subtract dTSetHeaPumIn
+    "Temperature difference heat pump set point minus inlet temperature"
     annotation (Placement(transformation(extent={{-200,-30},{-180,-10}})));
   Buildings.Controls.OBC.CDL.Reals.Multiply mul "Multiply inputs"
     annotation (Placement(transformation(extent={{-160,-100},{-140,-80}})));
-  Buildings.Controls.OBC.CDL.Reals.Add leaWatSet(y(displayUnit="degC", unit="K"))
-    "Heat pump leaving water temperature setpoint"
+  Buildings.Controls.OBC.CDL.Reals.Add TLeaWatSet(y(displayUnit="degC", unit=
+          "K")) "Heat pump leaving water temperature setpoint"
     annotation (Placement(transformation(extent={{-120,-30},{-100,-10}})));
 
   Buildings.Controls.OBC.CDL.Reals.PIDWithReset conPIDHea(
@@ -495,6 +493,9 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Logical.TrueDelay delBypVal(delayTime=isoValStrTim
          + watPumRis) "Delay enabling bypass valve"
     annotation (Placement(transformation(extent={{200,-360},{220,-340}})));
+  Buildings.Controls.OBC.CDL.Reals.Max mHeaPum_flow_nonZero
+    "Heat pump mass flow rate, bounded away from zero"
+    annotation (Placement(transformation(extent={{-280,-160},{-260,-140}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-400,420},{-322,420}}, color={255,127,0}));
@@ -526,33 +527,20 @@ equation
           8},{-242,8}},          color={0,0,127}));
   connect(cooSet.y, plaSet.u3) annotation (Line(points={{-338,-10},{-280,-10},{-280,
           -8},{-242,-8}},        color={0,0,127}));
-  connect(mHeaPum_flow, heaPumFlo.u1) annotation (Line(points={{-400,-130},{-290,
-          -130},{-290,-142},{-282,-142}},
-                                       color={0,0,127}));
-  connect(dumCon.y, heaPumFlo.u3) annotation (Line(points={{-298,-180},{-290,-180},
-          {-290,-158},{-282,-158}},
-                                  color={0,0,127}));
-  connect(mPla_flow, div1.u1) annotation (Line(points={{-400,-100},{-250,-100},{
-          -250,-114},{-242,-114}},
-                            color={0,0,127}));
-  connect(heaPumFlo.y, div1.u2) annotation (Line(points={{-258,-150},{-250,-150},
-          {-250,-126},{-242,-126}},
-                                  color={0,0,127}));
-  connect(plaSet.y, sub.u1) annotation (Line(points={{-218,0},{-214,0},{-214,
-          -14},{-202,-14}},    color={0,0,127}));
-  connect(THeaPumIn, sub.u2) annotation (Line(points={{-400,-40},{-210,-40},{-210,
-          -26},{-202,-26}},
-                          color={0,0,127}));
-  connect(sub.y, mul.u1) annotation (Line(points={{-178,-20},{-170,-20},{-170,-84},
-          {-162,-84}},color={0,0,127}));
-  connect(div1.y, mul.u2) annotation (Line(points={{-218,-120},{-210,-120},{
-          -210,-96},{-162,-96}},
-                        color={0,0,127}));
-  connect(THeaPumIn, leaWatSet.u1) annotation (Line(points={{-400,-40},{-160,-40},
-          {-160,-14},{-122,-14}},
-                                color={0,0,127}));
-  connect(mul.y, leaWatSet.u2) annotation (Line(points={{-138,-90},{-130,-90},{-130,
-          -26},{-122,-26}},    color={0,0,127}));
+  connect(mPla_flow, ratFlo.u1) annotation (Line(points={{-400,-100},{-250,-100},
+          {-250,-114},{-242,-114}}, color={0,0,127}));
+  connect(plaSet.y, dTSetHeaPumIn.u1) annotation (Line(points={{-218,0},{-214,0},
+          {-214,-14},{-202,-14}}, color={0,0,127}));
+  connect(THeaPumIn, dTSetHeaPumIn.u2) annotation (Line(points={{-400,-40},{-210,
+          -40},{-210,-26},{-202,-26}}, color={0,0,127}));
+  connect(dTSetHeaPumIn.y, mul.u1) annotation (Line(points={{-178,-20},{-170,-20},
+          {-170,-84},{-162,-84}}, color={0,0,127}));
+  connect(ratFlo.y, mul.u2) annotation (Line(points={{-218,-120},{-210,-120},{-210,
+          -96},{-162,-96}}, color={0,0,127}));
+  connect(THeaPumIn, TLeaWatSet.u1) annotation (Line(points={{-400,-40},{-160,-40},
+          {-160,-14},{-122,-14}}, color={0,0,127}));
+  connect(mul.y, TLeaWatSet.u2) annotation (Line(points={{-138,-90},{-130,-90},
+          {-130,-26},{-122,-26}}, color={0,0,127}));
   connect(and2.y,pre. u) annotation (Line(points={{182,-160},{190,-160},{190,
           -240},{-260,-240},{-260,-220},{-242,-220}},
                                             color={255,0,255}));
@@ -703,7 +691,7 @@ equation
           {298,152}}, color={0,0,127}));
   connect(zer.y, swi8.u3) annotation (Line(points={{182,120},{200,120},{200,136},
           {298,136}},color={0,0,127}));
-  connect(leaWatSet.y, swi9.u1) annotation (Line(points={{-98,-20},{-80,-20},{
+  connect(TLeaWatSet.y, swi9.u1) annotation (Line(points={{-98,-20},{-80,-20},{
           -80,-32},{-62,-32}}, color={0,0,127}));
   connect(THeaPumOut, swi9.u3) annotation (Line(points={{-400,-70},{-100,-70},{
           -100,-48},{-62,-48}}, color={0,0,127}));
@@ -800,9 +788,6 @@ equation
           -160},{240,-330},{190,-330},{190,-350},{198,-350}}, color={255,0,255}));
   connect(delHeaPumOn.y, swi8.u2) annotation (Line(points={{282,30},{300,30},{
           300,120},{280,120},{280,144},{298,144}}, color={255,0,255}));
-  connect(delHeaPumOn.y, heaPumFlo.u2) annotation (Line(points={{282,30},{300,
-          30},{300,10},{230,10},{230,-260},{-340,-260},{-340,-150},{-282,-150}},
-        color={255,0,255}));
   connect(delHeaPumOn.y, triSam.trigger) annotation (Line(points={{282,30},{300,
           30},{300,120},{240,120},{240,208}}, color={255,0,255}));
   connect(delHeaPumOn.y, conPIDHea.trigger) annotation (Line(points={{282,30},{
@@ -821,6 +806,13 @@ equation
           300,50},{240,50},{240,70},{258,70}}, color={255,0,255}));
   connect(delValDis.y, y1On) annotation (Line(points={{282,-50},{306,-50},{306,
           30},{400,30}}, color={255,0,255}));
+  connect(mHeaPum_flow, mHeaPum_flow_nonZero.u1) annotation (Line(points={{-400,
+          -130},{-400,-132},{-292,-132},{-292,-144},{-282,-144}}, color={0,0,
+          127}));
+  connect(minFloDivZer.y, mHeaPum_flow_nonZero.u2)
+    annotation (Line(points={{-298,-156},{-282,-156}}, color={0,0,127}));
+  connect(mHeaPum_flow_nonZero.y, ratFlo.u2) annotation (Line(points={{-258,
+          -150},{-250,-150},{-250,-126},{-242,-126}}, color={0,0,127}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
             {100,120}}), graphics={Rectangle(

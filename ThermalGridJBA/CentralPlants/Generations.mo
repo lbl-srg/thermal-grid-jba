@@ -477,14 +477,12 @@ model Generations
     final QCoo_flow_nominal=QHeaPumCoo_flow_nominal,
     redeclare model RefrigerantCycleHeatPumpHeating =
         Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness
-        (redeclare
-          Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
-          iceFacCal),
+        (redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting iceFacCal,
+          final use_constAppTem=true),
     redeclare model RefrigerantCycleHeatPumpCooling =
         Buildings.Fluid.Chillers.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness
-        (redeclare
-          Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
-          iceFacCal),
+        (redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting iceFacCal,
+          final use_constAppTem=true),
     final TConHea_nominal=TConHea_nominal,
     final TEvaHea_nominal=TEvaHea_nominal,
     final TConCoo_nominal=TConCoo_nominal,
@@ -846,8 +844,6 @@ model Generations
   Buildings.Fluid.HeatExchangers.ConstantEffectiveness dryCoo(
     redeclare package Medium1 = MediumA,
     redeclare package Medium2 = MediumG,
-    allowFlowReversal1=false,
-    allowFlowReversal2=false,
     final m1_flow_nominal=mFan_flow_nominal,
     final m2_flow_nominal=mGly_flow_nominal,
     show_T=true,
@@ -867,7 +863,6 @@ model Generations
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow fanDryCoo(
     redeclare package Medium = MediumA,
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
-    allowFlowReversal=false,
     final addPowerToMedium=false,
     use_riseTime=true,
     riseTime=heaPumPumRis,
