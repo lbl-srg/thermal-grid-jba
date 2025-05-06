@@ -266,7 +266,7 @@ model DetailedPlantFiveHubs
     "Heat pump electric energy"
     annotation (Placement(transformation(extent={{240,150},{260,170}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum ETot(
-    nin=6,
+    nin=7,
     u(each unit="J",
       each displayUnit="Wh"),
     y(each unit="J",
@@ -500,9 +500,19 @@ model DetailedPlantFiveHubs
   Modelica.Blocks.Continuous.Integrator EEleNonHvaETS(initType=Modelica.Blocks.Types.Init.InitialState)
     "Non-HVAC electric use in the ETS"
     annotation (Placement(transformation(extent={{240,230},{260,250}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiSum PEleNonHva(nin=nBui)
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PEleNonHva(final nin=nBui)
     "Non-HVAC electric power"
     annotation (Placement(transformation(extent={{180,230},{200,250}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiSum PFanBuiSum(final nin=nBui)
+    "Sum of fan electric power consumption of the buildings"
+    annotation (Placement(transformation(extent={{180,270},{200,290}})));
+  Modelica.Blocks.Continuous.Integrator EFanBui(
+    initType=Modelica.Blocks.Types.Init.InitialState)
+    "Building fan electric energy"
+    annotation (Placement(transformation(extent={{240,270},{260,290}})));
+  Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
+    "Fan electric power consumption of each building"
+    annotation (Placement(transformation(extent={{120,270},{140,290}})));
 equation
  for i in 1:nBui loop
    connect(weaDat.weaBus, bui[i].weaBus) annotation (Line(
@@ -534,10 +544,11 @@ equation
     annotation (Line(points={{202,180},{230,180},{230,160},{238,160}},
                                                    color={0,0,127}));
   connect(EHeaPum.y, ETot.u[1]) annotation (Line(points={{261,160},{350,160},{
-          350,99.1667},{358,99.1667}},
+          350,99.1429},{358,99.1429}},
                                    color={0,0,127}));
   connect(EPum.y, ETot.u[2]) annotation (Line(points={{322,130},{340,130},{340,
-          99.5},{358,99.5}},   color={0,0,127}));
+          99.4286},{358,99.4286}},
+                               color={0,0,127}));
   connect(TDisWatRet.port_a, pumDis.port_b) annotation (Line(points={{-80,-90},
           {-80,-100},{90,-100},{90,-70}},color={0,127,255},
       thickness=0.5));
@@ -586,7 +597,7 @@ equation
   connect(EPumPla.y, EPum.u[2]) annotation (Line(points={{262,70},{280,70},{280,
           130.5},{298,130.5}},     color={0,0,127}));
   connect(EComPla.y, ETot.u[3]) annotation (Line(points={{261,30},{320,30},{320,
-          99.8333},{358,99.8333}},
+          99.7143},{358,99.7143}},
                                  color={0,0,127}));
   connect(TLooMaxMea.y, looPumSpe.TMixMax) annotation (Line(points={{-278,230},
           {-260,230},{-260,196},{-220,196}}, color={0,0,127}));
@@ -729,22 +740,30 @@ equation
           -136,7},{-136,150},{38,150}}, color={0,0,127}));
   connect(cenPla.PFanDryCoo, multiSum.u[12]) annotation (Line(points={{-158,7},
           {-136,7},{-136,-147.308},{240,-147.308}}, color={0,0,127}));
-  connect(EFanDryCoo.y, ETot.u[4]) annotation (Line(points={{61,150},{80,150},{
-          80,144},{292,144},{292,100.167},{358,100.167}},
-                                                        color={0,0,127}));
+  connect(EFanDryCoo.y, ETot.u[4]) annotation (Line(points={{61,150},{80,150},{80,
+          144},{292,144},{292,100},{358,100}},          color={0,0,127}));
   connect(PEleNonHva.y, EEleNonHvaETS.u)
     annotation (Line(points={{202,240},{238,240}}, color={0,0,127}));
   connect(bui.PEleNonHva, PEleNonHva.u) annotation (Line(points={{12,238},{20,
           238},{20,252},{160,252},{160,240},{178,240}}, color={0,0,127}));
   connect(EPumETS.y, ETot.u[5]) annotation (Line(points={{261,200},{350,200},{
-          350,100.5},{358,100.5}}, color={0,0,127}));
+          350,100.286},{358,100.286}},
+                                   color={0,0,127}));
   connect(EEleNonHvaETS.y, ETot.u[6]) annotation (Line(points={{261,240},{350,
-          240},{350,100},{358,100},{358,100.833}}, color={0,0,127}));
+          240},{350,100},{358,100},{358,100.571}},
+                                              color={0,0,127}));
   connect(PEleNonHva.y, multiSum.u[13]) annotation (Line(points={{202,240},{228,
           240},{228,-148},{240,-148},{240,-146.769}}, color={0,0,127}));
+  connect(PFanBuiSum.y, EFanBui.u)
+    annotation (Line(points={{202,280},{238,280}}, color={0,0,127}));
+  connect(EFanBui.y, ETot.u[7]) annotation (Line(points={{261,280},{348,280},{
+          348,116},{352,116},{352,100.857},{358,100.857}},
+                                                       color={0,0,127}));
+  connect(PFanBui.y, PFanBuiSum.u)
+    annotation (Line(points={{141,280},{178,280}}, color={0,0,127}));
   annotation (
   Diagram(
-  coordinateSystem(preserveAspectRatio=false, extent={{-400,-300},{400,260}})),
+  coordinateSystem(preserveAspectRatio=false, extent={{-400,-300},{400,300}})),
     __Dymola_Commands(
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
