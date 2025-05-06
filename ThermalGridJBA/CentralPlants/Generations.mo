@@ -321,7 +321,6 @@ model Generations
     annotation (Placement(transformation(extent={{-280,-40},{-300,-20}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHeaPum(
     redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
     final m_flow_nominal=mHeaPumWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
     use_strokeTime=true,
@@ -374,7 +373,6 @@ model Generations
     annotation (Placement(transformation(extent={{-490,-170},{-470,-150}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemHeaPumLea(
     redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
     final m_flow_nominal=mHeaPumWat_flow_nominal)
     "Temperature of waterflow leave heat pump" annotation (Placement(
         transformation(
@@ -470,7 +468,6 @@ model Generations
     dTEva_nominal=TApp,
     dpEva_nominal=30000,
     use_evaCap=false,
-    allowFlowReversalCon=false,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final QHea_flow_nominal=QHeaPumHea_flow_nominal,
     final QCoo_flow_nominal=QHeaPumCoo_flow_nominal,
@@ -783,14 +780,13 @@ model Generations
     "Mass flow rate entering plant"
     annotation (Placement(transformation(extent={{-440,-170},{-420,-150}})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFloHeaPum(redeclare each package
-      Medium = MediumW, each allowFlowReversal=false)
+      Medium = MediumW)
     "Mass flow rate entering heat pump" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={310,-102})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemheaPumEnt(
     redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
     final m_flow_nominal=mHeaPumWat_flow_nominal,
     tau=0) "Temperature entering into heat pump" annotation (Placement(
         transformation(
@@ -806,11 +802,11 @@ model Generations
         extent={{10,-10},{-10,10}},
         rotation=270,
         origin={-150,-70})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort senTemBorCenRet1(
+  Buildings.Fluid.Sensors.TemperatureTwoPort senTemBorCenSup(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     final m_flow_nominal=mBorFieCen_flow_nominal,
-    tau=0) "Temperature of return from borefield center" annotation (Placement(
+    tau=0) "Temperature of supply to borefield center" annotation (Placement(
         transformation(
         extent={{10,-10},{-10,10}},
         rotation=270,
@@ -1218,11 +1214,11 @@ equation
       points={{-150,-60},{-150,120},{-286,120},{-286,270},{-160,270},{-160,280}},
       color={0,127,255},
       thickness=0.5));
-  connect(pumBorFieCen.port_b, senTemBorCenRet1.port_a) annotation (Line(
+  connect(pumBorFieCen.port_b, senTemBorCenSup.port_a) annotation (Line(
       points={{180,-100},{180,-82}},
       color={0,127,255},
       thickness=0.5));
-  connect(senTemBorCenRet1.port_b, portBorFieCen_b) annotation (Line(
+  connect(senTemBorCenSup.port_b, portBorFieCen_b) annotation (Line(
       points={{180,-62},{180,260},{100,260},{100,280}},
       color={0,127,255},
       thickness=0.5));
