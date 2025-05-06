@@ -133,7 +133,7 @@ model Borefield "Borefield model"
 
   Modelica.Fluid.Interfaces.FluidPort_b portPer_b(redeclare final package
       Medium = Medium) "Fluid connector outlet of perimeter borefield zones"
-    annotation (Placement(transformation(extent={{90,30},{110,50}}),
+    annotation (Placement(transformation(extent={{90,70},{110,90}}),
         iconTransformation(extent={{90,70},{110,90}})));
 
   Modelica.Fluid.Interfaces.FluidPort_a portCen_a(redeclare final package
@@ -144,16 +144,20 @@ model Borefield "Borefield model"
   Modelica.Fluid.Interfaces.FluidPort_b portCen_b(redeclare final package
       Medium = Medium) "Fluid connector for center of the borefield"
                                                                    annotation
-    (Placement(transformation(extent={{90,-50},{110,-30}}), iconTransformation(
+    (Placement(transformation(extent={{90,-90},{110,-70}}), iconTransformation(
           extent={{88,-90},{108,-70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput QPer_flow(
     final unit="W")
-    "Perimeter heat flow rate" annotation (Placement(transformation(extent={{100,
-            0},{140,40}}), iconTransformation(extent={{100,20},{140,60}})));
+    "Perimeter heat flow rate" annotation (Placement(transformation(extent={{100,10},
+            {140,50}}),    iconTransformation(extent={{100,20},{140,60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput QCen_flow(
     final unit="W")
-    "Center heat flow rate" annotation (Placement(transformation(extent={{100,-30},
-            {140,10}}), iconTransformation(extent={{100,-10},{140,30}})));
+    "Center heat flow rate" annotation (Placement(transformation(extent={{100,-50},
+            {140,-10}}),iconTransformation(extent={{100,-10},{140,30}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput qBor_flow(unit="W/m")
+    "Heat flow rate per meter of borehole" annotation (Placement(transformation(
+          extent={{100,-20},{140,20}}), iconTransformation(extent={{100,-40},{140,
+            0}})));
 
   Modelica.Blocks.Math.Add sumQPer_flow(
     u1(final unit="W"),
@@ -161,14 +165,14 @@ model Borefield "Borefield model"
     y(final unit="W"),
     k1=2,
     k2=nBorSec - 2) "Perimeter borefield heat flow rates"
-    annotation (Placement(transformation(extent={{10,10},{30,30}})));
+    annotation (Placement(transformation(extent={{10,20},{30,40}})));
   Modelica.Blocks.Math.Add sumQCen_flow(
     u1(final unit="W"),
     u2(final unit="W"),
     y(final unit="W"),
     k1=2,
     k2=nBorSec - 2)    "Center borefield heat flow rates"
-    annotation (Placement(transformation(extent={{10,-20},{30,0}})));
+    annotation (Placement(transformation(extent={{10,-40},{30,-20}})));
 
   BaseClasses.BorefieldSection edgSec(
     redeclare package Medium = Medium,
@@ -297,7 +301,7 @@ model Borefield "Borefield model"
     redeclare each final package Medium = Medium,
     each allowFlowReversal=false,
     k=2) "Mass flow rate multiplier at outlet of edge perimeter"
-    annotation (Placement(transformation(extent={{40,60},{60,80}})));
+    annotation (Placement(transformation(extent={{40,70},{60,90}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulEntCen(
     redeclare final package Medium = Medium,
     allowFlowReversal=false,
@@ -308,18 +312,17 @@ model Borefield "Borefield model"
     redeclare each final package Medium = Medium,
     each allowFlowReversal=false,
     k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
-    annotation (Placement(transformation(extent={{40,30},{60,50}})));
+    annotation (Placement(transformation(extent={{40,40},{60,60}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaEdgCen(
     redeclare each final package Medium = Medium,
     each allowFlowReversal=false,
     k=2) "Mass flow rate multiplier at outlet of edge center"
-    annotation (Placement(transformation(extent={{40,-40},{60,-20}})));
+    annotation (Placement(transformation(extent={{40,-60},{60,-40}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaCorCen(
     redeclare each final package Medium = Medium,
     each allowFlowReversal=false,
     k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
-    annotation (Placement(transformation(extent={{40,-70},{60,-50}})));
-
+    annotation (Placement(transformation(extent={{40,-90},{60,-70}})));
   BaseClasses.DummyBorefield edgDummy(redeclare package Medium = Medium, final
       m_flow_nominal=mPer_flow_nominal) if useDummy_borefield
     "Dummy borefield for edge (for development only)"
@@ -328,6 +331,13 @@ model Borefield "Borefield model"
       m_flow_nominal=mPer_flow_nominal) if useDummy_borefield
     "Dummy borefield for core (for development only)"
     annotation (Placement(transformation(extent={{-50,-80},{-30,-60}})));
+  Buildings.Controls.OBC.CDL.Reals.Add add2
+    annotation (Placement(transformation(extent={{40,-10},{60,10}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter perMetHea(k=1/((
+        nBorPerTot + nBorCenTot)*hBor))
+    "Unit heat transfer between boreholes and ground"
+    annotation (Placement(transformation(extent={{70,-10},{90,10}})));
+
 equation
   // Added test on time so translation does not stop because the condition is always violated
   if useDummy_borefield and time >= -10*365*24*3600 then
@@ -336,15 +346,17 @@ equation
   end if;
 
   connect(edgSec.QPer_flow, sumQPer_flow.u1)
-    annotation (Line(points={{-28,46},{4,46},{4,26},{8,26}}, color={0,0,127}));
+    annotation (Line(points={{-28,46},{-14,46},{-14,36},{8,36}},
+                                                             color={0,0,127}));
   connect(corSec.QPer_flow, sumQPer_flow.u2) annotation (Line(points={{-28,-34},
-          {4,-34},{4,14},{8,14}}, color={0,0,127}));
+          {4,-34},{4,24},{8,24}}, color={0,0,127}));
   connect(edgSec.QCor_flow, sumQCen_flow.u1) annotation (Line(points={{-28,43},{
-          0,43},{0,-4},{8,-4}}, color={0,0,127}));
+          0,43},{0,-24},{8,-24}},
+                                color={0,0,127}));
   connect(corSec.QCor_flow, sumQCen_flow.u2) annotation (Line(points={{-28,-37},
-          {0,-37},{0,-16},{8,-16}},   color={0,0,127}));
+          {0,-37},{0,-36},{8,-36}},   color={0,0,127}));
   connect(sumQCen_flow.y, QCen_flow)
-    annotation (Line(points={{31,-10},{120,-10}}, color={0,0,127}));
+    annotation (Line(points={{31,-30},{120,-30}}, color={0,0,127}));
   connect(portCen_a,masFloMulEntCen. port_a)
     annotation (Line(points={{-100,-40},{-90,-40}}, color={0,127,255}));
   connect(portPer_a, masFloMulEntPer.port_a)
@@ -358,23 +370,24 @@ equation
   connect(masFloMulEntCen.port_b,corSec.portCen_a)  annotation (Line(points={{-70,
           -40},{-56,-40},{-56,-48},{-50,-48}}, color={0,127,255}));
   connect(sumQPer_flow.y, QPer_flow)
-    annotation (Line(points={{31,20},{120,20}}, color={0,0,127}));
+    annotation (Line(points={{31,30},{120,30}}, color={0,0,127}));
   connect(edgSec.portPer_b, masFloMulLeaEdgPer.port_a) annotation (Line(points={{-30,48},
-          {-10,48},{-10,70},{40,70}},       color={0,127,255}));
-  connect(corSec.portPer_b, masFloMulLeaCorPer.port_a) annotation (Line(points=
-          {{-30,-32},{-4,-32},{-4,40},{40,40}}, color={0,127,255}));
-  connect(edgSec.portCen_b, masFloMulLeaEdgCen.port_a) annotation (Line(points=
-          {{-30.2,32},{-6,32},{-6,-30},{40,-30}}, color={0,127,255}));
+          {-10,48},{-10,80},{40,80}},       color={0,127,255}));
+  connect(corSec.portPer_b, masFloMulLeaCorPer.port_a) annotation (Line(points={{-30,-32},
+          {-4,-32},{-4,50},{40,50}},            color={0,127,255}));
+  connect(edgSec.portCen_b, masFloMulLeaEdgCen.port_a) annotation (Line(points={{-30.2,
+          32},{-6,32},{-6,-50},{40,-50}},         color={0,127,255}));
   connect(corSec.portCen_b, masFloMulLeaCorCen.port_a) annotation (Line(points={{-30.2,
-          -48},{20,-48},{20,-60},{40,-60}},         color={0,127,255}));
-  connect(masFloMulLeaEdgCen.port_b, portCen_b) annotation (Line(points={{60,
-          -30},{80,-30},{80,-40},{100,-40}}, color={0,127,255}));
-  connect(masFloMulLeaCorCen.port_b, portCen_b) annotation (Line(points={{60,
-          -60},{80,-60},{80,-40},{100,-40}}, color={0,127,255}));
-  connect(masFloMulLeaEdgPer.port_b, portPer_b) annotation (Line(points={{60,70},
-          {80,70},{80,40},{100,40}}, color={0,127,255}));
+          -48},{-10,-48},{-10,-80},{40,-80}},       color={0,127,255}));
+  connect(masFloMulLeaEdgCen.port_b, portCen_b) annotation (Line(points={{60,-50},
+          {80,-50},{80,-80},{100,-80}},      color={0,127,255}));
+  connect(masFloMulLeaCorCen.port_b, portCen_b) annotation (Line(points={{60,-80},
+          {100,-80}},                        color={0,127,255}));
+  connect(masFloMulLeaEdgPer.port_b, portPer_b) annotation (Line(points={{60,80},
+          {100,80}},                 color={0,127,255}));
   connect(masFloMulLeaCorPer.port_b, portPer_b)
-    annotation (Line(points={{60,40},{100,40}}, color={0,127,255}));
+    annotation (Line(points={{60,50},{80,50},{80,80},{100,80}},
+                                                color={0,127,255}));
   connect(corDummy.portPer_a, masFloMulEntPer.port_b) annotation (Line(points={{
           -50,-62},{-60,-62},{-60,40},{-68,40}}, color={0,127,255}));
   connect(corDummy.portCor_a, masFloMulEntCen.port_b) annotation (Line(points={{
@@ -384,21 +397,31 @@ equation
   connect(edgDummy.portCor_a, masFloMulEntCen.port_b) annotation (Line(points={{-50,2},
           {-64,2},{-64,-40},{-70,-40}},        color={0,127,255}));
   connect(edgDummy.portPer_b, masFloMulLeaEdgPer.port_a) annotation (Line(
-        points={{-30,18},{-10,18},{-10,70},{40,70}}, color={0,127,255}));
+        points={{-30,18},{-10,18},{-10,80},{40,80}}, color={0,127,255}));
   connect(edgDummy.portCor_b, masFloMulLeaEdgCen.port_a) annotation (Line(
-        points={{-30.2,2},{-6,2},{-6,-30},{40,-30}}, color={0,127,255}));
+        points={{-30.2,2},{-6,2},{-6,-50},{40,-50}}, color={0,127,255}));
   connect(corDummy.portPer_b, masFloMulLeaCorPer.port_a) annotation (Line(
-        points={{-30,-62},{-4,-62},{-4,40},{40,40}}, color={0,127,255}));
+        points={{-30,-62},{-4,-62},{-4,50},{40,50}}, color={0,127,255}));
   connect(corDummy.portCor_b, masFloMulLeaCorCen.port_a) annotation (Line(
-        points={{-30.2,-78},{20,-78},{20,-60},{40,-60}}, color={0,127,255}));
-  connect(sumQPer_flow.u1, edgDummy.QPer_flow) annotation (Line(points={{8,26},{
-          -18,26},{-18,16},{-28,16}}, color={0,0,127}));
-  connect(sumQPer_flow.u2, corDummy.QPer_flow) annotation (Line(points={{8,14},{
-          4,14},{4,-64},{-28,-64}}, color={0,0,127}));
+        points={{-30.2,-78},{-10,-78},{-10,-80},{40,-80}},
+                                                         color={0,127,255}));
+  connect(sumQPer_flow.u1, edgDummy.QPer_flow) annotation (Line(points={{8,36},{
+          -14,36},{-14,16},{-28,16}}, color={0,0,127}));
+  connect(sumQPer_flow.u2, corDummy.QPer_flow) annotation (Line(points={{8,24},{
+          4,24},{4,-64},{-28,-64}}, color={0,0,127}));
   connect(sumQCen_flow.u1, edgDummy.QCor_flow)
-    annotation (Line(points={{8,-4},{0,-4},{0,13},{-28,13}}, color={0,0,127}));
+    annotation (Line(points={{8,-24},{0,-24},{0,13},{-28,13}},
+                                                             color={0,0,127}));
   connect(corDummy.QCor_flow, sumQCen_flow.u2) annotation (Line(points={{-28,-67},
-          {0,-67},{0,-16},{8,-16}}, color={0,0,127}));
+          {0,-67},{0,-36},{8,-36}}, color={0,0,127}));
+  connect(sumQPer_flow.y, add2.u1)
+    annotation (Line(points={{31,30},{34,30},{34,6},{38,6}}, color={0,0,127}));
+  connect(sumQCen_flow.y, add2.u2) annotation (Line(points={{31,-30},{34,-30},{34,
+          -6},{38,-6}}, color={0,0,127}));
+  connect(add2.y, perMetHea.u)
+    annotation (Line(points={{62,0},{68,0}}, color={0,0,127}));
+  connect(perMetHea.y, qBor_flow)
+    annotation (Line(points={{92,0},{120,0}}, color={0,0,127}));
   annotation (defaultComponentName="borFie",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

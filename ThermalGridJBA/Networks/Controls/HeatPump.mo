@@ -26,11 +26,11 @@ block HeatPump
     final unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
-  parameter Real TPlaCooSet(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")=TLooMin
-    "Plant cooling setpoint temperature";
+//   parameter Real TPlaCooSet(
+//     final quantity="ThermodynamicTemperature",
+//     final unit="K",
+//     displayUnit="degC")=TLooMin
+//     "Plant cooling setpoint temperature";
   parameter Real TPlaHeaSet(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -127,7 +127,13 @@ block HeatPump
     final unit="K",
     displayUnit="degC") "Temperature of the water into the central plant"
     annotation (Placement(transformation(extent={{-460,130},{-420,170}}),
-        iconTransformation(extent={{-140,20},{-100,60}})));
+        iconTransformation(extent={{-140,30},{-100,70}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TActPlaCooSet(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC") "Active plant cooling setpoint"
+    annotation (Placement(transformation(extent={{-460,40},{-420,80}}),
+        iconTransformation(extent={{-140,10},{-100,50}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaPumIn(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -231,14 +237,9 @@ block HeatPump
     final k=TPlaHeaSet)
     "Plant heating setpoint"
     annotation (Placement(transformation(extent={{-400,90},{-380,110}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSet(
-    y(unit="K", displayUnit="degC"),
-    final k=TPlaCooSet)
-    "Plant cooling setpoint"
-    annotation (Placement(transformation(extent={{-400,30},{-380,50}})));
   Buildings.Controls.OBC.CDL.Reals.Average aveSet
     "Average plant setpoint temperature"
-    annotation (Placement(transformation(extent={{-360,60},{-340,80}})));
+    annotation (Placement(transformation(extent={{-360,70},{-340,90}})));
   Buildings.Controls.OBC.CDL.Reals.Less heaMod(
     final h=THys)
     "Heat pump should be in heating mode"
@@ -497,6 +498,7 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Reals.Switch higLoaModFlo2
     "Mass flow rate setpoint if the heat pump is enabeld due to the high load"
     annotation (Placement(transformation(extent={{360,-490},{380,-470}})));
+
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-440,470},{-362,470}}, color={255,127,0}));
@@ -515,19 +517,15 @@ equation
   connect(uSea, inFal.u2) annotation (Line(points={{-440,390},{-240,390},{-240,402},
           {-182,402}},      color={255,127,0}));
   connect(heaSet.y, aveSet.u1) annotation (Line(points={{-378,100},{-370,100},{-370,
-          76},{-362,76}},        color={0,0,127}));
-  connect(cooSet.y, aveSet.u2) annotation (Line(points={{-378,40},{-370,40},{-370,
-          64},{-362,64}},        color={0,0,127}));
+          86},{-362,86}},        color={0,0,127}));
   connect(TPlaIn, heaMod.u1) annotation (Line(points={{-440,150},{-322,150}},
                                  color={0,0,127}));
-  connect(aveSet.y, heaMod.u2) annotation (Line(points={{-338,70},{-330,70},{-330,
+  connect(aveSet.y, heaMod.u2) annotation (Line(points={{-338,80},{-330,80},{-330,
           142},{-322,142}},      color={0,0,127}));
   connect(heaMod.y, plaSet.u2) annotation (Line(points={{-298,150},{-290,150},{-290,
           50},{-282,50}},        color={255,0,255}));
   connect(heaSet.y, plaSet.u1) annotation (Line(points={{-378,100},{-320,100},{-320,
           58},{-282,58}},        color={0,0,127}));
-  connect(cooSet.y, plaSet.u3) annotation (Line(points={{-378,40},{-320,40},{-320,
-          42},{-282,42}},        color={0,0,127}));
   connect(mPla_flow, ratFlo.u1) annotation (Line(points={{-440,-50},{-290,-50},{
           -290,-64},{-282,-64}},    color={0,0,127}));
   connect(plaSet.y, dTSetHeaPumIn.u1) annotation (Line(points={{-258,50},{-254,50},
@@ -810,6 +808,10 @@ equation
           {320,-420},{320,-488},{358,-488}}, color={0,0,127}));
   connect(minWatRat.y, higLoaModFlo2.u1) annotation (Line(points={{82,-420},{
           100,-420},{100,-472},{358,-472}}, color={0,0,127}));
+  connect(TActPlaCooSet, aveSet.u2) annotation (Line(points={{-440,60},{-380,60},
+          {-380,74},{-362,74}}, color={0,0,127}));
+  connect(TActPlaCooSet, plaSet.u3) annotation (Line(points={{-440,60},{-380,60},
+          {-380,42},{-282,42}}, color={0,0,127}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(
