@@ -122,6 +122,7 @@ model Chiller "Base subsystem with heat recovery chiller"
     final dTEva_nominal=dat.dTEva_nominal,
     final allowFlowReversalEva=allowFlowReversal,
     final allowFlowReversalCon=allowFlowReversal,
+    limWarSca=0.98,
     final QHea_flow_nominal=-dat.QCoo_flow_nominal*1.5,
     TConHea_nominal=dat.TConLvg_nominal,
     TEvaHea_nominal=dat.TEvaLvg_nominal,
