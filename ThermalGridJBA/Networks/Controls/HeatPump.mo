@@ -317,9 +317,11 @@ block HeatPump
     u(start=false),
     y(start=false))            "Keep heat pump being off for sufficient time"
     annotation (Placement(transformation(extent={{-20,-190},{0,-170}})));
-  Buildings.Controls.OBC.CDL.Logical.Not not1 "Not disabled"
+  Buildings.Controls.OBC.CDL.Logical.Not not1(y(start=true))
+                                              "Not disabled"
     annotation (Placement(transformation(extent={{20,-190},{40,-170}})));
-  Buildings.Controls.OBC.CDL.Logical.And ena "Enabled heat pump "
+  Buildings.Controls.OBC.CDL.Logical.And ena(u2(start=false))
+    "Enabled heat pump "
     annotation (Placement(transformation(extent={{160,-170},{180,-150}})));
   Buildings.Controls.OBC.CDL.Logical.TrueFalseHold holHeaPum(
     final trueHoldDuration=holOnTim,
@@ -474,9 +476,10 @@ block HeatPump
     y(start=false))
     "Keep heat pump being off for minimum off time"
     annotation (Placement(transformation(extent={{-20,-230},{0,-210}})));
-  Buildings.Controls.OBC.CDL.Logical.Or enaTim "Enable heat pump based on time"
+  Buildings.Controls.OBC.CDL.Logical.Or enaTim(u2(start=false))
+    "Enable heat pump based on time"
     annotation (Placement(transformation(extent={{120,-190},{140,-170}})));
-  Buildings.Controls.OBC.CDL.Logical.And and3
+  Buildings.Controls.OBC.CDL.Logical.And and3(u1(start=false))
     "Passed minimum off time and the plant load is high"
     annotation (Placement(transformation(extent={{80,-230},{100,-210}})));
   Buildings.Controls.OBC.CDL.Logical.Not pasMinOff "Passed minimum off time"
