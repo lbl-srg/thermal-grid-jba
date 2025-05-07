@@ -7,11 +7,11 @@
 
 from _config_estcp import * # This imports os and pandas as pd
 
-import csv
 import glob
 import shutil
 
 import numpy as np
+import pandas as pd
 
 # Deletes the folder of the previous written exchange files
 #   and remake the directory
@@ -20,12 +20,35 @@ if flag_deleteOldDirectory:
     shutil.rmtree(dirExch)
     os.makedirs(dirExch, exist_ok = True)
 
-util_cols = [[4,5,6], 30, 31, 32]
-    # column numbers of the respective utilities
-    #   from the input file (base 0)
-    # ele needs to be summed up
-row_start = 10
-row_end = 8770
+def safe_read_csv(fr):
+    """ Special handling of the dhw column:
+           When dhw is not in the file, it can be either out of bound or empty.
+           The csv is therefore first test-read to see how many columns exist.
+    """
+    header = pd.read_csv(fr, nrows=0)
+    num_columns = len(header.columns)
+    
+    if num_columns >= 33:  # Check if column 32 exists (index 32 means 33 columns)
+        usecols = [4, 5, 6, 30, 31, 32]
+        names = ['ele1', 'ele2', 'ele3', 'coo', 'hea', 'dhw']
+        have_dhw = True
+    else:
+        usecols = [4, 5, 6, 30, 31]
+        names = ['ele1', 'ele2', 'ele3', 'coo', 'hea']
+        have_dhw = False
+    
+    df = pd.read_csv(fr,
+                     dtype=float,
+                     header=0,
+                     skiprows=9,
+                     nrows=8760,
+                     usecols=usecols,
+                     names=names)
+    
+    # if column exists but empty, have_dhw := false
+    have_dhw = have_dhw and not np.isnan(df['dhw'][0])
+    
+    return df, have_dhw
 
 for stag, buil_no in [(stag, buil_no) for stag in stags for buil_no in buil_nos]:
     if stag == 'base':
@@ -35,42 +58,23 @@ for stag, buil_no in [(stag, buil_no) for stag in stags for buil_no in buil_nos]
     elif stag == 'futu':
         filename = f'{buil_no}*Future*.csv'
     else:
-        filename = ''
+        print(f'`stag = "{stag}"` is invalid.')
+        continue
+    fr = glob.glob(os.path.join(dirRead, filename))[0]
+    df, have_dhw = safe_read_csv(fr)
     
-    with open(glob.glob(os.path.join(dirRead, filename))[0],
-              newline='') as fr:
-        reader = csv.reader(fr, delimiter=',')
-        rows = list(reader)
-
-    for idxU, util in enumerate(utils):
-        
-        util_col = util_cols[idxU]
-        
-        if util == 'dhw':
-            if len(rows[row_start]) <= util_col:
-                # if dhw column doesn't exist
+    for util in utils:
+        if util == 'ele':
+            # ele: sum the ele colomns
+            series = df['ele1'] + df['ele2'] + df['ele3']
+        else:
+            # all others: convert from Btu to kWh
+            if util == 'dhw' and not have_dhw:
                 continue
-            if rows[row_start][util_col] == '':
-                # if dhw column is empty
-                continue
-
-        with open(os.path.join(dirExch, f'{stag}_{buil_no}_{util}.csv'),
-                  'w',
-                  newline='') as fw:
-            writer = csv.DictWriter(fw,
-                                    fieldnames = ['value'],
-                                    delimiter = delimiter)
-                # Fields:
-                #   value           - float non-negative
-            
-            for idxR in range(row_start,row_end):
-                if util == 'ele':
-                    # ele: sum 3 columns
-                    valu = 0
-                    for c in util_col:
-                        valu += float(rows[idxR][c])
-                else:
-                    # all others: convert from Btu to kWh
-                    valu = abs(float(rows[idxR][util_col])) / 3412.142
-                
-                writer.writerow({'value' : valu})
+            series = abs(df[util]) / 3412.142
+        
+        fw = os.path.join(dirExch, f'{stag}_{buil_no}_{util}.csv')
+        series.to_csv(fw,
+                      sep=',',
+                      header=False,
+                      index=False)
