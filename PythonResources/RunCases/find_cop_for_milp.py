@@ -26,7 +26,7 @@ csv_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "deta
 
 PRINT_RESULTS = False
 WRITE_TO_XLSX = True
-PATH_XLSX = os.path.join(CWD, "seasonal_cop.xlsx")
+PATH_XLSX = os.path.join(CWD, "cop_for_milp.xlsx")
 nBui = 5
 
 # remarks to be written to the output file
