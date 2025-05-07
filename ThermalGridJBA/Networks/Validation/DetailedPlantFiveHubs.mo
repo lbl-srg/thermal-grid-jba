@@ -513,6 +513,13 @@ model DetailedPlantFiveHubs
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
     "Fan electric power consumption of each building"
     annotation (Placement(transformation(extent={{120,270},{140,290}})));
+  Modelica.Blocks.Sources.CombiTimeTable borefield_soc(
+    tableOnFile=true,
+    tableName="tab1",
+    fileName=ModelicaServices.ExternalReferences.loadResource(
+        "modelica://ThermalGridJBA/Data/borefield_soc/borefield_soc_solution3.mos"),
+    columns={2})
+    annotation (Placement(transformation(extent={{-400,-300},{-380,-280}})));
 equation
  for i in 1:nBui loop
    connect(weaDat.weaBus, bui[i].weaBus) annotation (Line(
