@@ -216,9 +216,15 @@ for i in range(1,nBui+1):
         cop_mon_df_pivot.to_excel(w, sheet_name=f'{sheet_name}_monthly', index=True)
         cop_ann_df.to_excel(w, sheet_name=f'{sheet_name}_annual', index=False)
 
-# Compute all-building COP for each month and mode
+# Compute all-building COP for each month and mode, also whole-year by mode
 cop_all_results = []
+cop_all_mode_sums = {
+    'simultaneous': {'QCon': 0, 'PChi': 0},
+    'coolingonly': {'QCon': 0, 'PChi': 0},
+    'heatingonly': {'QCon': 0, 'PChi': 0}
+    }
 for (month, mode), sums in all_sums.items():
+    # All-building COP of each month each mode
     QCon_all_sum = sums['QCon']
     PChi_all_sum = sums['PChi']
     
@@ -228,6 +234,10 @@ for (month, mode), sums in all_sums.items():
         COP_all = np.nan
     
     cop_all_results.append((month, mode, COP_all))
+    
+    # All-building whole-year
+    cop_all_mode_sums[mode]['QCon'] += sums['QCon']
+    cop_all_mode_sums[mode]['PChi'] += sums['PChi']
 
 column_names = ['COP_h']
 
@@ -235,7 +245,19 @@ cop_all_df = pd.DataFrame(cop_all_results, columns=['month', 'mode'] + column_na
 
 # Convert the 'month' column to abbreviated month names
 cop_all_df['month'] = cop_all_df['month'].dt.strftime('%b')
-cop_all_df['month'] = pd.Categorical(cop_all_df['month'], categories=month_order, ordered=True)
+
+# All-building whole-year COP
+#   Needs to be after month string formatting
+for mode in modes:
+    if cop_all_mode_sums[mode]['PChi'] != 0:
+        COP_all = cop_all_mode_sums[mode]['QCon'] / cop_all_mode_sums[mode]['PChi']
+    else:
+        COP_all = np.nan
+        
+    cop_all_results.append(('Whole year', mode, COP_all))
+    cop_all_df.loc[len(cop_all_df)] = ["Whole year", mode, COP_all]
+
+cop_all_df['month'] = pd.Categorical(cop_all_df['month'], categories=month_order+['Whole year'], ordered=True)
 
 # Pivot the DataFrame
 cop_all_df_pivot = cop_all_df.pivot_table(
