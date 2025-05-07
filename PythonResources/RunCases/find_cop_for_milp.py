@@ -108,6 +108,7 @@ result_full['datetime'] = pd.to_datetime(result_full['Time'], unit='s', origin='
 if WRITE_TO_XLSX:
     w = pd.ExcelWriter(PATH_XLSX, engine='xlsxwriter')
 
+month_order = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 all_sums = {}
 for i in range(1,nBui+1):
 #for i in [1]:
@@ -170,8 +171,9 @@ for i in range(1,nBui+1):
     
     cop_mon_df = pd.DataFrame(cop_mon_results, columns=['month', 'mode'] + column_names)
     
-    # Convert the 'month' column to abbreviated month names
+    # Convert the 'month' column to abbreviated month names and order it
     cop_mon_df['month'] = cop_mon_df['month'].dt.strftime('%b')
+    cop_mon_df['month'] = pd.Categorical(cop_mon_df['month'], categories=month_order, ordered=True)
     
     # Pivot the DataFrame
     cop_mon_df_pivot = cop_mon_df.pivot_table(
@@ -233,6 +235,7 @@ cop_all_df = pd.DataFrame(cop_all_results, columns=['month', 'mode'] + column_na
 
 # Convert the 'month' column to abbreviated month names
 cop_all_df['month'] = cop_all_df['month'].dt.strftime('%b')
+cop_all_df['month'] = pd.Categorical(cop_all_df['month'], categories=month_order, ordered=True)
 
 # Pivot the DataFrame
 cop_all_df_pivot = cop_all_df.pivot_table(
