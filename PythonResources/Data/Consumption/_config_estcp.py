@@ -16,7 +16,6 @@ weatherfile = {'base' : "USA_MD_Andrews.AFB.745940_TMY3.mos",
 utils = ['ele', 'coo', 'hea', 'dhw']
     # utility types:
     #   electricity, cooling, heating, domestic hot water
-delimiter = ','
 # list of hubs
 dict_hub = {'H01' : ['1500'],
             'H02' : ['1560'],
