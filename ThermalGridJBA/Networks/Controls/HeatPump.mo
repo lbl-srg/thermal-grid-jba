@@ -499,6 +499,11 @@ block HeatPump
     "Mass flow rate setpoint if the heat pump is enabeld due to the high load"
     annotation (Placement(transformation(extent={{360,-490},{380,-470}})));
 
+  Buildings.Controls.OBC.CDL.Reals.Limiter lim(
+    uMax=273.15 + 20,
+    uMin=273.15 + 6,
+    y(unit="K", displayUnit="degC"))
+    annotation (Placement(transformation(extent={{-130,20},{-110,40}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-440,470},{-362,470}}, color={255,127,0}));
@@ -678,8 +683,6 @@ equation
           {258,202}}, color={0,0,127}));
   connect(zer.y, swi8.u3) annotation (Line(points={{142,170},{160,170},{160,186},
           {258,186}},color={0,0,127}));
-  connect(TLeaWatSet.y, swi9.u1) annotation (Line(points={{-138,30},{-120,30},{-120,
-          18},{-102,18}},      color={0,0,127}));
   connect(THeaPumOut, swi9.u3) annotation (Line(points={{-440,-20},{-140,-20},{-140,
           2},{-102,2}},         color={0,0,127}));
   connect(swi9.y, swi4.u1) annotation (Line(points={{-78,10},{-70,10},{-70,58},{
@@ -812,6 +815,10 @@ equation
           {-380,74},{-362,74}}, color={0,0,127}));
   connect(TActPlaCooSet, plaSet.u3) annotation (Line(points={{-440,60},{-380,60},
           {-380,42},{-282,42}}, color={0,0,127}));
+  connect(TLeaWatSet.y, lim.u)
+    annotation (Line(points={{-138,30},{-132,30}}, color={0,0,127}));
+  connect(lim.y, swi9.u1) annotation (Line(points={{-108,30},{-106,30},{-106,18},
+          {-102,18}}, color={0,0,127}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(
