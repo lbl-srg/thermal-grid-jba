@@ -45,6 +45,18 @@ if WRITE_REMARKS:
                                      ['Result file at commit', '343b6a5a47399dbee9441f1aaf96fb83d38b8aa6'],
                                      ['This file generated at commit', get_commit_hash()]]))
 
+def safe_cop(QCon, PChi):
+    """ Returns nan if PChi == 0.
+          This is needed because not all operational modes are present
+          in all months.
+    """
+    if PChi > 0.01:
+        COP = QCon / PChi
+    else:
+        COP = np.nan
+    
+    return COP
+
 #%% Generate variable list
 def generate_indexed_var_list(pre_index, holder, i):
     """ Replaces the `holder` string in `pre_index` with index `i`.
@@ -154,10 +166,7 @@ for i in range(1,nBui+1):
         all_sums[(month, mode)]['QCon'] += QCon_sum
         all_sums[(month, mode)]['PChi'] += PChi_sum
         
-        if PChi_sum != 0:
-            COP_mon = QCon_sum / PChi_sum
-        else:
-            COP_mon = np.nan
+        COP_mon = safe_cop(QCon_sum,PChi_sum)
         
         TEvaEnt_avg = group['TEvaEnt'].mean() - 273.15
         TEvaLvg_avg = group['TEvaLvg'].mean() - 273.15
@@ -189,10 +198,7 @@ for i in range(1,nBui+1):
         QCon_sum = result_bui[result_bui['mode'] == mode]['QCon'].sum()
         PChi_sum = result_bui[result_bui['mode'] == mode]['PChi'].sum()
         
-        if PChi_sum != 0:
-            COP_ann = QCon_sum / PChi_sum
-        else:
-            COP_ann = np.nan
+        COP_ann = safe_cop(QCon_sum, PChi_sum)
         
         TEvaEnt_avg = result_bui[result_bui['mode'] == mode]['TEvaEnt'].mean() - 273.15
         TEvaLvg_avg = result_bui[result_bui['mode'] == mode]['TEvaLvg'].mean() - 273.15
@@ -228,11 +234,7 @@ for (month, mode), sums in all_sums.items():
     QCon_all_sum = sums['QCon']
     PChi_all_sum = sums['PChi']
     
-    if PChi_all_sum != 0:
-        COP_all = QCon_all_sum / PChi_all_sum
-    else:
-        COP_all = np.nan
-    
+    COP_all = safe_cop(QCon_all_sum, PChi_all_sum)
     cop_all_results.append((month, mode, COP_all))
     
     # All-building whole-year
@@ -249,10 +251,7 @@ cop_all_df['month'] = cop_all_df['month'].dt.strftime('%b')
 # All-building whole-year COP
 #   Needs to be after month string formatting
 for mode in modes:
-    if cop_all_mode_sums[mode]['PChi'] != 0:
-        COP_all = cop_all_mode_sums[mode]['QCon'] / cop_all_mode_sums[mode]['PChi']
-    else:
-        COP_all = np.nan
+    COP_all = safe_cop(cop_all_mode_sums[mode]['QCon'], cop_all_mode_sums[mode]['PChi'])
         
     cop_all_results.append(('Whole year', mode, COP_all))
     cop_all_df.loc[len(cop_all_df)] = ["Whole year", mode, COP_all]
