@@ -501,7 +501,7 @@ block HeatPump
 
   Buildings.Controls.OBC.CDL.Reals.Limiter lim(
     uMax=273.15 + 20,
-    uMin=273.15 + 6,
+    uMin=273.15 + 5,
     y(unit="K", displayUnit="degC"))
     annotation (Placement(transformation(extent={{-130,20},{-110,40}})));
 equation
