@@ -151,15 +151,15 @@ for i in range(1,nBui+1):
         else:
             COP_mon = np.nan
         
-        TEvaEnt_avg = group['TEvaEnt'].mean()
-        TEvaLvg_avg = group['TEvaLvg'].mean()
-        TConEnt_avg = group['TConEnt'].mean()
-        TConLvg_avg = group['TConLvg'].mean()
-        size = len(group)
+        TEvaEnt_avg = group['TEvaEnt'].mean() - 273.15
+        TEvaLvg_avg = group['TEvaLvg'].mean() - 273.15
+        TConEnt_avg = group['TConEnt'].mean() - 273.15
+        TConLvg_avg = group['TConLvg'].mean() - 273.15
+        duration = len(group)
         
-        cop_mon_results.append((month, mode, COP_mon, TEvaEnt_avg, TEvaLvg_avg, TConEnt_avg, TConLvg_avg, size))
+        cop_mon_results.append((month, mode, COP_mon, TEvaEnt_avg, TEvaLvg_avg, TConEnt_avg, TConLvg_avg, duration))
     
-    column_names = ['COP_mon', 'TEvaEnt_avg|K', 'TEvaLvg_avg|K', 'TConEnt_avg|K', 'TConLvg_avg|K', 'size|h']
+    column_names = ['COP_mon', 'TEvaEnt_avg|C', 'TEvaLvg_avg|C', 'TConEnt_avg|C', 'TConLvg_avg|C', 'Duration|h']
     
     cop_mon_df = pd.DataFrame(cop_mon_results, columns=['month', 'mode'] + column_names)
     
@@ -185,13 +185,13 @@ for i in range(1,nBui+1):
         else:
             COP_ann = np.nan
         
-        TEvaEnt_avg = result_bui[result_bui['mode'] == mode]['TEvaEnt'].mean()
-        TEvaLvg_avg = result_bui[result_bui['mode'] == mode]['TEvaLvg'].mean()
-        TConEnt_avg = result_bui[result_bui['mode'] == mode]['TConEnt'].mean()
-        TConLvg_avg = result_bui[result_bui['mode'] == mode]['TConLvg'].mean()
-        size = len(result_bui[result_bui['mode'] == mode])
+        TEvaEnt_avg = result_bui[result_bui['mode'] == mode]['TEvaEnt'].mean() - 273.15
+        TEvaLvg_avg = result_bui[result_bui['mode'] == mode]['TEvaLvg'].mean() - 273.15
+        TConEnt_avg = result_bui[result_bui['mode'] == mode]['TConEnt'].mean() - 273.15
+        TConLvg_avg = result_bui[result_bui['mode'] == mode]['TConLvg'].mean() - 273.15
+        duration = len(result_bui[result_bui['mode'] == mode])
         
-        cop_ann_results.append((mode, COP_ann, TEvaEnt_avg, TEvaLvg_avg, TConEnt_avg, TConLvg_avg, size))
+        cop_ann_results.append((mode, COP_ann, TEvaEnt_avg, TEvaLvg_avg, TConEnt_avg, TConLvg_avg, duration))
     
     cop_ann_df = pd.DataFrame(cop_ann_results, columns=['mode'] + column_names)
     
