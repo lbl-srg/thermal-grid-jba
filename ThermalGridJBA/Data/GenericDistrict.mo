@@ -89,6 +89,12 @@ record GenericDistrict "District network design parameters"
   parameter Modelica.Units.SI.Temperature TPlaSumCooSet=TLooMax-dTLoo_nominal-2*dTOveSho
     "Design plant summer cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=295.15
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Central plant"));
 //   parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(mCon_flow_nominal)
 //     "Nominal water mass flow rate of plant"
 //     annotation (Dialog(tab="Central plant"));

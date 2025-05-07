@@ -40,6 +40,12 @@ model DetailedPlantFiveHubs
   parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
     "Design plant summer cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=datDis.TDryBulSum
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Central plant"));
 
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
@@ -288,6 +294,7 @@ model DetailedPlantFiveHubs
     final TLooMax=datDis.TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
+    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -307,6 +314,7 @@ model DetailedPlantFiveHubs
     final TDryAppSet=TDryAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
+    final TDryBulSum=TDryBulSum,
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,

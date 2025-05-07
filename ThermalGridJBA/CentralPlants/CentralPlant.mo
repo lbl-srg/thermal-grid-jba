@@ -93,6 +93,12 @@ model CentralPlant "Central plant"
 //   parameter Real THeaSet(unit="K")=TLooMax
 //     "Heat pump tracking temperature setpoint in heating mode"
 //     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=295.15
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K", displayUnit="degC")
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
@@ -249,6 +255,7 @@ model CentralPlant "Central plant"
     final TApp=TApp,
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
+    final TDryBulSum=TDryBulSum,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,

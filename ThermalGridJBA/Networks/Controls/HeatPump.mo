@@ -26,6 +26,11 @@ block HeatPump
     final unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=295.15
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield";
 //   parameter Real TPlaCooSet(
 //     final quantity="ThermodynamicTemperature",
 //     final unit="K",
@@ -122,42 +127,49 @@ block HeatPump
     "Season indicator. 1-Winter; 2-Spring; 3-Summer; 4-Fall"
     annotation (Placement(transformation(extent={{-460,370},{-420,410}}),
         iconTransformation(extent={{-140,50},{-100,90}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")
+    "Outdoor dry bulb temperature"
+    annotation (Placement(transformation(extent={{-460,250},{-420,290}}),
+        iconTransformation(extent={{-140,30},{-100,70}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TPlaIn(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Temperature of the water into the central plant"
     annotation (Placement(transformation(extent={{-460,130},{-420,170}}),
-        iconTransformation(extent={{-140,30},{-100,70}})));
+        iconTransformation(extent={{-140,10},{-100,50}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TActPlaCooSet(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Active plant cooling setpoint"
     annotation (Placement(transformation(extent={{-460,40},{-420,80}}),
-        iconTransformation(extent={{-140,10},{-100,50}})));
+        iconTransformation(extent={{-140,-10},{-100,30}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaPumIn(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Temperature of the water into the heat pump"
     annotation (Placement(transformation(extent={{-460,-10},{-420,30}}),
-        iconTransformation(extent={{-140,-10},{-100,30}})));
+        iconTransformation(extent={{-140,-30},{-100,10}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaPumOut(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Temperature of the water out of the heat pump"
     annotation (Placement(transformation(extent={{-460,-40},{-420,0}}),
-        iconTransformation(extent={{-140,-30},{-100,10}})));
+        iconTransformation(extent={{-140,-50},{-100,-10}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput mPla_flow(
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Plant mass flow rate"
     annotation (Placement(transformation(extent={{-460,-70},{-420,-30}}),
-        iconTransformation(extent={{-140,-60},{-100,-20}})));
+        iconTransformation(extent={{-140,-70},{-100,-30}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput mHeaPum_flow(
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Heat pump mass flow rate"
     annotation (Placement(transformation(extent={{-460,-100},{-420,-60}}),
-        iconTransformation(extent={{-140,-80},{-100,-40}})));
+        iconTransformation(extent={{-140,-90},{-100,-50}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TGlyIn(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -221,28 +233,26 @@ block HeatPump
     "High plant load"
     annotation (Placement(transformation(extent={{-340,530},{-320,550}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant spr(final k=2) "Spring"
-    annotation (Placement(transformation(extent={{-260,530},{-240,550}})));
+    annotation (Placement(transformation(extent={{-280,530},{-260,550}})));
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant fal(final k=4) "Fall"
-    annotation (Placement(transformation(extent={{-260,490},{-240,510}})));
+    annotation (Placement(transformation(extent={{-280,490},{-260,510}})));
   Buildings.Controls.OBC.CDL.Integers.Equal higEleRat "High electricity rate"
     annotation (Placement(transformation(extent={{-360,460},{-340,480}})));
   Buildings.Controls.OBC.CDL.Integers.Equal higPlaLoa "High plant load"
     annotation (Placement(transformation(extent={{-300,460},{-280,480}})));
   Buildings.Controls.OBC.CDL.Integers.Equal inSpr "In Spring"
-    annotation (Placement(transformation(extent={{-180,430},{-160,450}})));
+    annotation (Placement(transformation(extent={{-220,430},{-200,450}})));
   Buildings.Controls.OBC.CDL.Integers.Equal inFal "In Fall"
-    annotation (Placement(transformation(extent={{-180,400},{-160,420}})));
+    annotation (Placement(transformation(extent={{-220,400},{-200,420}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant heaSet(
     y(unit="K", displayUnit="degC"),
-    final k=TPlaHeaSet)
-    "Plant heating setpoint"
+    final k=TPlaHeaSet) "Plant heating setpoint"
     annotation (Placement(transformation(extent={{-400,90},{-380,110}})));
   Buildings.Controls.OBC.CDL.Reals.Average aveSet
     "Average plant setpoint temperature"
     annotation (Placement(transformation(extent={{-360,70},{-340,90}})));
   Buildings.Controls.OBC.CDL.Reals.Less heaMod(
-    final h=THys)
-    "Heat pump should be in heating mode"
+    final h=THys) "Heat pump should be in heating mode"
     annotation (Placement(transformation(extent={{-320,140},{-300,160}})));
   Buildings.Controls.OBC.CDL.Reals.Switch plaSet "Plant setpoint"
     annotation (Placement(transformation(extent={{-280,40},{-260,60}})));
@@ -327,9 +337,9 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Logical.Not norRat "Normal electricity rate"
     annotation (Placement(transformation(extent={{-300,360},{-280,380}})));
   Buildings.Controls.OBC.CDL.Logical.And norRatSpr "Normal rate in Spring"
-    annotation (Placement(transformation(extent={{-120,360},{-100,380}})));
+    annotation (Placement(transformation(extent={{-160,380},{-140,400}})));
   Buildings.Controls.OBC.CDL.Logical.And norRatFal "Normal rate in Fall"
-    annotation (Placement(transformation(extent={{-120,320},{-100,340}})));
+    annotation (Placement(transformation(extent={{-140,320},{-120,340}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desLooMin(
     y(unit="K", displayUnit="degC"),
     final k=TLooMin)
@@ -353,7 +363,7 @@ block HeatPump
     "4 degree higher than the inlet temperature"
     annotation (Placement(transformation(extent={{-180,160},{-160,180}})));
   Buildings.Controls.OBC.CDL.Logical.Or enaHeaPumForBor
-    "Enable borefield for borefields"
+    "Enable heat pump for borefields"
     annotation (Placement(transformation(extent={{-40,360},{-20,380}})));
   Buildings.Controls.OBC.CDL.Reals.Switch swi3
     "Heat pump leaving water temperature when the heat pump is used for charging borefields"
@@ -472,7 +482,6 @@ block HeatPump
     annotation (Placement(transformation(extent={{40,-180},{60,-160}})));
   Buildings.Controls.OBC.CDL.Logical.Not pasMinOff "Passed minimum off time"
     annotation (Placement(transformation(extent={{-20,-180},{0,-160}})));
-
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter mSetHPGly_flow(final k=
         mHeaPumGly_flow_nominal/mWat_flow_nominal)
     "Set point for heat pump glycol pump mass flow rate"
@@ -498,12 +507,29 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Reals.Switch higLoaModFlo2
     "Mass flow rate setpoint if the heat pump is enabeld due to the high load"
     annotation (Placement(transformation(extent={{360,-490},{380,-470}})));
-
   Buildings.Controls.OBC.CDL.Reals.Limiter lim(
-    uMax=273.15 + 20,
-    uMin=273.15 + 5,
-    y(unit="K", displayUnit="degC"))
+    uMax=TLooMax,
+    uMin=TLooMin,
+    y(unit="K", displayUnit="degC")) "Limit the setpoint"
     annotation (Placement(transformation(extent={{-130,20},{-110,40}})));
+  Buildings.Controls.OBC.CDL.Integers.Sources.Constant sum(final k=3) "Summer"
+    annotation (Placement(transformation(extent={{-400,310},{-380,330}})));
+  Buildings.Controls.OBC.CDL.Reals.Less sumChaBor(final h=THys)
+    "Charge borefield in summer"
+    annotation (Placement(transformation(extent={{-360,260},{-340,280}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant sumChaBorTem(y(unit="K",
+        displayUnit="degC"), final k=TDryBulSum)
+    "Threshold of the dry bulb temperaure in Summer below which starts charging borefield"
+    annotation (Placement(transformation(extent={{-400,230},{-380,250}})));
+  Buildings.Controls.OBC.CDL.Logical.And cooSum "Cool summer"
+    annotation (Placement(transformation(extent={{-320,310},{-300,330}})));
+  Buildings.Controls.OBC.CDL.Integers.Equal inSum "In summer"
+    annotation (Placement(transformation(extent={{-360,310},{-340,330}})));
+  Buildings.Controls.OBC.CDL.Logical.And cooSumNorRat
+    "Cool summer in normal rate hours"
+    annotation (Placement(transformation(extent={{-220,330},{-200,350}})));
+  Buildings.Controls.OBC.CDL.Logical.Or cooBor "Cool down borefield"
+    annotation (Placement(transformation(extent={{-120,360},{-100,380}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-440,470},{-362,470}}, color={255,127,0}));
@@ -513,14 +539,14 @@ equation
           {-310,470},{-302,470}}, color={255,127,0}));
   connect(uSt, higPlaLoa.u2) annotation (Line(points={{-440,430},{-310,430},{-310,
           462},{-302,462}},      color={255,127,0}));
-  connect(spr.y, inSpr.u1) annotation (Line(points={{-238,540},{-220,540},{-220,
-          440},{-182,440}}, color={255,127,0}));
-  connect(fal.y, inFal.u1) annotation (Line(points={{-238,500},{-230,500},{-230,
-          410},{-182,410}}, color={255,127,0}));
+  connect(spr.y, inSpr.u1) annotation (Line(points={{-258,540},{-240,540},{-240,
+          440},{-222,440}}, color={255,127,0}));
+  connect(fal.y, inFal.u1) annotation (Line(points={{-258,500},{-230,500},{-230,
+          410},{-222,410}}, color={255,127,0}));
   connect(uSea, inSpr.u2) annotation (Line(points={{-440,390},{-240,390},{-240,432},
-          {-182,432}},      color={255,127,0}));
+          {-222,432}},      color={255,127,0}));
   connect(uSea, inFal.u2) annotation (Line(points={{-440,390},{-240,390},{-240,402},
-          {-182,402}},      color={255,127,0}));
+          {-222,402}},      color={255,127,0}));
   connect(heaSet.y, aveSet.u1) annotation (Line(points={{-378,100},{-370,100},{-370,
           86},{-362,86}},        color={0,0,127}));
   connect(TPlaIn, heaMod.u1) annotation (Line(points={{-440,150},{-322,150}},
@@ -573,14 +599,14 @@ equation
           {-240,-60},{-240,-130},{-222,-130}},  color={0,0,127}));
   connect(higEleRat.y, norRat.u) annotation (Line(points={{-338,470},{-320,470},
           {-320,370},{-302,370}}, color={255,0,255}));
-  connect(norRat.y, norRatSpr.u2) annotation (Line(points={{-278,370},{-180,370},
-          {-180,362},{-122,362}},color={255,0,255}));
-  connect(inSpr.y, norRatSpr.u1) annotation (Line(points={{-158,440},{-140,440},
-          {-140,370},{-122,370}},color={255,0,255}));
-  connect(norRat.y, norRatFal.u2) annotation (Line(points={{-278,370},{-180,370},
-          {-180,322},{-122,322}},color={255,0,255}));
-  connect(inFal.y, norRatFal.u1) annotation (Line(points={{-158,410},{-150,410},
-          {-150,330},{-122,330}},color={255,0,255}));
+  connect(norRat.y, norRatSpr.u2) annotation (Line(points={{-278,370},{-240,370},
+          {-240,382},{-162,382}},color={255,0,255}));
+  connect(inSpr.y, norRatSpr.u1) annotation (Line(points={{-198,440},{-180,440},
+          {-180,390},{-162,390}},color={255,0,255}));
+  connect(norRat.y, norRatFal.u2) annotation (Line(points={{-278,370},{-240,370},
+          {-240,322},{-142,322}},color={255,0,255}));
+  connect(inFal.y, norRatFal.u1) annotation (Line(points={{-198,410},{-190,410},
+          {-190,330},{-142,330}},color={255,0,255}));
   connect(THeaPumIn, addPar.u) annotation (Line(points={{-440,10},{-200,10},{-200,
           250},{-182,250}}, color={0,0,127}));
   connect(addPar.y, max1.u2) annotation (Line(points={{-158,250},{-140,250},{-140,
@@ -593,12 +619,9 @@ equation
           184},{-122,184}},color={0,0,127}));
   connect(THeaPumIn, addPar1.u) annotation (Line(points={{-440,10},{-200,10},{-200,
           170},{-182,170}},      color={0,0,127}));
-  connect(norRatSpr.y, enaHeaPumForBor.u1)
-    annotation (Line(points={{-98,370},{-42,370}},color={255,0,255}));
-  connect(norRatFal.y, enaHeaPumForBor.u2) annotation (Line(points={{-98,330},{-60,
-          330},{-60,362},{-42,362}},color={255,0,255}));
-  connect(norRatSpr.y, swi3.u2) annotation (Line(points={{-98,370},{-70,370},{-70,
-          230},{-42,230}},color={255,0,255}));
+  connect(norRatFal.y, enaHeaPumForBor.u2) annotation (Line(points={{-118,330},{
+          -60,330},{-60,362},{-42,362}},
+                                    color={255,0,255}));
   connect(max1.y, swi3.u1) annotation (Line(points={{-98,270},{-80,270},{-80,238},
           {-42,238}},color={0,0,127}));
   connect(min1.y, swi3.u3) annotation (Line(points={{-98,190},{-80,190},{-80,222},
@@ -708,7 +731,7 @@ equation
   connect(higHeaLoa.y, inHeaMod.u2) annotation (Line(points={{-158,90},{-140,90},
           {-140,102},{18,102}},
                               color={255,0,255}));
-  connect(norRatFal.y, inHeaMod.u1) annotation (Line(points={{-98,330},{-60,330},
+  connect(norRatFal.y, inHeaMod.u1) annotation (Line(points={{-118,330},{-60,330},
           {-60,110},{18,110}},
                              color={255,0,255}));
   connect(inHeaMod.y, heaPumMod.u3) annotation (Line(points={{42,110},{50,110},{
@@ -819,6 +842,30 @@ equation
     annotation (Line(points={{-138,30},{-132,30}}, color={0,0,127}));
   connect(lim.y, swi9.u1) annotation (Line(points={{-108,30},{-106,30},{-106,18},
           {-102,18}}, color={0,0,127}));
+  connect(sumChaBorTem.y, sumChaBor.u2) annotation (Line(points={{-378,240},{-370,
+          240},{-370,262},{-362,262}}, color={0,0,127}));
+  connect(TDryBul, sumChaBor.u1)
+    annotation (Line(points={{-440,270},{-362,270}}, color={0,0,127}));
+  connect(sum.y, inSum.u1)
+    annotation (Line(points={{-378,320},{-362,320}}, color={255,127,0}));
+  connect(inSum.y, cooSum.u1)
+    annotation (Line(points={{-338,320},{-322,320}}, color={255,0,255}));
+  connect(uSea, inSum.u2) annotation (Line(points={{-440,390},{-370,390},{-370,312},
+          {-362,312}}, color={255,127,0}));
+  connect(sumChaBor.y, cooSum.u2) annotation (Line(points={{-338,270},{-330,270},
+          {-330,312},{-322,312}}, color={255,0,255}));
+  connect(cooSum.y, cooSumNorRat.u2) annotation (Line(points={{-298,320},{-280,320},
+          {-280,332},{-222,332}}, color={255,0,255}));
+  connect(norRat.y, cooSumNorRat.u1) annotation (Line(points={{-278,370},{-240,370},
+          {-240,340},{-222,340}}, color={255,0,255}));
+  connect(norRatSpr.y, cooBor.u1) annotation (Line(points={{-138,390},{-130,390},
+          {-130,370},{-122,370}}, color={255,0,255}));
+  connect(cooSumNorRat.y, cooBor.u2) annotation (Line(points={{-198,340},{-180,340},
+          {-180,362},{-122,362}}, color={255,0,255}));
+  connect(cooBor.y, enaHeaPumForBor.u1)
+    annotation (Line(points={{-98,370},{-42,370}}, color={255,0,255}));
+  connect(cooBor.y, swi3.u2) annotation (Line(points={{-98,370},{-70,370},{-70,230},
+          {-42,230}}, color={255,0,255}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(

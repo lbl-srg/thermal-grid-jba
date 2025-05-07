@@ -131,6 +131,12 @@ model Generations
 //   parameter Real THeaSet(unit="K")=TLooMax
 //     "Heat pump tracking temperature setpoint in heating mode"
 //     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=295.15
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K")
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
@@ -759,6 +765,7 @@ model Generations
     final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal,
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,
+    final TDryBulSum=TDryBulSum,
     final TPlaHeaSet=TPlaHeaSet,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
@@ -1114,9 +1121,9 @@ equation
           220},{-520,200},{-260,200},{-260,228},{-242,228}},
                                                         color={0,0,127}));
   connect(senTemGenEnt.T, heaPumCon.TPlaIn) annotation (Line(points={{-480,-149},
-          {-480,204},{84,204},{84,233},{118,233}},      color={0,0,127}));
+          {-480,204},{84,204},{84,231},{118,231}},      color={0,0,127}));
   connect(senTemHeaPumLea.T, heaPumCon.THeaPumOut) annotation (Line(points={{381,
-          -100},{428,-100},{428,186},{92,186},{92,227},{118,227}},        color
+          -100},{428,-100},{428,186},{92,186},{92,225},{118,225}},        color
         ={0,0,127}));
   connect(senTemGenEnt.port_b, senMasFloPla.port_a) annotation (Line(
       points={{-470,-160},{-440,-160}},
@@ -1131,9 +1138,9 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(senMasFloPla.m_flow, heaPumCon.mPla_flow) annotation (Line(points={{-430,
-          -149},{-430,170},{96,170},{96,224},{118,224}},      color={0,0,127}));
+          -149},{-430,170},{96,170},{96,223},{118,223}},      color={0,0,127}));
   connect(senMasFloHeaPum.m_flow, heaPumCon.mHeaPum_flow) annotation (Line(
-        points={{299,-102},{274,-102},{274,176},{100,176},{100,222},{118,222}},
+        points={{299,-102},{274,-102},{274,176},{100,176},{100,221},{118,221}},
         color={0,0,127}));
   connect(senTemHeaPumGlyIn.T, heaPumCon.TGlyIn) annotation (Line(points={{381,40},
           {412,40},{412,170},{104,170},{104,219},{118,219}},        color={0,0,
@@ -1205,7 +1212,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(senTemHeaPumEnt.T, heaPumCon.THeaPumIn) annotation (Line(points={{299,-70},
-          {290,-70},{290,-56},{420,-56},{420,182},{88,182},{88,229},{118,229}},
+          {290,-70},{290,-56},{420,-56},{420,182},{88,182},{88,227},{118,227}},
                                                                       color={0,
           0,127}));
   connect(pumBorFiePer.port_b, senTemBorPerSup.port_a) annotation (Line(
@@ -1281,8 +1288,10 @@ equation
         points={{30,102},{30,120},{74,120},{74,230},{62,230}}, color={0,0,127}));
   connect(fanDryCoo.P, PFanDryCoo) annotation (Line(points={{19,99},{12,99},{12,
           244},{560,244}}, color={0,0,127}));
-  connect(ind.TActPlaCooSet, heaPumCon.TActPlaCooSet) annotation (Line(points={{
-          -498,265},{94,265},{94,231},{118,231}}, color={0,0,127}));
+  connect(ind.TActPlaCooSet, heaPumCon.TActPlaCooSet) annotation (Line(points={{-498,
+          265},{94,265},{94,229},{118,229}},      color={0,0,127}));
+  connect(TDryBul, heaPumCon.TDryBul) annotation (Line(points={{-560,190},{80,190},
+          {80,233},{118,233}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
