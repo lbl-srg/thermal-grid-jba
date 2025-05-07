@@ -21,6 +21,8 @@ import numpy as np
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
+mat_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.mat")
+csv_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.csv")
 
 PRINT_RESULTS = False
 WRITE_TO_XLSX = True
@@ -41,8 +43,6 @@ if WRITE_REMARKS:
                                      ['Weather scenario', 'fTMY'],
                                      ['Result file at commit', '343b6a5a47399dbee9441f1aaf96fb83d38b8aa6'],
                                      ['This file generated at commit', get_commit_hash()]]))
-
-
 
 #%% Generate variable list
 def generate_indexed_var_list(pre_index, holder, i):
@@ -91,9 +91,6 @@ def generate_dymola_command(var_list, mat_file_path, csv_file_path):
         
     return s    
     # __ref = r'DataFiles.convertMATtoCSV("/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/DetailedPlantFiveHubs.mat", {"bui[1].ets.chi.chi.COP","bui[1].ets.chi.uCoo"}, "/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/trimmed.csv");'
-
-mat_file_name = "/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/DetailedPlantFiveHubs.mat"
-csv_file_name = "/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/DetailedPlantFiveHubs.csv"
 
 dymola_command = generate_dymola_command(var_list,
                                          mat_file_name,
