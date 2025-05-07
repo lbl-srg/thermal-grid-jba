@@ -107,7 +107,8 @@ result_full['datetime'] = pd.to_datetime(result_full['Time'], unit='s', origin='
 
 if WRITE_TO_XLSX:
     w = pd.ExcelWriter(PATH_XLSX, engine='xlsxwriter')
-    
+
+all_sums = {}
 for i in range(1,nBui+1):
 #for i in [1]:
     # initialise list
@@ -146,6 +147,11 @@ for i in range(1,nBui+1):
     for (month, mode), group in grouped:
         QCon_sum = group['QCon'].sum()
         PChi_sum = group['PChi'].sum()
+        
+        if (month, mode) not in all_sums:
+            all_sums[(month, mode)] = {'QCon': 0, 'PChi': 0}
+        all_sums[(month, mode)]['QCon'] += QCon_sum
+        all_sums[(month, mode)]['PChi'] += PChi_sum
         
         if PChi_sum != 0:
             COP_mon = QCon_sum / PChi_sum
@@ -208,7 +214,40 @@ for i in range(1,nBui+1):
         cop_mon_df_pivot.to_excel(w, sheet_name=f'{sheet_name}_monthly', index=True)
         cop_ann_df.to_excel(w, sheet_name=f'{sheet_name}_annual', index=False)
 
+# Compute all-building COP for each month and mode
+cop_all_results = []
+for (month, mode), sums in all_sums.items():
+    QCon_all_sum = sums['QCon']
+    PChi_all_sum = sums['PChi']
+    
+    if PChi_all_sum != 0:
+        COP_all = QCon_all_sum / PChi_all_sum
+    else:
+        COP_all = np.nan
+    
+    cop_all_results.append((month, mode, COP_all))
+
+column_names = ['COP_h']
+
+cop_all_df = pd.DataFrame(cop_all_results, columns=['month', 'mode'] + column_names)
+
+# Convert the 'month' column to abbreviated month names
+cop_all_df['month'] = cop_all_df['month'].dt.strftime('%b')
+
+# Pivot the DataFrame
+cop_all_df_pivot = cop_all_df.pivot_table(
+    index='month',
+    columns='mode',
+    values=column_names,
+    aggfunc='first'
+).swaplevel(axis=1).sort_index(axis=1)
+
+if PRINT_RESULTS:
+    print("COP across all buildings:")
+    print(cop_all_df_pivot)
+
 if WRITE_TO_XLSX:
+    cop_all_df_pivot.to_excel(w, sheet_name='All buildings', index=True)
     if WRITE_REMARKS:
         remarks.to_excel(w, sheet_name="remarks", index=False)
     w.close()
