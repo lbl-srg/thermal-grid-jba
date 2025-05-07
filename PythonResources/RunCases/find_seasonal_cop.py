@@ -27,6 +27,23 @@ WRITE_TO_XLSX = True
 PATH_XLSX = os.path.join(CWD, "seasonal_cop.xlsx")
 nBui = 5
 
+# remarks to be written to the output file
+WRITE_REMARKS = True
+
+def get_commit_hash():
+    import git
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.object.hexsha
+    return sha
+
+if WRITE_REMARKS:
+    remarks = pd.DataFrame(np.array([['Model', 'ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs'],
+                                     ['Weather scenario', 'fTMY'],
+                                     ['Result file at commit', '343b6a5a47399dbee9441f1aaf96fb83d38b8aa6'],
+                                     ['This file generated at commit', get_commit_hash()]]))
+
+
+
 #%% Generate variable list
 def generate_indexed_var_list(pre_index, holder, i):
     """ Replaces the `holder` string in `pre_index` with index `i`.
@@ -189,11 +206,12 @@ for i in range(1,nBui+1):
         print(cop_ann_df)
     
     if WRITE_TO_XLSX:
-        #sheet_name = cas.split(os.sep)[-1]
         sheet_name = f'ETS_{i}'
         cop_mon_df_pivot.to_excel(w, sheet_name=f'{sheet_name}_monthly', index=True)
         cop_ann_df.to_excel(w, sheet_name=f'{sheet_name}_annual', index=False)
 
 if WRITE_TO_XLSX:
+    if WRITE_REMARKS:
+        remarks.to_excel(w, sheet_name="remarks", index=False)
     w.close()
     print(f"Results wrote to {PATH_XLSX}.")
