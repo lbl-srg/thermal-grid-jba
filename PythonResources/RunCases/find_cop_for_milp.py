@@ -159,7 +159,7 @@ for i in range(1,nBui+1):
         
         cop_mon_results.append((month, mode, COP_mon, TEvaEnt_avg, TEvaLvg_avg, TConEnt_avg, TConLvg_avg, duration))
     
-    column_names = ['COP_mon', 'TEvaEnt_avg|C', 'TEvaLvg_avg|C', 'TConEnt_avg|C', 'TConLvg_avg|C', 'Duration|h']
+    column_names = ['COP_h', 'TEvaEnt_avg|C', 'TEvaLvg_avg|C', 'TConEnt_avg|C', 'TConLvg_avg|C', 'Duration|h']
     
     cop_mon_df = pd.DataFrame(cop_mon_results, columns=['month', 'mode'] + column_names)
     
