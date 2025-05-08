@@ -1,6 +1,7 @@
 #1
 double tab1(8760,2)
-#Capacity:9500000.000000002kWh
+# Capacity = 9500000.000000002 kWh
+# SOC_start = 0.6362
 # Date
 # SOC
 0,0.6362987985107218
