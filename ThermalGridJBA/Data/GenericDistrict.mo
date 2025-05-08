@@ -29,8 +29,8 @@ record GenericDistrict "District network design parameters"
         string="#Peak space cooling load",
         filNam=Modelica.Utilities.Files.loadResource(filNamCom)));
 
-  parameter Modelica.Units.SI.HeatFlowRate QPlaPeaHea_flow(
-    min=Modelica.Constants.eps) = hexSiz.QHea_flow_nominal
+  parameter Modelica.Units.SI.HeatFlowRate QPlaPeaHea_flow(min=Modelica.Constants.eps)
+    =hexSiz.QHea_flow_nominal
     "Peak heating load at all the ETS heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Modelica.Units.SI.HeatFlowRate QPlaPeaCoo_flow = hexSiz.QCoo_flow_nominal
@@ -69,12 +69,12 @@ record GenericDistrict "District network design parameters"
   parameter Real staDowDel(unit="s")=3600
     "Minimum stage down delay, to avoid quickly staging down"
    annotation (Dialog(tab="Central plant"));
-  parameter Real dTEqu_nominal(unit="K") = 4
+  parameter Real dTEqu_nominal(unit="K")=4
     "Temperature difference for sizing heat pump and the operational condition for dry cooler"
     annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TSoi_start(displayUnit="degC") = 17.15+273.15
+  parameter Modelica.Units.SI.Temperature TSoi_start(displayUnit="degC")=290.3
     "Initial temperature of the soil of borefield";
-  parameter Modelica.Units.SI.TemperatureDifference dTOveSho(min=0) = 2
+  parameter Modelica.Units.SI.TemperatureDifference dTOveSho(min=0)=2
     "Temperature difference to allow for control over or undershoot. dTOveSho >= 0"
    annotation (Dialog(tab="Central plant"));
   parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal*(QPlaPeaHea_flow/abs(QPlaPeaCoo_flow))+dTOveSho
@@ -86,13 +86,12 @@ record GenericDistrict "District network design parameters"
   parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-dTLoo_nominal-dTOveSho
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaSumCooSet=TLooMax-dTLoo_nominal-2*dTOveSho
+  parameter Modelica.Units.SI.Temperature TPlaSumCooSet=TLooMax - dTLoo_nominal
     "Design plant summer cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
   parameter Real TDryBulSum(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")=295.15
+    unit="K",
+    displayUnit="degC")=297.15
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
     annotation (Dialog(tab="Central plant"));
 //   parameter Real mPlaWat_flow_nominal(unit="kg/s")=sum(mCon_flow_nominal)
@@ -108,7 +107,8 @@ record GenericDistrict "District network design parameters"
   parameter Real dpPlaHex_nominal(unit="Pa")=10000
     "Pressure difference across heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
-  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*cpWatLiq/cpGly
+  parameter Real mPlaHexGly_flow_nominal(unit="kg/s")=mPlaWat_flow_nominal*
+    cpWatLiq/cpGly
     "Nominal glycol mass flow rate for heat exchanger"
     annotation (Dialog(tab="Central plant", group="Heat exchanger"));
   // Central plant: dry coolers
@@ -126,15 +126,17 @@ record GenericDistrict "District network design parameters"
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Central plant", group="Dry cooler"));
   // Central plant: heat pumps
-  parameter Real mPlaHeaPumWat_flow_nominal(unit="kg/s")=
-    max(abs(QPlaHeaPumCoo_flow_nominal), QPlaHeaPumHea_flow_nominal)/(cpWatLiq*dTLoo_nominal)
+  parameter Real mPlaHeaPumWat_flow_nominal(unit="kg/s")=max(abs(
+    QPlaHeaPumCoo_flow_nominal), QPlaHeaPumHea_flow_nominal)/(cpWatLiq*
+    dTLoo_nominal)
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=mPlaHeaPumWat_flow_nominal*0.2/
-    nGen
+  parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=mPlaHeaPumWat_flow_nominal
+    *0.2/nGen
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mPlaHeaPumGly_flow_nominal(unit="kg/s") = mPlaHeaPumWat_flow_nominal*cpWatLiq/cpGly
+  parameter Real mPlaHeaPumGly_flow_nominal(unit="kg/s")=
+    mPlaHeaPumWat_flow_nominal*cpWatLiq/cpGly
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
@@ -157,7 +159,8 @@ record GenericDistrict "District network design parameters"
 //     "Nominal cooling capacity"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // Downsize the heat pump capacity by considering the heating supply from borefield
-  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=QPlaPeaCoo_flow + 0.75*10e6
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=QPlaPeaCoo_flow + 0.75*
+    10e6
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
@@ -175,10 +178,10 @@ record GenericDistrict "District network design parameters"
   parameter Real TPlaEvaCoo_nominal(unit="K")=42 + 273.15
     "Nominal temperature used to size the heat pump in cooling mode (hot side maximum temperature)"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaConInMin(unit="K")=TLooMax -dTEqu_nominal - dTLoo_nominal
+  parameter Real TPlaConInMin(unit="K")=TLooMax - dTEqu_nominal - dTLoo_nominal
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real TPlaEvaInMax(unit="K")=TLooMin +dTEqu_nominal + dTLoo_nominal
+  parameter Real TPlaEvaInMax(unit="K")=TLooMin + dTEqu_nominal + dTLoo_nominal
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real minPlaComSpe(unit="1")=0.2/nGen
