@@ -523,15 +523,8 @@ model DetailedPlantFiveHubs
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
     "Fan electric power consumption of each building"
     annotation (Placement(transformation(extent={{120,270},{140,290}})));
-  Modelica.Blocks.Sources.CombiTimeTable borMil(
-    tableOnFile=true,
-    tableName="tab1",
-    fileName=ModelicaServices.ExternalReferences.loadResource(
-        "modelica://ThermalGridJBA/Resources/Data/BorefieldSOC/borefield_soc_solution3.mos"),
-    columns={2}) "Reader for the borefield SOC (y[1] is SOC). 
-    The input file is from the MILP optimization (Solution 3 - TEN + PV + Battery). 
-    SOC = 1 when the temperature of the borefield is the highest, 0 when the temperature in the borefield is the lowest"
-    annotation (Placement(transformation(extent={{-400,-300},{-380,-280}})));
+  CentralPlants.BorefieldMILP borMil
+    annotation (Placement(transformation(extent={{340,-280},{360,-260}})));
 equation
  for i in 1:nBui loop
    connect(weaDat.weaBus, bui[i].weaBus) annotation (Line(
