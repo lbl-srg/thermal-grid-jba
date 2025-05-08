@@ -10,6 +10,8 @@
 #############################################################
 import os
 BRANCH="main"
+SHOW_DYMOLA_GUI = False
+KEEP_DYMOLA_OPEN = False
 ONLY_SHORT_TIME=False
 FROM_GIT_HUB = False
 CASE_LIST = 'detailedPlantFiveHubs'
@@ -50,8 +52,6 @@ if not KEEP_MAT_FILES:
     print("="*10 + "!"*10 + "="*10)
     print("Result mat files will be deleted because KEEP_MAT_FILES = False")
     print("="*10 + "!"*10 + "="*10)
-SHOW_DYMOLA_GUI = False
-KEEP_DYMOLA_OPEN = False
 
 CWD = os.getcwd()
 package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
