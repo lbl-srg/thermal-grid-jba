@@ -1171,8 +1171,8 @@ equation
           127}));
   connect(borCon.yPumSec, pumCenPlaSec.m_flow_in) annotation (Line(points={{-218,
           221},{-204,221},{-204,-136},{120,-136},{120,-148}}, color={0,0,127}));
-  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{142,238},{292,
-          238},{292,-17.9},{328.9,-17.9}},
+  connect(heaPumCon.y1Mod, heaPum.hea) annotation (Line(points={{142,237},{292,
+          237},{292,-17.9},{328.9,-17.9}},
                                       color={255,0,255}));
   connect(heaPumCon.yComSet, heaPum.ySet) annotation (Line(points={{142,235},{
           286,235},{286,-21.9},{328.9,-21.9}},
@@ -1292,6 +1292,9 @@ equation
           265},{94,265},{94,229},{118,229}},      color={0,0,127}));
   connect(TDryBul, heaPumCon.TDryBul) annotation (Line(points={{-560,190},{80,190},
           {80,233},{118,233}}, color={0,0,127}));
+  connect(heaPumCon.y1SumCooBor, borCon.u1SumCooBor) annotation (Line(points={{
+          142,239},{166,239},{166,208},{-264,208},{-264,231},{-242,231}}, color
+        ={255,0,255}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

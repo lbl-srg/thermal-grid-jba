@@ -184,10 +184,14 @@ block HeatPump
     "District pump norminal speed"
     annotation (Placement(transformation(extent={{-460,-380},{-420,-340}}),
         iconTransformation(extent={{-140,-130},{-100,-90}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1SumCooBor
+    "=true for cooling down borefield in summer"
+    annotation (Placement(transformation(extent={{420,320},{460,360}}),
+        iconTransformation(extent={{100,90},{140,130}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1Mod
     "=true for heating, =false for cooling"
     annotation (Placement(transformation(extent={{420,250},{460,290}}),
-        iconTransformation(extent={{100,80},{140,120}})));
+        iconTransformation(extent={{100,70},{140,110}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yComSet(
     final min=0,
     final max=1,
@@ -339,7 +343,7 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Logical.And norRatSpr "Normal rate in Spring"
     annotation (Placement(transformation(extent={{-160,380},{-140,400}})));
   Buildings.Controls.OBC.CDL.Logical.And norRatFal "Normal rate in Fall"
-    annotation (Placement(transformation(extent={{-140,320},{-120,340}})));
+    annotation (Placement(transformation(extent={{-140,310},{-120,330}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desLooMin(
     y(unit="K", displayUnit="degC"),
     final k=TLooMin)
@@ -530,6 +534,7 @@ block HeatPump
     annotation (Placement(transformation(extent={{-220,330},{-200,350}})));
   Buildings.Controls.OBC.CDL.Logical.Or cooBor "Cool down borefield"
     annotation (Placement(transformation(extent={{-120,360},{-100,380}})));
+
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-440,470},{-362,470}}, color={255,127,0}));
@@ -604,9 +609,9 @@ equation
   connect(inSpr.y, norRatSpr.u1) annotation (Line(points={{-198,440},{-180,440},
           {-180,390},{-162,390}},color={255,0,255}));
   connect(norRat.y, norRatFal.u2) annotation (Line(points={{-278,370},{-240,370},
-          {-240,322},{-142,322}},color={255,0,255}));
+          {-240,312},{-142,312}},color={255,0,255}));
   connect(inFal.y, norRatFal.u1) annotation (Line(points={{-198,410},{-190,410},
-          {-190,330},{-142,330}},color={255,0,255}));
+          {-190,320},{-142,320}},color={255,0,255}));
   connect(THeaPumIn, addPar.u) annotation (Line(points={{-440,10},{-200,10},{-200,
           250},{-182,250}}, color={0,0,127}));
   connect(addPar.y, max1.u2) annotation (Line(points={{-158,250},{-140,250},{-140,
@@ -619,8 +624,8 @@ equation
           184},{-122,184}},color={0,0,127}));
   connect(THeaPumIn, addPar1.u) annotation (Line(points={{-440,10},{-200,10},{-200,
           170},{-182,170}},      color={0,0,127}));
-  connect(norRatFal.y, enaHeaPumForBor.u2) annotation (Line(points={{-118,330},{
-          -60,330},{-60,362},{-42,362}},
+  connect(norRatFal.y, enaHeaPumForBor.u2) annotation (Line(points={{-118,320},{
+          -60,320},{-60,362},{-42,362}},
                                     color={255,0,255}));
   connect(max1.y, swi3.u1) annotation (Line(points={{-98,270},{-80,270},{-80,238},
           {-42,238}},color={0,0,127}));
@@ -731,7 +736,7 @@ equation
   connect(higHeaLoa.y, inHeaMod.u2) annotation (Line(points={{-158,90},{-140,90},
           {-140,102},{18,102}},
                               color={255,0,255}));
-  connect(norRatFal.y, inHeaMod.u1) annotation (Line(points={{-118,330},{-60,330},
+  connect(norRatFal.y, inHeaMod.u1) annotation (Line(points={{-118,320},{-60,320},
           {-60,110},{18,110}},
                              color={255,0,255}));
   connect(inHeaMod.y, heaPumMod.u3) annotation (Line(points={{42,110},{50,110},{
@@ -866,6 +871,8 @@ equation
     annotation (Line(points={{-98,370},{-42,370}}, color={255,0,255}));
   connect(cooBor.y, swi3.u2) annotation (Line(points={{-98,370},{-70,370},{-70,230},
           {-42,230}}, color={255,0,255}));
+  connect(cooSumNorRat.y, y1SumCooBor)
+    annotation (Line(points={{-198,340},{440,340}}, color={255,0,255}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(
