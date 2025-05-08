@@ -154,10 +154,10 @@ model Borefield "Borefield model"
     final unit="W")
     "Center heat flow rate" annotation (Placement(transformation(extent={{100,-50},
             {140,-10}}),iconTransformation(extent={{100,-10},{140,30}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput qBor_flow(unit="W/m")
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput qBorSpe_flow(unit="W/m")
     "Heat flow rate per meter of borehole" annotation (Placement(transformation(
-          extent={{100,-20},{140,20}}), iconTransformation(extent={{100,-40},{140,
-            0}})));
+          extent={{100,-20},{140,20}}), iconTransformation(extent={{100,-40},{
+            140,0}})));
 
   Modelica.Blocks.Math.Add sumQPer_flow(
     u1(final unit="W"),
@@ -420,7 +420,7 @@ equation
           -6},{38,-6}}, color={0,0,127}));
   connect(add2.y, perMetHea.u)
     annotation (Line(points={{62,0},{68,0}}, color={0,0,127}));
-  connect(perMetHea.y, qBor_flow)
+  connect(perMetHea.y, qBorSpe_flow)
     annotation (Line(points={{92,0},{120,0}}, color={0,0,127}));
   annotation (defaultComponentName="borFie",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
