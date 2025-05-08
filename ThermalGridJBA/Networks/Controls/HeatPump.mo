@@ -150,7 +150,7 @@ block HeatPump
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Temperature of the water into the heat pump"
-    annotation (Placement(transformation(extent={{-460,-10},{-420,30}}),
+    annotation (Placement(transformation(extent={{-460,-20},{-420,20}}),
         iconTransformation(extent={{-140,-30},{-100,10}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaPumOut(
     final quantity="ThermodynamicTemperature",
@@ -259,7 +259,7 @@ block HeatPump
     final h=THys) "Heat pump should be in heating mode"
     annotation (Placement(transformation(extent={{-320,140},{-300,160}})));
   Buildings.Controls.OBC.CDL.Reals.Switch plaSet "Plant setpoint"
-    annotation (Placement(transformation(extent={{-280,30},{-260,50}})));
+    annotation (Placement(transformation(extent={{-280,20},{-260,40}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant minFloDivZer(final k=
         mWat_flow_min)
     "Minimum flow rate to avoid a division by zero if mass flow measurement is zero"
@@ -269,7 +269,7 @@ block HeatPump
     annotation (Placement(transformation(extent={{-280,-80},{-260,-60}})));
   Buildings.Controls.OBC.CDL.Reals.Subtract dTSetHeaPumIn
     "Temperature difference heat pump set point minus inlet temperature"
-    annotation (Placement(transformation(extent={{-240,20},{-220,40}})));
+    annotation (Placement(transformation(extent={{-240,10},{-220,30}})));
   Buildings.Controls.OBC.CDL.Reals.Multiply mul "Multiply inputs"
     annotation (Placement(transformation(extent={{-200,-50},{-180,-30}})));
   Buildings.Controls.OBC.CDL.Reals.Add TLeaWatSet(y(displayUnit="degC", unit=
@@ -549,6 +549,11 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Logical.Or cooBor "Cool down borefield"
     annotation (Placement(transformation(extent={{-120,360},{-100,380}})));
 
+  Buildings.Controls.OBC.CDL.Logical.Not notHigLoa "Not high load"
+    annotation (Placement(transformation(extent={{-258,210},{-238,230}})));
+  Buildings.Controls.OBC.CDL.Logical.And cooSumNotHig
+    "Cool summer in normal rate hours and not in high load"
+    annotation (Placement(transformation(extent={{-258,270},{-238,290}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-440,470},{-362,470}}, color={255,127,0}));
@@ -573,22 +578,22 @@ equation
   connect(aveSet.y, heaMod.u2) annotation (Line(points={{-338,80},{-330,80},{
           -330,142},{-322,142}}, color={0,0,127}));
   connect(heaMod.y, plaSet.u2) annotation (Line(points={{-298,150},{-290,150},{
-          -290,40},{-282,40}},   color={255,0,255}));
+          -290,30},{-282,30}},   color={255,0,255}));
   connect(heaSet.y, plaSet.u1) annotation (Line(points={{-378,100},{-300,100},{
-          -300,48},{-282,48}},   color={0,0,127}));
+          -300,38},{-282,38}},   color={0,0,127}));
   connect(mPla_flow, ratFlo.u1) annotation (Line(points={{-440,-50},{-290,-50},
           {-290,-64},{-282,-64}},   color={0,0,127}));
-  connect(plaSet.y, dTSetHeaPumIn.u1) annotation (Line(points={{-258,40},{-250,
-          40},{-250,36},{-242,36}},
+  connect(plaSet.y, dTSetHeaPumIn.u1) annotation (Line(points={{-258,30},{-250,
+          30},{-250,26},{-242,26}},
                                   color={0,0,127}));
-  connect(THeaPumIn, dTSetHeaPumIn.u2) annotation (Line(points={{-440,10},{-250,
-          10},{-250,24},{-242,24}},    color={0,0,127}));
-  connect(dTSetHeaPumIn.y, mul.u1) annotation (Line(points={{-218,30},{-210,30},
+  connect(THeaPumIn, dTSetHeaPumIn.u2) annotation (Line(points={{-440,0},{-250,
+          0},{-250,14},{-242,14}},     color={0,0,127}));
+  connect(dTSetHeaPumIn.y, mul.u1) annotation (Line(points={{-218,20},{-210,20},
           {-210,-34},{-202,-34}}, color={0,0,127}));
   connect(ratFlo.y, mul.u2) annotation (Line(points={{-258,-70},{-210,-70},{
           -210,-46},{-202,-46}},
                             color={0,0,127}));
-  connect(THeaPumIn, TLeaWatSet.u1) annotation (Line(points={{-440,10},{-200,10},
+  connect(THeaPumIn, TLeaWatSet.u1) annotation (Line(points={{-440,0},{-200,0},
           {-200,36},{-162,36}},   color={0,0,127}));
   connect(mul.y, TLeaWatSet.u2) annotation (Line(points={{-178,-40},{-170,-40},
           {-170,24},{-162,24}},   color={0,0,127}));
@@ -626,9 +631,8 @@ equation
           {-240,312},{-142,312}},color={255,0,255}));
   connect(inFal.y, norRatFal.u1) annotation (Line(points={{-198,410},{-190,410},
           {-190,320},{-142,320}},color={255,0,255}));
-  connect(THeaPumIn, addPar.u) annotation (Line(points={{-440,10},{-200,10},{
-          -200,250},{-182,250}},
-                            color={0,0,127}));
+  connect(THeaPumIn, addPar.u) annotation (Line(points={{-440,0},{-200,0},{-200,
+          250},{-182,250}}, color={0,0,127}));
   connect(addPar.y, max1.u2) annotation (Line(points={{-158,250},{-140,250},{
           -140,264},{-122,264}},
                            color={0,0,127}));
@@ -641,7 +645,7 @@ equation
   connect(addPar1.y, min1.u2) annotation (Line(points={{-158,170},{-140,170},{
           -140,184},{-122,184}},
                            color={0,0,127}));
-  connect(THeaPumIn, addPar1.u) annotation (Line(points={{-440,10},{-200,10},{
+  connect(THeaPumIn, addPar1.u) annotation (Line(points={{-440,0},{-200,0},{
           -200,170},{-182,170}}, color={0,0,127}));
   connect(norRatFal.y, enaHeaPumForBor.u2) annotation (Line(points={{-118,320},
           {-60,320},{-60,362},{-42,362}},
@@ -656,8 +660,8 @@ equation
           370},{0,-138},{38,-138}},  color={255,0,255}));
   connect(higPlaLoa.y, enaSta.u1) annotation (Line(points={{-278,470},{20,470},
           {20,-130},{38,-130}}, color={255,0,255}));
-  connect(higPlaLoa.y, swi4.u2) annotation (Line(points={{-278,470},{-250,470},
-          {-250,50},{-42,50}},color={255,0,255}));
+  connect(higPlaLoa.y, swi4.u2) annotation (Line(points={{-278,470},{-270,470},
+          {-270,50},{-42,50}},color={255,0,255}));
   connect(swi3.y, swi5.u1) annotation (Line(points={{-18,230},{10,230},{10,198},
           {38,198}},color={0,0,127}));
   connect(enaHeaPumForBor.y, swi5.u2) annotation (Line(points={{-18,370},{0,370},
@@ -759,14 +763,15 @@ equation
           -58},{318,-58}},                     color={0,0,127}));
   connect(minSpe.y, swi10.u1) annotation (Line(points={{162,230},{210,230},{210,
           -42},{318,-42}}, color={0,0,127}));
-  connect(higPlaLoa.y, heaPumMod.u2) annotation (Line(points={{-278,470},{-250,470},
-          {-250,130},{58,130}},color={255,0,255}));
+  connect(higPlaLoa.y, heaPumMod.u2) annotation (Line(points={{-278,470},{-270,
+          470},{-270,130},{58,130}},
+                               color={255,0,255}));
   connect(heaMod.y, heaPumMod.u1) annotation (Line(points={{-298,150},{40,150},{
           40,138},{58,138}},color={255,0,255}));
   connect(heaMod.y, higHeaLoa.u2) annotation (Line(points={{-298,150},{-290,150},
           {-290,72},{-182,72}}, color={255,0,255}));
-  connect(higPlaLoa.y, higHeaLoa.u1) annotation (Line(points={{-278,470},{-250,
-          470},{-250,80},{-182,80}},
+  connect(higPlaLoa.y, higHeaLoa.u1) annotation (Line(points={{-278,470},{-270,
+          470},{-270,80},{-182,80}},
                                 color={255,0,255}));
   connect(higHeaLoa.y, inHeaMod.u2) annotation (Line(points={{-158,80},{-100,80},
           {-100,102},{-42,102}},
@@ -886,7 +891,7 @@ equation
   connect(TActPlaCooSet, aveSet.u2) annotation (Line(points={{-440,60},{-380,60},
           {-380,74},{-362,74}}, color={0,0,127}));
   connect(TActPlaCooSet, plaSet.u3) annotation (Line(points={{-440,60},{-380,60},
-          {-380,32},{-282,32}}, color={0,0,127}));
+          {-380,22},{-282,22}}, color={0,0,127}));
   connect(TLeaWatSet.y, lim.u)
     annotation (Line(points={{-138,30},{-122,30}}, color={0,0,127}));
   connect(lim.y, swi9.u1) annotation (Line(points={{-98,30},{-90,30},{-90,18},{
@@ -903,8 +908,6 @@ equation
           {-362,312}}, color={255,127,0}));
   connect(sumChaBor.y, cooSum.u2) annotation (Line(points={{-338,270},{-330,270},
           {-330,312},{-322,312}}, color={255,0,255}));
-  connect(cooSum.y, cooSumNorRat.u2) annotation (Line(points={{-298,320},{-280,320},
-          {-280,332},{-222,332}}, color={255,0,255}));
   connect(norRat.y, cooSumNorRat.u1) annotation (Line(points={{-278,370},{-240,
           370},{-240,340},{-222,340}},
                                   color={255,0,255}));
@@ -921,6 +924,15 @@ equation
     annotation (Line(points={{-198,340},{440,340}}, color={255,0,255}));
   connect(edg.y, offHeaPum.u) annotation (Line(points={{-98,-130},{-90,-130},{
           -90,-180},{-82,-180}}, color={255,0,255}));
+  connect(higPlaLoa.y, notHigLoa.u) annotation (Line(points={{-278,470},{-270,
+          470},{-270,220},{-260,220}}, color={255,0,255}));
+  connect(notHigLoa.y, cooSumNotHig.u2) annotation (Line(points={{-236,220},{
+          -228,220},{-228,240},{-280,240},{-280,272},{-260,272}}, color={255,0,
+          255}));
+  connect(cooSum.y, cooSumNotHig.u1) annotation (Line(points={{-298,320},{-280,
+          320},{-280,280},{-260,280}}, color={255,0,255}));
+  connect(cooSumNotHig.y, cooSumNorRat.u2) annotation (Line(points={{-236,280},
+          {-230,280},{-230,332},{-222,332}}, color={255,0,255}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(
