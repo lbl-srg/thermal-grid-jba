@@ -30,7 +30,7 @@ partial model PartialConnectedETS
     TEvaLvgMax=288.15,
     dTCon_nominal=datBuiSet.dTHeaWat_nominal,
     dTEva_nominal=datBuiSet.dTChiWat_nominal,
-    TConLvg_nominal=max(datBuiSet.TChiWatSup_nominal, datBuiSet.THotWatSupTan_nominal),
+    TConLvg_nominal=max(datBuiSet.THeaWatSup_nominal, datBuiSet.THotWatSupTan_nominal),
     TEvaLvg_nominal=datBuiSet.TChiWatSup_nominal)
     "Heat recovery chiller parameters"
     annotation (Placement(transformation(extent={{20,180},{40,200}})));
