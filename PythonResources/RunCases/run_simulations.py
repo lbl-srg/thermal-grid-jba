@@ -75,7 +75,7 @@ def create_working_directory():
     import os
     import tempfile
     import getpass
-    worDir = tempfile.mkdtemp( prefix='tmp-simulator-jbacases-' + getpass.getuser() )
+    worDir = tempfile.mkdtemp( prefix='tmp-simulator-jbacases-' + getpass.getuser() + '-')
 #    print("Created directory {}".format(worDir))
     return worDir
 
