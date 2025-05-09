@@ -320,9 +320,10 @@ equation
           -8},{74,-8},{74,26},{-142,26},{-142,10}}, color={0,127,255}));
   connect(gen.port_b, port_b) annotation (Line(points={{-160,-20},{-170,-20},{-170,
           -32},{280,-32},{280,0},{322,0}}, color={0,127,255}));
-  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,4},{100,4},
-          {100,-200},{340,-200}}, color={0,0,127}));
-  connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,1},{96,1},
+  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,5},{100,
+          5},{100,-200},{340,-200}},
+                                  color={0,0,127}));
+  connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,3},{96,3},
           {96,-230},{340,-230}}, color={0,0,127}));
   connect(gen.PPumBorFiePer, PPumBorFiePer) annotation (Line(points={{-138,-1},
           {-96,-1},{-96,80},{340,80}},     color={0,0,127}));
