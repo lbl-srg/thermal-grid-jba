@@ -36,16 +36,20 @@ record Chiller "Parameters for the modular expandable chiller"
   parameter Modelica.Units.SI.TemperatureDifference TEvaLvg_nominal(
      displayUnit="degC") "Nominal evaporator leaving temperature"
     annotation (Dialog(group="Evaporator"));
-  parameter Modelica.Units.SI.Temperature TConEntMin(displayUnit="degC")
+  parameter Modelica.Units.SI.Temperature TConEntMin(displayUnit="degC") =
+    25 + 273.15
     "Minimum of condenser water entering temperature"
     annotation (Dialog(group="Condenser"));
-  parameter Modelica.Units.SI.Temperature TEvaEntMax(displayUnit="degC")
+  parameter Modelica.Units.SI.Temperature TEvaEntMax(displayUnit="degC") =
+    20 + 273.15
     "Maximum of evaporator water entering temperature"
     annotation (Dialog(group="Evaporator"));
-  parameter Modelica.Units.SI.Temperature TEvaLvgMin(displayUnit="degC")
+  parameter Modelica.Units.SI.Temperature TEvaLvgMin(displayUnit="degC") =
+    4 + 273.15
     "Minimum value for leaving evaporator temperature"
     annotation (Dialog(group="Evaporator"));
-  parameter Modelica.Units.SI.Temperature TEvaLvgMax(displayUnit="degC")
+  parameter Modelica.Units.SI.Temperature TEvaLvgMax(displayUnit="degC") =
+    15 + 273.15
     "Maximum value for leaving evaporator temperature"
     annotation (Dialog(group="Evaporator"));
   parameter Modelica.Units.SI.MassFlowRate mCon_flow_nominal =
