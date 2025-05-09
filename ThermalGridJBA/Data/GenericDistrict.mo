@@ -140,6 +140,8 @@ record GenericDistrict "District network design parameters"
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
+    // We assume that the borefield can provide maximum cooling of 10e6 W and maximum
+    // heating of 3e6 W.
 //   parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=
 //     mPlaWat_flow_nominal*cpWatLiq*dTLoo_nominal
 //     "Nominal heating capacity"
@@ -148,7 +150,7 @@ record GenericDistrict "District network design parameters"
 //     "Nominal heating capacity"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // Downsize the heat pump capacity by considering the heating supply from borefield
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=QPlaPeaHea_flow - 1*3e6
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=QPlaPeaHea_flow - 0.5*3e6
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
