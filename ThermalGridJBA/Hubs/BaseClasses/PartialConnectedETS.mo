@@ -22,7 +22,7 @@ partial model PartialConnectedETS
       transformation(extent={{20,140},{40,160}})));
   parameter ThermalGridJBA.Data.Chiller datChi(
     PLRMin=0.2/3 "20%, and assume 3 chillers in parallel",
-    QHea_flow_nominal=max(QHea_flow_nominal, abs(QCoo_flow_nominal)*1.5),
+    QHea_flow_nominal=max(QHea_flow_nominal, abs(QCoo_flow_nominal)*1.2),
     QCoo_flow_nominal=QCoo_flow_nominal,
     final dTCon_nominal=datBuiSet.dTHeaWat_nominal,
     final dTEva_nominal=datBuiSet.dTChiWat_nominal,
