@@ -117,7 +117,7 @@ model Chiller "Base subsystem with heat recovery chiller"
   Buildings.Fluid.HeatPumps.ModularReversible.LargeScaleWaterToWater chi(
     redeclare package MediumCon = Medium,
     redeclare package MediumEva = Medium,
-    final datTabHea = dat.datHea,
+    final datTabHea = dat.dat,
     final datTabCoo = dat.datCoo,
     final allowDifferentDeviceIdentifiers=true,
     final allowFlowReversalEva=allowFlowReversal,

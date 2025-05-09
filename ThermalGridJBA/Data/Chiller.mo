@@ -4,13 +4,13 @@ record Chiller "Parameters for the modular expandable chiller"
   constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
 
 
-  parameter Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.GenericHeatPump datHea
+  parameter Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.GenericHeatPump dat
     = Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.EN14511.WAMAK_WaterToWater_220kW()
     "Performance map for the heat pump"
     annotation (Dialog(group="Performance map"));
-  parameter Buildings.Fluid.Chillers.ModularReversible.Data.TableData2D.Generic datCoo
+  final parameter Buildings.Fluid.Chillers.ModularReversible.Data.TableData2D.Generic datCoo
     = Buildings.Fluid.Chillers.ModularReversible.Data.TableData2D.EN14511.Carrier30XWP1012_1MW()
-    "Not used - performance map for the cooling mode"
+    "Not used - placeholder performance map for the cooling mode, has no influence"
     annotation (Dialog(group="Performance map"));
 
   parameter Real PLRMax(min=0) = 1 "Maximum part load ratio"
