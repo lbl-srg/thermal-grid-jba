@@ -1063,9 +1063,9 @@ equation
           {532,70},{532,72},{539,72}}, color={0,0,127}));
   connect(THexWatEnt.y,reqTWatSer. u) annotation (Line(points={{521,-270},{530,-270},
           {530,-266},{539,-266}}, color={0,0,127}));
-  connect(TDisWatSup.T, reqTPlaMix.u) annotation (Line(points={{-91,170},{-216,170},
-          {-216,-168},{64,-168},{64,-292},{572,-292},{572,-488},{532,-488},{532,
-          -466},{539,-466}}, color={0,0,127}));
+  connect(TDisWatSup.T, reqTPlaMix.u) annotation (Line(points={{-91,170},{-216,
+          170},{-216,-168},{64,-168},{64,-466},{539,-466}},
+                             color={0,0,127}));
   connect(TTanTop.y, reqTDhwTan.u) annotation (Line(points={{521,300},{530,300},
           {530,294},{539,294}}, color={0,0,127}));
   connect(DhwTanCha.y, reqTDhwTan.active) annotation (Line(points={{521,280},{532,
