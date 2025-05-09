@@ -8,7 +8,7 @@ model SinglePlantFiveHubs_requirements
         bui[3].ets.dhw.domHotWatTan.senTemHot.T,bui[4].ets.dhw.domHotWatTan.senTemHot.T,
         bui[5].ets.dhw.domHotWatTan.senTemHot.T})
     annotation (Placement(transformation(extent={{460,222},{480,242}})));
-  Buildings_Requirements.WithinBand reqTDomHotWatSupply[nBui](
+  Buildings_Requirements.WithinBand_old reqTDomHotWatSupply[nBui](
     name="ETS",
     text=
         "O-301: The domestic hot water supply temperature must be 45°C ± 1 K.",
@@ -23,7 +23,7 @@ model SinglePlantFiveHubs_requirements
     witBan(u(final unit="K")))
     "Requirement for domestic hot water supply temperature"
     annotation (Placement(transformation(extent={{500,220},{520,240}})));
-  Buildings_Requirements.WithinBand reqTDomHotWatTan[nBui](
+  Buildings_Requirements.WithinBand_old reqTDomHotWatTan[nBui](
     name="ETS",
     text=
         "O-302: The heating water temperature that serves the domestic hot water tank must be 50°C ± 1 K once the tank charging is on for 5 minutes.",
@@ -48,7 +48,7 @@ model SinglePlantFiveHubs_requirements
     annotation (Placement(transformation(extent={{460,150},{480,170}})));
   Modelica.Blocks.Sources.RealExpression THEXWatLvg[nBui](y=bui.ets.hex.senT2WatLvg.T)
     annotation (Placement(transformation(extent={{380,80},{400,100}})));
-  Buildings_Requirements.WithinBand reqTHEXETSLeaPri[nBui](
+  Buildings_Requirements.WithinBand_old reqTHEXETSLeaPri[nBui](
     name="ETS",
     text=
         "O-306: At the district heat exchanger in the ETS, the primary side leaving water temperature that is fed back to the district loop must be between 6.5°C and 28°C.",
@@ -63,9 +63,10 @@ model SinglePlantFiveHubs_requirements
     witBan(u(final unit="K")))
     "Requirement for  leaving water temperature on the primary side of the heat exchanger in the ETS "
     annotation (Placement(transformation(extent={{500,100},{520,120}})));
-  Buildings_Requirements.WithinBand reqTdiffHEX[nBui](
+  Buildings_Requirements.WithinBand_old reqTdiffHEX[nBui](
     name="ETS",
-    text="O-307: At the district heat exchanger in the ETS, the primary side water temperature difference must be ± 4 K, with a tolerance of ± 1 K.",
+    text=
+        "O-307: At the district heat exchanger in the ETS, the primary side water temperature difference must be ± 4 K, with a tolerance of ± 1 K.",
     delayTime(each displayUnit="min") = 300,
     u_max(
       final unit="K",
@@ -97,7 +98,7 @@ model SinglePlantFiveHubs_requirements
     use_activeInput=true)
     "Requirement for heat pump condenser leaving water temperature"
     annotation (Placement(transformation(extent={{500,-160},{520,-140}})));
-  Buildings_Requirements.WithinBand reqTWatSer[nBui](
+  Buildings_Requirements.WithinBand_old reqTWatSer[nBui](
     name="Network",
     text=
         "O-401: The water that is served to each service line must be between 10.5°C and 24°C.",
@@ -128,7 +129,7 @@ model SinglePlantFiveHubs_requirements
     annotation (Placement(transformation(extent={{460,-140},{480,-120}})));
   Modelica.Blocks.Sources.Constant TminHeaPumEva[nBui](k=15 + 273.15)
     annotation (Placement(transformation(extent={{460,-60},{480,-40}})));
-  Buildings_Requirements.WithinBand reqTWatPlaMix(
+  Buildings_Requirements.WithinBand_old reqTWatPlaMix(
     name="Central plant",
     text=
         "O-503: The mixing water temperature in the district loop after the central plant must be between 10.5°C and 24°C.",
@@ -171,7 +172,7 @@ model SinglePlantFiveHubs_requirements
     annotation (Placement(transformation(extent={{460,-360},{480,-340}})));
   Modelica.Blocks.Sources.Constant fracPLMax[nBui + 2](k=125)
     annotation (Placement(transformation(extent={{460,-320},{480,-300}})));
-  Buildings_Requirements.WithinBand reqTSHSet[nBui](
+  Buildings_Requirements.WithinBand_old reqTSHSet[nBui](
     name="ETS",
     text=
         "O-303: The space heating water supply temperature set point must be tracked within ± 1 K once the system is on for 5 minutes.",
@@ -187,7 +188,7 @@ model SinglePlantFiveHubs_requirements
     witBan(u(final unit="K")))
     "Requirment for tracking the space heating water supply temperature set point"
     annotation (Placement(transformation(extent={{500,-400},{520,-380}})));
-  Buildings_Requirements.WithinBand reqTSCSet[nBui](
+  Buildings_Requirements.WithinBand_old reqTSCSet[nBui](
     name="ETS",
     text=
         "O-304: The space cooling water supply temperature set point must be tracked within ± 1 K once the system is on for 5 minutes.",
@@ -217,6 +218,54 @@ model SinglePlantFiveHubs_requirements
     annotation (Placement(transformation(extent={{420,-434},{440,-414}})));
   Modelica.Blocks.Sources.RealExpression TSCSupplySet[nBui](y=bui.TChiWatSupSet.y)
     annotation (Placement(transformation(extent={{420,-446},{440,-426}})));
+  Buildings.Controls.OBC.CDL.Reals.MovingAverage movAve[nBui](delta(each
+        displayUnit="min") = 3600)
+    annotation (Placement(transformation(extent={{460,-490},{480,-470}})));
+  Buildings_Requirements.WithinBand_old reqTSHSet1[nBui](
+    name="Load tracking",
+    text=
+        "O-351/2: The room temperature set point must be tracked within ± 0.5 K during any 60 min window.",
+    use_activeInput=true,
+    delayTime(each displayUnit="min") = 3600,
+    u_max(
+      final unit="K",
+      each displayUnit="K") = 0.5,
+    u_min(
+      final unit="K",
+      each displayUnit="K") = -0.5,
+    u(final unit="K", each displayUnit="K"),
+    witBan(u(final unit="K")))
+    "Requirment for tracking the space heating water supply temperature set point"
+    annotation (Placement(transformation(extent={{500,-500},{520,-480}})));
+  Modelica.Blocks.Sources.RealExpression TSHSupply1
+                                                  [nBui](y=bui.bui.disFloHea.senTSup.T)
+    annotation (Placement(transformation(extent={{380,-506},{400,-486}})));
+  Modelica.Blocks.Sources.RealExpression TSHSupply2
+                                                  [nBui](y=bui.bui.disFloHea.senTSup.T)
+    annotation (Placement(transformation(extent={{380,-494},{400,-474}})));
+  Modelica.Blocks.Math.Add TSCCompare1
+                                     [nBui](k2=-1)
+    annotation (Placement(transformation(extent={{420,-500},{440,-480}})));
+  Modelica.Blocks.Continuous.Integrator integrator[nBui]
+    annotation (Placement(transformation(extent={{460,-530},{480,-510}})));
+  Buildings_Requirements.WithinBand_old reqTSHSet2[nBui](
+    name="ETS",
+    text=
+        "O-353: The room temperature set point must be tracked within ± 0.05 K averaged over the year",
+    use_activeInput=true,
+    delayTime(each displayUnit="s") = 0,
+    u_max(
+      final unit="K",
+      each displayUnit="K") = 0.05,
+    u_min(
+      final unit="K",
+      each displayUnit="K") = -0.05,
+    u(final unit="K", each displayUnit="K"),
+    witBan(u(final unit="K")))
+    "Requirment for tracking the space heating water supply temperature set point"
+    annotation (Placement(transformation(extent={{500,-540},{520,-520}})));
+  Modelica.Blocks.Sources.BooleanExpression last_value[nBui](y=terminal())
+    annotation (Placement(transformation(extent={{460,-560},{480,-540}})));
 equation
   for i in 1:5 loop
     y_value[i] = bui[i].ets.valIsoEva.y_actual;
@@ -305,4 +354,20 @@ equation
     annotation (Line(points={{441,-374},{458,-374}}, color={0,0,127}));
   connect(TSHSupplySet.y, TSHcompare.u2)
     annotation (Line(points={{441,-386},{458,-386}}, color={0,0,127}));
+  connect(movAve.y, reqTSHSet1.u) annotation (Line(points={{482,-480},{490,-480},
+          {490,-486},{499,-486}}, color={0,0,127}));
+  connect(TSHSupply2.y, TSCCompare1.u1)
+    annotation (Line(points={{401,-484},{418,-484}}, color={0,0,127}));
+  connect(TSHSupply1.y, TSCCompare1.u2)
+    annotation (Line(points={{401,-496},{418,-496}}, color={0,0,127}));
+  connect(TSCCompare1.y, movAve.u) annotation (Line(points={{441,-490},{450,
+          -490},{450,-480},{458,-480}}, color={0,0,127}));
+  connect(TSCCompare1.y, integrator.u) annotation (Line(points={{441,-490},{450,
+          -490},{450,-520},{458,-520}}, color={0,0,127}));
+  connect(integrator.y, reqTSHSet2.u) annotation (Line(points={{481,-520},{490,
+          -520},{490,-526},{499,-526}}, color={0,0,127}));
+  connect(BooOn.y, reqTSHSet1.active) annotation (Line(points={{381,-410},{400,
+          -410},{400,-460},{486,-460},{486,-494},{498,-494}}, color={255,0,255}));
+  connect(last_value.y, reqTSHSet2.active) annotation (Line(points={{481,-550},
+          {490,-550},{490,-534},{498,-534}}, color={255,0,255}));
 end SinglePlantFiveHubs_requirements;
