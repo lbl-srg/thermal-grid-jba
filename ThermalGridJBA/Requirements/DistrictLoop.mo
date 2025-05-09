@@ -16,16 +16,16 @@ block DistrictLoop "Requirements for district loop"
     "Pressure drop per meter pipe in service line"
     annotation (Placement(transformation(extent={{-140,-80},{-100,-40}})));
 
-  Buildings_Requirements.WithinBand disLooTem[:](
+  Buildings_Requirements.WithinBand_old disLooTem[:](
     each name="District loop",
-    each text="O-401: The water that is served to each service line must be between 10.5◦C and 24◦C.",
+    each text=
+        "O-401: The water that is served to each service line must be between 10.5◦C and 24◦C.",
     each u_max(
       each final unit="K",
       each displayUnit="degC") = 297.15,
     each u_min(
       each final unit="K",
-      each displayUnit="degC") = 283.65)
-    if verifyRequirements
+      each displayUnit="degC") = 283.65) if verifyRequirements
     "Test whether loop temperatures are within an upper and lower band"
     annotation (Placement(transformation(extent={{0,60},{20,80}})));
   Buildings_Requirements.GreaterEqual disPipPreDro(
