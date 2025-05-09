@@ -182,12 +182,17 @@ def construct_clusters():
                 'C',
                 'D',
                 'E']
-    for buil in clusters:
+    factors = [1.3,
+               1.3,
+               1.0,
+               1.0]
+    for buil, fac in zip(clusters, factors):
         cases.append( \
             {"model": "ThermalGridJBA.Hubs.Validation.ConnectedETSWithDHW",
               "name": f"cluster_{buil}_{scenario_placeholder}",
               "building": buil,
-              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}_{scenario_placeholder}.mos"}})
+              "parameters": {'filNam' : f"modelica://ThermalGridJBA/Resources/Data/Consumptions/C{buil}_{scenario_placeholder}.mos",
+                             'bui.facTerUniSizHea' : fac}})
 
     return cases
 
