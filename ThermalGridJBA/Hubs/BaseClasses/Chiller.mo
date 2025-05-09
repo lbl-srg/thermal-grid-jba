@@ -114,32 +114,28 @@ model Chiller "Base subsystem with heat recovery chiller"
     annotation (Placement(transformation(extent={{200,-160},{240,-120}}),
     iconTransformation(extent={{100,-40},{140,0}})));
   // COMPONENTS
-    Buildings.Fluid.HeatPumps.ModularReversible.LargeScaleWaterToWater chi(
-    show_T=true,
-    allowDifferentDeviceIdentifiers=true,
-    use_intSafCtr=false,
-    final dTCon_nominal=dat.dTCon_nominal,
-    final dTEva_nominal=dat.dTEva_nominal,
-    final allowFlowReversalEva=allowFlowReversal,
-    final allowFlowReversalCon=allowFlowReversal,
-    limWarSca=0.98,
-    final QHea_flow_nominal=-dat.QCoo_flow_nominal*1.5,
-    TConHea_nominal=dat.TConLvg_nominal,
-    TEvaHea_nominal=dat.TEvaLvg_nominal,
-    redeclare
-      Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.EN14511.WAMAK_WaterToWater_220kW
-      datTabHea,
-    redeclare
-      Buildings.Fluid.Chillers.ModularReversible.Data.TableData2D.EN14511.Carrier30XWP1012_1MW
-      datTabCoo,
+  Buildings.Fluid.HeatPumps.ModularReversible.LargeScaleWaterToWater chi(
     redeclare package MediumCon = Medium,
     redeclare package MediumEva = Medium,
+    final datTabHea = dat.datHea,
+    final datTabCoo = dat.datCoo,
+    final allowDifferentDeviceIdentifiers=true,
+    final allowFlowReversalEva=allowFlowReversal,
+    final allowFlowReversalCon=allowFlowReversal,
+    final dTCon_nominal=dat.dTCon_nominal,
+    final dTEva_nominal=dat.dTEva_nominal,
+    final QHea_flow_nominal=dat.QHea_flow_nominal,
     final QCoo_flow_nominal=dat.QCoo_flow_nominal,
-    TConCoo_nominal=dat.TConLvg_nominal,
+    final TConHea_nominal=dat.TConLvg_nominal,
+    final TEvaHea_nominal=dat.TEvaLvg_nominal,
+    final TConCoo_nominal=dat.TConLvg_nominal,
+    final TEvaCoo_nominal=dat.TEvaLvg_nominal,
     final dpCon_nominal(displayUnit="Pa") = dpCon_nominal,
-    TEvaCoo_nominal=dat.TEvaLvg_nominal,
     final dpEva_nominal(displayUnit="Pa") = dpEva_nominal,
-    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial)
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    show_T=true,
+    use_intSafCtr=false,
+    limWarSca=0.98)
     "Heat recovery chiller"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumCon(
