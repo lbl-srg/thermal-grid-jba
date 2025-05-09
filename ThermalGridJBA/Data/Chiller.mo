@@ -49,18 +49,13 @@ record Chiller "Parameters for the modular expandable chiller"
     "Maximum value for leaving evaporator temperature"
     annotation (Dialog(group="Evaporator"));
   parameter Modelica.Units.SI.MassFlowRate mCon_flow_nominal =
-    m_flow_nominal_internal
+    QHea_flow_nominal/dTCon_nominal/cpWatLiq
     "Nominal medium flow rate in the condenser"
     annotation (Dialog(group="Condenser"));
   parameter Modelica.Units.SI.MassFlowRate mEva_flow_nominal =
-    m_flow_nominal_internal
+    abs(QCoo_flow_nominal)/dTEva_nominal/cpWatLiq
     "Nominal medium flow rate in the evaporator"
     annotation (Dialog(group="Evaporator"));
-
-  final parameter Modelica.Units.SI.MassFlowRate m_flow_nominal_internal =
-    max(QHea_flow_nominal/dTCon_nominal/cpWatLiq,
-        abs(QCoo_flow_nominal)/dTEva_nominal/cpWatLiq)
-    "Intermediate value";
 
 annotation(defaultComponentName="datChi");
 end Chiller;
