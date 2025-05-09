@@ -1,6 +1,8 @@
 within ThermalGridJBA.Data;
 record Chiller "Parameters for the modular expandable chiller"
   extends Modelica.Icons.Record;
+  constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
+
 
   parameter Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.GenericHeatPump datHea
     = Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.EN14511.WAMAK_WaterToWater_220kW()
@@ -15,13 +17,6 @@ record Chiller "Parameters for the modular expandable chiller"
     annotation (Dialog(group="Part load"));
   parameter Real PLRMin(min=0) = 0.3 "Minimum part load ratio"
     annotation (Dialog(group="Part load"));
-
-  parameter Real COP_hexSizRejCoo = 11.570534706115723
-    "Cooling rejection COP for hex sizing"
-    annotation (Dialog(group="COP"));
-  parameter Real COP_hexSizRejHea = 2.3183610439300537
-    "Heating rejection COP for hex sizing"
-    annotation (Dialog(group="COP"));
 
   parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(min=Modelica.Constants.eps)
     "Nominal heating capacity"
@@ -63,8 +58,8 @@ record Chiller "Parameters for the modular expandable chiller"
     annotation (Dialog(group="Evaporator"));
 
   final parameter Modelica.Units.SI.MassFlowRate m_flow_nominal_internal =
-    max(QHea_flow_nominal/dTCon_nominal/4186,
-        abs(QCoo_flow_nominal)/dTEva_nominal/4186)
+    max(QHea_flow_nominal/dTCon_nominal/cpWatLiq,
+        abs(QCoo_flow_nominal)/dTEva_nominal/cpWatLiq)
     "Intermediate value";
 
 annotation(defaultComponentName="datChi");

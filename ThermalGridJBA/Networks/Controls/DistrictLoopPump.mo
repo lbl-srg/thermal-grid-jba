@@ -118,7 +118,7 @@ Documentation(info="
 It resets the district loop pump speed as the plot below.
 </p>
 <p align=\"center\">
-<img src=\"modelica://ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png\"
+<img src=\"modelica://ThermalGridJBA/Resources/Images/Networks/Controls/districtPumpControl.png\"
      alt=\"districtPumpControl.png\" />
 </p>
 <p>

@@ -3,7 +3,10 @@ record SingleHub
   "District set up for one single hub covering the whole JBA site"
   extends GenericDistrict(
     nBui=1,
-    filNam={"modelica://ThermalGridJBA/Resources/Data/Consumptions/All_futu.mos"},
+    filNamInd={
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_futu.mos"},
+    filNamCom=
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_futu.mos",
     lDis={722,2738},
     lCon={226});
   annotation (

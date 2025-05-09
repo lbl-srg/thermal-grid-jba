@@ -28,9 +28,9 @@ block TankChargingController
         transformation(extent={{-140,-120},{-100,-80}}), iconTransformation(
           extent={{-140,-100},{-100,-60}})));
   Buildings.Controls.OBC.CDL.Logical.Latch lat
-    annotation (Placement(transformation(extent={{50,-10},{70,10}})));
+    annotation (Placement(transformation(extent={{40,-10},{60,10}})));
   Buildings.Controls.OBC.CDL.Logical.Not not1
-    annotation (Placement(transformation(extent={{30,-70},{50,-50}})));
+    annotation (Placement(transformation(extent={{26,-70},{46,-50}})));
 block Routing
   extends Modelica.Blocks.Icons.Block;
 
@@ -77,30 +77,34 @@ end Routing;
     annotation (Placement(transformation(extent={{-80,20},{-60,40}})));
   Routing rouCol if not isHotWat "Routing block for cold tank"
     annotation (Placement(transformation(extent={{-80,-60},{-60,-40}})));
-protected
+
   Buildings.Controls.OBC.CDL.Reals.Hysteresis cha(uLow=hysTop, uHigh=0)
     "Outputs true if tank should be charged"
-    annotation (Placement(transformation(extent={{0,-10},{20,10}})));
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
   Buildings.Controls.OBC.CDL.Reals.Subtract sub
     annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
   Buildings.Controls.OBC.CDL.Reals.Hysteresis cha1(uLow=hysBot, uHigh=0)
     "Outputs true if tank should be charged"
-    annotation (Placement(transformation(extent={{0,-70},{20,-50}})));
+    annotation (Placement(transformation(extent={{-10,-70},{10,-50}})));
   Buildings.Controls.OBC.CDL.Reals.Subtract sub1
     annotation (Placement(transformation(extent={{-40,-70},{-20,-50}})));
+  Buildings.Controls.OBC.CDL.Logical.And chaTopBot
+    "Outputs true if top and bottom test wants tank to be charged. Used to override latch if tank temperature drops without triggering latch"
+    annotation (Placement(transformation(extent={{30,30},{50,50}})));
+  Buildings.Controls.OBC.CDL.Logical.Or or1
+    "Or block to enable charge if one of the inputs request charging"
+    annotation (Placement(transformation(extent={{66,16},{86,36}})));
 equation
   connect(sub.y, cha.u)
-    annotation (Line(points={{-18,0},{-2,0}}, color={0,0,127}));
+    annotation (Line(points={{-18,0},{-12,0}},color={0,0,127}));
   connect(sub1.y, cha1.u)
-    annotation (Line(points={{-18,-60},{-2,-60}}, color={0,0,127}));
+    annotation (Line(points={{-18,-60},{-12,-60}},color={0,0,127}));
   connect(cha.y, lat.u)
-    annotation (Line(points={{22,0},{48,0}}, color={255,0,255}));
-  connect(lat.y, charge)
-    annotation (Line(points={{72,0},{120,0}}, color={255,0,255}));
+    annotation (Line(points={{12,0},{38,0}}, color={255,0,255}));
   connect(cha1.y, not1.u)
-    annotation (Line(points={{22,-60},{28,-60}}, color={255,0,255}));
-  connect(not1.y, lat.clr) annotation (Line(points={{52,-60},{60,-60},{60,-34},
-          {40,-34},{40,-6},{48,-6}}, color={255,0,255}));
+    annotation (Line(points={{12,-60},{24,-60}}, color={255,0,255}));
+  connect(not1.y, lat.clr) annotation (Line(points={{48,-60},{48,-32},{32,-32},
+          {32,-6},{38,-6}},          color={255,0,255}));
   connect(TTanSet, rouHot.TSet_in) annotation (Line(points={{-120,70},{-90,70},
           {-90,36},{-82,36}}, color={0,0,127}));
   connect(TTanSet, rouCol.TSet_in) annotation (Line(points={{-120,70},{-90,70},
@@ -129,6 +133,16 @@ equation
           {-48,-54},{-42,-54}}, color={0,0,127}));
   connect(rouCol.TSet_out, sub1.u2) annotation (Line(points={{-59,-44},{-54,-44},
           {-54,-66},{-42,-66}}, color={0,0,127}));
+  connect(cha.y, chaTopBot.u1) annotation (Line(points={{12,0},{16,0},{16,40},{
+          28,40}}, color={255,0,255}));
+  connect(cha1.y, chaTopBot.u2) annotation (Line(points={{12,-60},{20,-60},{20,
+          32},{28,32}}, color={255,0,255}));
+  connect(or1.y, charge) annotation (Line(points={{88,26},{94,26},{94,0},{120,0}},
+        color={255,0,255}));
+  connect(lat.y, or1.u2)
+    annotation (Line(points={{62,0},{64,0},{64,18}}, color={255,0,255}));
+  connect(or1.u1, chaTopBot.y) annotation (Line(points={{64,26},{58,26},{58,40},
+          {52,40}}, color={255,0,255}));
   annotation (
   defaultComponentName="tanCha",
   Icon(coordinateSystem(preserveAspectRatio=false), graphics={

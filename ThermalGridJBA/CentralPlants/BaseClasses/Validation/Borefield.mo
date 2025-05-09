@@ -24,7 +24,8 @@ model Borefield "Validation model for borefield"
     use_T_in=false,
     nPorts=1) "Mass flow source"
     annotation (Placement(transformation(extent={{-80,-30},{-60,-10}})));
-  ThermalGridJBA.CentralPlants.BaseClasses.Borefield borFie "Borefield"
+  ThermalGridJBA.CentralPlants.BaseClasses.Borefield borFie(TSoi_start=289.15)
+                                                            "Borefield"
     annotation (Placement(transformation(extent={{-12,-10},{8,10}})));
   Buildings.Fluid.Sensors.HeatMeter senHeaFloPer(
     redeclare package Medium = Medium,

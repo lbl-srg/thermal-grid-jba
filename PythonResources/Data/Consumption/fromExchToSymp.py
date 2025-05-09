@@ -55,7 +55,15 @@ if flag_deleteOldDirectory:
 main('base', 'ele', ['1380','1045'])
 """
 
-#%% Hub list
+#%% Each building
+for stag, util, buil_no in [(stag, util, buil_no) for stag in stags for util in utils for buil_no in buil_nos]:
+    main(stag=stag, util=util, buil_nos=[buil_no])
+
+#%% Each cluster
+for stag, util, clus in [(stag, util, clus) for stag in stags for util in utils for clus in dict_clu]:
+    main(stag=stag, util=util, buil_nos=dict_clu[clus], hubname=clus)
+
+#%% Customary list
 """
 # validation
 hub_dict = {'1058x1060':['1058x1060'],

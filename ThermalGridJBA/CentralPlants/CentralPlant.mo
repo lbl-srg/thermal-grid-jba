@@ -13,6 +13,15 @@ model CentralPlant "Central plant"
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
+  parameter Real TPlaHeaSet(
+    unit="K",
+    displayUnit="degC")=TLooMin
+    "Design plant heating setpoint temperature";
+  parameter Real TPlaCooSet(
+    unit="K",
+    displayUnit="degC")=TLooMax
+    "Design plant cooling setpoint temperature";
+
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each generation module";
   parameter Real dpValve_nominal(unit="Pa")=6000
@@ -34,7 +43,10 @@ model CentralPlant "Central plant"
     "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(group="Dry cooler"));
   // Heat pump parameters
-  parameter Real mWat_flow_min(unit="kg/s")
+  parameter Real mHeaPumWat_flow_nominal(unit="kg/s")
+    "Heat pump nominal water mass flow rate"
+    annotation (Dialog(group="Heat pump"));
+  parameter Real mHeaPumWat_flow_min(unit="kg/s")
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(group="Heat pump"));
   parameter Real mHpGly_flow_nominal(unit="kg/s")
@@ -46,24 +58,25 @@ model CentralPlant "Central plant"
   parameter Real TConHea_nominal(unit="K")=TLooMin + TApp
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaHea_nominal(unit="K")=TLooMin
-    "Nominal temperature of the cooled fluid in heating mode"
+  parameter Real TEvaHea_nominal(unit="K")
+    "Nominal temperature of evaporator for heat pump design during heating"
     annotation (Dialog(group="Heat pump"));
   parameter Real QHeaPumCoo_flow_nominal(unit="W")
     "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConCoo_nominal(unit="K")=TLooMax
-    "Nominal temperature of the cooled fluid in cooling mode"
+  parameter Real TConCoo_nominal(unit="K")
+    "Nominal temperature of condenser for heat pump design during cooling"
     annotation (Dialog(group="Heat pump"));
   parameter Real TEvaCoo_nominal(unit="K")=TLooMax + TApp
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
 
-  parameter Real samplePeriod(unit="s")=7200
-     "Sample period of district loop pump speed"
-    annotation (Dialog(tab="Controls", group="Indicators"));
-  parameter Real TAppSet(unit="K")=2
-    "Dry cooler approch setpoint"
+  parameter Real staDowDel(
+    unit="s")=3600
+    "Minimum stage down delay, to avoid quickly staging down"
+    annotation (Dialog(tab="Controls"));
+  parameter Real TDryAppSet(unit="K")=2
+    "Dry cooler approach setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
   parameter Real TApp(unit="K")=4
     "Approach temperature for checking if the dry cooler should be enabled"
@@ -71,12 +84,12 @@ model CentralPlant "Central plant"
   parameter Real minFanSpe(unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TCooSet(unit="K")=TLooMin
-    "Heat pump tracking temperature setpoint in cooling mode"
-    annotation (Dialog(tab="Controls", group="Heat pump"));
-  parameter Real THeaSet(unit="K")=TLooMax
-    "Heat pump tracking temperature setpoint in heating mode"
-    annotation (Dialog(tab="Controls", group="Heat pump"));
+//   parameter Real TCooSet(unit="K")=TLooMin
+//     "Heat pump tracking temperature setpoint in cooling mode"
+//     annotation (Dialog(tab="Controls", group="Heat pump"));
+//   parameter Real THeaSet(unit="K")=TLooMax
+//     "Heat pump tracking temperature setpoint in heating mode"
+//     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K", displayUnit="degC")
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
@@ -95,80 +108,129 @@ model CentralPlant "Central plant"
   parameter Real minComSpe(unit="1")=0.2
     "Minimum heat pump compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real minHeaPumSpeHol=120
+    "Threshold time for checking if the compressor has been in the minimum speed"
+     annotation (Dialog(tab="Controls", group="Heat pump"));
+
+  parameter Modelica.Units.SI.Temperature TSoi_start
+    "Initial temperature of the soil of borefield";
 
   Modelica.Fluid.Interfaces.FluidPort_a port_a(
     redeclare final package Medium = MediumW)
     "Fluid connector for waterflow from the district"
     annotation (Placement(transformation(extent={{-250,-10},{-230,10}}),
       iconTransformation(extent={{-110,-10},{-90,10}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TPlaOut(
+    final unit="K",
+    final quantity="ThermodynamicTemperature",
+    displayUnit="degC")
+    "Central plant outlet water temperature"
+    annotation (Placement(transformation(extent={{-280,120},{-240,160}}),
+        iconTransformation(extent={{-140,60},{-100,100}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput uDisPum
     "District loop pump speed"
-    annotation (Placement(transformation(extent={{-280,100},{-240,140}}),
-        iconTransformation(extent={{-140,70},{-100,110}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput uSolTim
-    "Solar time. An output from weather data"
-    annotation (Placement(transformation(extent={{-280,60},{-240,100}}),
-        iconTransformation(extent={{-140,50},{-100,90}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput TMixAve(
+    annotation (Placement(transformation(extent={{-280,70},{-240,110}}),
+        iconTransformation(extent={{-140,40},{-100,80}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMaxMea(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
-    "Average temperature of mixing points after each energy transfer station"
-    annotation (Placement(transformation(extent={{-280,20},{-240,60}}),
-        iconTransformation(extent={{-140,10},{-100,50}})));
+    "Maximum temperature of mixing points after each energy transfer station"
+    annotation (Placement(transformation(extent={{-280,-160},{-240,-120}}),
+        iconTransformation(extent={{-140,-100},{-100,-60}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TLooMinMea(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")
+    "Minimum temperature of mixing points after each energy transfer station"
+    annotation (Placement(transformation(extent={{-280,-220},{-240,-180}}),
+        iconTransformation(extent={{-140,-140},{-100,-100}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
+    "Current electricity rate, dollar per kWh"
+    annotation (Placement(transformation(extent={{320,220},{360,260}}),
+        iconTransformation(extent={{100,70},{140,110}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Ambient dry bulb temperature"
-    annotation (Placement(transformation(extent={{-280,-60},{-240,-20}}),
-        iconTransformation(extent={{-140,-90},{-100,-50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(quantity="Power",
-      final unit="W")
+    annotation (Placement(transformation(extent={{-280,40},{-240,80}}),
+        iconTransformation(extent={{-140,20},{-100,60}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PFanDryCoo(
+    final quantity="Power",
+    final unit="W")
+    "Electrical power consumed by dry cool fan"
+    annotation (Placement(transformation(extent={{320,160},{360,200}}),
+        iconTransformation(extent={{100,50},{140,90}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumCirPum(
+    final quantity="Power",
+    final unit="W")
     "Electrical power consumed by circulation pump"
-    annotation (Placement(transformation(extent={{320,-260},{360,-220}}),
-        iconTransformation(extent={{100,-100},{140,-60}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat(quantity="Power",
-      final unit="W")
+    annotation (Placement(transformation(extent={{320,-190},{360,-150}}),
+        iconTransformation(extent={{100,-160},{140,-120}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumWat(
+    final quantity="Power",
+    final unit="W")
     "Electrical power consumed by heat pump waterside pump"
-    annotation (Placement(transformation(extent={{320,-230},{360,-190}}),
-        iconTransformation(extent={{100,-80},{140,-40}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorOut_flow(unit="W")
-    "Heat flow from borefield to water"
-    annotation (Placement(transformation(extent={{320,-60},{360,-20}}),
-        iconTransformation(extent={{100,-120},{140,-80}})));
+    annotation (Placement(transformation(extent={{320,-160},{360,-120}}),
+        iconTransformation(extent={{100,-140},{140,-100}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PCom(quantity="Power",
       final unit="W")
     "Electric power consumed by compressor"
-    annotation (Placement(transformation(extent={{320,-200},{360,-160}}),
-        iconTransformation(extent={{100,-60},{140,-20}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly(quantity="Power",
-      final unit="W")
+    annotation (Placement(transformation(extent={{320,-130},{360,-90}}),
+        iconTransformation(extent={{100,-120},{140,-80}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHeaPumGly(
+    final quantity="Power",
+    final unit="W")
     "Electrical power consumed by glycol pump of heat pump"
-    annotation (Placement(transformation(extent={{320,-170},{360,-130}}),
+    annotation (Placement(transformation(extent={{320,-100},{360,-60}}),
         iconTransformation(extent={{100,-40},{140,0}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumHexGly(quantity="Power",
       final unit="W")
     "Electrical power consumed by the glycol pump of heat exchanger"
-    annotation (Placement(transformation(extent={{320,130},{360,170}}),
+    annotation (Placement(transformation(extent={{320,100},{360,140}}),
         iconTransformation(extent={{100,10},{140,50}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo(quantity="Power",
-      final unit="W")
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumBorFiePer(
+    final quantity="Power",
+    final unit="W")
+    "Electrical power consumed by pump for borefield perimeter"
+    annotation (Placement(transformation(extent={{320,60},{360,100}}),
+        iconTransformation(extent={{100,-60},{140,-20}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumBorFieCen(
+    final quantity="Power",
+    final unit="W")
+    "Electrical power consumed by pump for borefield center"
+    annotation (Placement(transformation(extent={{320,30},{360,70}}),
+        iconTransformation(extent={{100,-80},{140,-40}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PPumDryCoo(
+    final quantity="Power",
+    final unit="W")
     "Electrical power consumed by dry cool pump"
-    annotation (Placement(transformation(extent={{320,160},{360,200}}),
+    annotation (Placement(transformation(extent={{320,130},{360,170}}),
         iconTransformation(extent={{100,30},{140,70}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yEleRat
-    "Current electricity rate, cent per kWh"
-    annotation (Placement(transformation(extent={{320,220},{360,260}}),
-        iconTransformation(extent={{100,70},{140,110}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorPer_flow(unit="W")
+    "Heat flow from borefield perimeter to water"
+    annotation (Placement(transformation(extent={{320,-220},{360,-180}}),
+        iconTransformation(extent={{100,-180},{140,-140}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput QBorCen_flow(unit="W")
+    "Heat flow from borefield center to water"
+    annotation (Placement(transformation(extent={{320,-250},{360,-210}}),
+        iconTransformation(extent={{100,-200},{140,-160}})));
 
-  ThermalGridJBA.CentralPlants.Generations gen(
+  Generations gen(
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,
+    final TPlaHeaSet=TPlaHeaSet,
+    final TPlaCooSet=TPlaCooSet,
     final mWat_flow_nominal=mWat_flow_nominal,
-    final mWat_flow_min=mWat_flow_min,
+    mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
+    mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
+    dpBorFiePer_nominal=borFie.dp_nominal,
+    dpBorFieCen_nominal=borFie.dp_nominal,
+    final mHeaPumWat_flow_nominal=mHeaPumWat_flow_nominal,
+    final mHeaPumWat_flow_min=mHeaPumWat_flow_min,
     final mHexGly_flow_nominal=mHexGly_flow_nominal,
     final mHpGly_flow_nominal=mHpGly_flow_nominal,
-    final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
+    final mGly_flow_nominal=mDryCoo_flow_nominal,
     final dpHex_nominal=dpHex_nominal,
     final dpValve_nominal=dpValve_nominal,
     final dpDryCoo_nominal=dpDryCoo_nominal,
@@ -178,60 +240,34 @@ model CentralPlant "Central plant"
     final QHeaPumCoo_flow_nominal=QHeaPumCoo_flow_nominal,
     final TConCoo_nominal=TConCoo_nominal,
     final TEvaCoo_nominal=TEvaCoo_nominal,
-    final samplePeriod=samplePeriod,
-    final TAppSet=TAppSet,
+    final staDowDel=staDowDel,
+    final TDryAppSet=TDryAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
-    final TCooSet=TCooSet,
-    final THeaSet=THeaSet,
+    fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,
     holOnTim=holOnTim,
     holOffTim=holOffTim,
     final minComSpe=minComSpe,
-    kHeaPum=0.1,
+    final minHeaPumSpeHol=minHeaPumSpeHol,
+    heaPumConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
+    kHeaPum=1,
     TiHeaPum=200,
+    TdHeaPum=0.1,
+    thrWayValConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
     kVal=0.1,
     TiVal=200,
     kFan=0.1,
-    TiFan=200) "Cooling and heating generation devices"
+    TiFan=200,
+    TdVal=0.1) "Cooling and heating generation devices"
     annotation (Placement(transformation(extent={{-160,-10},{-140,10}})));
   Modelica.Fluid.Interfaces.FluidPort_b port_b(
     redeclare final package Medium = MediumW)
     "Fluid connector for waterflow to the district"
     annotation (Placement(transformation(extent={{312,-10},{332,10}}),
       iconTransformation(extent={{90,-10},{110,10}})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort leaBorTem(
-    redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
-    final m_flow_nominal=mWat_flow_nominal)
-    "Temperature of waterflow leaving borefield"           annotation (
-      Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=0,
-        origin={240,0})));
-  Buildings.Fluid.Sensors.TemperatureTwoPort entBorTem(
-    redeclare final package Medium = MediumW,
-    allowFlowReversal=false,
-    final m_flow_nominal=mWat_flow_nominal)
-    "Temperature of waterflow entering borefield" annotation (Placement(
-        transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=0,
-        origin={-60,0})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFlo(
-    redeclare final package Medium = MediumW)
-    "Water flow rate into borefield"
-    annotation (Placement(transformation(extent={{270,-10},{290,10}})));
-  Buildings.Controls.OBC.CDL.Reals.Subtract sub
-    "Water flow temperature difference"
-    annotation (Placement(transformation(extent={{260,30},{280,50}})));
-  Buildings.Controls.OBC.CDL.Reals.Multiply mul
-    annotation (Placement(transformation(extent={{240,-50},{260,-30}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter heaCap(final k=4184)
-    "Water specific heat capacity"
-    annotation (Placement(transformation(extent={{280,-50},{300,-30}})));
 
   Modelica.Blocks.Sources.RealExpression heaPumHea(y=gen.heaPum.Q1_flow)
     "Heat pump heat flow"
@@ -245,71 +281,68 @@ model CentralPlant "Central plant"
   Modelica.Blocks.Continuous.Integrator EHexEne(initType=Modelica.Blocks.Types.Init.InitialState)
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
-
-  BaseClasses.Borefield borFie                                   "Borefield"
+  Borefield borFie(TSoi_start=TSoi_start) "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
+
 equation
 
-  connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,120},{-170,120},{
-          -170,9},{-162,9}}, color={0,0,127}));
-  connect(uSolTim, gen.uSolTim) annotation (Line(points={{-260,80},{-180,80},{-180,
-          7},{-162,7}}, color={0,0,127}));
-  connect(TMixAve, gen.TMixAve) annotation (Line(points={{-260,40},{-190,40},{-190,
-          3},{-162,3}}, color={0,0,127}));
-  connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,-40},{-180,-40},{
-          -180,-7},{-162,-7}}, color={0,0,127}));
-  connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-130,9},{-130,
-          240},{340,240}}, color={0,0,127}));
-  connect(entBorTem.T, sub.u2)
-    annotation (Line(points={{-60,11},{-60,34},{258,34}}, color={0,0,127}));
-  connect(leaBorTem.T, sub.u1)
-    annotation (Line(points={{240,11},{240,46},{258,46}}, color={0,0,127}));
-  connect(leaBorTem.port_b, senMasFlo.port_a)
-    annotation (Line(points={{250,0},{270,0}}, color={0,127,255}));
-  connect(senMasFlo.port_b, port_b)
-    annotation (Line(points={{290,0},{322,0}}, color={0,127,255}));
-  connect(sub.y, mul.u2) annotation (Line(points={{282,40},{288,40},{288,60},{224,
-          60},{224,-46},{238,-46}}, color={0,0,127}));
-  connect(senMasFlo.m_flow, mul.u1) annotation (Line(points={{280,11},{280,20},{
-          228,20},{228,-34},{238,-34}}, color={0,0,127}));
-  connect(mul.y, heaCap.u)
-    annotation (Line(points={{262,-40},{278,-40}}, color={0,0,127}));
-  connect(heaCap.y, QBorOut_flow)
-    annotation (Line(points={{302,-40},{340,-40}}, color={0,0,127}));
+  connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,
+          5},{-162,5}},      color={0,0,127}));
+  connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,60},{-186,60},{-186,
+          1.8},{-162,1.8}},    color={0,0,127}));
   connect(heaPumHea.y, EHeaPumEne.u)
     annotation (Line(points={{-79,220},{-62,220}}, color={0,0,127}));
   connect(hexHea.y, EHexEne.u)
     annotation (Line(points={{-79,200},{18,200}}, color={0,0,127}));
 
-  connect(gen.PPumDryCoo, PPumDryCoo) annotation (Line(points={{-138,5},{-120,5},
-          {-120,180},{340,180}}, color={0,0,127}));
-  connect(gen.PPumHexGly, PPumHexGly) annotation (Line(points={{-138,3},{-110,3},
-          {-110,150},{340,150}}, color={0,0,127}));
+  connect(gen.PPumDryCoo, PPumDryCoo) annotation (Line(points={{-138,5},{-112,5},
+          {-112,150},{340,150}}, color={0,0,127}));
+  connect(gen.PPumHexGly, PPumHexGly) annotation (Line(points={{-138,3},{-102,3},
+          {-102,120},{340,120}}, color={0,0,127}));
   connect(port_a, gen.port_a)
-    annotation (Line(points={{-240,0},{-160,0}}, color={0,127,255}));
-  connect(entBorTem.port_a, gen.port_b)
-    annotation (Line(points={{-70,0},{-140,0}}, color={0,127,255}));
-  connect(gen.PPumHeaPumGly, PPumHeaPumGly) annotation (Line(points={{-138,-3},
-          {-100,-3},{-100,-150},{340,-150}}, color={0,0,127}));
-  connect(gen.PCom, PCom) annotation (Line(points={{-138,-5},{-108,-5},{-108,
-          -180},{340,-180}}, color={0,0,127}));
-  connect(gen.PPumHeaPumWat, PPumHeaPumWat) annotation (Line(points={{-138,-7},
-          {-114,-7},{-114,-210},{340,-210}}, color={0,0,127}));
-  connect(gen.PPumCirPum, PPumCirPum) annotation (Line(points={{-138,-9},{-120,
-          -9},{-120,-240},{340,-240}}, color={0,0,127}));
-  connect(entBorTem.port_b, borFie.portPer_a)
-    annotation (Line(points={{-50,0},{0,0},{0,8},{40,8}}, color={0,127,255}));
-  connect(entBorTem.port_b, borFie.portCen_a) annotation (Line(points={{-50,0},{
-          0,0},{0,-8},{40,-8}}, color={0,127,255}));
-  connect(borFie.portPer_b, leaBorTem.port_a) annotation (Line(points={{60,8},{100,
-          8},{100,0},{230,0}}, color={0,127,255}));
-  connect(borFie.portCen_b, leaBorTem.port_a) annotation (Line(points={{59.8,-8},
-          {100,-8},{100,0},{230,0}}, color={0,127,255}));
+    annotation (Line(points={{-240,0},{-200,0},{-200,-16},{-160,-16}},
+                                                 color={0,127,255}));
+  connect(gen.PPumHeaPumGly, PPumHeaPumGly) annotation (Line(points={{-138,1},{-100,
+          1},{-100,-80},{340,-80}},          color={0,0,127}));
+  connect(gen.PCom, PCom) annotation (Line(points={{-138,-5},{-108,-5},{-108,-110},
+          {340,-110}},       color={0,0,127}));
+  connect(gen.PPumHeaPumWat, PPumHeaPumWat) annotation (Line(points={{-138,-7},{
+          -114,-7},{-114,-140},{340,-140}},  color={0,0,127}));
+  connect(gen.PPumCirPum, PPumCirPum) annotation (Line(points={{-138,-9},{-120,-9},
+          {-120,-170},{340,-170}},     color={0,0,127}));
+  connect(gen.portBorFiePer_b, borFie.portPer_a) annotation (Line(points={{-158,
+          10},{-158,20},{-60,20},{-60,8},{40,8}}, color={0,127,255}));
+  connect(borFie.portPer_b, gen.portBorFiePer_a) annotation (Line(points={{60,8},
+          {70,8},{70,24},{-154,24},{-154,10}}, color={0,127,255}));
+  connect(gen.portBorFieCen_b, borFie.portCen_a) annotation (Line(points={{-146,
+          10},{-146,18},{-62,18},{-62,-8},{40,-8}}, color={0,127,255}));
+  connect(borFie.portCen_b, gen.portBorFieCen_a) annotation (Line(points={{59.8,
+          -8},{74,-8},{74,26},{-142,26},{-142,10}}, color={0,127,255}));
+  connect(gen.port_b, port_b) annotation (Line(points={{-160,-20},{-170,-20},{-170,
+          -32},{280,-32},{280,0},{322,0}}, color={0,127,255}));
+  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,4},{100,4},
+          {100,-200},{340,-200}}, color={0,0,127}));
+  connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,1},{96,1},
+          {96,-230},{340,-230}}, color={0,0,127}));
+  connect(gen.PPumBorFiePer, PPumBorFiePer) annotation (Line(points={{-138,-1},
+          {-96,-1},{-96,80},{340,80}},     color={0,0,127}));
+  connect(gen.PPumBorFieCen, PPumBorFieCen) annotation (Line(points={{-138,-3},
+          {-90,-3},{-90,50},{340,50}},   color={0,0,127}));
+  connect(TLooMaxMea, gen.TLooMaxMea) annotation (Line(points={{-260,-140},{-186,
+          -140},{-186,-8.2},{-162,-8.2}}, color={0,0,127}));
+  connect(TLooMinMea, gen.TLooMinMea) annotation (Line(points={{-260,-200},{-182,
+          -200},{-182,-12.2},{-162,-12.2}}, color={0,0,127}));
+  connect(TPlaOut, gen.TPlaOut) annotation (Line(points={{-260,140},{-174,140},{
+          -174,8},{-162,8}}, color={0,0,127}));
+  connect(gen.yEleRat, yEleRat) annotation (Line(points={{-138,9},{-128,9},{
+          -128,240},{340,240}}, color={0,127,255}));
+  connect(gen.PFanDryCoo, PFanDryCoo) annotation (Line(points={{-138,7},{-120,7},
+          {-120,180},{340,180}}, color={0,0,127}));
   annotation (defaultComponentName="cenPla",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
                                 Rectangle(
-        extent={{-100,-100},{100,100}},
+        extent={{-100,-200},{100,100}},
         lineColor={0,0,127},
         fillColor={255,255,255},
         fillPattern=FillPattern.Solid),
@@ -326,13 +359,78 @@ equation
           fillColor={0,255,255},
           fillPattern=FillPattern.Solid),
         Rectangle(
-          extent={{-40,-40},{40,40}},
+          extent={{-40,-20},{40,60}},
           lineColor={27,0,55},
           fillColor={170,213,255},
           fillPattern=FillPattern.Solid),
        Text(extent={{-100,140},{100,100}},
           textString="%name",
-          textColor={0,0,255})}),
+          textColor={0,0,255}),
+        Rectangle(
+          extent={{-62,-44},{62,-190}},
+          lineColor={0,0,0},
+          fillColor={234,210,210},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{-52,-50},{-24,-78}},
+          lineColor={0,0,0},
+          fillColor={238,46,47},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{-14,-50},{14,-78}},
+          lineColor={0,0,0},
+          fillColor={238,46,47},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{24,-50},{52,-78}},
+          lineColor={0,0,0},
+          fillColor={238,46,47},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{-14,-152},{14,-180}},
+          lineColor={0,0,0},
+          fillColor={238,46,47},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{24,-152},{52,-180}},
+          lineColor={0,0,0},
+          fillColor={238,46,47},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{-52,-152},{-24,-180}},
+          lineColor={0,0,0},
+          fillColor={238,46,47},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{-14,-120},{14,-148}},
+          lineColor={0,0,0},
+          fillColor={28,108,200},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{24,-120},{52,-148}},
+          lineColor={0,0,0},
+          fillColor={28,108,200},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{-52,-120},{-24,-148}},
+          lineColor={0,0,0},
+          fillColor={28,108,200},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{-14,-88},{14,-116}},
+          lineColor={0,0,0},
+          fillColor={28,108,200},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{24,-88},{52,-116}},
+          lineColor={0,0,0},
+          fillColor={28,108,200},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{-52,-88},{-24,-116}},
+          lineColor={0,0,0},
+          fillColor={28,108,200},
+          fillPattern=FillPattern.Solid)}),
                           Diagram(coordinateSystem(preserveAspectRatio=false,
           extent={{-240,-280},{320,280}})));
 end CentralPlant;
