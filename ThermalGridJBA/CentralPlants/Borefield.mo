@@ -330,7 +330,6 @@ model Borefield "Borefield model"
     each allowFlowReversal=false,
     k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
     annotation (Placement(transformation(extent={{40,-90},{60,-70}})));
-
   BaseClasses.DummyBorefield edgDummy(redeclare package Medium = Medium, final
       m_flow_nominal=mPer_flow_nominal) if useDummy_borefield
     "Dummy borefield for edge (for development only)"

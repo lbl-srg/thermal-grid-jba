@@ -37,6 +37,15 @@ model DetailedPlantFiveHubs
   parameter Real TPlaCooSet(unit="K")=datDis.TPlaCooSet
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
+  parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
+    "Design plant summer cooling setpoint temperature"
+    annotation (Dialog(tab="Central plant"));
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=datDis.TDryBulSum
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Central plant"));
 
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
@@ -71,7 +80,7 @@ model DetailedPlantFiveHubs
   parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=datDis.mPlaHeaPumWat_flow_min
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=datDis.mHpGly_flow_nominal
+  parameter Real mHeaPumGly_flow_nominal(unit="kg/s") = datDis.mPlaHeaPumGly_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=datDis.QPlaHeaPumHea_flow_nominal
@@ -285,6 +294,7 @@ model DetailedPlantFiveHubs
     final TLooMax=datDis.TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
+    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -293,7 +303,7 @@ model DetailedPlantFiveHubs
     final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
     final mHeaPumWat_flow_nominal=mPlaHeaPumWat_flow_nominal,
     final mHeaPumWat_flow_min=mPlaHeaPumWat_flow_min,
-    final mHpGly_flow_nominal=mHpGly_flow_nominal,
+    final mHeaPumGly_flow_nominal=mHeaPumGly_flow_nominal,
     final QHeaPumHea_flow_nominal=QPlaHeaPumHea_flow_nominal,
     final TConHea_nominal=TPlaConHea_nominal,
     final TEvaHea_nominal=TPlaEvaHea_nominal,
@@ -304,6 +314,7 @@ model DetailedPlantFiveHubs
     final TDryAppSet=TDryAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
+    final TDryBulSum=TDryBulSum,
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,
@@ -311,8 +322,7 @@ model DetailedPlantFiveHubs
     final holOffTim=holOffTim,
     final minComSpe=minPlaComSpe,
     final TSoi_start=datDis.TSoi_start,
-    final minHeaPumSpeHol=minHeaPumSpeHol)
-                                  "Central plant"
+    final minHeaPumSpeHol=minHeaPumSpeHol) "Central plant"
     annotation (Placement(transformation(extent={{-180,-10},{-160,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
@@ -768,8 +778,8 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=1728000,
-      Interval=3600,
+      StopTime=31536000,
+      Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
