@@ -453,31 +453,7 @@ model DetailedPlantFiveHubs
     annotation (Placement(transformation(extent={{340,-140},{360,-120}})));
   Modelica.Blocks.Math.MultiSum multiSum(nu=14)
     annotation (Placement(transformation(extent={{240,-160},{260,-140}})));
-  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiPer(
-    T_start=datDis.TSoi_start,
-    V=(63 - 39)*445.5*91) "Borefield temperature change for perimeter"
-    annotation (Placement(transformation(extent={{260,-220},{280,-200}})));
-  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiCen(
-    T_start=datDis.TSoi_start,
-    V=39*445.5*91) "Borefield temperature change for center"
-    annotation (Placement(transformation(extent={{260,-250},{280,-230}})));
-  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoi(
-    T_start=datDis.TSoi_start,
-    V=63*445.5*91) "Borefield temperature change on average"
-    annotation (Placement(transformation(extent={{260,-280},{280,-260}})));
-  Buildings.Controls.OBC.CDL.Reals.Add EBor(
-    u1(final unit="J", displayUnit="Wh"),
-    u2(final unit="J", displayUnit="Wh"),
-    y(final unit="J", displayUnit="Wh"))
-    "Total energy exchange with borehole"
-    annotation (Placement(transformation(extent={{220,-280},{240,-260}})));
-  Buildings.Utilities.IO.Files.Printer priBorFie(
-    samplePeriod(displayUnit="d") = 31536000,
-    header="Average center perimeter",
-    fileName="BorefieldTemperatureChanges.csv",
-    nin=3,
-    configuration=3) "Printer for borefield temperature changes"
-    annotation (Placement(transformation(extent={{300,-280},{320,-260}})));
+
   Buildings.Controls.OBC.CDL.Routing.RealExtractSignal TLooMea(
     nin=5,
     nout=4,
@@ -513,7 +489,32 @@ model DetailedPlantFiveHubs
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
     "Fan electric power consumption of each building"
     annotation (Placement(transformation(extent={{120,270},{140,290}})));
-  CentralPlants.BorefieldMILP borMil
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiPer(
+    T_start=datDis.TSoi_start,
+    V=(495+2*3)*(57+2*3-39)*(91+3)) "Borefield temperature change for perimeter"
+    annotation (Placement(transformation(extent={{260,-220},{280,-200}})));
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiCen(
+    T_start=datDis.TSoi_start,
+    V=(495+2*3)*39*(91+3)) "Borefield temperature change for center"
+    annotation (Placement(transformation(extent={{260,-250},{280,-230}})));
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoi(
+    T_start=datDis.TSoi_start,
+    V=(495+2*3)*(57+2*3)*(91+3)) "Borefield temperature change on average"
+    annotation (Placement(transformation(extent={{260,-280},{280,-260}})));
+  Buildings.Controls.OBC.CDL.Reals.Add EBor(
+    u1(final unit="J", displayUnit="Wh"),
+    u2(final unit="J", displayUnit="Wh"),
+    y(final unit="J", displayUnit="Wh"))
+    "Total energy exchange with borehole"
+    annotation (Placement(transformation(extent={{220,-280},{240,-260}})));
+  Buildings.Utilities.IO.Files.Printer priBorFie(
+    samplePeriod(displayUnit="d") = 31536000,
+    header="Average center perimeter",
+    fileName="BorefieldTemperatureChanges.csv",
+    nin=3,
+    configuration=3) "Printer for borefield temperature changes"
+    annotation (Placement(transformation(extent={{300,-280},{320,-260}})));
+  CentralPlants.BorefieldMILP borMil "Energy exchange with borefield as computed by MILP"
     annotation (Placement(transformation(extent={{340,-280},{360,-260}})));
 equation
  for i in 1:nBui loop
@@ -618,12 +619,7 @@ equation
           -12},{-112,-12},{-112,10},{138,10}},
                                              color={0,0,127}));
   connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-158,-14},
-          {-108,-14},{-108,-28},{178,-28}},
-                                     color={0,0,127}));
-//   connect(weaDat.weaBus, bui.weaBus) annotation (Line(
-//       points={{-360,-20},{-340,-20},{-340,250},{0,250}},
-//       color={255,204,51},
-//       thickness=0.5));
+          {-108,-14},{-108,-28},{178,-28}}, color={0,0,127}));
   connect(TDisWatSup.T, sub.u1) annotation (Line(points={{-91,170},{-220,170},{
           -220,-170},{60,-170},{60,-214},{78,-214}},    color={0,0,127}));
   connect(TDisWatRet.T, sub.u2) annotation (Line(points={{-91,-80},{-100,-80},{-100,
