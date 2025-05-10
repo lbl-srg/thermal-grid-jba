@@ -37,6 +37,15 @@ model DetailedPlantFiveHubs
   parameter Real TPlaCooSet(unit="K")=datDis.TPlaCooSet
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
+  parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
+    "Design plant summer cooling setpoint temperature"
+    annotation (Dialog(tab="Central plant"));
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=datDis.TDryBulSum
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Central plant"));
 
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
@@ -71,7 +80,7 @@ model DetailedPlantFiveHubs
   parameter Real mPlaHeaPumWat_flow_min(unit="kg/s")=datDis.mPlaHeaPumWat_flow_min
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")=datDis.mHpGly_flow_nominal
+  parameter Real mHeaPumGly_flow_nominal(unit="kg/s") = datDis.mPlaHeaPumGly_flow_nominal
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=datDis.QPlaHeaPumHea_flow_nominal
@@ -285,6 +294,7 @@ model DetailedPlantFiveHubs
     final TLooMax=datDis.TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
+    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -293,7 +303,7 @@ model DetailedPlantFiveHubs
     final mDryCoo_flow_nominal=mDryCoo_flow_nominal,
     final mHeaPumWat_flow_nominal=mPlaHeaPumWat_flow_nominal,
     final mHeaPumWat_flow_min=mPlaHeaPumWat_flow_min,
-    final mHpGly_flow_nominal=mHpGly_flow_nominal,
+    final mHeaPumGly_flow_nominal=mHeaPumGly_flow_nominal,
     final QHeaPumHea_flow_nominal=QPlaHeaPumHea_flow_nominal,
     final TConHea_nominal=TPlaConHea_nominal,
     final TEvaHea_nominal=TPlaEvaHea_nominal,
@@ -304,6 +314,7 @@ model DetailedPlantFiveHubs
     final TDryAppSet=TDryAppSet,
     final TApp=TApp,
     final minFanSpe=minFanSpe,
+    final TDryBulSum=TDryBulSum,
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,
@@ -311,8 +322,7 @@ model DetailedPlantFiveHubs
     final holOffTim=holOffTim,
     final minComSpe=minPlaComSpe,
     final TSoi_start=datDis.TSoi_start,
-    final minHeaPumSpeHol=minHeaPumSpeHol)
-                                  "Central plant"
+    final minHeaPumSpeHol=minHeaPumSpeHol) "Central plant"
     annotation (Placement(transformation(extent={{-180,-10},{-160,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
@@ -453,31 +463,7 @@ model DetailedPlantFiveHubs
     annotation (Placement(transformation(extent={{340,-140},{360,-120}})));
   Modelica.Blocks.Math.MultiSum multiSum(nu=14)
     annotation (Placement(transformation(extent={{240,-160},{260,-140}})));
-  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiPer(
-    T_start=datDis.TSoi_start,
-    V=(63 - 39)*445.5*91) "Borefield temperature change for perimeter"
-    annotation (Placement(transformation(extent={{260,-220},{280,-200}})));
-  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiCen(
-    T_start=datDis.TSoi_start,
-    V=39*445.5*91) "Borefield temperature change for center"
-    annotation (Placement(transformation(extent={{260,-250},{280,-230}})));
-  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoi(
-    T_start=datDis.TSoi_start,
-    V=63*445.5*91) "Borefield temperature change on average"
-    annotation (Placement(transformation(extent={{260,-280},{280,-260}})));
-  Buildings.Controls.OBC.CDL.Reals.Add EBor(
-    u1(final unit="J", displayUnit="Wh"),
-    u2(final unit="J", displayUnit="Wh"),
-    y(final unit="J", displayUnit="Wh"))
-    "Total energy exchange with borehole"
-    annotation (Placement(transformation(extent={{220,-280},{240,-260}})));
-  Buildings.Utilities.IO.Files.Printer priBorFie(
-    samplePeriod(displayUnit="d") = 31536000,
-    header="Average center perimeter",
-    fileName="BorefieldTemperatureChanges.csv",
-    nin=3,
-    configuration=3) "Printer for borefield temperature changes"
-    annotation (Placement(transformation(extent={{300,-280},{320,-260}})));
+
   Buildings.Controls.OBC.CDL.Routing.RealExtractSignal TLooMea(
     nin=5,
     nout=4,
@@ -513,7 +499,32 @@ model DetailedPlantFiveHubs
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
     "Fan electric power consumption of each building"
     annotation (Placement(transformation(extent={{120,270},{140,290}})));
-  CentralPlants.BorefieldMILP borMil
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiPer(
+    T_start=datDis.TSoi_start,
+    V=(495+2*3)*(57+2*3-39)*(91+3)) "Borefield temperature change for perimeter"
+    annotation (Placement(transformation(extent={{260,-220},{280,-200}})));
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiCen(
+    T_start=datDis.TSoi_start,
+    V=(495+2*3)*39*(91+3)) "Borefield temperature change for center"
+    annotation (Placement(transformation(extent={{260,-250},{280,-230}})));
+  CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoi(
+    T_start=datDis.TSoi_start,
+    V=(495+2*3)*(57+2*3)*(91+3)) "Borefield temperature change on average"
+    annotation (Placement(transformation(extent={{260,-280},{280,-260}})));
+  Buildings.Controls.OBC.CDL.Reals.Add EBor(
+    u1(final unit="J", displayUnit="Wh"),
+    u2(final unit="J", displayUnit="Wh"),
+    y(final unit="J", displayUnit="Wh"))
+    "Total energy exchange with borehole"
+    annotation (Placement(transformation(extent={{220,-280},{240,-260}})));
+  Buildings.Utilities.IO.Files.Printer priBorFie(
+    samplePeriod(displayUnit="d") = 31536000,
+    header="Average center perimeter",
+    fileName="BorefieldTemperatureChanges.csv",
+    nin=3,
+    configuration=3) "Printer for borefield temperature changes"
+    annotation (Placement(transformation(extent={{300,-280},{320,-260}})));
+  CentralPlants.BorefieldMILP borMil "Energy exchange with borefield as computed by MILP"
     annotation (Placement(transformation(extent={{340,-280},{360,-260}})));
 equation
  for i in 1:nBui loop
@@ -618,12 +629,7 @@ equation
           -12},{-112,-12},{-112,10},{138,10}},
                                              color={0,0,127}));
   connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-158,-14},
-          {-108,-14},{-108,-28},{178,-28}},
-                                     color={0,0,127}));
-//   connect(weaDat.weaBus, bui.weaBus) annotation (Line(
-//       points={{-360,-20},{-340,-20},{-340,250},{0,250}},
-//       color={255,204,51},
-//       thickness=0.5));
+          {-108,-14},{-108,-28},{178,-28}}, color={0,0,127}));
   connect(TDisWatSup.T, sub.u1) annotation (Line(points={{-91,170},{-220,170},{
           -220,-170},{60,-170},{60,-214},{78,-214}},    color={0,0,127}));
   connect(TDisWatRet.T, sub.u2) annotation (Line(points={{-91,-80},{-100,-80},{-100,
@@ -772,8 +778,8 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=1728000,
-      Interval=3600,
+      StopTime=31536000,
+      Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>

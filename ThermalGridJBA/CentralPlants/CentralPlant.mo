@@ -21,6 +21,10 @@ model CentralPlant "Central plant"
     unit="K",
     displayUnit="degC")=TLooMax
     "Design plant cooling setpoint temperature";
+  parameter Real TPlaSumCooSet(
+    unit="K",
+    displayUnit="degC")=TPlaCooSet-2
+    "Design plant summer cooling setpoint temperature";
 
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each generation module";
@@ -38,9 +42,8 @@ model CentralPlant "Central plant"
   parameter Real dpDryCoo_nominal(unit="Pa")=10000
     "Nominal pressure drop of dry cooler"
     annotation (Dialog(group="Dry cooler"));
-  parameter Real mDryCoo_flow_nominal(unit="kg/s")=
-    mHexGly_flow_nominal + mHpGly_flow_nominal
-    "Nominal glycol mass flow rate for dry cooler"
+  parameter Real mDryCoo_flow_nominal(unit="kg/s") = mHexGly_flow_nominal +
+    mHeaPumGly_flow_nominal "Nominal glycol mass flow rate for dry cooler"
     annotation (Dialog(group="Dry cooler"));
   // Heat pump parameters
   parameter Real mHeaPumWat_flow_nominal(unit="kg/s")
@@ -49,7 +52,7 @@ model CentralPlant "Central plant"
   parameter Real mHeaPumWat_flow_min(unit="kg/s")
     "Heat pump minimum water mass flow rate"
     annotation (Dialog(group="Heat pump"));
-  parameter Real mHpGly_flow_nominal(unit="kg/s")
+  parameter Real mHeaPumGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
   parameter Real QHeaPumHea_flow_nominal(unit="W")
@@ -90,6 +93,12 @@ model CentralPlant "Central plant"
 //   parameter Real THeaSet(unit="K")=TLooMax
 //     "Heat pump tracking temperature setpoint in heating mode"
 //     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=295.15
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K", displayUnit="degC")
     "Minimum condenser inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
@@ -221,6 +230,7 @@ model CentralPlant "Central plant"
     final TLooMax=TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
+    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mWat_flow_nominal,
     mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
@@ -229,7 +239,7 @@ model CentralPlant "Central plant"
     final mHeaPumWat_flow_nominal=mHeaPumWat_flow_nominal,
     final mHeaPumWat_flow_min=mHeaPumWat_flow_min,
     final mHexGly_flow_nominal=mHexGly_flow_nominal,
-    final mHpGly_flow_nominal=mHpGly_flow_nominal,
+    mHeaPumGly_flow_nominal=mHeaPumGly_flow_nominal,
     final mGly_flow_nominal=mDryCoo_flow_nominal,
     final dpHex_nominal=dpHex_nominal,
     final dpValve_nominal=dpValve_nominal,
@@ -245,6 +255,7 @@ model CentralPlant "Central plant"
     final TApp=TApp,
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
+    final TDryBulSum=TDryBulSum,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,
