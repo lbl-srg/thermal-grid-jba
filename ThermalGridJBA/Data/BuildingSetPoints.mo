@@ -13,9 +13,13 @@ record BuildingSetPoints "Set points for the buildings"
     annotation (Dialog(group="Chilled water"));
   final parameter Modelica.Units.SI.ThermodynamicTemperature TChiWatRet_nominal = TChiWatSup_nominal + dTChiWat_nominal
     "Nominal chilled water return temperature";
+  final parameter Modelica.Units.SI.ThermodynamicTemperature THeaRooSet = 273.15+20.5
+    "Room air temperature set point for heating system at which control is at zero demand";
+  final parameter Modelica.Units.SI.ThermodynamicTemperature TCooRooSet = 273.15+23.5
+    "Room air temperature set point for cooling system at which control is at zero demand";
   parameter Modelica.Units.SI.ThermodynamicTemperature tabChiWatRes[2,2](each displayUnit="degC")=
-    [16+273.15, 12+273.15;
-     27+273.15, TChiWatSup_nominal]
+    [TCooRooSet-1, 12+273.15;
+     TCooRooSet, TChiWatSup_nominal]
     "Chilled water supply temperature reset schedule"
     annotation (Dialog(group="Chilled water"));
 
@@ -28,8 +32,8 @@ record BuildingSetPoints "Set points for the buildings"
   final parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatRet_nominal = THeaWatSup_nominal - dTHeaWat_nominal
     "Nominal heating hot water supply temperature";
   parameter Real tabHeaWatRes[2,2]=[
-      273.15+19.5, 273.15+60;
-      273.15+20.5, 273.15+22]
+      THeaRooSet-1, THeaWatSup_nominal;
+      THeaRooSet, THeaRooSet+1.5]
     "Heating hot water supply temperature reset schedule"
     annotation (Dialog(group="Heating hot water"));
   parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSupTan_nominal(displayUnit="degC") =

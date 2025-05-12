@@ -120,9 +120,12 @@ model ConnectedETS
         unit="W"), final k=facMul) if have_eleNonHva
                                                "Scaling"
     annotation (Placement(transformation(extent={{270,-10},{290,10}})));
-  Modelica.Blocks.Sources.RealExpression TRooAir(y=bui.terUniHea.TLoaODE.TAir)
+  Modelica.Blocks.Sources.RealExpression TRooAirHea(y=bui.terUniHea.TLoaODE.TAir)
     "Room air temperature"
     annotation (Placement(transformation(extent={{-180,60},{-160,80}})));
+  Modelica.Blocks.Sources.RealExpression TRooAirCoo(y=bui.terUniCoo.TLoaODE.TAir)
+    "Room air temperature"
+    annotation (Placement(transformation(extent={{-180,20},{-160,40}})));
 equation
 
   connect(ets.QReqHotWat_flow, bui.QReqHotWat_flow) annotation (Line(points={{-34,-74},
@@ -143,20 +146,14 @@ equation
           {-64,70},{-64,-58},{-34,-58}}, color={0,0,127}));
   connect(TChiWatSupSet.y, ets.TChiWatSupSet) annotation (Line(points={{-119,30},
           {-68,30},{-68,-62},{-34,-62}}, color={0,0,127}));
-  connect(weaBus.TDryBul, TChiWatSupSet.u) annotation (Line(
-      points={{0.1,280.1},{-152,280.1},{-152,30},{-142,30}},
-      color={255,204,51},
-      thickness=0.5), Text(
-      string="%first",
-      index=-1,
-      extent={{-3,6},{-3,6}},
-      horizontalAlignment=TextAlignment.Right));
   connect(mulPEleNonHva.y, PEleNonHva)
     annotation (Line(points={{292,0},{320,0}}, color={0,0,127}));
   connect(loaEleNonHva.y[1], mulPEleNonHva.u)
     annotation (Line(points={{181,0},{268,0}}, color={0,0,127}));
-  connect(TRooAir.y, THeaWatSupSet.u)
+  connect(TRooAirHea.y, THeaWatSupSet.u)
     annotation (Line(points={{-159,70},{-142,70}}, color={0,0,127}));
+  connect(TChiWatSupSet.u, TRooAirCoo.y)
+    annotation (Line(points={{-142,30},{-159,30}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
         defaultComponentName = "bui");

@@ -15,6 +15,10 @@ partial model PartialConnectedETS
       terUniHea(
         con(
           controllerType=Buildings.Controls.OBC.CDL.Types.SimpleController.P),
+        TLoaODE(tau=7200)),
+      terUniCoo(
+        con(
+          controllerType=Buildings.Controls.OBC.CDL.Types.SimpleController.P),
         TLoaODE(tau=7200))),
     nPorts_heaWat=1,
     nPorts_chiWat=1);
