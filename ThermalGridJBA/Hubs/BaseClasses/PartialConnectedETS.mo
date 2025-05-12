@@ -10,7 +10,12 @@ partial model PartialConnectedETS
       final have_hotWat=have_hotWat,
       QHea_flow_nominal=facTerUniSizHea*Buildings.DHC.Loads.BaseClasses.getPeakLoad(
           string="#Peak space heating load",
-          filNam=Modelica.Utilities.Files.loadResource(filNam))),
+          filNam=Modelica.Utilities.Files.loadResource(filNam)),
+      k = 20,
+      terUniHea(
+        con(
+          controllerType=Buildings.Controls.OBC.CDL.Types.SimpleController.P),
+        TLoaODE(tau=7200))),
     nPorts_heaWat=1,
     nPorts_chiWat=1);
 
