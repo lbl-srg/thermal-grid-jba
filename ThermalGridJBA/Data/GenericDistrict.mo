@@ -28,6 +28,9 @@ record GenericDistrict "District network design parameters"
         string="#Peak space cooling load",
         filNam=Modelica.Utilities.Files.loadResource(filNamCom)));
 
+  parameter Real facTerUniSizHea[nBui](each final unit="1") = fill(1, nBui)
+    "Factor to increase design capacity of space terminal units for heating";
+
   parameter Modelica.Units.SI.HeatFlowRate QPlaPeaHea_flow(
     min=Modelica.Constants.eps) = hexSiz.QHea_flow_nominal
     "Peak heating load at all the ETS heat exchanger"

@@ -11,7 +11,8 @@ record FiveHubs "District set up for five clustered hubs using fTMY"
     filNamCom=
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_futu.mos",
     lDis={34,688,347,401,1412,578},
-    lCon={27,226,237,48,31});
+    lCon={27,226,237,48,31},
+    facTerUniSizHea={1,1.3,1.3,1,1});
   annotation (
     defaultComponentName="datDis",
     defaultComponentPrefixes="inner",
