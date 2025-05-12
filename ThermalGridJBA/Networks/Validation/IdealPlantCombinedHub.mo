@@ -120,7 +120,7 @@ model IdealPlantCombinedHub
         origin={-80,-40})));
   ThermalGridJBA.Hubs.ConnectedETS
     bui[nBui](
-    facTerUniSizHea={1},
+    final facTerUniSizHea = datDis.facTerUniSizHea,
     final filNam = datDis.filNamInd,
     bui(each final facMul=1),
     redeclare each final package MediumBui = Medium,
