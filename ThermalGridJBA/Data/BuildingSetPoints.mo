@@ -2,9 +2,6 @@ within ThermalGridJBA.Data;
 record BuildingSetPoints "Set points for the buildings"
   extends Modelica.Icons.Record;
 
-  parameter Real facTerUniSizHea[5](
-     each final unit="1") = {1, 1.3, 1.3, 1, 1}
-    "Factor to increase design capacity of space terminal units for heating";
   parameter Modelica.Units.SI.ThermodynamicTemperature TChiWatSup_nominal = 7+273.15
     "Nominal chilled water supply temperature"
     annotation (Dialog(group="Chilled water"));
