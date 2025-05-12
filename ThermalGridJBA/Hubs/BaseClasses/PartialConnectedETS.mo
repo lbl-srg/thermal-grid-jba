@@ -14,7 +14,7 @@ partial model PartialConnectedETS
     nPorts_heaWat=1,
     nPorts_chiWat=1);
 
-   parameter Real facTerUniSizHea(final unit="1")
+  parameter Real facTerUniSizHea(final unit="1")
     "Factor to increase design capacity of space terminal units for heating";
   parameter String filNam "File name for the load profile";
   parameter ThermalGridJBA.Data.BuildingSetPoints datBuiSet
