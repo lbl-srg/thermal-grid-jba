@@ -293,10 +293,16 @@ model CentralPlant "Central plant"
   Modelica.Blocks.Sources.RealExpression hexHea(y=gen.hex.Q2_flow)
     "Heat exchanger heat flow"
     annotation (Placement(transformation(extent={{-100,190},{-80,210}})));
-  Modelica.Blocks.Continuous.Integrator EHeaPumEne(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EHeaPum(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Heat pump energy"
     annotation (Placement(transformation(extent={{-60,210},{-40,230}})));
-  Modelica.Blocks.Continuous.Integrator EHexEne(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EHexEne(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
   Borefield borFie(TSoi_start=TSoi_start) "Borefield"
@@ -308,7 +314,7 @@ equation
           5},{-162,5}},      color={0,0,127}));
   connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,60},{-186,60},{-186,
           1.8},{-162,1.8}},    color={0,0,127}));
-  connect(heaPumHea.y, EHeaPumEne.u)
+  connect(heaPumHea.y, EHeaPum.u)
     annotation (Line(points={{-79,220},{-62,220}}, color={0,0,127}));
   connect(hexHea.y, EHexEne.u)
     annotation (Line(points={{-79,200},{18,200}}, color={0,0,127}));
