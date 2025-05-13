@@ -481,7 +481,7 @@ model DetailedPlantFiveHubs
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J", displayUnit="Wh")) "Dry cooler fan electric energy"
-    annotation (Placement(transformation(extent={{40,140},{60,160}})));
+    annotation (Placement(transformation(extent={{242,110},{262,130}})));
 
   Modelica.Blocks.Continuous.Integrator EEleNonHvaETS(
     initType=Modelica.Blocks.Types.Init.InitialState,
@@ -750,11 +750,13 @@ equation
   connect(dis.dH_flow, QEtsHex_flow.u) annotation (Line(points={{22,207},{30,
           207},{30,226},{38,226}}, color={0,0,127}));
   connect(cenPla.PFanDryCoo, EFanDryCoo.u) annotation (Line(points={{-158,7},{
-          -136,7},{-136,150},{38,150}}, color={0,0,127}));
+          -136,7},{-136,144},{234,144},{234,120},{240,120}},
+                                        color={0,0,127}));
   connect(cenPla.PFanDryCoo, multiSum.u[12]) annotation (Line(points={{-158,7},
           {-136,7},{-136,-147.75},{240,-147.75}},   color={0,0,127}));
-  connect(EFanDryCoo.y, ETot.u[4]) annotation (Line(points={{61,150},{80,150},{80,
-          144},{292,144},{292,100},{358,100}},          color={0,0,127}));
+  connect(EFanDryCoo.y, ETot.u[4]) annotation (Line(points={{263,120},{272,120},
+          {272,160},{348,160},{348,116},{352,116},{352,100},{358,100}},
+                                                        color={0,0,127}));
   connect(PEleNonHva.y, EEleNonHvaETS.u)
     annotation (Line(points={{202,240},{238,240}}, color={0,0,127}));
   connect(bui.PEleNonHva, PEleNonHva.u) annotation (Line(points={{12,238},{20,
