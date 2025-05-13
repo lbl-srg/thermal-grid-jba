@@ -164,11 +164,11 @@ block Borefields
     annotation (Placement(transformation(extent={{120,-310},{140,-290}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con(final k=1)
     "Constant one"
-    annotation (Placement(transformation(extent={{20,-250},{40,-230}})));
+    annotation (Placement(transformation(extent={{20,-230},{40,-210}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai3(
     final k=mBorFieCen_flow_nominal)
     "Convert to mass flow rate"
-    annotation (Placement(transformation(extent={{60,-250},{80,-230}})));
+    annotation (Placement(transformation(extent={{60,-230},{80,-210}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con1(final k=0)
     "Constant zero"
     annotation (Placement(transformation(extent={{-180,-310},{-160,-290}})));
@@ -265,11 +265,7 @@ equation
   connect(gai1.y, secLooPum.u1) annotation (Line(points={{62,-150},{140,-150},{140,
           -232},{178,-232}},      color={0,0,127}));
   connect(con.y, gai3.u)
-    annotation (Line(points={{42,-240},{58,-240}}, color={0,0,127}));
-  connect(gai3.y, cenBorPum1.u1) annotation (Line(points={{82,-240},{100,-240},{
-          100,-252},{118,-252}},  color={0,0,127}));
-  connect(gai3.y, secLooPum1.u1) annotation (Line(points={{82,-240},{100,-240},{
-          100,-292},{118,-292}},  color={0,0,127}));
+    annotation (Line(points={{42,-220},{58,-220}}, color={0,0,127}));
   connect(cenBorPum1.y, cenBorPum.u3) annotation (Line(points={{142,-260},{150,-260},
           {150,-208},{178,-208}},       color={0,0,127}));
   connect(secLooPum1.y, secLooPum.u3) annotation (Line(points={{142,-300},{160,-300},
@@ -306,6 +302,10 @@ equation
           110,-260},{118,-260}}, color={255,0,255}));
   connect(onlPer2.y, secLooPum1.u2) annotation (Line(points={{102,70},{110,70},{
           110,-300},{118,-300}}, color={255,0,255}));
+  connect(mHeaPum_flow, cenBorPum1.u1) annotation (Line(points={{-280,-250},{80,
+          -250},{80,-252},{118,-252}}, color={0,0,127}));
+  connect(mHeaPum_flow, secLooPum1.u1) annotation (Line(points={{-280,-250},{80,
+          -250},{80,-292},{118,-292}}, color={0,0,127}));
 annotation (defaultComponentName="borCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(

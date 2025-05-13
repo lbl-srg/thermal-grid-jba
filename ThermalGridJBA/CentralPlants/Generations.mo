@@ -349,7 +349,7 @@ model Generations
     final addPowerToMedium=false,
     final use_riseTime=true,
     final riseTime=heaPumPumRis,
-    final m_flow_nominal=max(mBorFieCen_flow_nominal, mHeaPumWat_flow_nominal),
+    final m_flow_nominal=mHeaPumWat_flow_nominal,
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-40})));
