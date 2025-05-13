@@ -159,7 +159,7 @@ def _simulate(spec):
                'flag' : flag}
     return success
 
-def summarise_tests(success):
+def summarize_results(success):
 
     num_cases = len(list_of_cases)
     num_success = sum(1 for item in success if item['flag'])
@@ -214,9 +214,9 @@ if __name__=='__main__':
     from multiprocessing import Pool
     import multiprocessing
     import shutil
-    import get_cases_full_system
+    import cases
 
-    list_of_cases = get_cases_full_system.get_cases_full_system()
+    list_of_cases = cases.get_cases()
 
 
     # Number of parallel processes
@@ -243,7 +243,7 @@ if __name__=='__main__':
     shutil.rmtree(lib_dir)
 
     print("="*10 + "TEST SUMMARY" + "="*10)
-    summarise_tests(success)
+    summarize_results(success)
     if CHECK_LOG_FILES.upper() in ['ALL', 'FAILED']:
         check_logs(CHECK_LOG_FILES, success)
 
