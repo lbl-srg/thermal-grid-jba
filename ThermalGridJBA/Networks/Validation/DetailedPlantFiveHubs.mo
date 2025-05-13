@@ -46,6 +46,12 @@ model DetailedPlantFiveHubs
     displayUnit="degC")=datDis.TDryBulSum
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
     annotation (Dialog(tab="Central plant"));
+  parameter Real dTCooCha(
+    final min=0,
+    final unit="K",
+    final quantity="TemperatureDifference")=datDis.dTCooCha
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0"
+    annotation (Dialog(tab="Central plant"));
 
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
     "Nominal water mass flow rate to each generation module"
@@ -315,6 +321,7 @@ model DetailedPlantFiveHubs
     final TApp=TApp,
     final minFanSpe=minFanSpe,
     final TDryBulSum=TDryBulSum,
+    final dTCooCha=dTCooCha,
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,

@@ -34,11 +34,9 @@ record GenericDistrict "District network design parameters"
 
   parameter Modelica.Units.SI.HeatFlowRate QPlaPeaHea_flow(min=Modelica.Constants.eps)
     =hexSiz.QHea_flow_nominal
-    "Peak heating load at all the ETS heat exchanger"
-    annotation (Dialog(tab="Central plant", group="Heat pump"));
+    "Peak heating load at all the ETS heat exchanger";
   parameter Modelica.Units.SI.HeatFlowRate QPlaPeaCoo_flow = hexSiz.QCoo_flow_nominal
-    "Peak cooling load at all the ETS heat exchanger"
-    annotation (Dialog(tab="Central plant", group="Heat pump"));
+    "Peak cooling load at all the ETS heat exchanger";
   parameter Modelica.Units.SI.TemperatureDifference dTLoo_nominal=4
     "Design temperature difference of the district loop";
 
@@ -169,7 +167,9 @@ record GenericDistrict "District network design parameters"
     "Nominal cooling capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
-
+  parameter Modelica.Units.SI.TemperatureDifference dTCooCha(min=0)=4
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0"
+    annotation (Dialog(tab="Central plant"));
   parameter Real TPlaConHea_nominal(unit="K")=TLooMin
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(tab="Central plant", group="Heat pump"));

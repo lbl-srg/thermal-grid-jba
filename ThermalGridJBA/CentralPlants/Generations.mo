@@ -134,8 +134,14 @@ model Generations
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC")=295.15
+    displayUnit="degC")=297.15
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real dTCooCha(
+    final min=0,
+    final unit="K",
+    final quantity="TemperatureDifference")=4
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K")
     "Minimum condenser inlet temperature"
@@ -343,7 +349,7 @@ model Generations
     final addPowerToMedium=false,
     final use_riseTime=true,
     final riseTime=heaPumPumRis,
-    final m_flow_nominal=max(mBorFieCen_flow_nominal, mHeaPumWat_flow_nominal),
+    final m_flow_nominal=mHeaPumWat_flow_nominal,
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-40})));
@@ -767,6 +773,7 @@ model Generations
     final TLooMax=TLooMax,
     final TDryBulSum=TDryBulSum,
     final TPlaHeaSet=TPlaHeaSet,
+    final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final minComSpe=minComSpe,
