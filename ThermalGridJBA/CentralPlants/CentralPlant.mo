@@ -96,8 +96,14 @@ model CentralPlant "Central plant"
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC")=295.15
+    displayUnit="degC")=297.15
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real dTCooCha(
+    final min=0,
+    final unit="K",
+    final quantity="TemperatureDifference")=4
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K", displayUnit="degC")
     "Minimum condenser inlet temperature"
@@ -256,6 +262,7 @@ model CentralPlant "Central plant"
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
     final TDryBulSum=TDryBulSum,
+    final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,
@@ -331,9 +338,9 @@ equation
           -8},{74,-8},{74,26},{-142,26},{-142,10}}, color={0,127,255}));
   connect(gen.port_b, port_b) annotation (Line(points={{-160,-20},{-170,-20},{-170,
           -32},{280,-32},{280,0},{322,0}}, color={0,127,255}));
-  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,4},{100,4},
+  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,5},{100,5},
           {100,-200},{340,-200}}, color={0,0,127}));
-  connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,1},{96,1},
+  connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,3},{96,3},
           {96,-230},{340,-230}}, color={0,0,127}));
   connect(gen.PPumBorFiePer, PPumBorFiePer) annotation (Line(points={{-138,-1},
           {-96,-1},{-96,80},{340,80}},     color={0,0,127}));

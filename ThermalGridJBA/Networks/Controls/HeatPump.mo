@@ -29,7 +29,7 @@ block HeatPump
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC")=295.15
+    displayUnit="degC")=297.15
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield";
 //   parameter Real TPlaCooSet(
 //     final quantity="ThermodynamicTemperature",
@@ -41,6 +41,11 @@ block HeatPump
     final unit="K",
     displayUnit="degC")=TLooMax
     "Plant heating setpoint temperature";
+  parameter Real dTCooCha(
+    final min=0,
+    final unit="K",
+    final quantity="TemperatureDifference")=4
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0";
   parameter Real TConInMin(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -354,8 +359,7 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Logical.And norRatFal "Normal rate in Fall"
     annotation (Placement(transformation(extent={{-140,310},{-120,330}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desLooMin(
-    y(unit="K", displayUnit="degC"),
-    final k=TLooMin)
+    y(unit="K", displayUnit="degC"), final k=TLooMin - dTCooCha)
     "Design minimum district loop temperature"
     annotation (Placement(transformation(extent={{-180,280},{-160,300}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desLooMax(

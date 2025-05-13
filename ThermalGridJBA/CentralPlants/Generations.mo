@@ -134,8 +134,14 @@ model Generations
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC")=295.15
+    displayUnit="degC")=297.15
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real dTCooCha(
+    final min=0,
+    final unit="K",
+    final quantity="TemperatureDifference")=4
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K")
     "Minimum condenser inlet temperature"
@@ -767,6 +773,7 @@ model Generations
     final TLooMax=TLooMax,
     final TDryBulSum=TDryBulSum,
     final TPlaHeaSet=TPlaHeaSet,
+    final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final minComSpe=minComSpe,
