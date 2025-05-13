@@ -19,6 +19,8 @@ from dymola.dymola_interface import DymolaInterface
 dymola = DymolaInterface("/usr/local/bin/dymola")
 # Replace the argument with the location of your Dymola excecutable. 
 
+from GetVariables import get_vars # python file under same folder
+
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
 mat_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.mat")
@@ -91,27 +93,12 @@ var_list_pre_index = list(var_dict_pre_index.keys())
 
 var_list = generate_indexed_var_list(var_list_pre_index, index_holder, range(1,nBui+1))
 
-#%% Generate Dymola command to export csv from large mat file
-def generate_dymola_command(var_list, mat_file_path, csv_file_path):
-    
-    s = ''
-    s += f'DataFiles.convertMATtoCSV("{mat_file_path}", '
-    s += '{"'
-    s += '","'.join(var_list)
-    s += '"}, '
-    s += f'"{csv_file_path}");'
-        
-    return s    
-    # __ref = r'DataFiles.convertMATtoCSV("/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/DetailedPlantFiveHubs.mat", {"bui[1].ets.chi.chi.COP","bui[1].ets.chi.uCoo"}, "/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/trimmed.csv");'
+#%% Read mat file
+result_full = get_vars(var_list,
+                       mat_file_name,
+                       'dymola',
+                       csv_file_name)
 
-dymola_command = generate_dymola_command(var_list,
-                                         mat_file_name,
-                                         csv_file_name)
-dymola.ExecuteCommand(dymola_command)
-
-#%% Read exported result csv file
-result_full = pd.read_csv(csv_file_name, header = 0)
-    
 # Convert the timestamp to datetime format
 result_full['datetime'] = pd.to_datetime(result_full['Time'], unit='s', origin='2025-01-01')
 
