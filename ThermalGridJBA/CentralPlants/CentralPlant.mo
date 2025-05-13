@@ -286,10 +286,16 @@ model CentralPlant "Central plant"
   Modelica.Blocks.Sources.RealExpression hexHea(y=gen.hex.Q2_flow)
     "Heat exchanger heat flow"
     annotation (Placement(transformation(extent={{-100,190},{-80,210}})));
-  Modelica.Blocks.Continuous.Integrator EHeaPumEne(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EHeaPum(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Heat pump energy"
     annotation (Placement(transformation(extent={{-60,210},{-40,230}})));
-  Modelica.Blocks.Continuous.Integrator EHexEne(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EHexEne(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
   Borefield borFie(TSoi_start=TSoi_start) "Borefield"
@@ -301,7 +307,7 @@ equation
           5},{-162,5}},      color={0,0,127}));
   connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,60},{-186,60},{-186,
           1.8},{-162,1.8}},    color={0,0,127}));
-  connect(heaPumHea.y, EHeaPumEne.u)
+  connect(heaPumHea.y, EHeaPum.u)
     annotation (Line(points={{-79,220},{-62,220}}, color={0,0,127}));
   connect(hexHea.y, EHexEne.u)
     annotation (Line(points={{-79,200},{18,200}}, color={0,0,127}));
@@ -331,9 +337,9 @@ equation
           -8},{74,-8},{74,26},{-142,26},{-142,10}}, color={0,127,255}));
   connect(gen.port_b, port_b) annotation (Line(points={{-160,-20},{-170,-20},{-170,
           -32},{280,-32},{280,0},{322,0}}, color={0,127,255}));
-  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,4},{100,4},
+  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,5},{100,5},
           {100,-200},{340,-200}}, color={0,0,127}));
-  connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,1},{96,1},
+  connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,3},{96,3},
           {96,-230},{340,-230}}, color={0,0,127}));
   connect(gen.PPumBorFiePer, PPumBorFiePer) annotation (Line(points={{-138,-1},
           {-96,-1},{-96,80},{340,80}},     color={0,0,127}));
