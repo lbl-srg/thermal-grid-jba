@@ -490,7 +490,10 @@ model DetailedPlantFiveHubs
     y(final unit="J", displayUnit="Wh")) "Dry cooler fan electric energy"
     annotation (Placement(transformation(extent={{40,140},{60,160}})));
 
-  Modelica.Blocks.Continuous.Integrator EEleNonHvaETS(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EEleNonHvaETS(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Non-HVAC electric use in the ETS"
     annotation (Placement(transformation(extent={{240,230},{260,250}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PEleNonHva(final nin=nBui)
@@ -500,7 +503,9 @@ model DetailedPlantFiveHubs
     "Sum of fan electric power consumption of the buildings"
     annotation (Placement(transformation(extent={{180,270},{200,290}})));
   Modelica.Blocks.Continuous.Integrator EFanBui(
-    initType=Modelica.Blocks.Types.Init.InitialState)
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Building fan electric energy"
     annotation (Placement(transformation(extent={{240,270},{260,290}})));
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
