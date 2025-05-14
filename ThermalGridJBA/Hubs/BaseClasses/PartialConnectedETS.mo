@@ -7,27 +7,27 @@ partial model PartialConnectedETS
       final T_bHeaWat_nominal=datBuiSet.THeaWatRet_nominal,
       final T_aChiWat_nominal=datBuiSet.TChiWatSup_nominal,
       final T_bChiWat_nominal=datBuiSet.TChiWatRet_nominal,
-      final have_hotWat=have_hotWat),
+      final have_hotWat=have_hotWat,
+      QHea_flow_nominal=facTerUniSizHea*Buildings.DHC.Loads.BaseClasses.getPeakLoad(
+          string="#Peak space heating load",
+          filNam=Modelica.Utilities.Files.loadResource(filNam))),
     nPorts_heaWat=1,
     nPorts_chiWat=1);
 
-  parameter String filNam
-    "File name for the load profile";
+  parameter Real facTerUniSizHea(final unit="1")
+    "Factor to increase design capacity of space terminal units for heating";
+  parameter String filNam "File name for the load profile";
   parameter ThermalGridJBA.Data.BuildingSetPoints datBuiSet
     "Building set points" annotation (Placement(
       transformation(extent={{20,140},{40,160}})));
   parameter ThermalGridJBA.Data.Chiller datChi(
-    PLRMin=0,
-    QHea_flow_nominal=max(QHea_flow_nominal, QCoo_flow_nominal*1.5),
+    PLRMin=0.2/3 "20%, and assume 3 chillers in parallel",
+    QHea_flow_nominal=max(QHea_flow_nominal, abs(QCoo_flow_nominal)*1.2),
     QCoo_flow_nominal=QCoo_flow_nominal,
-    TConEntMin=313.15,
-    TEvaEntMax=293.15,
-    TEvaLvgMin=277.15,
-    TEvaLvgMax=288.15,
-    dTCon_nominal=datBuiSet.dTHeaWat_nominal,
-    dTEva_nominal=datBuiSet.dTChiWat_nominal,
-    TConLvg_nominal=max(datBuiSet.TChiWatSup_nominal, datBuiSet.THotWatSupTan_nominal),
-    TEvaLvg_nominal=datBuiSet.TChiWatSup_nominal)
+    final dTCon_nominal=datBuiSet.dTHeaWat_nominal,
+    final dTEva_nominal=datBuiSet.dTChiWat_nominal,
+    final TConLvg_nominal=max(datBuiSet.THeaWatSup_nominal, datBuiSet.THotWatSupTan_nominal),
+    final TEvaLvg_nominal=datBuiSet.TChiWatSup_nominal)
     "Heat recovery chiller parameters"
     annotation (Placement(transformation(extent={{20,180},{40,200}})));
 

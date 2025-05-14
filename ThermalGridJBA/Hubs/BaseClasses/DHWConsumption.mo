@@ -37,6 +37,9 @@ model DHWConsumption
       origin={-50,30})));
   Buildings.DHC.ETS.BaseClasses.Junction dcwSpl(
     redeclare final package Medium = Medium,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
     final m_flow_nominal=m_flow_nominal*{1,-1,-1})
                                              "Splitter for domestic cold water"
     annotation (Placement(transformation(
@@ -96,7 +99,8 @@ model DHWConsumption
   Buildings.DHC.Networks.BaseClasses.DifferenceEnthalpyFlowRate dHFlow(
     redeclare final package Medium1 = Medium,
     redeclare final package Medium2 = Medium,
-    final m_flow_nominal=m_flow_nominal) "Variation of enthalpy flow rate"
+    final m_flow_nominal=m_flow_nominal,
+    allowFlowReversal=false)             "Variation of enthalpy flow rate"
     annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
         rotation=-90,
@@ -148,10 +152,48 @@ equation
         extent={{-100,-100},{100,100}},
         lineColor={0,0,127},
         fillColor={255,255,255},
-        fillPattern=FillPattern.Solid), Text(
-          extent={{-66,40},{60,-38}},
-          textColor={102,44,145},
-          textString="DHW",
-          textStyle={TextStyle.Bold})}),  Diagram(
+        fillPattern=FillPattern.Solid),
+        Rectangle(
+          extent={{-48,-60},{52,-68}},
+          lineColor={0,0,255},
+          pattern=LinePattern.None,
+          fillColor={255,255,0},
+          fillPattern=FillPattern.Solid),
+        Rectangle(
+          extent={{-38,70},{-48,-64}},
+          lineColor={0,0,255},
+          pattern=LinePattern.None,
+          fillColor={255,255,0},
+          fillPattern=FillPattern.Solid),
+        Rectangle(
+          extent={{52,72},{42,-62}},
+          lineColor={0,0,255},
+          pattern=LinePattern.None,
+          fillColor={255,255,0},
+          fillPattern=FillPattern.Solid),
+        Rectangle(
+          extent={{-38,-16},{42,-60}},
+          lineColor={0,0,255},
+          pattern=LinePattern.None,
+          fillColor={0,0,127},
+          fillPattern=FillPattern.Solid),
+        Rectangle(
+          extent={{-38,24},{42,-16}},
+          lineColor={255,0,0},
+          pattern=LinePattern.None,
+          fillColor={0,0,127},
+          fillPattern=FillPattern.CrossDiag),
+        Rectangle(
+          extent={{-38,68},{42,24}},
+          lineColor={255,0,0},
+          fillColor={255,0,0},
+          fillPattern=FillPattern.Solid),
+        Rectangle(
+          extent={{-48,76},{52,68}},
+          lineColor={0,0,255},
+          pattern=LinePattern.None,
+          fillColor={255,255,0},
+          fillPattern=FillPattern.Solid)}),
+                                          Diagram(
         coordinateSystem(preserveAspectRatio=false)));
 end DHWConsumption;

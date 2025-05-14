@@ -23,61 +23,36 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
     "Temperature start value"
     annotation(Dialog(tab = "Initialization"));
   parameter Boolean isHotWat
-    "True if the tank supplies hot water, False for chilled water";
+    "True if the tank supplies hot water, false for chilled water";
 
   // IO CONNECTORS
-  Modelica.Fluid.Interfaces.FluidPort_a port_aTop(
-    redeclare final package Medium=Medium,
-    m_flow(
-      min=
-        if allowFlowReversal then
-          -Modelica.Constants.inf
-        else
-          0),
-    h_outflow(
-      start=Medium.h_default,
-      nominal=Medium.h_default))
-    "Inlet fluid port at tank top"
-    annotation (Placement(transformation(extent={{90,50},{110,70}}),iconTransformation(extent={{90,50},{110,70}})));
-  Modelica.Fluid.Interfaces.FluidPort_b port_bBot(
-    redeclare final package Medium=Medium,
-    m_flow(
-      max=
-        if allowFlowReversal then
-          +Modelica.Constants.inf
-        else
-          0),
-    h_outflow(
-      start=Medium.h_default,
-      nominal=Medium.h_default))
-    "Outlet fluid port at tank bottom"
-    annotation (Placement(transformation(extent={{90,-70},{110,-50}}),iconTransformation(extent={{90,-70},{110,-50}})));
-  Modelica.Fluid.Interfaces.FluidPort_a port_aBot(
-    redeclare final package Medium=Medium,
-    m_flow(
-      min=
-        if allowFlowReversal then
-          -Modelica.Constants.inf
-        else
-          0),
-    h_outflow(
-      start=Medium.h_default,
-      nominal=Medium.h_default))
-    "Inlet fluid port at tank bottom"
-    annotation (Placement(transformation(extent={{-110,-70},{-90,-50}}),iconTransformation(extent={{-110,-70},{-90,-50}})));
-  Modelica.Fluid.Interfaces.FluidPort_b port_bTop(
-    redeclare final package Medium=Medium,
-    m_flow(
-      max=
-        if allowFlowReversal then
-          +Modelica.Constants.inf
-        else
-          0),
-    h_outflow(
-      start=Medium.h_default,
-      nominal=Medium.h_default))
-    "Outlet fluid port at tank top"
-    annotation (Placement(transformation(extent={{-110,50},{-90,70}}),iconTransformation(extent={{-110,50},{-90,70}})));
+  Modelica.Fluid.Interfaces.FluidPort_a port_genTop(
+    redeclare final package Medium = Medium,
+    m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0),
+    h_outflow(start=Medium.h_default, nominal=Medium.h_default))
+    "Tank top port on generation side" annotation (Placement(transformation(
+          extent={{90,50},{110,70}}), iconTransformation(extent={{90,50},{110,
+            70}})));
+  Modelica.Fluid.Interfaces.FluidPort_b port_genBot(
+    redeclare final package Medium = Medium,
+    m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0),
+    h_outflow(start=Medium.h_default, nominal=Medium.h_default))
+    "Tank bottom port on generation side" annotation (Placement(transformation(
+          extent={{90,-70},{110,-50}}), iconTransformation(extent={{90,-70},{
+            110,-50}})));
+  Modelica.Fluid.Interfaces.FluidPort_a port_loaBot(
+    redeclare final package Medium = Medium,
+    m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0),
+    h_outflow(start=Medium.h_default, nominal=Medium.h_default))
+    "Tank bottom port on load side" annotation (Placement(transformation(extent
+          ={{-110,-70},{-90,-50}}), iconTransformation(extent={{-110,-70},{-90,
+            -50}})));
+  Modelica.Fluid.Interfaces.FluidPort_b port_loaTop(
+    redeclare final package Medium = Medium,
+    m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0),
+    h_outflow(start=Medium.h_default, nominal=Medium.h_default))
+    "Tank top port on load side" annotation (Placement(transformation(extent={{
+            -110,50},{-90,70}}), iconTransformation(extent={{-110,50},{-90,70}})));
   Modelica.Blocks.Interfaces.RealOutput Ql_flow(
     final unit="W")
     "Heat loss of tank (positive if heat flows from tank to ambient)"
@@ -140,16 +115,14 @@ protected
     "Connector to assign multiple heat ports to one heat port"
     annotation (Placement(transformation(extent={{-6,-6},{6,6}},rotation=-90,origin={-60,0})));
 equation
-  connect(port_aTop,tan.port_a)
-    annotation (Line(points={{100,60},{-20,60},{-20,10},{0,10}},color={0,127,255}));
-  connect(port_bTop,tan.fluPorVol[1])
-    annotation (Line(points={{-100,60},{-40,60},{-40,20},{0,20},{0,-1.33333},{-5,
-          -1.33333}},                                                                           color={0,127,255}));
-  connect(tan.port_b,port_bBot)
-    annotation (Line(points={{0,-10},{20,-10},{20,-60},{100,-60}},
-                                                               color={0,127,255}));
-  connect(port_aBot,tan.fluPorVol[nSeg])
-    annotation (Line(points={{-100,-60},{0,-60},{0,0},{-5,0}},  color={0,127,255}));
+  connect(port_genTop, tan.port_a) annotation (Line(points={{100,60},{-20,60},{
+          -20,10},{0,10}}, color={0,127,255}));
+  connect(port_loaTop, tan.fluPorVol[1]) annotation (Line(points={{-100,60},{-40,
+          60},{-40,20},{0,20},{0,-1.33333},{-5,-1.33333}}, color={0,127,255}));
+  connect(tan.port_b, port_genBot) annotation (Line(points={{0,-10},{20,-10},{
+          20,-60},{100,-60}}, color={0,127,255}));
+  connect(port_loaBot, tan.fluPorVol[nSeg]) annotation (Line(points={{-100,-60},
+          {0,-60},{0,0},{-5,0}}, color={0,127,255}));
   connect(tan.Ql_flow,Ql_flow)
     annotation (Line(points={{11,7.2},{80,7.2},{80,30},{120,30}},  color={0,0,127}));
   connect(tan.heaPorVol[nSeg],senTBot.port)
@@ -178,6 +151,7 @@ equation
           24,90},{-58,90}}, color={0,0,127}));
   connect(dTOff.u, TTanSet)
     annotation (Line(points={{-82,90},{-120,90}}, color={0,0,127}));
+
   annotation (
     Icon(
       coordinateSystem(
@@ -256,7 +230,13 @@ equation
         Text(
           extent={{-139,-106},{161,-146}},
           textColor={0,0,255},
-          textString="%name")}),
+          textString="%name"),
+        Rectangle(
+          extent={{100,4},{50,-4}},
+          lineColor={0,0,255},
+          pattern=LinePattern.None,
+          fillColor={0,0,127},
+          fillPattern=FillPattern.Solid)}),
     defaultComponentName="tan",
     Diagram(
       coordinateSystem(

@@ -21,7 +21,6 @@ model StorageTankWithExternalHeatExchanger
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_dp pumHex(
     redeclare package Medium = MediumHea,
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
-    use_riseTime=false,
     riseTime=10,
     m_flow_nominal=dat.mHex_flow_nominal,
     dp_nominal=dat.dpHexHea_nominal) "Pump with head as input" annotation (
@@ -66,6 +65,7 @@ model StorageTankWithExternalHeatExchanger
   Buildings.Fluid.FixedResistances.Junction junTop(
     redeclare package Medium = MediumHea,
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal=dat.mHex_flow_nominal*{1,1,1},
     dp_nominal=zeros(3)) "Flow junction at top of tank"
     annotation (Placement(transformation(extent={{10,20},{30,40}})));
@@ -91,13 +91,11 @@ model StorageTankWithExternalHeatExchanger
   Buildings.Fluid.Actuators.Valves.ThreeWayLinear divVal(
     redeclare package Medium = MediumHea,
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
-    use_strokeTime=false,
     m_flow_nominal=dat.mHex_flow_nominal,
     dpValve_nominal=1000) "Diversion valve to reduce mixing in tank"
     annotation (Placement(transformation(extent={{30,-40},{10,-60}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTemRet(
     redeclare package Medium = MediumHea,
-    final allowFlowReversal=allowFlowReversalDom,
     m_flow_nominal=dat.mHex_flow_nominal)
     "Temperature sensor for return heating water from heat exchanger"
     annotation (Placement(transformation(extent={{-20,-60},{0,-40}})));

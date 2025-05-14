@@ -1,8 +1,8 @@
 within ThermalGridJBA.Hubs;
 model ConnectedETS
   "Load connected to the network via ETS with or without DHW integration"
-  extends ThermalGridJBA.Hubs.BaseClasses.PartialConnectedETS(redeclare
-      ThermalGridJBA.Hubs.BaseClasses.ChillerThreeUtilities ets(
+  extends ThermalGridJBA.Hubs.BaseClasses.PartialConnectedETS(
+    redeclare ThermalGridJBA.Hubs.BaseClasses.ChillerThreeUtilities ets(
       final have_hotWat= QHotWat_flow_nominal > Modelica.Constants.eps,
       have_weaBus=true,
       QChiWat_flow_nominal=QCoo_flow_nominal,
@@ -10,11 +10,11 @@ model ConnectedETS
       QHotWat_flow_nominal=QHot_flow_nominal,
       dp1Hex_nominal=40E3,
       dp2Hex_nominal=40E3,
-      QHex_flow_nominal=-QCoo_flow_nominal,
-      T_a1Hex_nominal=284.15,
-      T_b1Hex_nominal=279.15,
-      T_a2Hex_nominal=277.15,
-      T_b2Hex_nominal=282.15,
+      final QHex_flow_nominal=hexSiz.Q_flow_nominal,
+      T_a1Hex_nominal=283.65,
+      T_b1Hex_nominal=279.65,
+      T_a2Hex_nominal=276.65,
+      T_b2Hex_nominal=282.65,
       VTanHeaWat=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
       VTanChiWat=datChi.mEva_flow_nominal*datBuiSet.dTChiWat_nominal*5*60/1000,
       dpCon_nominal=40E3,
@@ -26,8 +26,11 @@ model ConnectedETS
                  else datBuiSet.THeaWatSup_nominal,
       TEva_start=datBuiSet.TChiWatSup_nominal,
       TConLvgHotSet(final k=datBuiSet.THotWatSupTan_nominal)));
-  parameter
-    Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
+
+  parameter Boolean have_eleNonHva "The ETS has non-HVAC electricity load"
+    annotation (Dialog(group="Configuration"));
+
+  parameter Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
     VTan=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
     mDom_flow_nominal=datDhw.QHex_flow_nominal/4200/(datDhw.TDom_nominal -
         datDhw.TCol_nominal),
@@ -51,13 +54,15 @@ model ConnectedETS
   Buildings.Controls.SetPoints.Table THeaWatSupSet(
     final table=datBuiSet.tabHeaWatRes,
     final offset=0,
-    final constantExtrapolation=true)
+    final constantExtrapolation=true,
+    y(final unit="K", displayUnit="degC"))
     "Heating water supply temperature set point"
     annotation (Placement(transformation(extent={{-140,60},{-120,80}})));
   Buildings.Controls.SetPoints.Table TChiWatSupSet(
     final table=datBuiSet.tabChiWatRes,
     final offset=0,
-    final constantExtrapolation=true)
+    final constantExtrapolation=true,
+    y(final unit="K", displayUnit="degC"))
     "Chilled water supply temperature set point"
     annotation (Placement(transformation(extent={{-140,20},{-120,40}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant THotWatSupSet(
@@ -68,7 +73,7 @@ model ConnectedETS
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant TColWat(
     final k=datBuiSet.TColWat_nominal,
     y(final unit="K", displayUnit="degC")) if have_hotWat
-                                             "Domestic cold water temperature"
+    "Domestic cold water temperature"
     annotation (Placement(transformation(extent={{-140,-60},{-120,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput dHHeaWat_flow(final unit="W")
     "Heating water distributed energy flow rate"
@@ -89,6 +94,30 @@ model ConnectedETS
         extent={{-20,-20},{20,20}},
         rotation=-90,
         origin={-60,-120})));
+  parameter Data.HexSize hexSiz(final QHeaLoa_flow_nominal=QHea_flow_nominal,
+      final QCooLoa_flow_nominal=QCoo_flow_nominal)
+    annotation (Placement(transformation(extent={{20,100},{40,120}})));
+  Modelica.Blocks.Sources.CombiTimeTable loaEleNonHva(
+    final tableOnFile=true,
+    tableName="tab1",
+    final fileName=Modelica.Utilities.Files.loadResource(filNam),
+    extrapolation=bui.loa.extrapolation,
+    y(each unit="W"),
+    timeScale=bui.loa.timeScale,
+    offset={0},
+    columns={5},
+    smoothness=bui.loa.smoothness) if have_eleNonHva
+                                   "Reader for non-HVAC electricity load"
+    annotation (Placement(transformation(extent={{160,-10},{180,10}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput PEleNonHva(final unit="W")
+    if have_eleNonHva
+                "Power drawn by non-HVAC electricity load" annotation (
+      Placement(transformation(extent={{300,-20},{340,20}}), iconTransformation(
+          extent={{100,-40},{140,0}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter mulPEleNonHva(u(final
+        unit="W"), final k=facMul) if have_eleNonHva
+                                               "Scaling"
+    annotation (Placement(transformation(extent={{270,-10},{290,10}})));
 equation
 
   connect(ets.QReqHotWat_flow, bui.QReqHotWat_flow) annotation (Line(points={{-34,-74},
@@ -125,6 +154,10 @@ equation
       index=-1,
       extent={{-3,6},{-3,6}},
       horizontalAlignment=TextAlignment.Right));
+  connect(mulPEleNonHva.y, PEleNonHva)
+    annotation (Line(points={{292,0},{320,0}}, color={0,0,127}));
+  connect(loaEleNonHva.y[1], mulPEleNonHva.u)
+    annotation (Line(points={{181,0},{268,0}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
         defaultComponentName = "bui");

@@ -238,10 +238,22 @@ def runBuildings(listBui,
                 + np.array(readMID(f'{stag}_{buil_no}_{util}'))
     
     for stag, util, mon in [(stag, util, mon) for stag in stags for util in utils for mon in mons]:
-        monthly.peak.loc[dict(stag=stag,util=util,buil=builcoord,mon=mon)] \
-            = hourly.sel(stag=stag,util=util,time=(hourly.time.dt.month==mon)).max().item()
-        monthly.total.loc[dict(stag=stag,util=util,buil=builcoord,mon=mon)] \
-            = hourly.sel(stag=stag,util=util,time=(hourly.time.dt.month==mon)).sum().item()
+        # monthly.peak.loc[dict(stag=stag,util=util,buil=builcoord,mon=mon)] \
+        #     = hourly.sel(stag=stag,util=util,time=(hourly.time.dt.month==mon)).max().item()
+        # monthly.total.loc[dict(stag=stag,util=util,buil=builcoord,mon=mon)] \
+        #     = hourly.sel(stag=stag,util=util,time=(hourly.time.dt.month==mon)).sum().item()
+        ### The above caused a segmentation fault with certain package versions
+        ###   and is therefore refactored.
+            
+        selected_data = hourly.sel(stag=stag, util=util)
+        monthly_data = selected_data.where(selected_data.time.dt.month == mon, drop=True)
+        
+        #peak_value = monthly_data.max().item() # This caused a segmentation fault
+        peak_value = max(monthly_data).item()
+        total_value = monthly_data.sum().item()
+        
+        monthly.peak.loc[dict(stag=stag, util=util, buil=builcoord, mon=mon)] = peak_value
+        monthly.total.loc[dict(stag=stag, util=util, buil=builcoord, mon=mon)] = total_value
     
     makePlot(figtitle = figtitle,
              filename = filename,
@@ -344,6 +356,7 @@ elif mode == 'all':
 
 #%% Save tables
 
+delimiter = ','
 if saveTables:
     
     for stag, util in [(stag, util) for stag in stags for util in utils]:

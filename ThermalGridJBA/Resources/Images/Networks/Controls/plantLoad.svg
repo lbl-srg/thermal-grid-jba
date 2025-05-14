@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="384.95123mm"
+   height="159.72069mm"
+   viewBox="0 0 384.95123 159.72069"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="plantLoad.svg"
+   inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/Controls/plantLoad.png"
+   inkscape:export-xdpi="55.689129"
+   inkscape:export-ydpi="55.689129"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="1.2810466"
+     inkscape:cx="458.21909"
+     inkscape:cy="197.10446"
+     inkscape:window-width="3998"
+     inkscape:window-height="2287"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid9"
+       originx="143.40151"
+       originy="-83.695984" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077" />
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lstart"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lstart"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(0.8,0,0,0.8,10,0)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path1929" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path1932" />
+    </marker>
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect167"
+       is_visible="true"
+       lpeversion="1" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect163"
+       is_visible="true"
+       lpeversion="1" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect46"
+       is_visible="true"
+       lpeversion="1" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect167-7"
+       is_visible="true"
+       lpeversion="1" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-6" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-9" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-2" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-2-0" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-2-6" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-2-6-8" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-2-6-9" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-2-0-0" />
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend-1"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path1932-5" />
+    </marker>
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect163-9"
+       is_visible="true"
+       lpeversion="1" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-6-4" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-8" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-8-7" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-8-7-6" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-8-7-3" />
+    <rect
+       x="-444.18637"
+       y="1210.6312"
+       width="1211.4606"
+       height="446.51602"
+       id="rect4077-8-7-3-9" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(143.40151,-83.695985)">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="M -105.83333,243.41667 V 84.666666"
+       id="path44"
+       inkscape:path-effect="#path-effect46"
+       inkscape:original-d="m -105.83333,243.41667 c 2.9e-4,-52.91634 2.9e-4,-105.83302 0,-158.750004"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="M -105.83333,169.33333 H 232.83333"
+       id="path161"
+       inkscape:path-effect="#path-effect163"
+       inkscape:original-d="m -105.83333,169.33333 c 112.8891501,2.9e-4 225.77804,2.9e-4 338.66666,0"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1"
+       d="M -105.83333,224.89583 H 169.33333"
+       id="path161-8"
+       inkscape:path-effect="#path-effect163-9"
+       inkscape:original-d="m -105.83333,224.89583 c 91.722434,2.9e-4 183.444656,2.9e-4 275.16666,0"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#ff0000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -105.83333,113.77083 h 31.749995"
+       id="path165"
+       inkscape:path-effect="#path-effect167"
+       inkscape:original-d="m -105.83333,113.77083 c 10.583593,2.7e-4 21.166926,2.7e-4 31.749995,0"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 169.33333,224.89583 h 31.75"
+       id="path165-5"
+       inkscape:path-effect="#path-effect167-7"
+       inkscape:original-d="m 169.33333,224.89583 c 10.5836,2.6e-4 21.16693,2.6e-4 31.75,0"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1"
+       d="m -74.083332,113.77083 v 55.5625"
+       id="path383"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#ff0000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -74.083331,113.77083 52.916666,55.5625"
+       id="path387"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 116.41667,169.33333 52.91667,55.5625"
+       id="path387-1"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#ff0000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M -21.166666,169.33333 H 31.75"
+       id="path588"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 63.500001,169.33333 H 116.41667"
+       id="path588-5"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 169.33333,169.33333 v 55.5625"
+       id="path383-5"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.20665994,0,0,0.20665994,-51.852372,-164.34439)"
+       id="text4075"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.28028"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5642">yPlaOut</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.19381703,0,0,0.19381703,-8.8159039,-62.011551)"
+       id="text4075-9"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077-8);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.36512"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5644">TPlaHeaSet</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.19381703,0,0,0.19381703,47.338128,-62.687811)"
+       id="text4075-9-7"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077-8-7);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.3651"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5646">TPlaHeaSet+1K</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.19381703,0,0,0.19381703,168.31882,-77.536043)"
+       id="text4075-9-7-4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077-8-7-6);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.3651"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5648">TPlaCooSet-1K</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.1983215,0,0,0.1983215,-27.143843,-75.030045)"
+       id="text4075-1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077-9);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.33411"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5650">0</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.20576021,0,0,0.20576021,-23.139335,-139.81922)"
+       id="text4075-2"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077-6);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.28588"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5652">1</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.20576021,0,0,0.20576021,-26.59592,-29.035768)"
+       id="text4075-2-8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077-6-4);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.28588"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5654">-1</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.19381703,0,0,0.19381703,237.59498,-77.03145)"
+       id="text4075-9-7-0"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077-8-7-3);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.3651"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5656">TPlaCooSet</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.19381703,0,0,0.19381703,297.45496,-59.987134)"
+       id="text4075-9-7-0-2"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4077-8-7-3-9);fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.3651"
+       inkscape:export-filename="/home/jianjunhu/GitFolder/thermal-grid-jba/thermal-grid-jba/ThermalGridJBA/Resources/Images/Networks/districtPumpControl.png"
+       inkscape:export-xdpi="200.06599"
+       inkscape:export-ydpi="200.06599"><tspan
+         x="-444.18555"
+         y="1246.0215"
+         id="tspan5658">TPlaOut</tspan></text>
+  </g>
+</svg>
