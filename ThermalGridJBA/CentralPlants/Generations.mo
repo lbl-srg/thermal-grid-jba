@@ -21,10 +21,6 @@ model Generations
     unit="K",
     displayUnit="degC")=297.15
     "Design plant cooling setpoint temperature";
-  parameter Real TPlaSumCooSet(
-    unit="K",
-    displayUnit="degC")=TPlaCooSet-2
-    "Design plant summer cooling setpoint temperature";
 
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate";
@@ -748,8 +744,7 @@ model Generations
   ThermalGridJBA.Networks.Controls.Indicators ind(
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
-    TDryBulSum=TDryBulSum,
+    final TDryBulSum=TDryBulSum,
     final staDowDel=staDowDel) "Load indicator"
     annotation (Placement(transformation(extent={{-520,250},{-500,270}})));
   ThermalGridJBA.Networks.Controls.HeatExchanger hexCon(final

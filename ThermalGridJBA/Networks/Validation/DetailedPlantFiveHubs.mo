@@ -37,9 +37,9 @@ model DetailedPlantFiveHubs
   parameter Real TPlaCooSet(unit="K")=datDis.TPlaCooSet
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
-    "Design plant summer cooling setpoint temperature"
-    annotation (Dialog(tab="Central plant"));
+//  parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
+//    "Design plant summer cooling setpoint temperature"
+//    annotation (Dialog(tab="Central plant"));
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -300,7 +300,6 @@ model DetailedPlantFiveHubs
     final TLooMax=datDis.TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -793,7 +792,8 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StartTime=17280000,
+      StopTime=19872000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),

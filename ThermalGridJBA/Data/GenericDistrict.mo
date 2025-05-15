@@ -89,9 +89,9 @@ record GenericDistrict "District network design parameters"
   parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-dTLoo_nominal-dTOveSho
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaSumCooSet=TLooMax - dTLoo_nominal
-    "Design plant summer cooling setpoint temperature"
-    annotation (Dialog(tab="Central plant"));
+//  parameter Modelica.Units.SI.Temperature TPlaSumCooSet=TLooMax - dTLoo_nominal
+//    "Design plant summer cooling setpoint temperature"
+//    annotation (Dialog(tab="Central plant"));
   parameter Real TDryBulSum(
     unit="K",
     displayUnit="degC")=297.15

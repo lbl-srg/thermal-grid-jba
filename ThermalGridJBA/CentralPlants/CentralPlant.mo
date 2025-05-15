@@ -21,10 +21,6 @@ model CentralPlant "Central plant"
     unit="K",
     displayUnit="degC")=TLooMax
     "Design plant cooling setpoint temperature";
-  parameter Real TPlaSumCooSet(
-    unit="K",
-    displayUnit="degC")=TPlaCooSet-2
-    "Design plant summer cooling setpoint temperature";
 
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each generation module";
@@ -236,7 +232,6 @@ model CentralPlant "Central plant"
     final TLooMax=TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mWat_flow_nominal,
     mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
