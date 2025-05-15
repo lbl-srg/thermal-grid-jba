@@ -21,10 +21,6 @@ model CentralPlant "Central plant"
     unit="K",
     displayUnit="degC")=TLooMax
     "Design plant cooling setpoint temperature";
-  parameter Real TPlaSumCooSet(
-    unit="K",
-    displayUnit="degC")=TPlaCooSet-2
-    "Design plant summer cooling setpoint temperature";
 
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each generation module";
@@ -236,7 +232,6 @@ model CentralPlant "Central plant"
     final TLooMax=TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mWat_flow_nominal,
     mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
@@ -258,9 +253,10 @@ model CentralPlant "Central plant"
     final TEvaCoo_nominal=TEvaCoo_nominal,
     final staDowDel=staDowDel,
     final TDryAppSet=TDryAppSet,
-    final TApp=TApp,
+    final dTHex_nominal=dTHex_nominal,
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
+    TApp=2,
     final TDryBulSum=TDryBulSum,
     final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,
@@ -308,6 +304,8 @@ model CentralPlant "Central plant"
   Borefield borFie(TSoi_start=TSoi_start) "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
 
+  parameter Real dTHex_nominal
+    "Temperature difference for heat exchanger mass flow rates";
 equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,

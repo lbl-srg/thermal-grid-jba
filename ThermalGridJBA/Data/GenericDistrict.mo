@@ -39,6 +39,8 @@ record GenericDistrict "District network design parameters"
     "Peak cooling load at all the ETS heat exchanger";
   parameter Modelica.Units.SI.TemperatureDifference dTLoo_nominal=4
     "Design temperature difference of the district loop";
+  parameter Modelica.Units.SI.TemperatureDifference dTPlaHex_nominal=4
+    "Design temperature difference for heat exchanger in central plant";
 
   parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=
     max(abs(QPlaPeaCoo_flow),QPlaPeaHea_flow)/(Buildings.Utilities.Psychrometrics.Constants.cpWatLiq * dTLoo_nominal)
@@ -87,9 +89,9 @@ record GenericDistrict "District network design parameters"
   parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-dTLoo_nominal-dTOveSho
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaSumCooSet=TLooMax - dTLoo_nominal
-    "Design plant summer cooling setpoint temperature"
-    annotation (Dialog(tab="Central plant"));
+//  parameter Modelica.Units.SI.Temperature TPlaSumCooSet=TLooMax - dTLoo_nominal
+//    "Design plant summer cooling setpoint temperature"
+//    annotation (Dialog(tab="Central plant"));
   parameter Real TDryBulSum(
     unit="K",
     displayUnit="degC")=297.15
