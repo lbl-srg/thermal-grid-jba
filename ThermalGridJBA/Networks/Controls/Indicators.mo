@@ -237,7 +237,7 @@ model Indicators "District load, electricity rate and season indicator"
     "Summer indicator"
     annotation (Placement(transformation(extent={{102,-230},{122,-210}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSumSetHot(y(unit="K",
-        displayUnit="degC"), final k=TPlaSumCooSet - 4)
+        displayUnit="degC"), final k=TPlaSumCooSet - 2)
     "Plant cooling setpoint during hot outdoor temperatures"
     annotation (Placement(transformation(extent={{-220,70},{-200,90}})));
   Buildings.Controls.OBC.CDL.Reals.Line plaCooSetSumShi(
