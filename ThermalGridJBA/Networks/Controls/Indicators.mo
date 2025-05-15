@@ -16,6 +16,11 @@ model Indicators "District load, electricity rate and season indicator"
     displayUnit="degC")=TPlaCooSet-2
     "Design plant summer cooling setpoint temperature"
     annotation (Dialog(group="Plant load"));
+  parameter Real TDryBulSum(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")=297.15
+    "Threshold of the dry bulb temperaure in summer below which starts charging borefield";
   parameter Real staDowDel(
     unit="s")=3600
     "Minimum stage down delay, to avoid quickly staging down"
@@ -26,7 +31,7 @@ model Indicators "District load, electricity rate and season indicator"
   parameter Integer winStaWee=44
     "Week that winter season starts at beginning of it"
     annotation (Dialog(group="Season"));
-  parameter Integer sumStaWee=22
+  parameter Integer sumStaWee=26
     "Week that summer season starts at beginning of it"
     annotation (Dialog(group="Season"));
   parameter Integer sumEndWee=36
@@ -68,6 +73,12 @@ model Indicators "District load, electricity rate and season indicator"
     final quantity="ThermodynamicTemperature",
     displayUnit="degC") "Central plant outlet water temperature"
     annotation (Placement(transformation(extent={{-280,170},{-240,210}}),
+        iconTransformation(extent={{-140,40},{-100,80}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
+    final unit="K",
+    final quantity="ThermodynamicTemperature",
+    displayUnit="degC") "Dry bulb temperature"
+    annotation (Placement(transformation(extent={{-280,-20},{-240,20}}),
         iconTransformation(extent={{-140,-20},{-100,20}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput yPlaOut
     "Plant load"
@@ -148,7 +159,7 @@ model Indicators "District load, electricity rate and season indicator"
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSet(
     y(unit="K", displayUnit="degC"),
     final k=TPlaCooSet) "Plant cooling setpoint"
-    annotation (Placement(transformation(extent={{-200,52},{-180,72}})));
+    annotation (Placement(transformation(extent={{-220,36},{-200,56}})));
   Buildings.Controls.OBC.CDL.Reals.Add plaLoa
     "Plant load"
     annotation (Placement(transformation(extent={{40,130},{60,150}})));
@@ -214,9 +225,9 @@ model Indicators "District load, electricity rate and season indicator"
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSumSet(y(unit="K",
         displayUnit="degC"), final k=TPlaSumCooSet)
     "Plant summer cooling setpoint"
-    annotation (Placement(transformation(extent={{-200,110},{-180,130}})));
+    annotation (Placement(transformation(extent={{-220,130},{-200,150}})));
   Buildings.Controls.OBC.CDL.Reals.Switch plaCooSet "Plant cooling setpoint"
-    annotation (Placement(transformation(extent={{-160,70},{-140,90}})));
+    annotation (Placement(transformation(extent={{-140,52},{-120,72}})));
   Buildings.Controls.OBC.CDL.Reals.AddParameter addPar(final p=-1)
     "One degree  lower"
     annotation (Placement(transformation(extent={{-100,110},{-80,130}})));
@@ -225,6 +236,17 @@ model Indicators "District load, electricity rate and season indicator"
   Buildings.Controls.OBC.CDL.Integers.Sources.Constant sumInd(k=3)
     "Summer indicator"
     annotation (Placement(transformation(extent={{102,-230},{122,-210}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant cooSumSetHot(y(unit="K",
+        displayUnit="degC"), final k=TPlaSumCooSet - 2)
+    "Plant cooling setpoint during hot outdoor temperatures"
+    annotation (Placement(transformation(extent={{-220,72},{-200,92}})));
+  Buildings.Controls.OBC.CDL.Reals.Switch plaCooSet1
+                                                    "Plant cooling setpoint"
+    annotation (Placement(transformation(extent={{-180,100},{-160,120}})));
+  Buildings.Controls.OBC.CDL.Reals.LessThreshold isMilSum(t=TDryBulSum + 2, h=
+        0.1)
+    "Outputs true if it is a mild temperature"
+    annotation (Placement(transformation(extent={{-220,100},{-200,120}})));
 equation
   connect(lesThr.y, intSwi3.u2)
     annotation (Line(points={{-178,-20},{-42,-20}}, color={255,0,255}));
@@ -254,8 +276,8 @@ equation
   connect(zer.y, plaHeaLoa.f2) annotation (Line(points={{-58,160},{-40,160},{
           -40,182},{-22,182}},
                            color={0,0,127}));
-  connect(TPlaOut, plaCooLoa.u) annotation (Line(points={{-260,190},{-220,190},{
-          -220,100},{-22,100}}, color={0,0,127}));
+  connect(TPlaOut, plaCooLoa.u) annotation (Line(points={{-260,190},{-46,190},{-46,
+          100},{-22,100}},      color={0,0,127}));
   connect(negOne.y, plaCooLoa.f2) annotation (Line(points={{-38,70},{-30,70},{-30,
           92},{-22,92}},       color={0,0,127}));
   connect(plaHeaLoa.y, plaLoa.u1) annotation (Line(points={{2,190},{20,190},{20,
@@ -321,24 +343,36 @@ equation
     annotation (Line(points={{82,-130},{158,-130}}, color={0,0,127}));
   connect(gai1.y, yEleRat)
     annotation (Line(points={{182,-130},{260,-130}}, color={0,0,127}));
-  connect(cooSet.y, plaCooSet.u3) annotation (Line(points={{-178,62},{-170,62},{
-          -170,72},{-162,72}}, color={0,0,127}));
-  connect(cooSumSet.y, plaCooSet.u1) annotation (Line(points={{-178,120},{-168,120},
-          {-168,88},{-162,88}}, color={0,0,127}));
-  connect(plaCooSet.y, plaCooLoa.x2) annotation (Line(points={{-138,80},{-120,80},
-          {-120,96},{-22,96}}, color={0,0,127}));
+  connect(cooSet.y, plaCooSet.u3) annotation (Line(points={{-198,46},{-170,46},
+          {-170,54},{-142,54}},color={0,0,127}));
+  connect(plaCooSet.y, plaCooLoa.x2) annotation (Line(points={{-118,62},{-110,
+          62},{-110,96},{-22,96}},
+                               color={0,0,127}));
   connect(addPar.y, plaCooLoa.x1) annotation (Line(points={{-78,120},{-60,120},{
           -60,108},{-22,108}},color={0,0,127}));
-  connect(plaCooSet.y, addPar.u) annotation (Line(points={{-138,80},{-120,80},{-120,
-          120},{-102,120}}, color={0,0,127}));
+  connect(plaCooSet.y, addPar.u) annotation (Line(points={{-118,62},{-110,62},{
+          -110,120},{-102,120}},
+                            color={0,0,127}));
   connect(sumInd.y, inSum.u2) annotation (Line(points={{124,-220},{140,-220},{140,
           -208},{158,-208}},     color={255,127,0}));
   connect(seaTab.y[1], inSum.u1) annotation (Line(points={{82,-200},{158,-200}},
                                   color={255,127,0}));
   connect(inSum.y, plaCooSet.u2) annotation (Line(points={{182,-200},{200,-200},
-          {200,-160},{-230,-160},{-230,80},{-162,80}}, color={255,0,255}));
-  connect(plaCooSet.y, TActPlaCooSet) annotation (Line(points={{-138,80},{-120,80},
-          {-120,50},{260,50}}, color={0,0,127}));
+          {200,-160},{-230,-160},{-230,62},{-142,62}}, color={255,0,255}));
+  connect(plaCooSet.y, TActPlaCooSet) annotation (Line(points={{-118,62},{-110,
+          62},{-110,50},{260,50}},
+                               color={0,0,127}));
+  connect(plaCooSet1.y, plaCooSet.u1) annotation (Line(points={{-158,110},{-150,
+          110},{-150,70},{-142,70}}, color={0,0,127}));
+  connect(cooSumSetHot.y, plaCooSet1.u3) annotation (Line(points={{-198,82},{
+          -190,82},{-190,102},{-182,102}},
+                                      color={0,0,127}));
+  connect(isMilSum.y, plaCooSet1.u2)
+    annotation (Line(points={{-198,110},{-182,110}}, color={255,0,255}));
+  connect(cooSumSet.y, plaCooSet1.u1) annotation (Line(points={{-198,140},{-190,
+          140},{-190,118},{-182,118}}, color={0,0,127}));
+  connect(TDryBul, isMilSum.u) annotation (Line(points={{-260,0},{-248,0},{-248,
+          2},{-234,2},{-234,110},{-222,110}}, color={0,0,127}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
