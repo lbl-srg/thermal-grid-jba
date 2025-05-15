@@ -12,35 +12,8 @@ import os
 BRANCH="main"
 SHOW_DYMOLA_GUI = False
 KEEP_DYMOLA_OPEN = False
-ONLY_SHORT_TIME=False
-FROM_GIT_HUB = False
-CASE_LIST = 'detailedPlantFiveHubs'
-""" This parameter determines which model to run and which load files to load.
-    See `cases.py`, case insensitive:
-        minimum: minimum test to see if things can run
-        handwrite: explicitly listed cases
-        eachBuilding: each building, differentiating with or without DHW
-        eachCluster: each of the five clusters, differentiating with or without DHW
-        idealPlantFiveHubs: runs ThermalGridJBA.Networks.Validation.IdealPlantFiveHubs
-        detailedPlantFiveHubs: runs ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs
-"""
-CASE_SPECS = {
-     'start_time' : 0 * 24 * 3600,
-     'stop_time'  : 365* 24 * 3600,
-     'number_of_intervals' : 365 * 24,
-     'solver'     : 'cvode'}
-""" Sets simulation specifications for all cases,
-        UNLESS such a specification is already in the case constructor,
-        in which case this specification is ignored.
-"""
-# CASE_SCENARIOS = ['futu']
-CASE_SCENARIOS = ['futu', 'heat', 'cold']
-""" List of weather scenarios:
-        'base', 'post' : TMY3, also chooses baseline or post-retrofit load files
-        'futu' : fTMY
-        'heat' : heat wave
-        'cold' : cold snap
-"""
+FROM_GIT_HUB = True
+
 CHECK_LOG_FILES = 'failed'
 """ Case insensitive:
         all: check all log files
@@ -54,7 +27,6 @@ if not KEEP_MAT_FILES:
     print("="*10 + "!"*10 + "="*10)
 
 CWD = os.getcwd()
-package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
 
 def sh(cmd, path):
     ''' Run the command ```cmd``` command in the directory ```path```
@@ -79,32 +51,25 @@ def create_working_directory():
 #    print("Created directory {}".format(worDir))
     return worDir
 
-def checkout_repository(working_directory):
-# def checkout_repository(working_directory, from_git_hub):
+def checkout_repository(working_directory, from_git_hub):
     import os
-    # from git import Repo
-    # import git
+    from git import Repo
+    import git
     d = {}
-    # if from_git_hub:
-    #     print("Checking out repository branch {}".format(BRANCH))
-    #     git_url = "https://github.com/lbl-srg/modelica-buildings"
-    #     r = Repo.clone_from(git_url, working_directory)
-    #     g = git.Git(working_directory)
-    #     g.checkout(BRANCH)
-    #     # Print commit
-    #     d['branch'] = BRANCH
-    #     d['commit'] = str(r.active_branch.commit)
-    # else:
-    # This is a hack to get the local copy of the repository
-
-    des = os.path.join(working_directory, "ThermalGridJBA")
-    print("*** Copying ThermalGridJBA library to {}".format(des))
-    shutil.copytree("../../ThermalGridJBA", des)
-
-    ### Test code using Buildings
-    # des = os.path.join(working_directory, "Buildings")
-    # print("*** Copying Buildings library to {}".format(des))
-    # shutil.copytree("/home/casper/gitRepo/modelica-buildings/Buildings", des)
+    if from_git_hub:
+        print("Checking out repository branch {}".format(BRANCH))
+        git_url = "git@github.com:lbl-srg/thermal-grid-jba.git"
+        r = Repo.clone_from(git_url, working_directory)
+        g = git.Git(working_directory)
+        g.checkout(BRANCH)
+        # Print commit
+        d['branch'] = BRANCH
+        d['commit'] = str(r.active_branch.commit)
+    else:
+        des = os.path.join(working_directory, "ThermalGridJBA")
+        print("*** Copying ThermalGridJBA library to {}".format(des))
+        package_path = os.path.realpath(os.path.join(os.path.realpath(__file__),'../../../ThermalGridJBA'))
+        shutil.copytree(package_path, des)
 
     return d
 
@@ -132,23 +97,15 @@ def _simulate(spec):
     else:
         os.environ["MODELICAPATH"] = ":".join([spec['lib_dir'], out_dir])
 
-    # Copy the models
-#    print("Copying models from {} to {}".format(CWD, wor_dir))
-    # shutil.copytree(os.path.join(CWD, "JBACases"), os.path.join(wor_dir, "JBACases"))
-    # Change the working directory so that the right checkout is loaded
-    # os.chdir(os.path.join(wor_dir, "JBACases"))
-
     # Write git information if the simulation is based on a github checkout
     #print(spec)
-    # if 'git' in spec:
     if 'git' in spec and spec['git'] != {}:
         with open(os.path.join(out_dir, "version.txt"), "w+") as text_file:
             text_file.write("branch={}\n".format(spec['git']['branch']))
             text_file.write("commit={}\n".format(spec['git']['commit']))
 
     print(out_dir)
-    # s=Simulator(spec["model"], packagePath="/home/casper/gitRepo/modelica-buildings/Buildings")
-    s=Simulator(spec["model"], packagePath=package_path)
+    s=Simulator(spec["model"])
     s.setOutputDirectory(out_dir)
     s.addPreProcessingStatement("OutputCPUtime:= true;")
     s.addPreProcessingStatement("Advanced.ParallelizeCode = false;")
@@ -202,7 +159,7 @@ def _simulate(spec):
                'flag' : flag}
     return success
 
-def summarise_tests(success):
+def summarize_results(success):
 
     num_cases = len(list_of_cases)
     num_success = sum(1 for item in success if item['flag'])
@@ -248,8 +205,6 @@ def check_logs(CHECK_LOG_FILES,
                            output_error_vars,
                            output_unaccounted,
                            output_warning_blocks)
-
-
     else:
         print("="*30)
         print("Log file checking is skipped.")
@@ -261,17 +216,7 @@ if __name__=='__main__':
     import shutil
     import cases
 
-    list_of_cases = cases.get_cases(CASE_LIST, CASE_SPECS, CASE_SCENARIOS)
-
-    for iEle in range(len(list_of_cases)):
-        if ONLY_SHORT_TIME:
-            if "annual" in list_of_cases[iEle]['name']:
-                print("Warning: Deleting {} from list of cases.".format(list_of_cases[iEle]['name']))
-                list_of_cases[iEle]['simulate'] = False
-            else:
-                list_of_cases[iEle]['simulate'] = True
-        else:
-            list_of_cases[iEle]['simulate'] = True
+    list_of_cases = cases.get_cases()
 
 
     # Number of parallel processes
@@ -279,8 +224,7 @@ if __name__=='__main__':
     po = Pool(nPro)
 
     lib_dir = create_working_directory()
-    #d = checkout_repository(lib_dir, from_git_hub = FROM_GIT_HUB)
-    d = checkout_repository(lib_dir)
+    d = checkout_repository(lib_dir, from_git_hub = FROM_GIT_HUB)
     # Add the directory where the library has been checked out
     for case in list_of_cases:
         case['lib_dir'] = lib_dir
@@ -288,12 +232,18 @@ if __name__=='__main__':
             case['git'] = d
 
     # Run all cases
-    success = po.map(_simulate, list_of_cases)
+    if nPro < 2:
+        # Don't run as multi-processing, which makes it easier to see errors on console
+        success = True
+        for case in list_of_cases:
+            success = success and _simulate(case)
+    else:
+        success = po.map(_simulate, list_of_cases)
     # Delete the checked out repository
     shutil.rmtree(lib_dir)
 
     print("="*10 + "TEST SUMMARY" + "="*10)
-    summarise_tests(success)
+    summarize_results(success)
     if CHECK_LOG_FILES.upper() in ['ALL', 'FAILED']:
         check_logs(CHECK_LOG_FILES, success)
 

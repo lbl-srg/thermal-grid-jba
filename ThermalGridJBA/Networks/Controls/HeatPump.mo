@@ -29,7 +29,7 @@ block HeatPump
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC")=295.15
+    displayUnit="degC")=297.15
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield";
 //   parameter Real TPlaCooSet(
 //     final quantity="ThermodynamicTemperature",
@@ -41,6 +41,11 @@ block HeatPump
     final unit="K",
     displayUnit="degC")=TLooMax
     "Plant heating setpoint temperature";
+  parameter Real dTCooCha(
+    final min=0,
+    final unit="K",
+    final quantity="TemperatureDifference")=4
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0";
   parameter Real TConInMin(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -354,8 +359,7 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Logical.And norRatFal "Normal rate in Fall"
     annotation (Placement(transformation(extent={{-140,310},{-120,330}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desLooMin(
-    y(unit="K", displayUnit="degC"),
-    final k=TLooMin)
+    y(unit="K", displayUnit="degC"), final k=TLooMin - dTCooCha)
     "Design minimum district loop temperature"
     annotation (Placement(transformation(extent={{-180,280},{-160,300}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant desLooMax(
@@ -363,9 +367,8 @@ block HeatPump
     final k=TLooMax)
     "Design maximum district loop temperature"
     annotation (Placement(transformation(extent={{-180,200},{-160,220}})));
-  Buildings.Controls.OBC.CDL.Reals.AddParameter addPar(
-    final p=-4)
-    "4 degree lower than the inlet temperature"
+  Buildings.Controls.OBC.CDL.Reals.AddParameter addPar(final p=-8)
+    "8 degree lower than the inlet temperature"
     annotation (Placement(transformation(extent={{-180,240},{-160,260}})));
   Buildings.Controls.OBC.CDL.Reals.Max max1
     annotation (Placement(transformation(extent={{-120,260},{-100,280}})));
@@ -454,11 +457,11 @@ block HeatPump
     annotation (Placement(transformation(extent={{120,-410},{140,-390}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con(final k=1)
     "Constant one"
-    annotation (Placement(transformation(extent={{-120,-410},{-100,-390}})));
+    annotation (Placement(transformation(extent={{-140,-410},{-120,-390}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai3(
     final k=mBorFieCen_flow_nominal)
     "Convert to mass flow rate"
-    annotation (Placement(transformation(extent={{-80,-410},{-60,-390}})));
+    annotation (Placement(transformation(extent={{-80,-450},{-60,-430}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant one1(final k=0) "zero"
     annotation (Placement(transformation(extent={{220,-460},{240,-440}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant minSpe(final k=minComSpe)
@@ -554,6 +557,9 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Logical.And cooSumNotHig
     "Cool summer in normal rate hours and not in high load"
     annotation (Placement(transformation(extent={{-258,270},{-238,290}})));
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai4(final k=
+        mWat_flow_nominal) "Heat pump flow rate when charging the borefield"
+    annotation (Placement(transformation(extent={{-80,-410},{-60,-390}})));
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-440,470},{-362,470}}, color={255,127,0}));
@@ -728,9 +734,8 @@ equation
   connect(gai2.y, higLoaModFlo.u1) annotation (Line(points={{-358,-360},{-20,-360},
           {-20,-372},{58,-372}},color={0,0,127}));
   connect(con.y, gai3.u)
-    annotation (Line(points={{-98,-400},{-82,-400}}, color={0,0,127}));
-  connect(gai3.y, higLoaModFlo.u3) annotation (Line(points={{-58,-400},{20,-400},
-          {20,-388},{58,-388}},color={0,0,127}));
+    annotation (Line(points={{-118,-400},{-100,-400},{-100,-440},{-82,-440}},
+                                                     color={0,0,127}));
   connect(higLoaModFlo.y, max2.u1) annotation (Line(points={{82,-380},{100,-380},
           {100,-394},{118,-394}}, color={0,0,127}));
   connect(minWatRat.y, max2.u2) annotation (Line(points={{82,-420},{100,-420},{
@@ -933,6 +938,10 @@ equation
           320},{-280,280},{-260,280}}, color={255,0,255}));
   connect(cooSumNotHig.y, cooSumNorRat.u2) annotation (Line(points={{-236,280},
           {-230,280},{-230,332},{-222,332}}, color={255,0,255}));
+  connect(con.y, gai4.u)
+    annotation (Line(points={{-118,-400},{-82,-400}}, color={0,0,127}));
+  connect(gai4.y, higLoaModFlo.u3) annotation (Line(points={{-58,-400},{20,-400},
+          {20,-388},{58,-388}}, color={0,0,127}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(
