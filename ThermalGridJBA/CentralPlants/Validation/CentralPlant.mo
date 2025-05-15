@@ -21,7 +21,8 @@ model CentralPlant "Validation model for central plant"
     TConCoo_nominal=315.15,
     TConInMin=291.15,
     TEvaInMax=289.65,
-    TSoi_start=289.15) "Central plant"
+    TSoi_start=289.15,
+    dTHex_nominal=4)   "Central plant"
     annotation (Placement(transformation(extent={{20,-50},{40,-30}})));
   Buildings.Fluid.Sources.MassFlowSource_T
                                       sou(
@@ -109,8 +110,9 @@ equation
             {100,100}})),                                        Diagram(
         coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})),
     experiment(
-      StopTime=31536000,
-      Interval=3600,
+      StartTime=17280000,
+      StopTime=19872000,
+      Interval=3600.00288,
       Tolerance=1e-05,
       __Dymola_Algorithm="Cvode"));
 end CentralPlant;
