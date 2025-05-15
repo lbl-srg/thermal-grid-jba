@@ -79,22 +79,22 @@ model Generations
   parameter Real mHeaPumGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumHea_flow_nominal(unit="W")=cpWat*mHeaPumWat_flow*TApp
-    "Nominal heating capacity"
+  parameter Real QHeaPumHea_flow_nominal(unit="W") = cpWat*mHeaPumWat_flow*
+    dTHex_nominal "Nominal heating capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConHea_nominal(unit="K")=TLooMin + TApp
+  parameter Real TConHea_nominal(unit="K") = TLooMin + dTHex_nominal
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(group="Heat pump"));
   parameter Real TEvaHea_nominal(unit="K")
     "Nominal temperature of evaporator for heat pump design during heating"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumCoo_flow_nominal(unit="W")=-cpWat*mHeaPumWat_flow*TApp
-    "Nominal cooling capacity"
+  parameter Real QHeaPumCoo_flow_nominal(unit="W") = -cpWat*mHeaPumWat_flow*
+    dTHex_nominal "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
   parameter Real TConCoo_nominal(unit="K")
     "Nominal temperature of condenser for heat pump design during cooling"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaCoo_nominal(unit="K")=TLooMax + TApp
+  parameter Real TEvaCoo_nominal(unit="K") = TLooMax + dTHex_nominal
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
 
@@ -105,9 +105,9 @@ model Generations
   parameter Real TDryAppSet(unit="K")=2
     "Dry cooler approach setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TApp(unit="K")=4
-    "Approach temperature for checking if the dry cooler should be enabled"
-    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Real dTHex_nominal(unit="K") = 4
+    "Temperature difference for heat exchanger mass flow rates"
+    annotation (Dialog(                group="Heat exchanger"));
   parameter Real minFanSpe=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
@@ -131,6 +131,12 @@ model Generations
 //   parameter Real THeaSet(unit="K")=TLooMax
 //     "Heat pump tracking temperature setpoint in heating mode"
 //     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real TApp(
+    final quantity="TemperatureDifference",
+    final unit="K")=2
+    "Approach temperatue for enabling economizer"
+    annotation (Dialog(tab="Controls", group="Dry cooler"));
+
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -475,14 +481,14 @@ model Generations
     redeclare
       Buildings.Fluid.HeatPumps.ModularReversible.Controls.Safety.Data.Wuellhorst2021
       safCtrPar,
-    dTCon_nominal=TApp,
+    dTCon_nominal=dTHex_nominal,
     mCon_flow_nominal=mHeaPumWat_flow_nominal,
     dpCon_nominal=30000,
     use_conCap=false,
     CCon=3000,
     GConOut=100,
     GConIns=1000,
-    dTEva_nominal=TApp,
+    dTEva_nominal=dTHex_nominal,
     mEva_flow_nominal=mHeaPumGly_flow_nominal,
     dpEva_nominal=30000,
     use_evaCap=false,
@@ -491,17 +497,18 @@ model Generations
     final QCoo_flow_nominal=QHeaPumCoo_flow_nominal,
     redeclare model RefrigerantCycleHeatPumpHeating =
         Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness
-        (redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting iceFacCal,
-          final use_constAppTem=true),
+        (redeclare
+          Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
+          iceFacCal, final use_constAppTem=true),
     redeclare model RefrigerantCycleHeatPumpCooling =
         Buildings.Fluid.Chillers.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness
-        (redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting iceFacCal,
-          final use_constAppTem=true),
+        (redeclare
+          Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
+          iceFacCal, final use_constAppTem=true),
     final TConHea_nominal=TConHea_nominal,
     final TEvaHea_nominal=TEvaHea_nominal,
     final TConCoo_nominal=TConCoo_nominal,
-    final TEvaCoo_nominal=TEvaCoo_nominal)
-    "Reversible heat pump"
+    final TEvaCoo_nominal=TEvaCoo_nominal) "Reversible heat pump"
     annotation (Placement(transformation(extent={{330,-10},{350,-30}})));
 
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaSec(
@@ -745,9 +752,8 @@ model Generations
     TDryBulSum=TDryBulSum,
     final staDowDel=staDowDel) "Load indicator"
     annotation (Placement(transformation(extent={{-520,250},{-500,270}})));
-  ThermalGridJBA.Networks.Controls.HeatExchanger hexCon(
-    final mHexGly_flow_nominal=mHexGly_flow_nominal,
-    final TApp=TApp)
+  ThermalGridJBA.Networks.Controls.HeatExchanger hexCon(final
+      mHexGly_flow_nominal=mHexGly_flow_nominal, final TApp=TApp)
     "Heat exchanger economizer and the associated pump and valves control"
     annotation (Placement(transformation(extent={{-460,220},{-440,240}})));
   ThermalGridJBA.Networks.Controls.DryCooler dryCooCon(
@@ -1306,8 +1312,8 @@ equation
   connect(heaPumCon.y1SumCooBor, borCon.u1SumCooBor) annotation (Line(points={{
           142,239},{166,239},{166,208},{-264,208},{-264,231},{-242,231}}, color
         ={255,0,255}));
-  connect(TDryBul, ind.TDryBul) annotation (Line(points={{-560,190},{-530,190},
-          {-530,260},{-522,260}}, color={0,0,127}));
+  connect(TDryBul, ind.TDryBul) annotation (Line(points={{-560,190},{-530,190},{
+          -530,260},{-522,260}}, color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

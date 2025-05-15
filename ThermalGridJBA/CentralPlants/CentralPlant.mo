@@ -258,9 +258,10 @@ model CentralPlant "Central plant"
     final TEvaCoo_nominal=TEvaCoo_nominal,
     final staDowDel=staDowDel,
     final TDryAppSet=TDryAppSet,
-    final TApp=TApp,
+    final dTHex_nominal=dTHex_nominal,
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
+    TApp=2,
     final TDryBulSum=TDryBulSum,
     final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,
@@ -308,6 +309,8 @@ model CentralPlant "Central plant"
   Borefield borFie(TSoi_start=TSoi_start) "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
 
+  parameter Real dTHex_nominal
+    "Temperature difference for heat exchanger mass flow rates";
 equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,

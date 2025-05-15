@@ -329,7 +329,8 @@ model DetailedPlantFiveHubs
     final holOffTim=holOffTim,
     final minComSpe=minPlaComSpe,
     final TSoi_start=datDis.TSoi_start,
-    final minHeaPumSpeHol=minHeaPumSpeHol) "Central plant"
+    final minHeaPumSpeHol=minHeaPumSpeHol,
+    dTHex_nominal=datDis.dTPlaHex_nominal) "Central plant"
     annotation (Placement(transformation(extent={{-180,-10},{-160,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
