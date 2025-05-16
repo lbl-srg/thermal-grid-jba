@@ -21,10 +21,6 @@ model CentralPlant "Central plant"
     unit="K",
     displayUnit="degC")=TLooMax
     "Design plant cooling setpoint temperature";
-  parameter Real TPlaSumCooSet(
-    unit="K",
-    displayUnit="degC")=TPlaCooSet-2
-    "Design plant summer cooling setpoint temperature";
 
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each generation module";
@@ -96,8 +92,14 @@ model CentralPlant "Central plant"
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC")=295.15
+    displayUnit="degC")=297.15
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real dTCooCha(
+    final min=0,
+    final unit="K",
+    final quantity="TemperatureDifference")=4
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0"
     annotation (Dialog(tab="Controls", group="Heat pump"));
   parameter Real TConInMin(unit="K", displayUnit="degC")
     "Minimum condenser inlet temperature"
@@ -230,7 +232,6 @@ model CentralPlant "Central plant"
     final TLooMax=TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mWat_flow_nominal,
     mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
@@ -252,10 +253,12 @@ model CentralPlant "Central plant"
     final TEvaCoo_nominal=TEvaCoo_nominal,
     final staDowDel=staDowDel,
     final TDryAppSet=TDryAppSet,
-    final TApp=TApp,
+    final dTHex_nominal=dTHex_nominal,
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
+    TApp=2,
     final TDryBulSum=TDryBulSum,
+    final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
     final offTim=offTim,
@@ -286,22 +289,30 @@ model CentralPlant "Central plant"
   Modelica.Blocks.Sources.RealExpression hexHea(y=gen.hex.Q2_flow)
     "Heat exchanger heat flow"
     annotation (Placement(transformation(extent={{-100,190},{-80,210}})));
-  Modelica.Blocks.Continuous.Integrator EHeaPumEne(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EHeaPum(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Heat pump energy"
     annotation (Placement(transformation(extent={{-60,210},{-40,230}})));
-  Modelica.Blocks.Continuous.Integrator EHexEne(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EHexEne(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Heat exchanger energy"
     annotation (Placement(transformation(extent={{20,190},{40,210}})));
   Borefield borFie(TSoi_start=TSoi_start) "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
 
+  parameter Real dTHex_nominal
+    "Temperature difference for heat exchanger mass flow rates";
 equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,
           5},{-162,5}},      color={0,0,127}));
   connect(TDryBul, gen.TDryBul) annotation (Line(points={{-260,60},{-186,60},{-186,
           1.8},{-162,1.8}},    color={0,0,127}));
-  connect(heaPumHea.y, EHeaPumEne.u)
+  connect(heaPumHea.y, EHeaPum.u)
     annotation (Line(points={{-79,220},{-62,220}}, color={0,0,127}));
   connect(hexHea.y, EHexEne.u)
     annotation (Line(points={{-79,200},{18,200}}, color={0,0,127}));
@@ -331,9 +342,8 @@ equation
           -8},{74,-8},{74,26},{-142,26},{-142,10}}, color={0,127,255}));
   connect(gen.port_b, port_b) annotation (Line(points={{-160,-20},{-170,-20},{-170,
           -32},{280,-32},{280,0},{322,0}}, color={0,127,255}));
-  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,5},{100,
-          5},{100,-200},{340,-200}},
-                                  color={0,0,127}));
+  connect(borFie.QPer_flow, QBorPer_flow) annotation (Line(points={{62,5},{100,5},
+          {100,-200},{340,-200}}, color={0,0,127}));
   connect(borFie.QCen_flow, QBorCen_flow) annotation (Line(points={{62,3},{96,3},
           {96,-230},{340,-230}}, color={0,0,127}));
   connect(gen.PPumBorFiePer, PPumBorFiePer) annotation (Line(points={{-138,-1},

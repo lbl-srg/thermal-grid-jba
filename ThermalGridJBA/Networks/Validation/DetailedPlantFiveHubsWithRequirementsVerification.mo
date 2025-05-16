@@ -386,5 +386,5 @@ equation
   connect(Valy.y,reqStaVal. u)
     annotation (Line(points={{521,494},{539,494}}, color={0,0,127}));
   annotation (Diagram(coordinateSystem(extent={{-400,-520},{600,520}})), Icon(
-        coordinateSystem(extent={{-400,-520},{600,520}})));
+        coordinateSystem(extent={{-100,-100},{100,100}})));
 end DetailedPlantFiveHubsWithRequirementsVerification;

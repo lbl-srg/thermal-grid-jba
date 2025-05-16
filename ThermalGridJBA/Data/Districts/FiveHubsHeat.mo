@@ -1,8 +1,7 @@
 within ThermalGridJBA.Data.Districts;
 record FiveHubsHeat
   "District set up for five clustered hubs using the heat wave scenario"
-  extends GenericDistrict(
-    nBui=5,
+  extends ThermalGridJBA.Data.Districts.FiveHubs(
     filNamInd={
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_heat.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_heat.mos",
@@ -10,9 +9,7 @@ record FiveHubsHeat
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_heat.mos",
       "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_heat.mos"},
     filNamCom=
-      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos",
-    lDis={34,688,347,401,1412,578},
-    lCon={27,226,237,48,31});
+      "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos");
   annotation (
     defaultComponentName="datDis",
     defaultComponentPrefixes="inner",

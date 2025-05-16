@@ -37,14 +37,20 @@ model DetailedPlantFiveHubs
   parameter Real TPlaCooSet(unit="K")=datDis.TPlaCooSet
     "Design plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
-    "Design plant summer cooling setpoint temperature"
-    annotation (Dialog(tab="Central plant"));
+//  parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
+//    "Design plant summer cooling setpoint temperature"
+//    annotation (Dialog(tab="Central plant"));
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")=datDis.TDryBulSum
     "Threshold of the dry bulb temperaure in summer below which starts charging borefield"
+    annotation (Dialog(tab="Central plant"));
+  parameter Real dTCooCha(
+    final min=0,
+    final unit="K",
+    final quantity="TemperatureDifference")=datDis.dTCooCha
+    "Temperature difference to allow subcooling the central borefield. dTCooCha >= 0"
     annotation (Dialog(tab="Central plant"));
 
   parameter Real mPlaWat_flow_nominal(unit="kg/s")=datDis.mPlaWat_flow_nominal
@@ -226,7 +232,7 @@ model DetailedPlantFiveHubs
         rotation=90,
         origin={-80,-80})));
   ThermalGridJBA.Hubs.ConnectedETS bui[nBui](
-    final facTerUniSizHea=datBuiSet.facTerUniSizHea,
+    final facTerUniSizHea=datDis.facTerUniSizHea,
     final filNam = datDis.filNamInd,
     bui(each final facMul=1),
     redeclare each final package MediumBui = Medium,
@@ -294,7 +300,6 @@ model DetailedPlantFiveHubs
     final TLooMax=datDis.TLooMax,
     final TPlaHeaSet=TPlaHeaSet,
     final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -315,6 +320,7 @@ model DetailedPlantFiveHubs
     final TApp=TApp,
     final minFanSpe=minFanSpe,
     final TDryBulSum=TDryBulSum,
+    final dTCooCha=dTCooCha,
     final TConInMin=TPlaConInMin,
     final TEvaInMax=TPlaEvaInMax,
     final offTim=offTim,
@@ -322,7 +328,8 @@ model DetailedPlantFiveHubs
     final holOffTim=holOffTim,
     final minComSpe=minPlaComSpe,
     final TSoi_start=datDis.TSoi_start,
-    final minHeaPumSpeHol=minHeaPumSpeHol) "Central plant"
+    final minHeaPumSpeHol=minHeaPumSpeHol,
+    dTHex_nominal=datDis.dTPlaHex_nominal) "Central plant"
     annotation (Placement(transformation(extent={{-180,-10},{-160,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
@@ -481,9 +488,12 @@ model DetailedPlantFiveHubs
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J", displayUnit="Wh")) "Dry cooler fan electric energy"
-    annotation (Placement(transformation(extent={{40,140},{60,160}})));
+    annotation (Placement(transformation(extent={{242,110},{262,130}})));
 
-  Modelica.Blocks.Continuous.Integrator EEleNonHvaETS(initType=Modelica.Blocks.Types.Init.InitialState)
+  Modelica.Blocks.Continuous.Integrator EEleNonHvaETS(
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Non-HVAC electric use in the ETS"
     annotation (Placement(transformation(extent={{240,230},{260,250}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PEleNonHva(final nin=nBui)
@@ -493,7 +503,9 @@ model DetailedPlantFiveHubs
     "Sum of fan electric power consumption of the buildings"
     annotation (Placement(transformation(extent={{180,270},{200,290}})));
   Modelica.Blocks.Continuous.Integrator EFanBui(
-    initType=Modelica.Blocks.Types.Init.InitialState)
+    initType=Modelica.Blocks.Types.Init.InitialState,
+    u(final unit="W"),
+    y(final unit="J", displayUnit="Wh"))
     "Building fan electric energy"
     annotation (Placement(transformation(extent={{240,270},{260,290}})));
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
@@ -745,11 +757,13 @@ equation
   connect(dis.dH_flow, QEtsHex_flow.u) annotation (Line(points={{22,207},{30,
           207},{30,226},{38,226}}, color={0,0,127}));
   connect(cenPla.PFanDryCoo, EFanDryCoo.u) annotation (Line(points={{-158,7},{
-          -136,7},{-136,150},{38,150}}, color={0,0,127}));
+          -136,7},{-136,144},{234,144},{234,120},{240,120}},
+                                        color={0,0,127}));
   connect(cenPla.PFanDryCoo, multiSum.u[12]) annotation (Line(points={{-158,7},
           {-136,7},{-136,-147.75},{240,-147.75}},   color={0,0,127}));
-  connect(EFanDryCoo.y, ETot.u[4]) annotation (Line(points={{61,150},{80,150},{80,
-          144},{292,144},{292,100},{358,100}},          color={0,0,127}));
+  connect(EFanDryCoo.y, ETot.u[4]) annotation (Line(points={{263,120},{272,120},
+          {272,160},{348,160},{348,116},{352,116},{352,100},{358,100}},
+                                                        color={0,0,127}));
   connect(PEleNonHva.y, EEleNonHvaETS.u)
     annotation (Line(points={{202,240},{238,240}}, color={0,0,127}));
   connect(bui.PEleNonHva, PEleNonHva.u) annotation (Line(points={{12,238},{20,
@@ -778,7 +792,8 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StartTime=17280000,
+      StopTime=19872000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
