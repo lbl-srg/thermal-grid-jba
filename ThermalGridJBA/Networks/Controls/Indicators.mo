@@ -80,7 +80,7 @@ model Indicators "District load, electricity rate and season indicator"
     final unit="K",
     final quantity="TemperatureDifference")
     "Actual overshot temperature"
-    annotation (Placement(transformation(extent={{-280,180},{-240,220}}),
+    annotation (Placement(transformation(extent={{-280,20},{-240,60}}),
         iconTransformation(extent={{-140,-80},{-100,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput TActPlaHeaSet(
     final unit="K",
@@ -162,7 +162,7 @@ model Indicators "District load, electricity rate and season indicator"
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant iniCooSet(y(unit="K",
         displayUnit="degC"), final k=TIniPlaCooSet)
     "Plant initial cooling setpoint except for summer"
-    annotation (Placement(transformation(extent={{-220,30},{-200,50}})));
+    annotation (Placement(transformation(extent={{-220,80},{-200,100}})));
   Buildings.Controls.OBC.CDL.Reals.Add plaLoa
     "Plant load"
     annotation (Placement(transformation(extent={{140,130},{160,150}})));
@@ -255,10 +255,11 @@ model Indicators "District load, electricity rate and season indicator"
         displayUnit="degC"), final k=TDryBulSum - 1)
     "Low limit to shift cooling set point"
     annotation (Placement(transformation(extent={{-100,140},{-80,160}})));
-  Buildings.Controls.OBC.CDL.Reals.Add nonSumCooSet
+  Buildings.Controls.OBC.CDL.Reals.Subtract
+                                       nonSumCooSet
     "Plant cooling setpoint except summer"
     annotation (Placement(transformation(extent={{-180,50},{-160,70}})));
-  Buildings.Controls.OBC.CDL.Reals.Subtract actPlaHeaSet
+  Buildings.Controls.OBC.CDL.Reals.Add      actPlaHeaSet
     "Actual plant heating setpoint"
     annotation (Placement(transformation(extent={{-80,210},{-60,230}})));
   Buildings.Controls.OBC.CDL.Reals.AddParameter addPar1(final p=1)
@@ -384,18 +385,14 @@ equation
           -160,126},{-160,150},{-178,150}},  color={0,0,127}));
   connect(plaCooSetSumShi.f2, hotSumSet.y) annotation (Line(points={{-60,122},{-70,
           122},{-70,110},{-78,110}}, color={0,0,127}));
-  connect(iniCooSet.y, nonSumCooSet.u2) annotation (Line(points={{-198,40},{-190,
-          40},{-190,54},{-182,54}},color={0,0,127}));
-  connect(dTActOveSho, nonSumCooSet.u1) annotation (Line(points={{-260,200},{-220,
-          200},{-220,66},{-182,66}},
-                                   color={0,0,127}));
   connect(nonSumCooSet.y, plaCooSet.u3) annotation (Line(points={{-158,60},{-150,
           60},{-150,72},{-22,72}},
                               color={0,0,127}));
   connect(iniHeaSet.y, actPlaHeaSet.u1) annotation (Line(points={{-118,220},{-100,
           220},{-100,226},{-82,226}}, color={0,0,127}));
-  connect(dTActOveSho, actPlaHeaSet.u2) annotation (Line(points={{-260,200},{-100,
-          200},{-100,214},{-82,214}},color={0,0,127}));
+  connect(dTActOveSho, actPlaHeaSet.u2) annotation (Line(points={{-260,40},{
+          -230,40},{-230,200},{-100,200},{-100,214},{-82,214}},
+                                     color={0,0,127}));
   connect(actPlaHeaSet.y, plaHeaLoa.x1) annotation (Line(points={{-58,220},{90,220},
           {90,178},{98,178}}, color={0,0,127}));
   connect(actPlaHeaSet.y, addPar1.u) annotation (Line(points={{-58,220},{-20,220},
@@ -410,6 +407,10 @@ equation
           {-110,150},{-110,134},{-60,134}}, color={0,0,127}));
   connect(cooSumSet11.y, hotSumSet.u) annotation (Line(points={{-118,150},{-110,
           150},{-110,110},{-102,110}}, color={0,0,127}));
+  connect(iniCooSet.y, nonSumCooSet.u1) annotation (Line(points={{-198,90},{
+          -190,90},{-190,66},{-182,66}}, color={0,0,127}));
+  connect(dTActOveSho, nonSumCooSet.u2) annotation (Line(points={{-260,40},{
+          -230,40},{-230,54},{-182,54}}, color={0,0,127}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
