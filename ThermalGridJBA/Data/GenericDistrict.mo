@@ -150,7 +150,7 @@ record GenericDistrict "District network design parameters"
 //     "Nominal heating capacity"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // Downsize the heat pump capacity by considering the heating supply from borefield
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=QPlaPeaHea_flow - 0.5*3e6
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=QPlaPeaHea_flow
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
