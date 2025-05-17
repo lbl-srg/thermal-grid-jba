@@ -36,11 +36,11 @@ block HeatPump
 //     final unit="K",
 //     displayUnit="degC")=TLooMin
 //     "Plant cooling setpoint temperature";
-  parameter Real TPlaHeaSet(
-    final quantity="ThermodynamicTemperature",
-    final unit="K",
-    displayUnit="degC")=TLooMax
-    "Plant heating setpoint temperature";
+//   parameter Real TPlaHeaSet(
+//     final quantity="ThermodynamicTemperature",
+//     final unit="K",
+//     displayUnit="degC")=TLooMax
+//     "Plant heating setpoint temperature";
   parameter Real dTCooCha(
     final min=0,
     final unit="K",
@@ -123,72 +123,80 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uEleRat
     "Electricity rate indicator. 0-normal rate; 1-high rate"
     annotation (Placement(transformation(extent={{-460,450},{-420,490}}),
-        iconTransformation(extent={{-140,90},{-100,130}})));
+        iconTransformation(extent={{-140,100},{-100,140}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uSt
     "Plant load indicator. 1-low load; 2-medium load; 3-high load"
     annotation (Placement(transformation(extent={{-460,410},{-420,450}}),
-        iconTransformation(extent={{-140,70},{-100,110}})));
+        iconTransformation(extent={{-140,80},{-100,120}})));
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uSea
     "Season indicator. 1-Winter; 2-Spring; 3-Summer; 4-Fall"
     annotation (Placement(transformation(extent={{-460,370},{-420,410}}),
-        iconTransformation(extent={{-140,50},{-100,90}})));
+        iconTransformation(extent={{-140,60},{-100,100}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TDryBul(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Outdoor dry bulb temperature"
     annotation (Placement(transformation(extent={{-460,250},{-420,290}}),
-        iconTransformation(extent={{-140,30},{-100,70}})));
+        iconTransformation(extent={{-140,40},{-100,80}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TPlaIn(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Temperature of the water into the central plant"
     annotation (Placement(transformation(extent={{-460,130},{-420,170}}),
-        iconTransformation(extent={{-140,10},{-100,50}})));
+        iconTransformation(extent={{-140,20},{-100,60}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput TActPlaHeaSet(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC")
+    "Actual plant heating setpoint"
+    annotation (Placement(transformation(extent={{-460,80},{-420,120}}),
+        iconTransformation(extent={{-140,0},{-100,40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TActPlaCooSet(
     final quantity="ThermodynamicTemperature",
     final unit="K",
-    displayUnit="degC") "Active plant cooling setpoint"
+    displayUnit="degC")
+    "Actual plant cooling setpoint"
     annotation (Placement(transformation(extent={{-460,40},{-420,80}}),
-        iconTransformation(extent={{-140,-10},{-100,30}})));
+        iconTransformation(extent={{-140,-20},{-100,20}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaPumIn(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Temperature of the water into the heat pump"
     annotation (Placement(transformation(extent={{-460,-20},{-420,20}}),
-        iconTransformation(extent={{-140,-30},{-100,10}})));
+        iconTransformation(extent={{-140,-40},{-100,0}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaPumOut(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC") "Temperature of the water out of the heat pump"
     annotation (Placement(transformation(extent={{-460,-40},{-420,0}}),
-        iconTransformation(extent={{-140,-50},{-100,-10}})));
+        iconTransformation(extent={{-140,-60},{-100,-20}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput mPla_flow(
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Plant mass flow rate"
     annotation (Placement(transformation(extent={{-460,-70},{-420,-30}}),
-        iconTransformation(extent={{-140,-70},{-100,-30}})));
+        iconTransformation(extent={{-140,-80},{-100,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput mHeaPum_flow(
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Heat pump mass flow rate"
     annotation (Placement(transformation(extent={{-460,-100},{-420,-60}}),
-        iconTransformation(extent={{-140,-90},{-100,-50}})));
+        iconTransformation(extent={{-140,-100},{-100,-60}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput TGlyIn(
     final quantity="ThermodynamicTemperature",
     final unit="K",
     displayUnit="degC")
     "Temperature of the glycol flowing into the heat pump"
     annotation (Placement(transformation(extent={{-460,-340},{-420,-300}}),
-        iconTransformation(extent={{-140,-110},{-100,-70}})));
+        iconTransformation(extent={{-140,-120},{-100,-80}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealInput uDisPum(
     final unit="1",
     final min=0,
     final max=1)
     "District pump norminal speed"
     annotation (Placement(transformation(extent={{-460,-380},{-420,-340}}),
-        iconTransformation(extent={{-140,-130},{-100,-90}})));
+        iconTransformation(extent={{-140,-140},{-100,-100}})));
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput y1SumCooBor
     "=true for cooling down borefield in summer"
     annotation (Placement(transformation(extent={{420,320},{460,360}}),
@@ -253,10 +261,6 @@ block HeatPump
     annotation (Placement(transformation(extent={{-220,430},{-200,450}})));
   Buildings.Controls.OBC.CDL.Integers.Equal inFal "In Fall"
     annotation (Placement(transformation(extent={{-220,400},{-200,420}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant heaSet(
-    y(unit="K", displayUnit="degC"),
-    final k=TPlaHeaSet) "Plant heating setpoint"
-    annotation (Placement(transformation(extent={{-400,90},{-380,110}})));
   Buildings.Controls.OBC.CDL.Reals.Average aveSet
     "Average plant setpoint temperature"
     annotation (Placement(transformation(extent={{-360,70},{-340,90}})));
@@ -560,6 +564,7 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai4(final k=
         mWat_flow_nominal) "Heat pump flow rate when charging the borefield"
     annotation (Placement(transformation(extent={{-80,-410},{-60,-390}})));
+
 equation
   connect(uEleRat, higEleRat.u1)
     annotation (Line(points={{-440,470},{-362,470}}, color={255,127,0}));
@@ -577,16 +582,12 @@ equation
           {-222,432}},      color={255,127,0}));
   connect(uSea, inFal.u2) annotation (Line(points={{-440,390},{-240,390},{-240,402},
           {-222,402}},      color={255,127,0}));
-  connect(heaSet.y, aveSet.u1) annotation (Line(points={{-378,100},{-370,100},{-370,
-          86},{-362,86}},        color={0,0,127}));
   connect(TPlaIn, heaMod.u1) annotation (Line(points={{-440,150},{-322,150}},
                                  color={0,0,127}));
   connect(aveSet.y, heaMod.u2) annotation (Line(points={{-338,80},{-330,80},{
           -330,142},{-322,142}}, color={0,0,127}));
   connect(heaMod.y, plaSet.u2) annotation (Line(points={{-298,150},{-290,150},{
           -290,30},{-282,30}},   color={255,0,255}));
-  connect(heaSet.y, plaSet.u1) annotation (Line(points={{-378,100},{-300,100},{
-          -300,38},{-282,38}},   color={0,0,127}));
   connect(mPla_flow, ratFlo.u1) annotation (Line(points={{-440,-50},{-290,-50},
           {-290,-64},{-282,-64}},   color={0,0,127}));
   connect(plaSet.y, dTSetHeaPumIn.u1) annotation (Line(points={{-258,30},{-250,
@@ -942,6 +943,10 @@ equation
     annotation (Line(points={{-118,-400},{-82,-400}}, color={0,0,127}));
   connect(gai4.y, higLoaModFlo.u3) annotation (Line(points={{-58,-400},{20,-400},
           {20,-388},{58,-388}}, color={0,0,127}));
+  connect(TActPlaHeaSet, aveSet.u1) annotation (Line(points={{-440,100},{-380,100},
+          {-380,86},{-362,86}}, color={0,0,127}));
+  connect(TActPlaHeaSet, plaSet.u1) annotation (Line(points={{-440,100},{-300,100},
+          {-300,38},{-282,38}}, color={0,0,127}));
 annotation (defaultComponentName="heaPumCon",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,120}}),
                          graphics={Rectangle(
