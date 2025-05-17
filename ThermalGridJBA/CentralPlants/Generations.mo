@@ -1330,11 +1330,14 @@ equation
           100},{-530,86},{-522,86}}, color={0,0,127}));
   connect(TLooMinMea, actOveSho.TMixMin) annotation (Line(points={{-560,60},{-530,
           60},{-530,74},{-522,74}}, color={0,0,127}));
-  connect(actOveSho.dTActOveSho, ind.dTActOveSho) annotation (Line(points={{-498,
-          80},{-492,80},{-492,240},{-526,240},{-526,254},{-522,254}}, color={0,0,
-          127}));
+  connect(actOveSho.dTActHeaOveSho, ind.dTActHeaOveSho) annotation (Line(points
+        ={{-498,74},{-490,74},{-490,240},{-526,240},{-526,254},{-522,254}},
+        color={0,0,127}));
   connect(ind.TActPlaHeaSet, heaPumCon.TActPlaHeaSet) annotation (Line(points={{
           -498,269},{110,269},{110,230},{118,230}}, color={0,0,127}));
+  connect(actOveSho.dTActCooOveSho, ind.dTActCooOveSho) annotation (Line(points
+        ={{-498,86},{-494,86},{-494,236},{-530,236},{-530,256},{-522,256}},
+        color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={

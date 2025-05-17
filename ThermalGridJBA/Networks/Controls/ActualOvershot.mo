@@ -35,18 +35,17 @@ model ActualOvershot "Actual overshot temperature"
     "Minimum measured mixing temperatures"
     annotation (Placement(transformation(extent={{-140,-80},{-100,-40}}),
         iconTransformation(extent={{-140,-80},{-100,-40}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput dTActOveSho(
-    final unit="K",
-    quantity="TemperatureDifference")
-    "Actual overshot temperature"
-    annotation (Placement(transformation(extent={{100,-20},{140,20}}),
-        iconTransformation(extent={{100,-20},{140,20}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput dTActCooOveSho(final unit="K",
+      quantity="TemperatureDifference") "Actual cooling overshot temperature"
+    annotation (Placement(transformation(extent={{100,40},{140,80}}),
+        iconTransformation(extent={{100,40},{140,80}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput dTActHeaOveSho(final unit="K",
+      quantity="TemperatureDifference") "Actual heating overshot temperature"
+    annotation (Placement(transformation(extent={{100,-80},{140,-40}}),
+        iconTransformation(extent={{100,-80},{140,-40}})));
   Buildings.Controls.OBC.CDL.Reals.Line incOve
     "Increase the overshot from the minium to the maximum"
     annotation (Placement(transformation(extent={{20,50},{40,70}})));
-  Buildings.Controls.OBC.CDL.Reals.Max oveSho
-    "Actual overshot"
-    annotation (Placement(transformation(extent={{60,-10},{80,10}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant minOveSho(
     final k=0)
     "Minimum overshot"
@@ -90,10 +89,6 @@ equation
     annotation (Line(points={{-120,-60},{18,-60}}, color={0,0,127}));
   connect(TMixMax,incOve. u)
     annotation (Line(points={{-120,60},{18,60}}, color={0,0,127}));
-  connect(incOve.y,oveSho. u1)
-    annotation (Line(points={{42,60},{50,60},{50,6},{58,6}}, color={0,0,127}));
-  connect(decOve.y,oveSho. u2) annotation (Line(points={{42,-60},{50,-60},{50,-6},
-          {58,-6}}, color={0,0,127}));
   connect(uppSta.y,incOve. x1) annotation (Line(points={{-38,80},{0,80},{0,68},{
           18,68}}, color={0,0,127}));
   connect(uppEnd.y,incOve. x2) annotation (Line(points={{-38,40},{0,40},{0,56},{
@@ -102,8 +97,10 @@ equation
           {18,-52}}, color={0,0,127}));
   connect(lowEnd.y,decOve. x2) annotation (Line(points={{-38,-80},{0,-80},{0,-64},
           {18,-64}}, color={0,0,127}));
-  connect(oveSho.y, dTActOveSho)
-    annotation (Line(points={{82,0},{120,0}}, color={0,0,127}));
+  connect(decOve.y, dTActHeaOveSho)
+    annotation (Line(points={{42,-60},{120,-60}}, color={0,0,127}));
+  connect(incOve.y, dTActCooOveSho)
+    annotation (Line(points={{42,60},{120,60}}, color={0,0,127}));
 annotation (defaultComponentName="actOveSho",
   Icon(coordinateSystem(preserveAspectRatio=false), graphics={
                                 Rectangle(

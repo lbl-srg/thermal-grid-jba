@@ -76,11 +76,17 @@ model Indicators "District load, electricity rate and season indicator"
     displayUnit="degC") "Dry bulb temperature"
     annotation (Placement(transformation(extent={{-280,110},{-240,150}}),
         iconTransformation(extent={{-140,-20},{-100,20}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealInput dTActOveSho(
+   Buildings.Controls.OBC.CDL.Interfaces.RealInput dTActCooOveSho(
+     final unit="K",
+     final quantity="TemperatureDifference")
+    "Actual cooling overshot temperature"
+    annotation (Placement(transformation(extent={{-280,20},{-240,60}}),
+        iconTransformation(extent={{-140,-60},{-100,-20}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput dTActHeaOveSho(
     final unit="K",
     final quantity="TemperatureDifference")
-    "Actual overshot temperature"
-    annotation (Placement(transformation(extent={{-280,20},{-240,60}}),
+    "Actual heating overshot temperature"
+    annotation (Placement(transformation(extent={{-280,180},{-240,220}}),
         iconTransformation(extent={{-140,-80},{-100,-40}})));
   Buildings.Controls.OBC.CDL.Interfaces.RealOutput TActPlaHeaSet(
     final unit="K",
@@ -255,8 +261,7 @@ model Indicators "District load, electricity rate and season indicator"
         displayUnit="degC"), final k=TDryBulSum - 1)
     "Low limit to shift cooling set point"
     annotation (Placement(transformation(extent={{-100,140},{-80,160}})));
-  Buildings.Controls.OBC.CDL.Reals.Subtract
-                                       nonSumCooSet
+  Buildings.Controls.OBC.CDL.Reals.Subtract nonSumCooSet
     "Plant cooling setpoint except summer"
     annotation (Placement(transformation(extent={{-180,50},{-160,70}})));
   Buildings.Controls.OBC.CDL.Reals.Add      actPlaHeaSet
@@ -265,10 +270,10 @@ model Indicators "District load, electricity rate and season indicator"
   Buildings.Controls.OBC.CDL.Reals.AddParameter addPar1(final p=1)
     "One degree higher than the plant heating setpoint"
     annotation (Placement(transformation(extent={{0,140},{20,160}})));
-
   Buildings.Controls.OBC.CDL.Reals.AddParameter cooSumSet11(final p=-2)
     "Plant cooling setpoint when it is in the cool summer"
     annotation (Placement(transformation(extent={{-140,140},{-120,160}})));
+
 equation
   connect(lesThr.y, intSwi3.u2)
     annotation (Line(points={{-138,-20},{-42,-20}}, color={255,0,255}));
@@ -390,9 +395,8 @@ equation
                               color={0,0,127}));
   connect(iniHeaSet.y, actPlaHeaSet.u1) annotation (Line(points={{-118,220},{-100,
           220},{-100,226},{-82,226}}, color={0,0,127}));
-  connect(dTActOveSho, actPlaHeaSet.u2) annotation (Line(points={{-260,40},{
-          -230,40},{-230,200},{-100,200},{-100,214},{-82,214}},
-                                     color={0,0,127}));
+  connect(dTActHeaOveSho, actPlaHeaSet.u2) annotation (Line(points={{-260,200},{
+          -92,200},{-92,214},{-82,214}}, color={0,0,127}));
   connect(actPlaHeaSet.y, plaHeaLoa.x1) annotation (Line(points={{-58,220},{90,220},
           {90,178},{98,178}}, color={0,0,127}));
   connect(actPlaHeaSet.y, addPar1.u) annotation (Line(points={{-58,220},{-20,220},
@@ -407,10 +411,10 @@ equation
           {-110,150},{-110,134},{-60,134}}, color={0,0,127}));
   connect(cooSumSet11.y, hotSumSet.u) annotation (Line(points={{-118,150},{-110,
           150},{-110,110},{-102,110}}, color={0,0,127}));
-  connect(iniCooSet.y, nonSumCooSet.u1) annotation (Line(points={{-198,90},{
-          -190,90},{-190,66},{-182,66}}, color={0,0,127}));
-  connect(dTActOveSho, nonSumCooSet.u2) annotation (Line(points={{-260,40},{
-          -230,40},{-230,54},{-182,54}}, color={0,0,127}));
+  connect(iniCooSet.y, nonSumCooSet.u1) annotation (Line(points={{-198,90},{-190,
+          90},{-190,66},{-182,66}}, color={0,0,127}));
+  connect(dTActCooOveSho, nonSumCooSet.u2) annotation (Line(points={{-260,40},{-200,
+          40},{-200,54},{-182,54}}, color={0,0,127}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
