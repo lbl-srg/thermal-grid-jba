@@ -28,18 +28,19 @@ model DetailedPlantFiveHubs
   parameter Real staDowDel(unit="s")=datDis.staDowDel
     "Minimum stage down delay, to avoid quickly staging down"
    annotation (Dialog(tab="Central plant"));
+  parameter Modelica.Units.SI.TemperatureDifference dTOveShoMax(min=0)=datDis.dTOveShoMax
+    "Maximum temperature difference to allow for control over or undershoot. dTOveShoMax >= 0"
+    annotation (Dialog(tab="Central plant"));
   parameter Real TApp(unit="K")=4
     "Approach temperature for sizing heat pump and the operational condition for dry cooler"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaHeaSet(unit="K")=datDis.TPlaHeaSet
-    "Design plant heating setpoint temperature"
+  parameter Real TIniPlaHeaSet(unit="K")=datDis.TIniPlaHeaSet
+    "Initial plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaCooSet(unit="K")=datDis.TPlaCooSet
-    "Design plant cooling setpoint temperature"
+  parameter Real TIniPlaCooSet(unit="K")=datDis.TIniPlaCooSet
+    "Initial plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-//  parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
-//    "Design plant summer cooling setpoint temperature"
-//    annotation (Dialog(tab="Central plant"));
+
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -298,8 +299,11 @@ model DetailedPlantFiveHubs
   CentralPlants.CentralPlant cenPla(
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
-    final TPlaHeaSet=TPlaHeaSet,
-    final TPlaCooSet=TPlaCooSet,
+    final TIniPlaHeaSet=TIniPlaHeaSet,
+    final TIniPlaCooSet=TIniPlaCooSet,
+    TDisPumUpp=TUpp,
+    TDisPumLow=TLow,
+    final dTOveShoMax=dTOveShoMax,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -792,8 +796,7 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StartTime=17280000,
-      StopTime=19872000,
+      StopTime=31536000,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
