@@ -330,10 +330,10 @@ bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
     annotation (Placement(transformation(extent={{500,344},{520,364}})));
   ThermalGridJBA.Data.MilpData milpData
     annotation (Placement(transformation(extent={{-380,500},{-360,520}})));
-  IndustrialPilot.Requirements.GreaterEqual reqEneCos(name="system", text="O-1-102: Energy cost must not be higher than 10% of cost computed in the architectural optimization.")
+ Buildings_Requirements.GreaterEqual reqEneCos(name="system", text="O-1-102: Energy cost must not be higher than 10% of cost computed in the architectural optimization.")
     "Requirement for energy cost"
     annotation (Placement(transformation(extent={{540,500},{562,520}})));
-  IndustrialPilot.Requirements.GreaterEqual reqEneImp(name="system", text="O-2-103: Imported annual energy must not be higher than 10% of the imported energy computed in the architectural optimization.")
+ Buildings_Requirements.GreaterEqual reqEneImp(name="system", text="O-2-103: Imported annual energy must not be higher than 10% of the imported energy computed in the architectural optimization.")
     "Requirement for energy import"
     annotation (Placement(transformation(extent={{540,460},{562,480}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gaiMilCos(k=1.1)
