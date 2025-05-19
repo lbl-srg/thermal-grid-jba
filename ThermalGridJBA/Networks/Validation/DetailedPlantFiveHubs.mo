@@ -504,16 +504,16 @@ model DetailedPlantFiveHubs
     "Non-HVAC electric power"
     annotation (Placement(transformation(extent={{180,230},{200,250}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PFanBuiSum(final nin=nBui)
-    "Sum of fan electric power consumption of the buildings"
+    "Sum of fan electric power consumption of the building terminal units"
     annotation (Placement(transformation(extent={{180,270},{200,290}})));
   Modelica.Blocks.Continuous.Integrator EFanBui(
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J", displayUnit="Wh"))
-    "Building fan electric energy"
+    "Building fan electric energy for terminal units"
     annotation (Placement(transformation(extent={{240,270},{260,290}})));
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
-    "Fan electric power consumption of each building"
+    "Fan electric power consumption of each building terminal units"
     annotation (Placement(transformation(extent={{120,270},{140,290}})));
   CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiPer(
     T_start=datDis.TSoi_start,
