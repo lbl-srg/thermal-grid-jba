@@ -64,6 +64,17 @@ model Generations
   parameter Modelica.Units.SI.MassFlowRate mBorFieCen_flow_nominal
     "Mass flow rate for center of borefield"
     annotation (Dialog(group="Borefield"));
+  parameter Real mBorFiePer_flow_minimum(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
+    "Minimum water mass flow rate to the perimeter borefield to get turbulent flow"
+    annotation (Dialog(group="Borefield"));
+  parameter Real mBorFieCen_flow_minimum(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
+    "Minimum water mass flow rate to the center borefield to get turbulent flow"
+    annotation (Dialog(group="Borefield"));
+
   parameter Modelica.Units.SI.PressureDifference dpBorFiePer_nominal(
     displayUnit="Pa")
     "Nominal pressure drop of perimeter zones of borefield"
@@ -777,7 +788,9 @@ model Generations
   ThermalGridJBA.Networks.Controls.Borefields borCon(
     final mWat_flow_nominal=mWat_flow_nominal,
     final mBorFiePer_flow_nominal=mBorFiePer_flow_nominal,
-    final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal)
+    final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal,
+    final mBorFiePer_flow_minimum=mBorFiePer_flow_minimum,
+    final mBorFieCen_flow_minimum=mBorFieCen_flow_minimum)
     "Borefield pumps and the valves control"
     annotation (Placement(transformation(extent={{-240,220},{-220,240}})));
   ThermalGridJBA.Networks.Controls.HeatPump heaPumCon(
