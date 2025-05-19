@@ -214,11 +214,11 @@ record GenericDistrict "District network design parameters"
   final parameter Real TLow(unit="K")=TLooMin + dTDisMar
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real dTSlo(unit="K")=2
+  parameter Real dTSlo(unit="K")=1
     "Temperature deadband for changing pump speed"
     annotation (Dialog(tab="District pump"));
-  parameter Real yDisPumMin(unit="1")=0.1
-    "District loop pump minimum speed"
+  parameter Real yDisPumMin(unit="1")=0.2/4
+    "District loop pump minimum speed, 20% minimum speed, and assuming 4 parallel pumps"
     annotation (Dialog(tab="District pump"));
   annotation (
     defaultComponentName="datDis",

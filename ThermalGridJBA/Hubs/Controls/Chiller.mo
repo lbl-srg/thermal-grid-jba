@@ -107,6 +107,9 @@ model Chiller "Chiller controller"
     final reverseActing=true,
     final y_neutral=0)        "Chiller compressor speed control"
     annotation (Placement(transformation(extent={{50,30},{70,50}})));
+  Buildings.Controls.OBC.CDL.Reals.LimitSlewRate ramLim(raisingSlewRate=1/0.01)
+    "Ramp limiter to avoid sudden load increase from chiller"
+    annotation (Placement(transformation(extent={{100,30},{120,50}})));
 equation
   connect(TEvaWatEnt,conValEva.u_m)
     annotation (Line(points={{-180,-60},{60,-60},{60,-32}},color={0,0,127}));
@@ -139,14 +142,16 @@ equation
           -140,6},{-122,6}}, color={0,0,127}));
   connect(sub.u2, TEvaWatLvg) annotation (Line(points={{-122,-6},{-140,-6},{
           -140,-20},{-180,-20}}, color={0,0,127}));
-  connect(conChi.y, yChi)
-    annotation (Line(points={{72,40},{180,40}}, color={0,0,127}));
   connect(zer.y, conChi.u_s)
     annotation (Line(points={{12,40},{48,40}}, color={0,0,127}));
   connect(sub.y, conChi.u_m)
     annotation (Line(points={{-98,0},{60,0},{60,28}}, color={0,0,127}));
   connect(heaOrCoo.y, conChi.uEna) annotation (Line(points={{-98,80},{-40,80},{
           -40,18},{56,18},{56,28}}, color={255,0,255}));
+  connect(conChi.y, ramLim.u)
+    annotation (Line(points={{72,40},{98,40}}, color={0,0,127}));
+  connect(ramLim.y, yChi)
+    annotation (Line(points={{122,40},{180,40}}, color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(
