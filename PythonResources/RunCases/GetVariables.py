@@ -27,7 +27,7 @@ def get_vars(var_list,
              mat_file_path,
              method : _methods = 'buildingspy',
              csv_file_path = None,
-             delete_csv = True):
+             delete_csv = False):
     """    
     """
     def generate_dymola_command(var_list, mat_file_path, csv_file_path):
@@ -76,6 +76,21 @@ def get_vars(var_list,
             os.remove(csv_file_path)
             
     return df        
+
+#%%
+def index_var_list(pre_index, holder, i):
+    """ Replaces the `holder` string in `pre_index` with index `i`.
+        Both `pre_index` and `i` can be either a single value or a list.
+    """
+    
+    _pre_index = [pre_index] if isinstance(pre_index, str) else pre_index
+    _i = [i] if isinstance(i, int) else i
+    
+    var_list = list()
+    for pre, ind in [(pre, ind) for pre in _pre_index for ind in _i]:
+        var_list.append(pre.replace(holder,str(ind)))
+        
+    return var_list
 
 #%%
 if __name__ == "__main__":

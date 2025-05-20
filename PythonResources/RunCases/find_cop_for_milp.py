@@ -19,12 +19,12 @@ from dymola.dymola_interface import DymolaInterface
 dymola = DymolaInterface("/usr/local/bin/dymola")
 # Replace the argument with the location of your Dymola excecutable. 
 
-from GetVariables import get_vars # python file under same folder
+from GetVariables import get_vars, index_var_list
+# python file under same folder
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
 mat_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.mat")
-csv_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.csv")
 
 PRINT_RESULTS = False
 WRITE_TO_XLSX = True
@@ -59,20 +59,6 @@ def safe_cop(QCon, PChi):
     return COP
 
 #%% Generate variable list
-def generate_indexed_var_list(pre_index, holder, i):
-    """ Replaces the `holder` string in `pre_index` with index `i`.
-        Both `pre_index` and `i` can be either a single value or a list.
-    """
-    
-    _pre_index = [pre_index] if isinstance(pre_index, str) else pre_index
-    _i = [i] if isinstance(i, int) else i
-    
-    var_list = list()
-    for pre, ind in [(pre, ind) for pre in _pre_index for ind in _i]:
-        var_list.append(pre.replace(holder,str(ind)))
-        
-    return var_list
-    
 index_holder = r'%%i%%' # placeholder string to be replaced with index
 
 # keys are the var names to be read from the result file
@@ -91,13 +77,12 @@ var_dict_pre_index = {
 
 var_list_pre_index = list(var_dict_pre_index.keys())
 
-var_list = generate_indexed_var_list(var_list_pre_index, index_holder, range(1,nBui+1))
+var_list = index_var_list(var_list_pre_index, index_holder, range(1,nBui+1))
 
 #%% Read mat file
 result_full = get_vars(var_list,
                        mat_file_name,
-                       'dymola',
-                       csv_file_name)
+                       'dymola')
 
 # Convert the timestamp to datetime format
 result_full['datetime'] = pd.to_datetime(result_full['Time'], unit='s', origin='2025-01-01')
@@ -115,7 +100,7 @@ for i in range(1,nBui+1):
     var_list_bui = ['Time', 'datetime'] # initialise
     
     # indexed var names for this building
-    var_list_bui += generate_indexed_var_list(var_list_pre_index, index_holder, i)
+    var_list_bui += index_var_list(var_list_pre_index, index_holder, i)
     result_bui = result_full[var_list_bui]
     
     # dict for renaming pd columns
