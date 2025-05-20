@@ -87,22 +87,34 @@ def index_var_list(pre_index, holder, i):
     _i = [i] if isinstance(i, int) else i
     
     var_list = list()
-    for pre, ind in [(pre, ind) for pre in _pre_index for ind in _i]:
-        var_list.append(pre.replace(holder,str(ind)))
-        
+    no_index = set()
+    for pre in _pre_index:
+        if holder in pre:  # check if `pre` has an index holder
+            for ind in _i:
+                var_list.append(pre.replace(holder, str(ind)))
+        else:
+            no_index.add(pre)  # if not, put it in a set to avoid duplicating
+    var_list += list(no_index)
+    
     return var_list
 
 #%%
 if __name__ == "__main__":
-    mat_file_path = os.path.join(CWD, "simulations", "ETS_All_futu", "ConnectedETSWithDHW.mat")
-    #csv_file_path = os.path.join(CWD, "simulations", "ETS_All_futu", "ConnectedETSWithDHW.csv")
+    # mat_file_path = os.path.join(CWD, "simulations", "ETS_All_futu", "ConnectedETSWithDHW.mat")
+    # #csv_file_path = os.path.join(CWD, "simulations", "ETS_All_futu", "ConnectedETSWithDHW.csv")
     
-    var_list = ['EChi.u', 'EChi.y']
+    # var_list = ['EChi.u', 'EChi.y']
     
-    df_bp = get_vars(var_list,
-                     mat_file_path,
-                     'buildingspy')
-    df_dy = get_vars(var_list,
-                     mat_file_path,
-                     'dymola')
+    # df_bp = get_vars(var_list,
+    #                  mat_file_path,
+    #                  'buildingspy')
+    # df_dy = get_vars(var_list,
+    #                  mat_file_path,
+    #                  'dymola')
+    
+    _i = r'%%i%%'
+    var_list_pre_index = [f'with_index[{_i}]', 'no_index']
+    var_list_indexed = index_var_list(var_list_pre_index,
+                                      _i,
+                                      [1,2])
     
