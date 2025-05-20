@@ -107,7 +107,8 @@ model Chiller "Chiller controller"
     final reverseActing=true,
     final y_neutral=0)        "Chiller compressor speed control"
     annotation (Placement(transformation(extent={{50,50},{70,70}})));
-  Buildings.Controls.OBC.CDL.Reals.LimitSlewRate ramLim(raisingSlewRate=1/0.01)
+  Buildings.Controls.OBC.CDL.Reals.LimitSlewRate ramLim(raisingSlewRate=1/(15*
+        60), fallingSlewRate=-1/60)
     "Ramp limiter to avoid sudden load increase from chiller"
     annotation (Placement(transformation(extent={{90,50},{110,70}})));
   Buildings.Controls.OBC.CDL.Reals.Min yChiLim
