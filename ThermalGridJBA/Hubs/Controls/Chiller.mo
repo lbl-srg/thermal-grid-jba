@@ -92,20 +92,18 @@ model Chiller "Chiller controller"
     "Chiller compressor speed control signal" annotation (Placement(
         transformation(extent={{160,20},{200,60}}), iconTransformation(extent={
             {100,0},{140,40}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer(y(final unit="K",
-        displayUnit="degC"), final k=0) "Zero"
-    annotation (Placement(transformation(extent={{-10,50},{10,70}})));
-  Buildings.Controls.OBC.CDL.Reals.Subtract sub
-    annotation (Placement(transformation(extent={{-120,-10},{-100,10}})));
-  Buildings.DHC.ETS.Combined.Controls.PIDWithEnable conChi(
+  Buildings.DHC.ETS.Combined.Controls.PIDWithEnable conCom(
     final controllerType=Modelica.Blocks.Types.SimpleController.PI,
     final yMax=1,
     final yMin=PLRMin,
-    k=0.01,
+    k=2,
     y_reset=PLRMin,
-    Ti(displayUnit="s"),
-    final reverseActing=true,
-    final y_neutral=0)        "Chiller compressor speed control"
+    Ti(displayUnit="s") = 300,
+    final reverseActing=false,
+    final y_neutral=0,
+    u_s(final unit="K", displayUnit="degC"),
+    u_m(final unit="K", displayUnit="degC"))
+    "Chiller compressor speed control"
     annotation (Placement(transformation(extent={{50,50},{70,70}})));
   Buildings.Controls.OBC.CDL.Reals.LimitSlewRate ramLim(raisingSlewRate=1/(15*
         60), fallingSlewRate=-1/60)
@@ -114,6 +112,18 @@ model Chiller "Chiller controller"
   Buildings.Controls.OBC.CDL.Reals.Min yChiLim
     "Minimum block, to pick lower of the load signals. Needed to switch off chiller fast but ramp up slowly"
     annotation (Placement(transformation(extent={{120,30},{140,50}})));
+  Buildings.Controls.OBC.CDL.Reals.AddParameter TEvaLvgSetMin(
+    p=-4,
+    u(final unit="K", displayUnit="degC"),
+    y(final unit="K", displayUnit="degC"))
+    "Minimum set point for evaporator leaving water temperature"
+    annotation (Placement(transformation(extent={{-120,-10},{-100,10}})));
+  Buildings.Controls.OBC.CDL.Reals.Max TEvaLvgSetAct(
+    u1(final unit="K", displayUnit="degC"),
+    u2(final unit="K", displayUnit="degC"),
+    y(final unit="K", displayUnit="degC"))
+    "Actual set point for evaporator leaving water temperature"
+    annotation (Placement(transformation(extent={{-80,50},{-60,70}})));
 equation
   connect(TEvaWatEnt,conValEva.u_m)
     annotation (Line(points={{-180,-60},{60,-60},{60,-32}},color={0,0,127}));
@@ -142,22 +152,24 @@ equation
                                                                             color={255,0,255}));
   connect(conValCon.y,yValCon)
     annotation (Line(points={{72,-80},{180,-80}},color={0,0,127}));
-  connect(TChiWatSupSet, sub.u1) annotation (Line(points={{-180,20},{-140,20},{
-          -140,6},{-122,6}}, color={0,0,127}));
-  connect(sub.u2, TEvaWatLvg) annotation (Line(points={{-122,-6},{-140,-6},{
-          -140,-20},{-180,-20}}, color={0,0,127}));
-  connect(zer.y, conChi.u_s)
-    annotation (Line(points={{12,60},{48,60}}, color={0,0,127}));
-  connect(sub.y, conChi.u_m)
-    annotation (Line(points={{-98,0},{60,0},{60,48}}, color={0,0,127}));
-  connect(heaOrCoo.y, conChi.uEna) annotation (Line(points={{-98,80},{-40,80},{
+  connect(heaOrCoo.y,conCom. uEna) annotation (Line(points={{-98,80},{-40,80},{
           -40,18},{56,18},{56,48}}, color={255,0,255}));
-  connect(conChi.y, ramLim.u)
+  connect(conCom.y, ramLim.u)
     annotation (Line(points={{72,60},{88,60}}, color={0,0,127}));
   connect(ramLim.y, yChiLim.u1) annotation (Line(points={{112,60},{116,60},{116,
           46},{118,46}}, color={0,0,127}));
-  connect(conChi.y, yChiLim.u2) annotation (Line(points={{72,60},{80,60},{80,34},
+  connect(conCom.y, yChiLim.u2) annotation (Line(points={{72,60},{80,60},{80,34},
           {118,34}}, color={0,0,127}));
+  connect(TEvaWatLvg,conCom. u_m) annotation (Line(points={{-180,-20},{-50,-20},
+          {-50,10},{60,10},{60,48}}, color={0,0,127}));
+  connect(TEvaWatEnt, TEvaLvgSetMin.u) annotation (Line(points={{-180,-60},{-140,
+          -60},{-140,0},{-122,0}}, color={0,0,127}));
+  connect(TEvaLvgSetMin.y, TEvaLvgSetAct.u2) annotation (Line(points={{-98,0},{-90,
+          0},{-90,54},{-82,54}}, color={0,0,127}));
+  connect(TEvaLvgSetAct.u1, TChiWatSupSet) annotation (Line(points={{-82,66},{-100,
+          66},{-100,20},{-180,20}}, color={0,0,127}));
+  connect(TEvaLvgSetAct.y, conCom.u_s)
+    annotation (Line(points={{-58,60},{48,60}}, color={0,0,127}));
   connect(yChiLim.y, yChi)
     annotation (Line(points={{142,40},{180,40}}, color={0,0,127}));
   annotation (
