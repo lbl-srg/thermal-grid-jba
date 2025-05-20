@@ -6,22 +6,69 @@ Created on Mon May 19 11:27:46 2025
 @author: casper
 """
 
+import os
+import numpy as np
 import plotly.graph_objects as go
 import plotly.io as pio
 pio.renderers.default='browser'
 
-# Semantic input data
-data = [("Electricity input", "HRC - cooling only", 8, "electricity"),
-        ("Electricity input", "HRC - heating only", 4, "electricity"),
-        ("Electricity input", "HRC - simultaneous", 2, "electricity"),
-        ("ETS hex", "HRC - cooling only", 8, "heat rejection"),
-        ("ETS hex", "HRC - heating only", 4, "cooling rejection"),
-        ("HRC - cooling only", "Cooling load", 10, "cooling"),
-        ("HRC - heating only", "Heating load", 10, "space heating"),
-        ("HRC - heating only", "DHW load", 1, "domestic hot water"),
-        ("HRC - simultaneous", "Cooling load", 5, "cooling"),
-        ("HRC - simultaneous", "Heating load", 6, "space heating"),
-        ("HRC - simultaneous", "DHW load", 1, "domestic hot water")]
+from GetVariables import get_vars # python file under same folder
+
+#CWD = os.getcwd()
+CWD = os.path.dirname(os.path.abspath(__file__))
+mat_file_name = os.path.join(CWD, "simulations", "2025-05-19", "DetailedPlantFiveHubs.mat")
+csv_file_name = mat_file_name.replace('.mat', '.csv')
+
+#%% read results file
+var_list = [
+    'bui[1].ets.chi.chi.COP',
+    'bui[1].ets.chi.chi.P',
+    'bui[1].ets.chi.chi.QCon_flow',
+    'bui[1].ets.chi.chi.QEva_flow',
+    'bui[1].ets.chi.con.uCoo',
+    'bui[1].ets.chi.con.uHea',
+    'cenPla.gen.ind.ySea']
+results = get_vars(var_list,
+                   mat_file_name,
+                   'dymola')
+
+#%% process results data
+# filter results
+results = results[results['bui[1].ets.chi.chi.COP'] > 0.01] # only when chiller on
+results = results[results['bui[1].ets.chi.chi.COP'] < 15.0] # remove transient at initialisation
+results = results[np.isclose(results['Time'] % 3600, 0)] # only keep hourly sampled values
+results = results.iloc[:-1] # drop the last point which would be categorised to the next year
+
+# filter data based on operational modes
+conditions = [
+    (results['bui[1].ets.chi.con.uCoo'] == 1) & (results['bui[1].ets.chi.con.uHea'] == 1),
+    (results['bui[1].ets.chi.con.uCoo'] == 1) & (results['bui[1].ets.chi.con.uHea'] == 0),
+    (results['bui[1].ets.chi.con.uCoo'] == 0) & (results['bui[1].ets.chi.con.uHea'] == 1)
+              ]
+modes = ['simultaneous', 'coolingonly', 'heatingonly']
+results['mode'] = np.select(conditions, modes, default='other')
+
+#%% make sankey diagram
+# All connections
+# (source, target, energy carrier, value)
+data = [("Electricity input", "HRC - cooling only", "electricity",
+         abs(results.loc[results['mode'] == 'coolingonly', 'bui[1].ets.chi.chi.P'].sum())),
+        ("Electricity input", "HRC - heating only", "electricity",
+         abs(results.loc[results['mode'] == 'heatingonly', 'bui[1].ets.chi.chi.P'].sum())),
+        ("Electricity input", "HRC - simultaneous", "electricity",
+         abs(results.loc[results['mode'] == 'simultaneous', 'bui[1].ets.chi.chi.P'].sum())),
+        ("ETS hex", "HRC - cooling only", "heat rejection",
+         abs(results.loc[results['mode'] == 'coolingonly', 'bui[1].ets.chi.chi.QCon_flow'].sum())),
+        ("ETS hex", "HRC - heating only", "cooling rejection",
+         abs(results.loc[results['mode'] == 'heatingonly', 'bui[1].ets.chi.chi.QEva_flow'].sum())),
+        ("HRC - cooling only", "Cooling load", "cooling",
+         abs(results.loc[results['mode'] == 'coolingonly', 'bui[1].ets.chi.chi.QEva_flow'].sum())),
+        ("HRC - heating only", "Heating load", "space heating",
+         abs(results.loc[results['mode'] == 'heatingonly', 'bui[1].ets.chi.chi.QCon_flow'].sum())),
+        ("HRC - simultaneous", "Cooling load", "cooling",
+         abs(results.loc[results['mode'] == 'simultaneous', 'bui[1].ets.chi.chi.QEva_flow'].sum())),
+        ("HRC - simultaneous", "Heating load", "space heating",
+         abs(results.loc[results['mode'] == 'simultaneous', 'bui[1].ets.chi.chi.QCon_flow'].sum()))]
 
 # Map energy carriers to colors
 dict_color = {
@@ -38,10 +85,10 @@ nodes = sorted(set(node for pair in data for node in pair[:2]))
 node_indices = {node: idx for idx, node in enumerate(nodes)}
 
 # Creat source, target, and value lists
-source = [node_indices[src] for src, tgt, val, carrier in data]
-target = [node_indices[tgt] for src, tgt, val, carrier in data]
-value = [val for src, tgt, val, carrier in data]
-color = [dict_color[carrier] for src, tgt, val, carrier in data]
+source = [node_indices[src] for src, tgt, crr, val in data]
+target = [node_indices[tgt] for src, tgt, crr, val in data]
+value = [val for src, tgt, crr, val in data]
+color = [dict_color[crr] for src, tgt, crr, val in data]
 
 # Creat the Sankey diagram
 fig = go.Figure(data=[go.Sankey(
