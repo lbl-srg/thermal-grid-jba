@@ -310,8 +310,8 @@ equation
   connect(chi.PPum, totPPum.u[2]) annotation (Line(points={{12,-8},{30,-8},{30,
           -70},{240,-70},{240,-60},{258,-60}},
                       color={0,0,127}));
-  connect(conSup.TChiWatSupSet, chi.TChiWatSupSet) annotation (Line(points={{-238,
-          17},{-26,17},{-26,-8},{-12,-8}}, color={0,0,127}));
+  connect(conSup.TChiWatSupSet, chi.TChiWatSupSet) annotation (Line(points={{-238,17},
+          {-26,17},{-26,-9},{-12,-9}},     color={0,0,127}));
   connect(conSup.yHea, chi.uHea) annotation (Line(points={{-238,31},{-20,31},{-20,
           -2},{-12,-2}}, color={255,0,255}));
   connect(conSup.yCoo, chi.uCoo) annotation (Line(points={{-238,29},{-22,29},{-22,
@@ -424,6 +424,9 @@ equation
     annotation (Line(points={{-144,80},{-144,70}}, color={0,127,255}));
   connect(valMixHea.port_1, valDivCon.port_2) annotation (Line(points={{-80,70},
           {-80,76},{-144,76},{-144,80}}, color={0,127,255}));
+  connect(conSup.THeaWatSupSet, chi.THeaWatSupSet) annotation (Line(points={{
+          -238,19},{-132,19},{-132,20},{-24,20},{-24,-7},{-12,-7}}, color={0,0,
+          127}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},

@@ -82,18 +82,19 @@ model Borefield "Borefield model"
     annotation (Dialog(group="Borefield"));
   final parameter Modelica.Units.SI.Length eTub=0.0029 "Thickness of a tube"
     annotation (Dialog(group="Borefield"));
-  final parameter Modelica.Units.SI.Velocity vFlu = mBor_flow_nominal/Medium.d_const/(rTub-eTub)^2/Modelica.Constants.pi / 2
+  final parameter Modelica.Units.SI.Velocity vFlu_nominal=mBor_flow_nominal/
+      Medium.d_const/(rTub - eTub)^2/Modelica.Constants.pi/2
     "Flow velocity in tube at design conditions. Divided by 2 to account for double-U tube"
     annotation (Dialog(group="Borefield"));
   final parameter Medium.ThermodynamicState sta_nominal=Medium.setState_pTX(
       T=Medium.T_default, p=Medium.p_default, X=Medium.X_default);
-  final parameter Modelica.Units.SI.ReynoldsNumber Re =
-    Modelica.Fluid.Pipes.BaseClasses.CharacteristicNumbers.ReynoldsNumber(
-      v = vFlu,
-      rho = Medium.density(sta_nominal),
-      D = 2*(rTub-eTub),
-      mu = Medium.dynamicViscosity(sta_nominal)) "Reynolds number at design flow rate"
-    annotation (Dialog(group="Borefield"));
+  final parameter Modelica.Units.SI.ReynoldsNumber Re_nominal=
+      Modelica.Fluid.Pipes.BaseClasses.CharacteristicNumbers.ReynoldsNumber(
+      v=vFlu_nominal,
+      rho=Medium.density(sta_nominal),
+      D=2*(rTub - eTub),
+      mu=Medium.dynamicViscosity(sta_nominal))
+    "Reynolds number at design flow rate" annotation (Dialog(group="Borefield"));
   final parameter Modelica.Units.SI.PressureDifference dp_nominal(
     displayUnit="Pa") =
     Modelica.Fluid.Pipes.BaseClasses.WallFriction.QuadraticTurbulent.pressureLoss_m_flow(
