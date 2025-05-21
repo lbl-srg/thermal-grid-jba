@@ -22,7 +22,6 @@ CWD = os.path.dirname(os.path.abspath(__file__))
 mat_file_name = os.path.join(CWD, "simulations", "2025-05-19", "DetailedPlantFiveHubs.mat")
 
 nBui = 5 # Ensure this is consistent with the mat file
-ranBui = range(1,nBui+1)
 _i = r'%%i%%' # placeholder string to be replaced with index
 
 def integrate_result(df, var, option = None):
@@ -75,19 +74,29 @@ def integrate_result(df, var, option = None):
 
 #%% read results file
 var_list = list()
-# bui[1] doesn't have dhw
-var_list += index_var_list(f'bui[{_i}].dHHotWat_flow',
-                           _i,
-                           range(2,nBui+1))
+# buildings
 var_list_pre_index = [
     f'bui[{_i}].ets.PCoo',
     f'bui[{_i}].dHChiWat_flow',
     f'bui[{_i}].dHHeaWat_flow',
-    f'bui[{_i}].ets.hex.hex.Q1_flow',
-    'cenPla.gen.ind.ySea']
+    f'bui[{_i}].ets.hex.hex.Q1_flow']
 var_list += index_var_list(var_list_pre_index,
                            _i,
-                           ranBui)
+                           range(1,nBui+1))
+# bui[1] doesn't have dhw
+var_list += index_var_list(f'bui[{_i}].dHHotWat_flow',
+                           _i,
+                           range(2,nBui+1))
+# ground connection has (nBui + 1) elements
+var_list += index_var_list(f'dis.heatPorts[{_i}].Q_flow',
+                           _i,
+                           range(1,nBui+2))
+# variables without an index
+var_list += ['cenPla.gen.ind.ySea',
+             'TDisWatSup.T',
+             'TDisWatRet.T',
+             'pumDis.m_flow',
+             'datDis.cpWatLiq']
 results = get_vars(var_list,
                    mat_file_name,
                    'dymola')
@@ -99,9 +108,14 @@ data_dict = {
     ("ETS hex", "ETS chiller", "cooling rejection") : 0,
     ("ETS chiller", "Cooling load", "cooling") : 0,
     ("ETS chiller", "Heating load", "space heating") : 0,
-    ('ETS chiller', 'DHW load', 'domestic hot water') : 0,
+    ("ETS chiller", "DHW load", "domestic hot water") : 0,
+    ("Central plant", "ETS hex", "reservoir heat") : 0,
+    ("Central plant", "ETS hex", "reservoir cooling") : 0,
+    ("Central plant", "Ground loss", "heat rejection") : 0,
+    ("Central plant", "Ground loss", "cooling rejection") : 0
         }
-for i in ranBui:
+
+for i in range(1,nBui+1):
     data_dict[("Electricity import", "ETS chiller", "electricity")] += \
         abs(integrate_result(results, f'bui[{i}].ets.PCoo'))
     data_dict[("ETS hex", "ETS chiller", "heat rejection")] += \
@@ -116,6 +130,19 @@ for i in ranBui:
         data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
             abs(integrate_result(results, f'bui[{i}].dHHotWat_flow'))
 
+for i in range(1,nBui+2):
+    data_dict[("Central plant", "Ground loss", "heat rejection")] += \
+        abs(integrate_result(results, f'dis.heatPorts[{i}].Q_flow','negative'))
+    data_dict[("Central plant", "Ground loss", "cooling rejection")] += \
+        abs(integrate_result(results, f'dis.heatPorts[{i}].Q_flow','positive'))
+
+cpWat = results['datDis.cpWatLiq'][0]
+results['Q_pla_to_ets'] = cpWat * results['pumDis.m_flow'] * (results['TDisWatSup.T'] - results['TDisWatRet.T'])
+data_dict[("Central plant", "ETS hex", "reservoir heat")] = \
+    abs(integrate_result(results, 'Q_pla_to_ets','negative'))
+data_dict[("Central plant", "ETS hex", "reservoir cooling")] = \
+    abs(integrate_result(results, 'Q_pla_to_ets','positive'))
+
 #%% make sankey diagram
 
 # Map energy carriers to colors
@@ -125,7 +152,9 @@ dict_color = {
     "space heating": 'rgba(255, 0, 0, 0.8)',
     "domestic hot water": 'rgba(106, 90, 205, 0.8)',
     "heat rejection": 'rgba(255, 0, 0, 0.4)',
-    "cooling rejection": 'rgba(0, 0, 255, 0.4)'
+    "cooling rejection": 'rgba(0, 0, 255, 0.4)',
+    "reservoir heat": 'rgba(255, 0, 0, 0.6)',
+    "reservoir cooling": 'rgba(0, 0, 255, 0.6)'
 }
 
 # Extract unique nodes and creat a mapping from node name to index
