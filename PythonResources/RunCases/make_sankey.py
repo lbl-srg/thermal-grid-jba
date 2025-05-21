@@ -30,12 +30,46 @@ def integrate_result(df, var, option = None):
         option = [None, 'positive', 'negative']
           to only integrate positive or negative values
     """
+    def find_zero_crossings(t, u):
+        """ Find indices where the sign of u changes
+        """
+        sign_changes = np.where(np.diff(np.sign(u)))[0]
+        
+        # Initialize lists to store zero crossing times and values
+        zero_crossing_times = []
+        zero_crossing_values = []
+    
+        for i in sign_changes:
+            # Perform linear interpolation to find the exact zero crossing time
+            t1, t2 = t[i], t[i + 1]
+            u1, u2 = u[i], u[i + 1]
+            
+            # Calculate the zero crossing time
+            t_zero = t1 - u1 * (t2 - t1) / (u2 - u1)
+            u_zero = 0.0
+            
+            # Append the zero crossing time and value to the lists
+            zero_crossing_times.append(t_zero)
+            zero_crossing_values.append(u_zero)
+    
+        return zero_crossing_times, zero_crossing_values
+    
     t = np.array(df['Time'])
     u = np.array(df[var])
-    if option == 'positive':
-        u[u<0] = 0
-    if option == 'negative':
-        u[u>0] = 0
+    
+    if option in ['positive', 'negative']:
+        t_crossing, u_crossing = find_zero_crossings(t, u)
+        # Insert zero crossings into the original time series
+        for t_zero, u_zero in zip(t_crossing, u_crossing):
+            idx = np.searchsorted(t, t_zero)
+            t = np.insert(t, idx, t_zero)
+            u = np.insert(u, idx, u_zero)
+        
+        if option == 'positive':
+            u[u<0] = 0
+        if option == 'negative':
+            u[u>0] = 0
+
     I = trapz(u, t)
     return I
 
@@ -82,13 +116,6 @@ for i in ranBui:
         data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
             abs(integrate_result(results, f'bui[{i}].dHHotWat_flow'))
 
-veri_ele_coo = data_dict[("Electricity import", "ETS chiller", "electricity")] \
-             + data_dict[("ETS hex", "ETS chiller", "cooling rejection")] \
-             + data_dict[("ETS chiller", "Cooling load", "cooling")]
-veri_hea     = data_dict[("ETS hex", "ETS chiller", "heat rejection")] \
-             + data_dict[("ETS chiller", "Heating load", "space heating")] \
-             + data_dict[("ETS chiller", "DHW load", "domestic hot water")]
-
 #%% make sankey diagram
 
 # Map energy carriers to colors
@@ -131,9 +158,15 @@ fig = go.Figure(data=[go.Sankey(
 fig.update_layout(title_text="Basic Sankey Diagram", font_size=10)
 fig.show()
 
-#%% verification
+#%% validation
 J_to_kWh = 2.7777777777777776e-07
-print("### VERIFICATION ###")
+veri_ele_coo = data_dict[("Electricity import", "ETS chiller", "electricity")] \
+             + data_dict[("ETS hex", "ETS chiller", "cooling rejection")] \
+             + data_dict[("ETS chiller", "Cooling load", "cooling")]
+veri_hea     = data_dict[("ETS hex", "ETS chiller", "heat rejection")] \
+             + data_dict[("ETS chiller", "Heating load", "space heating")] \
+             + data_dict[("ETS chiller", "DHW load", "domestic hot water")]
+print("### VALIDATION ###")
 print(f'total cooling load = {data_dict[("ETS chiller", "Cooling load", "cooling")]*J_to_kWh:.5g} kWh')
 print(f'    reference from load files: {16908188:.5g} kWh')
 print(f'total heating load = {data_dict[("ETS chiller", "Heating load", "space heating")]*J_to_kWh:.5g} kWh')
