@@ -34,6 +34,7 @@ model BorefieldSection "Section for a core or an edge of the borefield"
     redeclare each final package Medium = Medium,
     each allowFlowReversal=true,
     show_T=true,
+    nSeg=5,
     each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     each TExt0_start=TSoi_start,
     each borFieDat=borFieDat,
