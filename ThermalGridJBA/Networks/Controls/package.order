@@ -7,4 +7,5 @@ HeatExchanger
 HeatPump
 Indicators
 TrueFalseDelay
+ContinuousIntegerMax
 Validation
