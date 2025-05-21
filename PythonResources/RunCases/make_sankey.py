@@ -10,7 +10,9 @@ import os
 import numpy as np
 import plotly.graph_objects as go
 import plotly.io as pio
-pio.renderers.default='browser'
+pio.renderers.default='browser' # if the IDE doesn't render plotly output
+
+from scipy.integrate import trapz
 
 from GetVariables import get_vars, index_var_list
 # python file under same folder
@@ -23,76 +25,69 @@ nBui = 5 # Ensure this is consistent with the mat file
 ranBui = range(1,nBui+1)
 _i = r'%%i%%' # placeholder string to be replaced with index
 
+def integrate_result(df, var, option = None):
+    """ Integrates df[var] along df['Time']
+        option = [None, 'positive', 'negative']
+          to only integrate positive or negative values
+    """
+    t = np.array(df['Time'])
+    u = np.array(df[var])
+    if option == 'positive':
+        u[u<0] = 0
+    if option == 'negative':
+        u[u>0] = 0
+    I = trapz(u, t)
+    return I
+
 #%% read results file
+var_list = list()
+# bui[1] doesn't have dhw
+var_list += index_var_list(f'bui[{_i}].dHHotWat_flow',
+                           _i,
+                           range(2,nBui+1))
 var_list_pre_index = [
-    f'bui[{_i}].ets.chi.chi.COP',
-    f'bui[{_i}].ets.chi.chi.P',
-    f'bui[{_i}].ets.chi.chi.QCon_flow',
-    f'bui[{_i}].ets.chi.chi.QEva_flow',
-    f'bui[{_i}].ets.chi.con.uCoo',
-    f'bui[{_i}].ets.chi.con.uHea',
+    f'bui[{_i}].ets.PCoo',
+    f'bui[{_i}].dHChiWat_flow',
+    f'bui[{_i}].dHHeaWat_flow',
+    f'bui[{_i}].ets.hex.hex.Q1_flow',
     'cenPla.gen.ind.ySea']
-var_list = index_var_list(var_list_pre_index,
-                          _i,
-                          ranBui)
+var_list += index_var_list(var_list_pre_index,
+                           _i,
+                           ranBui)
 results = get_vars(var_list,
                    mat_file_name,
                    'dymola')
 
 #%% process results data
-# filter results
-results = results[np.isclose(results['Time'] % 3600, 0)] # only keep hourly sampled values
-results = results.iloc[:-1] # drop the last point which would be categorised to the next year
-
-# initialise data dict
-# (source, target, energy carrier) : value
 data_dict = {
-    ("Electricity input", "HRC - cooling only", "electricity") : 0,
-    ("Electricity input", "HRC - heating only", "electricity") : 0,
-    ("Electricity input", "HRC - simultaneous", "electricity") : 0,
-    ("ETS hex", "HRC - cooling only", "heat rejection") : 0,
-    ("ETS hex", "HRC - heating only", "cooling rejection") : 0,
-    ("HRC - cooling only", "Cooling load", "cooling") : 0,
-    ("HRC - heating only", "Heating load", "space heating") : 0,
-    ("HRC - simultaneous", "Cooling load", "cooling") : 0,
-    ("HRC - simultaneous", "Heating load", "space heating") : 0
+    ("Electricity import", "ETS chiller", "electricity") : 0,
+    ("ETS hex", "ETS chiller", "heat rejection") : 0,
+    ("ETS hex", "ETS chiller", "cooling rejection") : 0,
+    ("ETS chiller", "Cooling load", "cooling") : 0,
+    ("ETS chiller", "Heating load", "space heating") : 0,
+    ('ETS chiller', 'DHW load', 'domestic hot water') : 0,
         }
 for i in ranBui:
-    # filter out data of the specified index
-    results_bui = results[['Time'] + [col for col in results.columns if col.startswith(f'bui[{i}].')]]
-    
-    # only when chiller on
-    results_bui = results_bui[results_bui[f'bui[{i}].ets.chi.chi.COP'] > 0.01]
-    # remove transient at initialisation
-    results_bui = results_bui[results_bui[f'bui[{i}].ets.chi.chi.COP'] < 15.0]
+    data_dict[("Electricity import", "ETS chiller", "electricity")] += \
+        abs(integrate_result(results, f'bui[{i}].ets.PCoo'))
+    data_dict[("ETS hex", "ETS chiller", "heat rejection")] += \
+        abs(integrate_result(results, f'bui[{i}].ets.hex.hex.Q1_flow', 'positive'))
+    data_dict[("ETS hex", "ETS chiller", "cooling rejection")] += \
+        abs(integrate_result(results, f'bui[{i}].ets.hex.hex.Q1_flow', 'negative'))
+    data_dict[("ETS chiller", "Cooling load", "cooling")] += \
+        abs(integrate_result(results, f'bui[{i}].dHChiWat_flow'))
+    data_dict[("ETS chiller", "Heating load", "space heating")] += \
+        abs(integrate_result(results, f'bui[{i}].dHHeaWat_flow'))
+    if i != 1: # bui[1] doesn't have dhw
+        data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
+            abs(integrate_result(results, f'bui[{i}].dHHotWat_flow'))
 
-    # filter data based on operational modes
-    conditions = [
-        (results_bui[f'bui[{i}].ets.chi.con.uCoo'] == 1) & (results_bui[f'bui[{i}].ets.chi.con.uHea'] == 1),
-        (results_bui[f'bui[{i}].ets.chi.con.uCoo'] == 1) & (results_bui[f'bui[{i}].ets.chi.con.uHea'] == 0),
-        (results_bui[f'bui[{i}].ets.chi.con.uCoo'] == 0) & (results_bui[f'bui[{i}].ets.chi.con.uHea'] == 1)
-                  ]
-    modes = ['simultaneous', 'coolingonly', 'heatingonly']
-    results_bui['mode'] = np.select(conditions, modes, default='other')
-    
-    data_dict[("Electricity input", "HRC - cooling only", "electricity")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'coolingonly', f'bui[{i}].ets.chi.chi.P'].sum())
-    data_dict[("Electricity input", "HRC - heating only", "electricity")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'heatingonly', f'bui[{i}].ets.chi.chi.P'].sum())
-    data_dict[("Electricity input", "HRC - simultaneous", "electricity")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'simultaneous', f'bui[{i}].ets.chi.chi.P'].sum())
-    data_dict[("ETS hex", "HRC - cooling only", "heat rejection")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'coolingonly', f'bui[{i}].ets.chi.chi.QCon_flow'].sum())
-    data_dict[("ETS hex", "HRC - heating only", "cooling rejection")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'heatingonly', f'bui[{i}].ets.chi.chi.QEva_flow'].sum())
-    data_dict[("HRC - cooling only", "Cooling load", "cooling")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'coolingonly', f'bui[{i}].ets.chi.chi.QEva_flow'].sum())
-    data_dict[("HRC - heating only", "Heating load", "space heating")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'heatingonly', f'bui[{i}].ets.chi.chi.QCon_flow'].sum())
-    data_dict[("HRC - simultaneous", "Cooling load", "cooling")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'simultaneous', f'bui[{i}].ets.chi.chi.QEva_flow'].sum())
-    data_dict[("HRC - simultaneous", "Heating load", "space heating")] += \
-        abs(results_bui.loc[results_bui['mode'] == 'simultaneous', f'bui[{i}].ets.chi.chi.QCon_flow'].sum())
+veri_ele_coo = data_dict[("Electricity import", "ETS chiller", "electricity")] \
+             + data_dict[("ETS hex", "ETS chiller", "cooling rejection")] \
+             + data_dict[("ETS chiller", "Cooling load", "cooling")]
+veri_hea     = data_dict[("ETS hex", "ETS chiller", "heat rejection")] \
+             + data_dict[("ETS chiller", "Heating load", "space heating")] \
+             + data_dict[("ETS chiller", "DHW load", "domestic hot water")]
 
 #%% make sankey diagram
 
@@ -135,3 +130,15 @@ fig = go.Figure(data=[go.Sankey(
 
 fig.update_layout(title_text="Basic Sankey Diagram", font_size=10)
 fig.show()
+
+#%% verification
+J_to_kWh = 2.7777777777777776e-07
+print("### VERIFICATION ###")
+print(f'total cooling load = {data_dict[("ETS chiller", "Cooling load", "cooling")]*J_to_kWh:.5g} kWh')
+print(f'    reference from load files: {16908188:.5g} kWh')
+print(f'total heating load = {data_dict[("ETS chiller", "Heating load", "space heating")]*J_to_kWh:.5g} kWh')
+print(f'    reference from load files: {10080563.2344998:.5g} kWh')
+print(f'total dhw load = {data_dict[("ETS chiller", "DHW load", "domestic hot water")]*J_to_kWh:.5g} kWh')
+print(f'    reference from load files: {4748967.95197562:.5g} kWh')
+print(f"chiller ele + eva = {veri_ele_coo*J_to_kWh:.5g} kWh")
+print(f"chiller con       = {veri_hea*J_to_kWh    :.5g} kWh")
