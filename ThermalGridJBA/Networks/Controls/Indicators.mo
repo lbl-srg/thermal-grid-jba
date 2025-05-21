@@ -188,13 +188,13 @@ model Indicators "District load, electricity rate and season indicator"
     annotation (Placement(transformation(extent={{200,-30},{220,-10}})));
   Buildings.Controls.OBC.CDL.Conversions.IntegerToReal intToRea
     "Convert integer to real"
-    annotation (Placement(transformation(extent={{20,0},{40,20}})));
+    annotation (Placement(transformation(extent={{20,10},{40,30}})));
   Buildings.Controls.OBC.CDL.Discrete.TriggeredSampler triSam(final y_start=1)
     "Sample the load indicator when it starts staging up"
-    annotation (Placement(transformation(extent={{60,0},{80,20}})));
+    annotation (Placement(transformation(extent={{60,10},{80,30}})));
   Buildings.Controls.OBC.CDL.Conversions.RealToInteger reaToInt
     "Convert real to integer"
-    annotation (Placement(transformation(extent={{120,0},{140,20}})));
+    annotation (Placement(transformation(extent={{120,10},{140,30}})));
   Buildings.Controls.OBC.CDL.Logical.Timer tim(t=staDowDel)
     "Check if the minimum dealy has passed"
     annotation (Placement(transformation(extent={{200,-60},{220,-40}})));
@@ -314,30 +314,28 @@ equation
   connect(zer.y, plaCooLoa.f1) annotation (Line(points={{62,150},{80,150},{80,104},
           {98,104}},           color={0,0,127}));
   connect(absLoa.y, greThr.u) annotation (Line(points={{202,100},{220,100},{220,
-          30},{-170,30},{-170,-60},{-162,-60}},   color={0,0,127}));
+          40},{-170,40},{-170,-60},{-162,-60}},   color={0,0,127}));
   connect(absLoa.y, lesThr.u) annotation (Line(points={{202,100},{220,100},{220,
-          30},{-170,30},{-170,-20},{-162,-20}},   color={0,0,127}));
+          40},{-170,40},{-170,-20},{-162,-20}},   color={0,0,127}));
   connect(intSwi3.y, cha.u) annotation (Line(points={{-18,-20},{18,-20}},
                      color={255,127,0}));
-  connect(cha.up, lat.u) annotation (Line(points={{42,-14},{70,-14},{70,-20},{98,
-          -20}},    color={255,0,255}));
+  connect(cha.up, lat.u) annotation (Line(points={{42,-14},{60,-14},{60,-20},{
+          98,-20}}, color={255,0,255}));
   connect(lat.y, truFalHol.u)
     annotation (Line(points={{122,-20},{138,-20}}, color={255,0,255}));
   connect(truFalHol.y, plaLoaInd.u2)
     annotation (Line(points={{162,-20},{198,-20}}, color={255,0,255}));
   connect(intSwi3.y, plaLoaInd.u3) annotation (Line(points={{-18,-20},{0,-20},{0,
           -40},{180,-40},{180,-28},{198,-28}}, color={255,127,0}));
-  connect(intSwi3.y, intToRea.u) annotation (Line(points={{-18,-20},{0,-20},{0,10},
-          {18,10}},       color={255,127,0}));
+  connect(intSwi3.y, intToRea.u) annotation (Line(points={{-18,-20},{0,-20},{0,
+          20},{18,20}},   color={255,127,0}));
   connect(intToRea.y, triSam.u)
-    annotation (Line(points={{42,10},{58,10}},   color={0,0,127}));
+    annotation (Line(points={{42,20},{58,20}},   color={0,0,127}));
   connect(triSam.y, reaToInt.u)
-    annotation (Line(points={{82,10},{118,10}},   color={0,0,127}));
-  connect(cha.up, triSam.trigger)
-    annotation (Line(points={{42,-14},{70,-14},{70,-2}},  color={255,0,255}));
-  connect(reaToInt.y, plaLoaInd.u1) annotation (Line(points={{142,10},{180,10},{
-          180,-12},{198,-12}},  color={255,127,0}));
-  connect(truFalHol.y, tim.u) annotation (Line(points={{162,-20},{190,-20},{190,
+    annotation (Line(points={{82,20},{118,20}},   color={0,0,127}));
+  connect(reaToInt.y, plaLoaInd.u1) annotation (Line(points={{142,20},{180,20},
+          {180,-12},{198,-12}}, color={255,127,0}));
+  connect(truFalHol.y, tim.u) annotation (Line(points={{162,-20},{170,-20},{170,
           -50},{198,-50}}, color={255,0,255}));
   connect(cha.down, or2.u1) annotation (Line(points={{42,-26},{52,-26},{52,-60},
           {58,-60}},color={255,0,255}));
@@ -415,6 +413,8 @@ equation
           90},{-190,66},{-182,66}}, color={0,0,127}));
   connect(dTActCooOveSho, nonSumCooSet.u2) annotation (Line(points={{-260,40},{-200,
           40},{-200,54},{-182,54}}, color={0,0,127}));
+  connect(truFalHol.y, triSam.trigger) annotation (Line(points={{162,-20},{170,
+          -20},{170,0},{70,0},{70,8}}, color={255,0,255}));
 annotation (defaultComponentName="ind",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(
