@@ -92,11 +92,16 @@ var_list += index_var_list(f'dis.heatPorts[{_i}].Q_flow',
                            _i,
                            range(1,nBui+2))
 # variables without an index
-var_list += ['cenPla.gen.ind.ySea',
+var_list += ['datDis.cpWatLiq',
+             'cenPla.gen.ind.ySea',
              'TDisWatSup.T',
              'TDisWatRet.T',
              'pumDis.m_flow',
-             'datDis.cpWatLiq']
+             'cenPla.gen.hex.Q1_flow',
+             'cenPla.gen.heaPum.P',
+             'cenPla.gen.heaPum.QCon_flow',
+             'cenPla.gen.heaPum.QEva_flow'
+             ]
 results = get_vars(var_list,
                    mat_file_name,
                    'dymola')
@@ -112,9 +117,19 @@ data_dict = {
     ("Central plant", "ETS hex", "reservoir heat") : 0,
     ("Central plant", "ETS hex", "reservoir cooling") : 0,
     ("Central plant", "Ground loss", "heat rejection") : 0,
-    ("Central plant", "Ground loss", "cooling rejection") : 0
+    ("Central plant", "Ground loss", "cooling rejection") : 0,
+    ("Dry cooler", "Economizer", "generic heat") : 0,
+    ("Dry cooler", "Economizer", "generic cooling") : 0,
+    ("Economizer", "Central plant", "reservoir heat") : 0,
+    ("Economizer", "Central plant", "reservoir cooling") : 0,
+    ("Electricity import", "Central chiller", "electricity") : 0,
+    ("Dry cooler", "Central chiller", "heat rejection") : 0,
+    ("Dry cooler", "Central chiller", "cooling rejection") : 0,
+    ("Central chiller", "Central plant", "reservoir heat") : 0,
+    ("Central chiller", "Central plant", "reservoir cooling") : 0,
         }
 
+# each building
 for i in range(1,nBui+1):
     data_dict[("Electricity import", "ETS chiller", "electricity")] += \
         abs(integrate_result(results, f'bui[{i}].ets.PCoo'))
@@ -130,18 +145,43 @@ for i in range(1,nBui+1):
         data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
             abs(integrate_result(results, f'bui[{i}].dHHotWat_flow'))
 
+# network ground loss
 for i in range(1,nBui+2):
     data_dict[("Central plant", "Ground loss", "heat rejection")] += \
         abs(integrate_result(results, f'dis.heatPorts[{i}].Q_flow','negative'))
     data_dict[("Central plant", "Ground loss", "cooling rejection")] += \
         abs(integrate_result(results, f'dis.heatPorts[{i}].Q_flow','positive'))
 
+# central plant
 cpWat = results['datDis.cpWatLiq'][0]
+
+# central plant boundary
 results['Q_pla_to_ets'] = cpWat * results['pumDis.m_flow'] * (results['TDisWatSup.T'] - results['TDisWatRet.T'])
 data_dict[("Central plant", "ETS hex", "reservoir heat")] = \
     abs(integrate_result(results, 'Q_pla_to_ets','negative'))
 data_dict[("Central plant", "ETS hex", "reservoir cooling")] = \
     abs(integrate_result(results, 'Q_pla_to_ets','positive'))
+
+# economiser
+data_dict[("Dry cooler", "Economizer", "heat rejection")] = \
+    abs(integrate_result(results, 'cenPla.gen.hex.Q1_flow', 'negative'))
+data_dict[("Dry cooler", "Economizer", "cooling rejection")] = \
+    abs(integrate_result(results, 'cenPla.gen.hex.Q1_flow', 'positive'))
+data_dict[("Economizer", "Central plant", "reservoir heat")] = data_dict[("Dry cooler", "Economizer", "generic heat")]
+data_dict[("Economizer", "Central plant", "reservoir cooling")] = data_dict[("Dry cooler", "Economizer", "generic cooling")]
+
+# central plant chiller
+data_dict[("Electricity import", "Central chiller", "electricity")] = \
+    abs(integrate_result(results, 'cenPla.gen.heaPum.P'))
+data_dict[("Dry cooler", "Central chiller", "cooling rejection")] =\
+    abs(integrate_result(results, 'cenPla.gen.heaPum.QEva_flow', 'negative'))
+data_dict[("Dry cooler", "Central chiller", "heat rejection")] =\
+    abs(integrate_result(results, 'cenPla.gen.heaPum.QEva_flow', 'positive'))
+data_dict[("Central chiller", "Central plant", "reservoir heat")] =\
+    abs(integrate_result(results, 'cenPla.gen.heaPum.QCon_flow', 'positive'))
+data_dict[("Central chiller", "Central plant", "reservoir cooling")] =\
+    abs(integrate_result(results,'cenPla.gen.heaPum.QEva_flow', 'negative'))
+
 
 #%% make sankey diagram
 
@@ -154,7 +194,9 @@ dict_color = {
     "heat rejection": 'rgba(255, 0, 0, 0.4)',
     "cooling rejection": 'rgba(0, 0, 255, 0.4)',
     "reservoir heat": 'rgba(255, 0, 0, 0.6)',
-    "reservoir cooling": 'rgba(0, 0, 255, 0.6)'
+    "reservoir cooling": 'rgba(0, 0, 255, 0.6)',
+    "generic heat": 'rgba(255, 0, 0, 0.5)',
+    "generic cooling": 'rgba(0, 0, 255, 0.5)'
 }
 
 # Extract unique nodes and creat a mapping from node name to index
