@@ -496,10 +496,7 @@ model Generations
     redeclare final package MediumEva = MediumG,
     use_rev=true,
     allowDifferentDeviceIdentifiers=true,
-    use_intSafCtr=true,
-    redeclare
-      Buildings.Fluid.HeatPumps.ModularReversible.Controls.Safety.Data.Wuellhorst2021
-      safCtrPar,
+    use_intSafCtr=false,
     dTCon_nominal=dTHex_nominal,
     mCon_flow_nominal=mHeaPumWat_flow_nominal,
     dpCon_nominal=30000,
