@@ -100,7 +100,9 @@ var_list += ['datDis.cpWatLiq',
              'cenPla.gen.hex.Q1_flow',
              'cenPla.gen.heaPum.P',
              'cenPla.gen.heaPum.QCon_flow',
-             'cenPla.gen.heaPum.QEva_flow'
+             'cenPla.gen.heaPum.QEva_flow',
+             'cenPla.QBorPer_flow',
+             'cenPla.QBorCen_flow'
              ]
 results = get_vars(var_list,
                    mat_file_name,
@@ -127,6 +129,10 @@ data_dict = {
     ("Dry cooler", "Central chiller", "cooling rejection") : 0,
     ("Central chiller", "Central plant", "reservoir heat") : 0,
     ("Central chiller", "Central plant", "reservoir cooling") : 0,
+    ("Borefield center", "Central plant", "reservoir heat") : 0,
+    ("Central plant", "Borefield center", "reservoir cooling") : 0,
+    ("Borefield perimeter", "Central plant", "reservoir heat") : 0,
+    ("Central plant", "Borefield perimeter", "reservoir cooling") : 0
         }
 
 # each building
@@ -167,8 +173,8 @@ data_dict[("Dry cooler", "Economizer", "heat rejection")] = \
     abs(integrate_result(results, 'cenPla.gen.hex.Q1_flow', 'negative'))
 data_dict[("Dry cooler", "Economizer", "cooling rejection")] = \
     abs(integrate_result(results, 'cenPla.gen.hex.Q1_flow', 'positive'))
-data_dict[("Economizer", "Central plant", "reservoir heat")] = data_dict[("Dry cooler", "Economizer", "generic heat")]
-data_dict[("Economizer", "Central plant", "reservoir cooling")] = data_dict[("Dry cooler", "Economizer", "generic cooling")]
+data_dict[("Economizer", "Central plant", "reservoir heat")] = data_dict[("Dry cooler", "Economizer", "cooling rejection")]
+data_dict[("Economizer", "Central plant", "reservoir cooling")] = data_dict[("Dry cooler", "Economizer", "heat rejection")]
 
 # central plant chiller
 data_dict[("Electricity import", "Central chiller", "electricity")] = \
@@ -180,8 +186,17 @@ data_dict[("Dry cooler", "Central chiller", "heat rejection")] =\
 data_dict[("Central chiller", "Central plant", "reservoir heat")] =\
     abs(integrate_result(results, 'cenPla.gen.heaPum.QCon_flow', 'positive'))
 data_dict[("Central chiller", "Central plant", "reservoir cooling")] =\
-    abs(integrate_result(results,'cenPla.gen.heaPum.QEva_flow', 'negative'))
+    abs(integrate_result(results,'cenPla.gen.heaPum.QCon_flow', 'negative'))
 
+# borefield
+data_dict[("Borefield center", "Central plant", "reservoir heat")] =\
+    abs(integrate_result(results,'cenPla.QBorCen_flow', 'positive'))
+data_dict[("Central plant", "Borefield center", "reservoir cooling")] =\
+    abs(integrate_result(results,'cenPla.QBorCen_flow', 'negative'))
+data_dict[("Borefield perimeter", "Central plant", "reservoir heat")] =\
+    abs(integrate_result(results,'cenPla.QBorPer_flow', 'positive'))
+data_dict[("Central plant", "Borefield perimeter", "reservoir cooling")] =\
+    abs(integrate_result(results,'cenPla.QBorPer_flow', 'negative'))
 
 #%% make sankey diagram
 
@@ -226,7 +241,7 @@ fig = go.Figure(data=[go.Sankey(
     )
 )])
 
-fig.update_layout(title_text="Basic Sankey Diagram", font_size=10)
+fig.update_layout(title_text="Energy flow", font_size=10)
 fig.show()
 
 #%% validation
