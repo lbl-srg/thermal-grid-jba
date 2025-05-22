@@ -1,5 +1,6 @@
 ActualOvershot
 Borefields
+ContinuousIntegerMax
 DistrictLoopPump
 DryCooler
 FalseDelay
@@ -7,5 +8,4 @@ HeatExchanger
 HeatPump
 Indicators
 TrueFalseDelay
-ContinuousIntegerMax
 Validation
