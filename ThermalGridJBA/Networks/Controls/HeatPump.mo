@@ -462,10 +462,6 @@ block HeatPump
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con(final k=1)
     "Constant one"
     annotation (Placement(transformation(extent={{-140,-410},{-120,-390}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai3(
-    final k=mBorFieCen_flow_nominal)
-    "Convert to mass flow rate"
-    annotation (Placement(transformation(extent={{-80,-450},{-60,-430}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant one1(final k=0) "zero"
     annotation (Placement(transformation(extent={{220,-460},{240,-440}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant minSpe(final k=minComSpe)
@@ -734,9 +730,6 @@ equation
     annotation (Line(points={{-440,-360},{-382,-360}}, color={0,0,127}));
   connect(gai2.y, higLoaModFlo.u1) annotation (Line(points={{-358,-360},{-20,-360},
           {-20,-372},{58,-372}},color={0,0,127}));
-  connect(con.y, gai3.u)
-    annotation (Line(points={{-118,-400},{-100,-400},{-100,-440},{-82,-440}},
-                                                     color={0,0,127}));
   connect(higLoaModFlo.y, max2.u1) annotation (Line(points={{82,-380},{100,-380},
           {100,-394},{118,-394}}, color={0,0,127}));
   connect(minWatRat.y, max2.u2) annotation (Line(points={{82,-420},{100,-420},{
