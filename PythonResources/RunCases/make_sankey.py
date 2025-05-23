@@ -209,16 +209,34 @@ dict_color = {
     "borefield perimeter anergy": 'rgba(165, 255, 0, 0.8)'
 }
 
+# Map node names to coordinates
+#   The origin is at the top left, from 0 to 1.
+dict_coord = {
+    "Electricity import": (0.1, 0.1),
+    "Dry cooler": (0.1, 0.4),
+    "Central chiller": (0.3, 0.4),
+    "Economizer": (0.3, 0.6),
+    "Borefield center": (0.3, 0.7),
+    "Borefield perimeter": (0.3, 0.8),
+    "Ground": (0.3, 0.85),
+    "Reservoir loop": (0.5, 0.6),
+    "ETS chiller": (0.7, 0.35),
+    "Cooling load": (0.9, 0.2),
+    "Heating load": (0.9, 0.6),
+    "DHW load": (0.9, 0.8)
+    }
+
 # Extract unique nodes and creat a mapping from node name to index
 nodes = sorted(set(node for pair in data_dict.keys() for node in pair[:2]))
 node_indices = {node: idx for idx, node in enumerate(nodes)}
+nodex = [dict_coord[node][0] for node in nodes]
+nodey = [dict_coord[node][1] for node in nodes]
 
 # Creat source, target, and value lists
 source = [node_indices[src] for src, tgt, crr in data_dict.keys()]
 target = [node_indices[tgt] for src, tgt, crr in data_dict.keys()]
 value = [data_dict[key] for key in data_dict.keys()]
 color = [dict_color[crr] for src, tgt, crr in data_dict.keys()]
-
 value = np.array(value)*J_to_kWh
 
 # Creat the Sankey diagram
@@ -230,6 +248,9 @@ fig = go.Figure(data=[go.Sankey(
         thickness=20,
         line=dict(color="black", width=0.5),
         label=nodes,
+        align='center',
+        x=nodex,
+        y=nodey,
         color="blue"
     ),
     link=dict(
@@ -240,7 +261,9 @@ fig = go.Figure(data=[go.Sankey(
     )
 )])
 
-fig.update_layout(title_text="Energy flow", font_size=10)
+fig.update_layout(title_text="Energy flow",
+                  font_size=30,
+                  font=dict(size = 20))
 fig.show()
 
 #%% validation
