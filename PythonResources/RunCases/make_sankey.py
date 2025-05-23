@@ -112,7 +112,8 @@ results = get_vars(var_list,
 #%% process results data
 # (source, target, energy carrier)
 #   `energy carrier` influences colouring in the diagram
-data_dict = {
+data_dicts = [
+    {
     ("Electricity import", "ETS chiller", "electricity") : 0,
     ("Reservoir loop", "ETS chiller", "reservoir heat") : 0,
     ("Reservoir loop", "ETS chiller", "reservoir cooling") : 0,
@@ -135,62 +136,71 @@ data_dict = {
     ("Borefield perimeter", "Reservoir loop", "borefield perimeter anergy") : 0,
     ("Reservoir loop", "Borefield perimeter", "borefield perimeter anergy") : 0
         }
+    for _ in range(5)]
 
-# each building
-for i in range(1,nBui+1):
-    data_dict[("Electricity import", "ETS chiller", "electricity")] += \
-        abs(integrate_result(results, f'bui[{i}].ets.PCoo'))
-    data_dict[("Reservoir loop", "ETS chiller", "reservoir heat")] += \
-        abs(integrate_result(results, f'QEtsHex_flow.u[{i}]', 'negative'))
-    data_dict[("Reservoir loop", "ETS chiller", "reservoir cooling")] += \
-        abs(integrate_result(results, f'QEtsHex_flow.u[{i}]', 'positive'))
-    data_dict[("ETS chiller", "Cooling load", "cooling")] += \
-        abs(integrate_result(results, f'bui[{i}].dHChiWat_flow'))
-    data_dict[("ETS chiller", "Heating load", "space heating")] += \
-        abs(integrate_result(results, f'bui[{i}].dHHeaWat_flow'))
-    if i != 1: # bui[1] doesn't have dhw
-        data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
-            abs(integrate_result(results, f'bui[{i}].dHHotWat_flow'))
-
-# ground
-for i in range(1,nBui+2):
-    data_dict[("Reservoir loop", "Ground", "ground anergy")] += \
-        abs(integrate_result(results, f'dis.heatPorts[{i}].Q_flow','negative'))
-    data_dict[("Ground", "Reservoir loop", "ground anergy")] += \
-        abs(integrate_result(results, f'dis.heatPorts[{i}].Q_flow','positive'))
-
-# Central plant
-# economiser
-data_dict[("Dry cooler", "Economizer", "heat rejection")] = \
-    abs(integrate_result(results, 'cenPla.gen.hex.Q1_flow', 'negative'))
-data_dict[("Dry cooler", "Economizer", "cooling rejection")] = \
-    abs(integrate_result(results, 'cenPla.gen.hex.Q1_flow', 'positive'))
-data_dict[("Economizer", "Reservoir loop", "reservoir heat")] = \
-    data_dict[("Dry cooler", "Economizer", "cooling rejection")]
-data_dict[("Economizer", "Reservoir loop", "reservoir cooling")] = \
-    data_dict[("Dry cooler", "Economizer", "heat rejection")]
-
-# central chiller
-data_dict[("Electricity import", "Central chiller", "electricity")] = \
-    abs(integrate_result(results, 'cenPla.gen.heaPum.P'))
-data_dict[("Dry cooler", "Central chiller", "cooling rejection")] =\
-    abs(integrate_result(results, 'cenPla.gen.heaPum.QEva_flow', 'negative'))
-data_dict[("Dry cooler", "Central chiller", "heat rejection")] =\
-    abs(integrate_result(results, 'cenPla.gen.heaPum.QEva_flow', 'positive'))
-data_dict[("Central chiller", "Reservoir loop", "reservoir heat")] =\
-    abs(integrate_result(results, 'cenPla.gen.heaPum.QCon_flow', 'positive'))
-data_dict[("Central chiller", "Reservoir loop", "reservoir cooling")] =\
-    abs(integrate_result(results,'cenPla.gen.heaPum.QCon_flow', 'negative'))
-
-# borefield
-data_dict[("Borefield center", "Reservoir loop", "borefield center anergy")] =\
-    abs(integrate_result(results,'cenPla.QBorCen_flow', 'positive'))
-data_dict[("Reservoir loop", "Borefield center", "borefield center anergy")] =\
-    abs(integrate_result(results,'cenPla.QBorCen_flow', 'negative'))
-data_dict[("Borefield perimeter", "Reservoir loop", "borefield perimeter anergy")] =\
-    abs(integrate_result(results,'cenPla.QBorPer_flow', 'positive'))
-data_dict[("Reservoir loop", "Borefield perimeter", "borefield perimeter anergy")] =\
-    abs(integrate_result(results,'cenPla.QBorPer_flow', 'negative'))
+for sea in range(5):
+    if sea == 0:
+        results_sliced = results
+    else:
+        results_sliced = results[results['cenPla.gen.ind.ySea'] == sea]
+    
+    data_dict = data_dicts[sea]
+    
+    # each building
+    for i in range(1,nBui+1):
+        data_dict[("Electricity import", "ETS chiller", "electricity")] += \
+            abs(integrate_result(results_sliced, f'bui[{i}].ets.PCoo'))
+        data_dict[("Reservoir loop", "ETS chiller", "reservoir heat")] += \
+            abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'negative'))
+        data_dict[("Reservoir loop", "ETS chiller", "reservoir cooling")] += \
+            abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'positive'))
+        data_dict[("ETS chiller", "Cooling load", "cooling")] += \
+            abs(integrate_result(results_sliced, f'bui[{i}].dHChiWat_flow'))
+        data_dict[("ETS chiller", "Heating load", "space heating")] += \
+            abs(integrate_result(results_sliced, f'bui[{i}].dHHeaWat_flow'))
+        if i != 1: # bui[1] doesn't have dhw
+            data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
+                abs(integrate_result(results_sliced, f'bui[{i}].dHHotWat_flow'))
+    
+    # ground
+    for i in range(1,nBui+2):
+        data_dict[("Reservoir loop", "Ground", "ground anergy")] += \
+            abs(integrate_result(results_sliced, f'dis.heatPorts[{i}].Q_flow','negative'))
+        data_dict[("Ground", "Reservoir loop", "ground anergy")] += \
+            abs(integrate_result(results_sliced, f'dis.heatPorts[{i}].Q_flow','positive'))
+    
+    # Central plant
+    # economiser
+    data_dict[("Dry cooler", "Economizer", "heat rejection")] = \
+        abs(integrate_result(results_sliced, 'cenPla.gen.hex.Q1_flow', 'negative'))
+    data_dict[("Dry cooler", "Economizer", "cooling rejection")] = \
+        abs(integrate_result(results_sliced, 'cenPla.gen.hex.Q1_flow', 'positive'))
+    data_dict[("Economizer", "Reservoir loop", "reservoir heat")] = \
+        data_dict[("Dry cooler", "Economizer", "cooling rejection")]
+    data_dict[("Economizer", "Reservoir loop", "reservoir cooling")] = \
+        data_dict[("Dry cooler", "Economizer", "heat rejection")]
+    
+    # central chiller
+    data_dict[("Electricity import", "Central chiller", "electricity")] = \
+        abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.P'))
+    data_dict[("Dry cooler", "Central chiller", "cooling rejection")] =\
+        abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QEva_flow', 'negative'))
+    data_dict[("Dry cooler", "Central chiller", "heat rejection")] =\
+        abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QEva_flow', 'positive'))
+    data_dict[("Central chiller", "Reservoir loop", "reservoir heat")] =\
+        abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QCon_flow', 'positive'))
+    data_dict[("Central chiller", "Reservoir loop", "reservoir cooling")] =\
+        abs(integrate_result(results_sliced,'cenPla.gen.heaPum.QCon_flow', 'negative'))
+    
+    # borefield
+    data_dict[("Borefield center", "Reservoir loop", "borefield center anergy")] =\
+        abs(integrate_result(results_sliced,'cenPla.QBorCen_flow', 'positive'))
+    data_dict[("Reservoir loop", "Borefield center", "borefield center anergy")] =\
+        abs(integrate_result(results_sliced,'cenPla.QBorCen_flow', 'negative'))
+    data_dict[("Borefield perimeter", "Reservoir loop", "borefield perimeter anergy")] =\
+        abs(integrate_result(results_sliced,'cenPla.QBorPer_flow', 'positive'))
+    data_dict[("Reservoir loop", "Borefield perimeter", "borefield perimeter anergy")] =\
+        abs(integrate_result(results_sliced,'cenPla.QBorPer_flow', 'negative'))
 
 #%% make sankey diagram
 
@@ -226,45 +236,49 @@ dict_coord = {
     "DHW load": (0.9, 0.8)
     }
 
-# Extract unique nodes and creat a mapping from node name to index
-nodes = sorted(set(node for pair in data_dict.keys() for node in pair[:2]))
-node_indices = {node: idx for idx, node in enumerate(nodes)}
-nodex = [dict_coord[node][0] for node in nodes]
-nodey = [dict_coord[node][1] for node in nodes]
+# Season names
+seasons = ['Whole year', 'Winter', 'Spring', 'Summer', 'Fall']
 
-# Creat source, target, and value lists
-source = [node_indices[src] for src, tgt, crr in data_dict.keys()]
-target = [node_indices[tgt] for src, tgt, crr in data_dict.keys()]
-value = [data_dict[key] for key in data_dict.keys()]
-color = [dict_color[crr] for src, tgt, crr in data_dict.keys()]
-value = np.array(value)*J_to_kWh
-
-# Creat the Sankey diagram
-fig = go.Figure(data=[go.Sankey(
-    valueformat = ",.0f",
-    valuesuffix = "kWh",
-    node=dict(
-        pad=15,
-        thickness=20,
-        line=dict(color="black", width=0.5),
-        label=nodes,
-        align='center',
-        x=nodex,
-        y=nodey,
-        color="blue"
-    ),
-    link=dict(
-        source=source,
-        target=target,
-        value=value,
-        color=color
-    )
-)])
-
-fig.update_layout(title_text="Energy flow",
-                  font_size=30,
-                  font=dict(size = 20))
-fig.show()
+for idx, data_dict in enumerate(data_dicts):
+    # Extract unique nodes and creat a mapping from node name to index
+    nodes = sorted(set(node for pair in data_dict.keys() for node in pair[:2]))
+    node_indices = {node: idx for idx, node in enumerate(nodes)}
+    nodex = [dict_coord[node][0] for node in nodes]
+    nodey = [dict_coord[node][1] for node in nodes]
+    
+    # Creat source, target, and value lists
+    source = [node_indices[src] for src, tgt, crr in data_dict.keys()]
+    target = [node_indices[tgt] for src, tgt, crr in data_dict.keys()]
+    value = [data_dict[key] for key in data_dict.keys()]
+    color = [dict_color[crr] for src, tgt, crr in data_dict.keys()]
+    value = np.array(value)*J_to_kWh
+    
+    # Creat the Sankey diagram
+    fig = go.Figure(data=[go.Sankey(
+        valueformat = ",.0f",
+        valuesuffix = "kWh",
+        node=dict(
+            pad=15,
+            thickness=20,
+            line=dict(color="black", width=0.5),
+            label=nodes,
+            align='center',
+            x=nodex,
+            y=nodey,
+            color="blue"
+        ),
+        link=dict(
+            source=source,
+            target=target,
+            value=value,
+            color=color
+        )
+    )])
+    
+    fig.update_layout(title_text=f"Energy flow - {seasons[idx]}",
+                      font_size=30,
+                      font=dict(size = 20))
+    fig.show()
 
 #%% validation
 # checks first-law conservation
