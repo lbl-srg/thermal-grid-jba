@@ -39,6 +39,8 @@ record GenericDistrict "District network design parameters"
     "Peak cooling load at all the ETS heat exchanger";
   parameter Modelica.Units.SI.TemperatureDifference dTLoo_nominal=4
     "Design temperature difference of the district loop";
+  parameter Modelica.Units.SI.TemperatureDifference dTPlaHex_nominal=4
+    "Design temperature difference for heat exchanger in central plant";
 
   parameter Modelica.Units.SI.MassFlowRate mPumDis_flow_nominal=
     max(abs(QPlaPeaCoo_flow),QPlaPeaHea_flow)/(Buildings.Utilities.Psychrometrics.Constants.cpWatLiq * dTLoo_nominal)
@@ -75,20 +77,17 @@ record GenericDistrict "District network design parameters"
     annotation (Dialog(tab="Central plant"));
   parameter Modelica.Units.SI.Temperature TSoi_start(displayUnit="degC")=290.3
     "Initial temperature of the soil of borefield";
-  parameter Modelica.Units.SI.TemperatureDifference dTOveSho(min=0)=2
-    "Temperature difference to allow for control over or undershoot. dTOveSho >= 0"
+  parameter Modelica.Units.SI.TemperatureDifference dTOveShoMax(min=0)=2
+    "Maximum temperature difference to allow for control over or undershoot. dTOveShoMax >= 0"
    annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal*(QPlaPeaHea_flow/abs(QPlaPeaCoo_flow))+dTOveSho
+  parameter Modelica.Units.SI.Temperature TIniPlaHeaSet=TLooMin+dTLoo_nominal*(QPlaPeaHea_flow/abs(QPlaPeaCoo_flow))
     "Design plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
 //   parameter Modelica.Units.SI.Temperature TPlaHeaSet=TLooMin+dTLoo_nominal
 //     "Design plant heating setpoint temperature"
 //     annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaCooSet=TLooMax-dTLoo_nominal-dTOveSho
+  parameter Modelica.Units.SI.Temperature TIniPlaCooSet=TLooMax-dTLoo_nominal
     "Design plant cooling setpoint temperature"
-    annotation (Dialog(tab="Central plant"));
-  parameter Modelica.Units.SI.Temperature TPlaSumCooSet=TLooMax - dTLoo_nominal
-    "Design plant summer cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
   parameter Real TDryBulSum(
     unit="K",
@@ -151,7 +150,7 @@ record GenericDistrict "District network design parameters"
 //     "Nominal heating capacity"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // Downsize the heat pump capacity by considering the heating supply from borefield
-  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=QPlaPeaHea_flow - 0.5*3e6
+  parameter Real QPlaHeaPumHea_flow_nominal(unit="W")=QPlaPeaHea_flow
     "Nominal heating capacity"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
@@ -206,17 +205,20 @@ record GenericDistrict "District network design parameters"
     "Heat pump hold off time"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // District pump
-  parameter Real TUpp(unit="K")=TLooMax - dTOveSho
+  parameter Modelica.Units.SI.TemperatureDifference dTDisMar(min=0)=2
+    "Temperature difference to allow for control over or undershoot. dTDisMar >= 0"
+   annotation (Dialog(tab="Central plant"));
+  final parameter Real TUpp(unit="K")=TLooMax - dTDisMar
     "Upper bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real TLow(unit="K")=TLooMin + dTOveSho
+  final parameter Real TLow(unit="K")=TLooMin + dTDisMar
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real dTSlo(unit="K")=2
+  parameter Real dTSlo(unit="K")=1
     "Temperature deadband for changing pump speed"
     annotation (Dialog(tab="District pump"));
-  parameter Real yDisPumMin(unit="1")=0.1
-    "District loop pump minimum speed"
+  parameter Real yDisPumMin(unit="1")=0.2/4
+    "District loop pump minimum speed, 20% minimum speed, and assuming 4 parallel pumps"
     annotation (Dialog(tab="District pump"));
   annotation (
     defaultComponentName="datDis",

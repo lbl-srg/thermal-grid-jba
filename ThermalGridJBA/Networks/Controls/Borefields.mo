@@ -14,6 +14,14 @@ block Borefields
     final quantity="MassFlowRate",
     final unit="kg/s")
     "Nominal water mass flow rate to the center borefield";
+  parameter Real mBorFiePer_flow_minimum(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
+    "Minimum water mass flow rate to the perimeter borefield to get turbulent flow";
+  parameter Real mBorFieCen_flow_minimum(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
+    "Minimum water mass flow rate to the center borefield to get turbulent flow";
 
   Buildings.Controls.OBC.CDL.Interfaces.IntegerInput uEleRat
     "Electricity rate indicator. 0-normal rate; 1-high rate"
@@ -133,11 +141,11 @@ block Borefields
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai(
     final k=mBorFiePer_flow_nominal)
     "Convert to mass flow rate"
-    annotation (Placement(transformation(extent={{40,-130},{60,-110}})));
+    annotation (Placement(transformation(extent={{-140,-130},{-120,-110}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai1(
     final k=mWat_flow_nominal)
     "Convert to mass flow rate"
-    annotation (Placement(transformation(extent={{40,-160},{60,-140}})));
+    annotation (Placement(transformation(extent={{-140,-160},{-120,-140}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal byPasPri(
     final realTrue=0,
     final realFalse=1)
@@ -149,7 +157,7 @@ block Borefields
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai2(
     final k=mBorFieCen_flow_nominal)
     "Convert to mass flow rate"
-    annotation (Placement(transformation(extent={{40,-190},{60,-170}})));
+    annotation (Placement(transformation(extent={{-140,-208},{-120,-188}})));
   Buildings.Controls.OBC.CDL.Reals.Switch cenBorPum
     "Speed setpoint for the pump of center borfield "
     annotation (Placement(transformation(extent={{180,-210},{200,-190}})));
@@ -162,13 +170,6 @@ block Borefields
   Buildings.Controls.OBC.CDL.Reals.Switch secLooPum1
     "Speed setpoint for the pump of secondary loop"
     annotation (Placement(transformation(extent={{120,-310},{140,-290}})));
-  Buildings.Controls.OBC.CDL.Reals.Sources.Constant con(final k=1)
-    "Constant one"
-    annotation (Placement(transformation(extent={{20,-230},{40,-210}})));
-  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gai3(
-    final k=mBorFieCen_flow_nominal)
-    "Convert to mass flow rate"
-    annotation (Placement(transformation(extent={{60,-230},{80,-210}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant con1(final k=0)
     "Constant zero"
     annotation (Placement(transformation(extent={{-180,-310},{-160,-290}})));
@@ -184,6 +185,18 @@ block Borefields
   Buildings.Controls.OBC.CDL.Logical.Or onlPer2
     "Only use perimeter borefield to cool or heat loop water"
     annotation (Placement(transformation(extent={{80,60},{100,80}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant mPer_min(final k=
+        mBorFiePer_flow_minimum) "Minimum flow rate for perimeter"
+    annotation (Placement(transformation(extent={{40,-110},{60,-90}})));
+  Buildings.Controls.OBC.CDL.Reals.Sources.Constant mCen_min(final k=
+        mBorFieCen_flow_minimum) "Minimum flow rate for center"
+    annotation (Placement(transformation(extent={{40,-180},{60,-160}})));
+  Buildings.Controls.OBC.CDL.Reals.Max mPer_flow
+    "Flow rate for borefield perimeter to ensure turbulent flow"
+    annotation (Placement(transformation(extent={{80,-130},{100,-110}})));
+  Buildings.Controls.OBC.CDL.Reals.Max mCen_flow
+    "Flow rate for borefield center to ensure turbulent flow"
+    annotation (Placement(transformation(extent={{80,-202},{100,-182}})));
 equation
   connect(higRat.y, higEleRat.u2) annotation (Line(points={{-218,300},{-210,300},
           {-210,172},{-202,172}}, color={255,127,0}));
@@ -238,14 +251,13 @@ equation
     annotation (Line(points={{62,-20},{78,-20}},     color={255,0,255}));
   connect(botBor.y, botBor1.u2) annotation (Line(points={{102,-20},{120,-20},{120,
           -8},{138,-8}},          color={255,0,255}));
-  connect(uDisPum, gai.u) annotation (Line(points={{-280,-120},{38,-120}},
+  connect(uDisPum, gai.u) annotation (Line(points={{-280,-120},{-142,-120}},
                                  color={0,0,127}));
-  connect(gai.y, yPumPerBor)
-    annotation (Line(points={{62,-120},{280,-120}},  color={0,0,127}));
-  connect(uDisPum, gai1.u) annotation (Line(points={{-280,-120},{20,-120},{20,-150},
-          {38,-150}},            color={0,0,127}));
+  connect(uDisPum, gai1.u) annotation (Line(points={{-280,-120},{-160,-120},{
+          -160,-150},{-142,-150}},
+                                 color={0,0,127}));
   connect(gai1.y, yPumPri)
-    annotation (Line(points={{62,-150},{280,-150}},  color={0,0,127}));
+    annotation (Line(points={{-118,-150},{280,-150}},color={0,0,127}));
   connect(botBor1.y, byPasPri.u)
     annotation (Line(points={{162,0},{218,0}},       color={255,0,255}));
   connect(byPasPri.y, yValPriByp)
@@ -254,18 +266,15 @@ equation
     annotation (Line(points={{242,-40},{280,-40}},   color={0,0,127}));
   connect(botBor1.y, isoSec.u) annotation (Line(points={{162,0},{170,0},{170,-40},
           {218,-40}},            color={255,0,255}));
-  connect(uDisPum, gai2.u) annotation (Line(points={{-280,-120},{20,-120},{20,-180},
-          {38,-180}},            color={0,0,127}));
+  connect(uDisPum, gai2.u) annotation (Line(points={{-280,-120},{-160,-120},{
+          -160,-198},{-142,-198}},
+                                 color={0,0,127}));
   connect(botBor1.y, cenBorPum.u2) annotation (Line(points={{162,0},{170,0},{170,
           -200},{178,-200}},            color={255,0,255}));
-  connect(gai2.y, cenBorPum.u1) annotation (Line(points={{62,-180},{80,-180},{80,
-          -192},{178,-192}},      color={0,0,127}));
   connect(botBor1.y, secLooPum.u2) annotation (Line(points={{162,0},{170,0},{170,
           -240},{178,-240}},            color={255,0,255}));
-  connect(gai1.y, secLooPum.u1) annotation (Line(points={{62,-150},{140,-150},{140,
-          -232},{178,-232}},      color={0,0,127}));
-  connect(con.y, gai3.u)
-    annotation (Line(points={{42,-220},{58,-220}}, color={0,0,127}));
+  connect(gai1.y, secLooPum.u1) annotation (Line(points={{-118,-150},{-40,-150},
+          {-40,-232},{178,-232}}, color={0,0,127}));
   connect(cenBorPum1.y, cenBorPum.u3) annotation (Line(points={{142,-260},{150,-260},
           {150,-208},{178,-208}},       color={0,0,127}));
   connect(secLooPum1.y, secLooPum.u3) annotation (Line(points={{142,-300},{160,-300},
@@ -306,6 +315,18 @@ equation
           -250},{80,-252},{118,-252}}, color={0,0,127}));
   connect(mHeaPum_flow, secLooPum1.u1) annotation (Line(points={{-280,-250},{80,
           -250},{80,-292},{118,-292}}, color={0,0,127}));
+  connect(mPer_flow.u2, gai.y) annotation (Line(points={{78,-126},{-100,-126},{
+          -100,-120},{-118,-120}}, color={0,0,127}));
+  connect(mPer_flow.y, yPumPerBor)
+    annotation (Line(points={{102,-120},{280,-120}}, color={0,0,127}));
+  connect(mPer_min.y, mPer_flow.u1) annotation (Line(points={{62,-100},{72,-100},
+          {72,-114},{78,-114}}, color={0,0,127}));
+  connect(cenBorPum.u1, mCen_flow.y)
+    annotation (Line(points={{178,-192},{102,-192}}, color={0,0,127}));
+  connect(mCen_flow.u1, mCen_min.y) annotation (Line(points={{78,-186},{68,-186},
+          {68,-170},{62,-170}}, color={0,0,127}));
+  connect(mCen_flow.u2, gai2.y)
+    annotation (Line(points={{78,-198},{-118,-198}}, color={0,0,127}));
 annotation (defaultComponentName="borCon",
 Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={Rectangle(

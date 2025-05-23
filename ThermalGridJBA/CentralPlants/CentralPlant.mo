@@ -13,18 +13,22 @@ model CentralPlant "Central plant"
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
-  parameter Real TPlaHeaSet(
+  parameter Real TIniPlaHeaSet(
     unit="K",
     displayUnit="degC")=TLooMin
-    "Design plant heating setpoint temperature";
-  parameter Real TPlaCooSet(
+    "Initial plant heating setpoint temperature";
+  parameter Real TIniPlaCooSet(
     unit="K",
     displayUnit="degC")=TLooMax
-    "Design plant cooling setpoint temperature";
-  parameter Real TPlaSumCooSet(
+    "Initial plant cooling setpoint temperature";
+  parameter Real TDisPumUpp(
     unit="K",
-    displayUnit="degC")=TPlaCooSet-2
-    "Design plant summer cooling setpoint temperature";
+    displayUnit="degC")=TIniPlaHeaSet-2
+    "Upper bound temperature for district pump control";
+  parameter Real TDisPumLow(
+    unit="K",
+    displayUnit="degC")=TIniPlaCooSet+2
+    "Lower bound temperature for district pump control";
 
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate to each generation module";
@@ -77,6 +81,9 @@ model CentralPlant "Central plant"
   parameter Real staDowDel(
     unit="s")=3600
     "Minimum stage down delay, to avoid quickly staging down"
+    annotation (Dialog(tab="Controls"));
+  parameter Modelica.Units.SI.TemperatureDifference dTOveShoMax(min=0)=2
+    "Maximum temperature difference to allow for control over or undershoot. dTOveShoMax >= 0"
     annotation (Dialog(tab="Controls"));
   parameter Real TDryAppSet(unit="K")=2
     "Dry cooler approach setpoint"
@@ -234,12 +241,15 @@ model CentralPlant "Central plant"
   Generations gen(
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,
-    final TPlaHeaSet=TPlaHeaSet,
-    final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
+    final TIniPlaHeaSet=TIniPlaHeaSet,
+    final TIniPlaCooSet=TIniPlaCooSet,
+    final TDisPumUpp=TDisPumUpp,
+    final TDisPumLow=TDisPumLow,
     final mWat_flow_nominal=mWat_flow_nominal,
     mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
+    mBorFiePer_flow_minimum=borFie.mPer_flow_nominal*2320/borFie.Re_nominal,
+    mBorFieCen_flow_minimum=borFie.mCen_flow_nominal*2320/borFie.Re_nominal,
     dpBorFiePer_nominal=borFie.dp_nominal,
     dpBorFieCen_nominal=borFie.dp_nominal,
     final mHeaPumWat_flow_nominal=mHeaPumWat_flow_nominal,
@@ -257,10 +267,12 @@ model CentralPlant "Central plant"
     final TConCoo_nominal=TConCoo_nominal,
     final TEvaCoo_nominal=TEvaCoo_nominal,
     final staDowDel=staDowDel,
+    final dTOveShoMax=dTOveShoMax,
     final TDryAppSet=TDryAppSet,
-    final TApp=TApp,
+    final dTHex_nominal=dTHex_nominal,
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
+    TApp=2,
     final TDryBulSum=TDryBulSum,
     final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,
@@ -308,6 +320,8 @@ model CentralPlant "Central plant"
   Borefield borFie(TSoi_start=TSoi_start) "Borefield"
     annotation (Placement(transformation(extent={{40,-10},{60,10}})));
 
+  parameter Real dTHex_nominal
+    "Temperature difference for heat exchanger mass flow rates";
 equation
 
   connect(uDisPum, gen.uDisPum) annotation (Line(points={{-260,90},{-180,90},{-180,

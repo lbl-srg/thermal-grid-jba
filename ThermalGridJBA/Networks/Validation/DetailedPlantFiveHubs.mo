@@ -28,18 +28,19 @@ model DetailedPlantFiveHubs
   parameter Real staDowDel(unit="s")=datDis.staDowDel
     "Minimum stage down delay, to avoid quickly staging down"
    annotation (Dialog(tab="Central plant"));
+  parameter Modelica.Units.SI.TemperatureDifference dTOveShoMax(min=0)=datDis.dTOveShoMax
+    "Maximum temperature difference to allow for control over or undershoot. dTOveShoMax >= 0"
+    annotation (Dialog(tab="Central plant"));
   parameter Real TApp(unit="K")=4
     "Approach temperature for sizing heat pump and the operational condition for dry cooler"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaHeaSet(unit="K")=datDis.TPlaHeaSet
-    "Design plant heating setpoint temperature"
+  parameter Real TIniPlaHeaSet(unit="K")=datDis.TIniPlaHeaSet
+    "Initial plant heating setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaCooSet(unit="K")=datDis.TPlaCooSet
-    "Design plant cooling setpoint temperature"
+  parameter Real TIniPlaCooSet(unit="K")=datDis.TIniPlaCooSet
+    "Initial plant cooling setpoint temperature"
     annotation (Dialog(tab="Central plant"));
-  parameter Real TPlaSumCooSet(unit="K")=datDis.TPlaSumCooSet
-    "Design plant summer cooling setpoint temperature"
-    annotation (Dialog(tab="Central plant"));
+
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -298,9 +299,11 @@ model DetailedPlantFiveHubs
   CentralPlants.CentralPlant cenPla(
     final TLooMin=datDis.TLooMin,
     final TLooMax=datDis.TLooMax,
-    final TPlaHeaSet=TPlaHeaSet,
-    final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
+    final TIniPlaHeaSet=TIniPlaHeaSet,
+    final TIniPlaCooSet=TIniPlaCooSet,
+    TDisPumUpp=TUpp,
+    TDisPumLow=TLow,
+    final dTOveShoMax=dTOveShoMax,
     final mWat_flow_nominal=mPlaWat_flow_nominal,
     final dpValve_nominal=dpPlaValve_nominal,
     final dpHex_nominal=dpPlaHex_nominal,
@@ -329,7 +332,8 @@ model DetailedPlantFiveHubs
     final holOffTim=holOffTim,
     final minComSpe=minPlaComSpe,
     final TSoi_start=datDis.TSoi_start,
-    final minHeaPumSpeHol=minHeaPumSpeHol) "Central plant"
+    final minHeaPumSpeHol=minHeaPumSpeHol,
+    dTHex_nominal=datDis.dTPlaHex_nominal) "Central plant"
     annotation (Placement(transformation(extent={{-180,-10},{-160,10}})));
   Controls.DistrictLoopPump looPumSpe(
     final TUpp=TUpp,
@@ -500,16 +504,16 @@ model DetailedPlantFiveHubs
     "Non-HVAC electric power"
     annotation (Placement(transformation(extent={{180,230},{200,250}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PFanBuiSum(final nin=nBui)
-    "Sum of fan electric power consumption of the buildings"
+    "Sum of fan electric power consumption of the building terminal units"
     annotation (Placement(transformation(extent={{180,270},{200,290}})));
   Modelica.Blocks.Continuous.Integrator EFanBui(
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J", displayUnit="Wh"))
-    "Building fan electric energy"
+    "Building fan electric energy for terminal units"
     annotation (Placement(transformation(extent={{240,270},{260,290}})));
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
-    "Fan electric power consumption of each building"
+    "Fan electric power consumption of each building terminal units"
     annotation (Placement(transformation(extent={{120,270},{140,290}})));
   CentralPlants.BaseClasses.BorefieldTemperatureChange dTSoiPer(
     T_start=datDis.TSoi_start,

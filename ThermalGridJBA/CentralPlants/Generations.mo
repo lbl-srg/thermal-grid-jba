@@ -13,18 +13,22 @@ model Generations
     unit="K",
     displayUnit="degC")=297.15
     "Design maximum district loop temperature";
-  parameter Real TPlaHeaSet(
+  parameter Real TIniPlaHeaSet(
     unit="K",
     displayUnit="degC")=283.65
-    "Design plant heating setpoint temperature";
-  parameter Real TPlaCooSet(
+    "Initial plant heating setpoint temperature";
+  parameter Real TIniPlaCooSet(
     unit="K",
     displayUnit="degC")=297.15
-    "Design plant cooling setpoint temperature";
-  parameter Real TPlaSumCooSet(
+    "Initial plant cooling setpoint temperature";
+  parameter Real TDisPumUpp(
     unit="K",
-    displayUnit="degC")=TPlaCooSet-2
-    "Design plant summer cooling setpoint temperature";
+    displayUnit="degC")=TIniPlaHeaSet-2
+    "Upper bound temperature for district pump control";
+  parameter Real TDisPumLow(
+    unit="K",
+    displayUnit="degC")=TIniPlaCooSet+2
+    "Lower bound temperature for district pump control";
 
   parameter Real mWat_flow_nominal(unit="kg/s")
     "Nominal water mass flow rate";
@@ -60,6 +64,17 @@ model Generations
   parameter Modelica.Units.SI.MassFlowRate mBorFieCen_flow_nominal
     "Mass flow rate for center of borefield"
     annotation (Dialog(group="Borefield"));
+  parameter Real mBorFiePer_flow_minimum(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
+    "Minimum water mass flow rate to the perimeter borefield to get turbulent flow"
+    annotation (Dialog(group="Borefield"));
+  parameter Real mBorFieCen_flow_minimum(
+    final quantity="MassFlowRate",
+    final unit="kg/s")
+    "Minimum water mass flow rate to the center borefield to get turbulent flow"
+    annotation (Dialog(group="Borefield"));
+
   parameter Modelica.Units.SI.PressureDifference dpBorFiePer_nominal(
     displayUnit="Pa")
     "Nominal pressure drop of perimeter zones of borefield"
@@ -79,35 +94,39 @@ model Generations
   parameter Real mHeaPumGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumHea_flow_nominal(unit="W")=cpWat*mHeaPumWat_flow*TApp
-    "Nominal heating capacity"
+  parameter Real QHeaPumHea_flow_nominal(unit="W") = cpWat*mHeaPumWat_flow*
+    dTHex_nominal "Nominal heating capacity"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TConHea_nominal(unit="K")=TLooMin + TApp
+  parameter Real TConHea_nominal(unit="K") = TLooMin + dTHex_nominal
     "Nominal temperature of the heated fluid in heating mode"
     annotation (Dialog(group="Heat pump"));
   parameter Real TEvaHea_nominal(unit="K")
     "Nominal temperature of evaporator for heat pump design during heating"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumCoo_flow_nominal(unit="W")=-cpWat*mHeaPumWat_flow*TApp
-    "Nominal cooling capacity"
+  parameter Real QHeaPumCoo_flow_nominal(unit="W") = -cpWat*mHeaPumWat_flow*
+    dTHex_nominal "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
   parameter Real TConCoo_nominal(unit="K")
     "Nominal temperature of condenser for heat pump design during cooling"
     annotation (Dialog(group="Heat pump"));
-  parameter Real TEvaCoo_nominal(unit="K")=TLooMax + TApp
+  parameter Real TEvaCoo_nominal(unit="K") = TLooMax + dTHex_nominal
     "Nominal temperature of the heated fluid in cooling mode"
     annotation (Dialog(group="Heat pump"));
 
+  // Controls
   parameter Real staDowDel(
     unit="s")=3600
     "Minimum stage down delay, to avoid quickly staging down"
     annotation (Dialog(tab="Controls"));
+  parameter Modelica.Units.SI.TemperatureDifference dTOveShoMax(min=0)=2
+    "Maximum temperature difference to allow for control over or undershoot. dTOveShoMax >= 0"
+    annotation (Dialog(tab="Controls"));
   parameter Real TDryAppSet(unit="K")=2
     "Dry cooler approach setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TApp(unit="K")=4
-    "Approach temperature for checking if the dry cooler should be enabled"
-    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Real dTHex_nominal(unit="K") = 4
+    "Temperature difference for heat exchanger mass flow rates"
+    annotation (Dialog(                group="Heat exchanger"));
   parameter Real minFanSpe=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
@@ -131,6 +150,12 @@ model Generations
 //   parameter Real THeaSet(unit="K")=TLooMax
 //     "Heat pump tracking temperature setpoint in heating mode"
 //     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Real TApp(
+    final quantity="TemperatureDifference",
+    final unit="K")=2
+    "Approach temperatue for enabling economizer"
+    annotation (Dialog(tab="Controls", group="Dry cooler"));
+
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
     final unit="K",
@@ -334,7 +359,7 @@ model Generations
     final dp1_nominal=dpHex_nominal,
     final dp2_nominal=dpHex_nominal,
     eps=0.9)                         "Economizer"
-    annotation (Placement(transformation(extent={{-280,-40},{-300,-20}})));
+    annotation (Placement(transformation(extent={{-278,-40},{-298,-20}})));
   Buildings.Fluid.Actuators.Valves.TwoWayEqualPercentage valHeaPum(
     redeclare final package Medium = MediumW,
     final m_flow_nominal=mHeaPumWat_flow_nominal,
@@ -376,7 +401,7 @@ model Generations
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     use_strokeTime=true,
     strokeTime=heaPumIsoValStrTim,
-    m_flow_nominal=mGly_flow_nominal,
+    m_flow_nominal=mHeaPumGly_flow_nominal,
     final dpValve_nominal=dpValve_nominal)
     "Heat pump bypass valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -471,17 +496,16 @@ model Generations
     redeclare final package MediumEva = MediumG,
     use_rev=true,
     allowDifferentDeviceIdentifiers=true,
-    use_intSafCtr=true,
-    redeclare
-      Buildings.Fluid.HeatPumps.ModularReversible.Controls.Safety.Data.Wuellhorst2021
-      safCtrPar,
-    dTCon_nominal=TApp,
+    use_intSafCtr=false,
+    dTCon_nominal=dTHex_nominal,
+    mCon_flow_nominal=mHeaPumWat_flow_nominal,
     dpCon_nominal=30000,
     use_conCap=false,
     CCon=3000,
     GConOut=100,
     GConIns=1000,
-    dTEva_nominal=TApp,
+    dTEva_nominal=dTHex_nominal,
+    mEva_flow_nominal=mHeaPumGly_flow_nominal,
     dpEva_nominal=30000,
     use_evaCap=false,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
@@ -489,17 +513,18 @@ model Generations
     final QCoo_flow_nominal=QHeaPumCoo_flow_nominal,
     redeclare model RefrigerantCycleHeatPumpHeating =
         Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness
-        (redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting iceFacCal,
-          final use_constAppTem=true),
+        (redeclare
+          Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
+          iceFacCal, final use_constAppTem=true),
     redeclare model RefrigerantCycleHeatPumpCooling =
         Buildings.Fluid.Chillers.ModularReversible.RefrigerantCycle.ConstantCarnotEffectiveness
-        (redeclare Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting iceFacCal,
-          final use_constAppTem=true),
+        (redeclare
+          Buildings.Fluid.HeatPumps.ModularReversible.RefrigerantCycle.Frosting.NoFrosting
+          iceFacCal, final use_constAppTem=true),
     final TConHea_nominal=TConHea_nominal,
     final TEvaHea_nominal=TEvaHea_nominal,
     final TConCoo_nominal=TConCoo_nominal,
-    final TEvaCoo_nominal=TEvaCoo_nominal)
-    "Reversible heat pump"
+    final TEvaCoo_nominal=TEvaCoo_nominal) "Reversible heat pump"
     annotation (Placement(transformation(extent={{330,-10},{350,-30}})));
 
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaSec(
@@ -723,7 +748,7 @@ model Generations
   Buildings.Fluid.FixedResistances.Junction jun15(
     redeclare final package Medium = MediumG,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    m_flow_nominal=mGly_flow_nominal*{1,-1,-1},
+    m_flow_nominal=mHeaPumGly_flow_nominal*{1,-1,-1},
     dp_nominal={0,0,0})
     annotation (Placement(transformation(extent={{10,10},{-10,-10}},
         rotation=-90,
@@ -737,14 +762,13 @@ model Generations
         rotation=90,
         origin={-320,90})));
   ThermalGridJBA.Networks.Controls.Indicators ind(
-    final TPlaHeaSet=TPlaHeaSet,
-    final TPlaCooSet=TPlaCooSet,
-    final TPlaSumCooSet=TPlaSumCooSet,
-    final staDowDel=staDowDel)
+    final TIniPlaHeaSet=TIniPlaHeaSet,
+    final TIniPlaCooSet=TIniPlaCooSet,
+    final TDryBulSum=TDryBulSum,
+    final staDowDel=staDowDel) "Load indicator"
     annotation (Placement(transformation(extent={{-520,250},{-500,270}})));
-  ThermalGridJBA.Networks.Controls.HeatExchanger hexCon(
-    final mHexGly_flow_nominal=mHexGly_flow_nominal,
-    final TApp=TApp)
+  ThermalGridJBA.Networks.Controls.HeatExchanger hexCon(final
+      mHexGly_flow_nominal=mHexGly_flow_nominal, final TApp=TApp)
     "Heat exchanger economizer and the associated pump and valves control"
     annotation (Placement(transformation(extent={{-460,220},{-440,240}})));
   ThermalGridJBA.Networks.Controls.DryCooler dryCooCon(
@@ -761,7 +785,9 @@ model Generations
   ThermalGridJBA.Networks.Controls.Borefields borCon(
     final mWat_flow_nominal=mWat_flow_nominal,
     final mBorFiePer_flow_nominal=mBorFiePer_flow_nominal,
-    final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal)
+    final mBorFieCen_flow_nominal=mBorFieCen_flow_nominal,
+    final mBorFiePer_flow_minimum=mBorFiePer_flow_minimum,
+    final mBorFieCen_flow_minimum=mBorFieCen_flow_minimum)
     "Borefield pumps and the valves control"
     annotation (Placement(transformation(extent={{-240,220},{-220,240}})));
   ThermalGridJBA.Networks.Controls.HeatPump heaPumCon(
@@ -772,7 +798,6 @@ model Generations
     final TLooMin=TLooMin,
     final TLooMax=TLooMax,
     final TDryBulSum=TDryBulSum,
-    final TPlaHeaSet=TPlaHeaSet,
     final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,
     final TEvaInMax=TEvaInMax,
@@ -884,6 +909,14 @@ model Generations
     dpMax=Modelica.Constants.inf) "Dry cooler fan"
     annotation (Placement(transformation(extent={{40,80},{20,100}})));
 
+  Networks.Controls.ActualOvershot actOveSho(
+    final TLooMax=TLooMax,
+    final TLooMin=TLooMin,
+    final TDisPumUpp=TDisPumUpp,
+    final TDisPumLow=TDisPumLow,
+    final dTOveShoMax=dTOveShoMax)
+    "Actual overshot"
+    annotation (Placement(transformation(extent={{-520,70},{-500,90}})));
 protected
   Buildings.Controls.OBC.CDL.Reals.Add PPumCirAdd
     "Adder for circulation pump power"
@@ -902,11 +935,11 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(hex.port_b1, bou.ports[1]) annotation (Line(
-      points={{-300,-24},{-334,-24}},
+      points={{-298,-24},{-334,-24}},
       color={0,127,255},
       thickness=0.5));
   connect(hex.port_a1, pumHexGly.port_b) annotation (Line(
-      points={{-280,-24},{-260,-24},{-260,6}},
+      points={{-278,-24},{-260,-24},{-260,6}},
       color={0,127,255},
       thickness=0.5));
   connect(pumDryCoo.P, PPumDryCoo) annotation (Line(points={{-77,73},{-72,73},{-72,
@@ -1029,8 +1062,8 @@ equation
     annotation (Line(points={{-90,-82},{-90,-150}},  color={0,127,255},
       thickness=0.5));
   connect(senTemBorPerRet.port_a,portBorFiePer_a)  annotation (Line(points={{-90,-62},
-          {-90,-38},{-146,-38},{-146,126},{-280,126},{-280,260},{-80,260},{-80,
-          280}},      color={0,127,255},
+          {-90,-36},{-146,-36},{-146,128},{-280,128},{-280,266},{-80,266},{-80,280}},
+                      color={0,127,255},
       thickness=0.5));
   connect(jun4.port_3, pumBorFieCen.port_a) annotation (Line(points={{180,-150},
           {180,-120}},          color={0,127,255},
@@ -1079,7 +1112,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(hex.port_b1, jun14.port_1) annotation (Line(
-      points={{-300,-24},{-320,-24},{-320,40}},
+      points={{-298,-24},{-320,-24},{-320,40}},
       color={0,127,255},
       thickness=0.5));
   connect(jun13.port_2, jun14.port_3) annotation (Line(
@@ -1098,11 +1131,10 @@ equation
       points={{-320,100},{-320,110},{-120,110},{-120,64},{-98,64}},
       color={0,127,255},
       thickness=0.5));
-  connect(ind.ySt, hexCon.uSt) annotation (Line(points={{-498,262},{-480,262},{-480,
+  connect(ind.ySt, hexCon.uSt) annotation (Line(points={{-498,260},{-480,260},{-480,
           236},{-462,236}}, color={255,127,0}));
-  connect(ind.yEle, hexCon.uEleRat) annotation (Line(points={{-498,259},{-476,
-          259},{-476,239},{-462,239}},
-                                  color={255,127,0}));
+  connect(ind.yEle, hexCon.uEleRat) annotation (Line(points={{-498,257},{-476,257},
+          {-476,239},{-462,239}}, color={255,127,0}));
   connect(ind.ySea, hexCon.uSea) annotation (Line(points={{-498,252},{-484,252},
           {-484,233},{-462,233}}, color={255,127,0}));
   connect(TDryBul, hexCon.TDryBul) annotation (Line(points={{-560,190},{-486,190},
@@ -1111,26 +1143,25 @@ equation
           -480,226},{-462,226}}, color={0,0,127}));
   connect(TDryBul, dryCooCon.TDryBul) annotation (Line(points={{-560,190},{-24,190},
           {-24,220},{38,220}},         color={0,0,127}));
-  connect(ind.ySt, borCon.uSt) annotation (Line(points={{-498,262},{-260,262},{-260,
+  connect(ind.ySt, borCon.uSt) annotation (Line(points={{-498,260},{-260,260},{-260,
           236},{-242,236}}, color={255,127,0}));
-  connect(ind.yEle, borCon.uEleRat) annotation (Line(points={{-498,259},{-256,
-          259},{-256,239},{-242,239}},
-                                  color={255,127,0}));
+  connect(ind.yEle, borCon.uEleRat) annotation (Line(points={{-498,257},{-256,257},
+          {-256,239},{-242,239}}, color={255,127,0}));
   connect(ind.ySea, borCon.uSea) annotation (Line(points={{-498,252},{-264,252},
           {-264,233},{-242,233}}, color={255,127,0}));
-  connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-498,262},{86,262},{
-          86,237},{118,237}},     color={255,127,0}));
-  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-498,259},{90,
-          259},{90,239},{118,239}},    color={255,127,0}));
-  connect(ind.ySea, heaPumCon.uSea) annotation (Line(points={{-498,252},{-360,
-          252},{-360,256},{80,256},{80,235},{118,235}}, color={255,127,0}));
+  connect(ind.ySt, heaPumCon.uSt) annotation (Line(points={{-498,260},{86,260},{
+          86,238},{118,238}},     color={255,127,0}));
+  connect(ind.yEle, heaPumCon.uEleRat) annotation (Line(points={{-498,257},{90,257},
+          {90,240},{118,240}},         color={255,127,0}));
+  connect(ind.ySea, heaPumCon.uSea) annotation (Line(points={{-498,252},{-360,252},
+          {-360,256},{80,256},{80,236},{118,236}},      color={255,127,0}));
   connect(uDisPum, borCon.uDisPum) annotation (Line(points={{-560,220},{-520,
           220},{-520,200},{-260,200},{-260,228},{-242,228}},
                                                         color={0,0,127}));
   connect(senTemGenEnt.T, heaPumCon.TPlaIn) annotation (Line(points={{-480,-149},
-          {-480,204},{84,204},{84,231},{118,231}},      color={0,0,127}));
+          {-480,204},{84,204},{84,232},{118,232}},      color={0,0,127}));
   connect(senTemHeaPumLea.T, heaPumCon.THeaPumOut) annotation (Line(points={{381,
-          -100},{428,-100},{428,186},{92,186},{92,225},{118,225}},        color
+          -100},{428,-100},{428,186},{92,186},{92,224},{118,224}},        color
         ={0,0,127}));
   connect(senTemGenEnt.port_b, senMasFloPla.port_a) annotation (Line(
       points={{-470,-160},{-440,-160}},
@@ -1145,15 +1176,15 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(senMasFloPla.m_flow, heaPumCon.mPla_flow) annotation (Line(points={{-430,
-          -149},{-430,170},{96,170},{96,223},{118,223}},      color={0,0,127}));
+          -149},{-430,170},{96,170},{96,222},{118,222}},      color={0,0,127}));
   connect(senMasFloHeaPum.m_flow, heaPumCon.mHeaPum_flow) annotation (Line(
-        points={{299,-102},{274,-102},{274,176},{100,176},{100,221},{118,221}},
+        points={{299,-102},{274,-102},{274,176},{100,176},{100,220},{118,220}},
         color={0,0,127}));
   connect(senTemHeaPumGlyIn.T, heaPumCon.TGlyIn) annotation (Line(points={{381,40},
-          {412,40},{412,170},{104,170},{104,219},{118,219}},        color={0,0,
+          {412,40},{412,170},{104,170},{104,218},{118,218}},        color={0,0,
           127}));
   connect(uDisPum, heaPumCon.uDisPum) annotation (Line(points={{-560,220},{-520,
-          220},{-520,200},{106,200},{106,217},{118,217}},    color={0,0,127}));
+          220},{-520,200},{106,200},{106,216},{118,216}},    color={0,0,127}));
   connect(hexCon.yValHexByp, valHexByp.y) annotation (Line(points={{-438,234},{-410,
           234},{-410,-120},{-280,-120},{-280,-148}}, color={0,0,127}));
   connect(hexCon.yValHex, valHex.y) annotation (Line(points={{-438,230},{-416,230},
@@ -1194,14 +1225,15 @@ equation
   connect(heaPumCon.yPum, pumHeaPumWat.m_flow_in) annotation (Line(points={{142,218},
           {258,218},{258,-40},{298,-40}},      color={0,0,127}));
   connect(TPlaOut, ind.TPlaOut)
-    annotation (Line(points={{-560,260},{-522,260}}, color={0,0,127}));
+    annotation (Line(points={{-560,260},{-536,260},{-536,266},{-522,266}},
+                                                     color={0,0,127}));
   connect(heaPumCon.y1On, dryCooCon.u1HeaPum) annotation (Line(points={{142,232},
           {148,232},{148,202},{-10,202},{-10,236},{38,236}},     color={255,0,
           255}));
   connect(senTemDryCooOut.T, dryCooCon.TDryCooOut) annotation (Line(points={{136,75},
           {136,154},{0,154},{0,223},{38,223}},                  color={0,0,127}));
-  connect(ind.yEleRat, yEleRat) annotation (Line(points={{-498,257},{500,257},{
-          500,270},{560,270}}, color={0,0,127}));
+  connect(ind.yEleRat, yEleRat) annotation (Line(points={{-498,255},{500,255},{500,
+          270},{560,270}},     color={0,0,127}));
   connect(heaPumCon.y1On, borCon.u1HeaPum) annotation (Line(points={{142,232},{
           148,232},{148,202},{-256,202},{-256,224},{-242,224}}, color={255,0,
           255}));
@@ -1219,7 +1251,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(senTemHeaPumEnt.T, heaPumCon.THeaPumIn) annotation (Line(points={{299,-70},
-          {290,-70},{290,-56},{420,-56},{420,182},{88,182},{88,227},{118,227}},
+          {290,-70},{290,-56},{420,-56},{420,182},{88,182},{88,226},{118,226}},
                                                                       color={0,
           0,127}));
   connect(pumBorFiePer.port_b, senTemBorPerSup.port_a) annotation (Line(
@@ -1227,7 +1259,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(senTemBorPerSup.port_b, portBorFiePer_b) annotation (Line(
-      points={{-150,-60},{-150,120},{-286,120},{-286,270},{-160,270},{-160,280}},
+      points={{-150,-60},{-150,122},{-286,122},{-286,272},{-160,272},{-160,280}},
       color={0,127,255},
       thickness=0.5));
   connect(pumBorFieCen.port_b, senTemBorCenSup.port_a) annotation (Line(
@@ -1243,11 +1275,11 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(senTemEcoEnt.port_b, hex.port_a2) annotation (Line(
-      points={{-320,-60},{-320,-36},{-300,-36}},
+      points={{-320,-60},{-320,-36},{-298,-36}},
       color={0,127,255},
       thickness=0.5));
   connect(hex.port_b2, senTemEcoLea.port_a) annotation (Line(
-      points={{-280,-36},{-240,-36},{-240,-62}},
+      points={{-278,-36},{-240,-36},{-240,-62}},
       color={0,127,255},
       thickness=0.5));
   connect(senTemEcoLea.port_b, jun1.port_3) annotation (Line(
@@ -1296,12 +1328,26 @@ equation
   connect(fanDryCoo.P, PFanDryCoo) annotation (Line(points={{19,99},{12,99},{12,
           244},{560,244}}, color={0,0,127}));
   connect(ind.TActPlaCooSet, heaPumCon.TActPlaCooSet) annotation (Line(points={{-498,
-          265},{94,265},{94,229},{118,229}},      color={0,0,127}));
+          263},{94,263},{94,228},{118,228}},      color={0,0,127}));
   connect(TDryBul, heaPumCon.TDryBul) annotation (Line(points={{-560,190},{80,190},
-          {80,233},{118,233}}, color={0,0,127}));
+          {80,234},{118,234}}, color={0,0,127}));
   connect(heaPumCon.y1SumCooBor, borCon.u1SumCooBor) annotation (Line(points={{
           142,239},{166,239},{166,208},{-264,208},{-264,231},{-242,231}}, color
         ={255,0,255}));
+  connect(TDryBul, ind.TDryBul) annotation (Line(points={{-560,190},{-532,190},{
+          -532,260},{-522,260}}, color={0,0,127}));
+  connect(TLooMaxMea, actOveSho.TMixMax) annotation (Line(points={{-560,100},{-530,
+          100},{-530,86},{-522,86}}, color={0,0,127}));
+  connect(TLooMinMea, actOveSho.TMixMin) annotation (Line(points={{-560,60},{-530,
+          60},{-530,74},{-522,74}}, color={0,0,127}));
+  connect(actOveSho.dTActHeaOveSho, ind.dTActHeaOveSho) annotation (Line(points
+        ={{-498,74},{-490,74},{-490,240},{-526,240},{-526,254},{-522,254}},
+        color={0,0,127}));
+  connect(ind.TActPlaHeaSet, heaPumCon.TActPlaHeaSet) annotation (Line(points={{
+          -498,269},{110,269},{110,230},{118,230}}, color={0,0,127}));
+  connect(actOveSho.dTActCooOveSho, ind.dTActCooOveSho) annotation (Line(points
+        ={{-498,86},{-494,86},{-494,236},{-530,236},{-530,256},{-522,256}},
+        color={0,0,127}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
                          graphics={
