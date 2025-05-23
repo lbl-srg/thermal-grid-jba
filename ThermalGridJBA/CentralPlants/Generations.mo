@@ -492,6 +492,10 @@ model Generations
     use_rev=true,
     allowDifferentDeviceIdentifiers=true,
     use_intSafCtr=false,
+    safCtrPar(
+      use_antFre=true,
+      TAntFre=257.15,
+      use_minFlowCtr=false),
     dTCon_nominal=dTHex_nominal,
     mCon_flow_nominal=mHeaPumWat_flow_nominal,
     dpCon_nominal=30000,
@@ -518,8 +522,8 @@ model Generations
           iceFacCal, final use_constAppTem=true),
     final TConHea_nominal=TConHea_nominal,
     final TEvaHea_nominal=TEvaHea_nominal,
-    final TConCoo_nominal=TConCoo_nominal,
-    final TEvaCoo_nominal=TEvaCoo_nominal) "Reversible heat pump"
+    final TConCoo_nominal=TEvaCoo_nominal,
+    final TEvaCoo_nominal=TConCoo_nominal) "Reversible heat pump. Note that for cooling, evaporator and condenser are changed."
     annotation (Placement(transformation(extent={{330,-10},{350,-30}})));
 
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaSec(
@@ -811,6 +815,7 @@ model Generations
     final isoValStrTim=heaPumIsoValStrTim,
     final watPumRis=heaPumPumRis,
     final heaPumRisTim=heaPumRisTim)
+    "Heat pump controller"
     annotation (Placement(transformation(extent={{120,216},{140,240}})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFloPla(redeclare each package
       Medium = MediumW, each allowFlowReversal=false)
@@ -1138,7 +1143,7 @@ equation
   connect(TDryBul, dryCooCon.TDryBul) annotation (Line(points={{-560,190},{-24,190},
           {-24,220},{38,220}},         color={0,0,127}));
   connect(ind.ySt, borCon.uSt) annotation (Line(points={{-498,260},{-260,260},{-260,
-          236},{-242,236}}, color={255,127,0}));
+          237},{-242,237}}, color={255,127,0}));
   connect(ind.yEle, borCon.uEleRat) annotation (Line(points={{-498,257},{-256,257},
           {-256,239},{-242,239}}, color={255,127,0}));
   connect(ind.ySea, borCon.uSea) annotation (Line(points={{-498,252},{-264,252},
@@ -1232,7 +1237,7 @@ equation
           148,232},{148,196},{-256,196},{-256,221},{-242,221}}, color={255,0,
           255}));
   connect(senMasFloHeaPum.m_flow, borCon.mHeaPum_flow) annotation (Line(points={{299,
-          -102},{274,-102},{274,180},{-252,180},{-252,222},{-242,222},{-242,224}},
+          -102},{274,-102},{274,180},{-252,180},{-252,222},{-242,222},{-242,223}},
         color={0,0,127}));
   connect(pumHeaPumWat.P, PPumHeaPumWat) annotation (Line(points={{301,-29},{
           301,-24},{292,-24},{292,-50},{560,-50}}, color={0,0,127}));
@@ -1342,16 +1347,16 @@ equation
   connect(actOveSho.dTActCooOveSho, ind.dTActCooOveSho) annotation (Line(points
         ={{-498,86},{-494,86},{-494,236},{-530,236},{-530,256},{-522,256}},
         color={0,0,127}));
-  connect(borCon.TMixMea, senTemMixPer.T) annotation (Line(points={{-242,225},{
-          -250,225},{-250,224},{-258,224},{-258,164},{-50,164},{-50,-146}},
+  connect(borCon.TMixMea, senTemMixPer.T) annotation (Line(points={{-242,225},{-250,
+          225},{-250,224},{-258,224},{-258,164},{-50,164},{-50,-149}},
         color={0,0,127}));
-  connect(ind.TActPlaHeaSet, borCon.TActPlaHeaSet) annotation (Line(points={{
-          -498,269},{-300,269},{-300,228},{-240,228}}, color={0,0,127}));
-  connect(ind.TActPlaCooSet, borCon.TActPlaCooSet) annotation (Line(points={{
-          -498,263},{-302,263},{-302,226},{-242,226},{-242,228}}, color={0,0,
+  connect(ind.TActPlaHeaSet, borCon.TActPlaHeaSet) annotation (Line(points={{-498,
+          269},{-300,269},{-300,229},{-242,229}},      color={0,0,127}));
+  connect(ind.TActPlaCooSet, borCon.TActPlaCooSet) annotation (Line(points={{-498,
+          263},{-302,263},{-302,226},{-242,226},{-242,227}},      color={0,0,
           127}));
-  connect(borCon.u1HeaPumMod, heaPumCon.y1Mod) annotation (Line(points={{-242,
-          219},{-244,219},{-244,246},{154,246},{154,236},{140,236}}, color={255,
+  connect(borCon.u1HeaPumMod, heaPumCon.y1Mod) annotation (Line(points={{-242,219},
+          {-244,219},{-244,246},{154,246},{154,237},{142,237}},      color={255,
           0,255}));
   annotation (defaultComponentName="gen",
   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
