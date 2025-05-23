@@ -522,8 +522,8 @@ model Generations
           iceFacCal, final use_constAppTem=true),
     final TConHea_nominal=TConHea_nominal,
     final TEvaHea_nominal=TEvaHea_nominal,
-    final TConCoo_nominal=TEvaCoo_nominal,
-    final TEvaCoo_nominal=TConCoo_nominal) "Reversible heat pump. Note that for cooling, evaporator and condenser are changed."
+    final TConCoo_nominal=TConCoo_nominal,
+    final TEvaCoo_nominal=TEvaCoo_nominal) "Reversible heat pump"
     annotation (Placement(transformation(extent={{330,-10},{350,-30}})));
 
   Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaSec(
