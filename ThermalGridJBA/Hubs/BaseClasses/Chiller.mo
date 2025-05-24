@@ -45,8 +45,8 @@ model Chiller "Base subsystem with heat recovery chiller"
     final unit="K",
     displayUnit="degC")
     "Chilled water supply temperature set point (may be reset down)"
-    annotation (Placement(transformation(extent={{-240,120},{-200,160}}),
-    iconTransformation(extent={{-140,-40},{-100,0}})));
+    annotation (Placement(transformation(extent={{-240,90},{-200,130}}),
+    iconTransformation(extent={{-140,-50},{-100,-10}})));
   Modelica.Fluid.Interfaces.FluidPort_a port_aChiWat(
     redeclare final package Medium=Medium,
     m_flow(
@@ -128,8 +128,8 @@ model Chiller "Base subsystem with heat recovery chiller"
     final QCoo_flow_nominal=dat.QCoo_flow_nominal,
     final TConHea_nominal=dat.TConLvg_nominal,
     final TEvaHea_nominal=dat.TEvaLvg_nominal,
-    final TConCoo_nominal=dat.TConLvg_nominal,
-    final TEvaCoo_nominal=dat.TEvaLvg_nominal,
+    final TConCoo_nominal=dat.TEvaLvg_nominal,
+    final TEvaCoo_nominal=dat.TConLvg_nominal,
     final dpCon_nominal(displayUnit="Pa") = dpCon_nominal,
     final dpEva_nominal(displayUnit="Pa") = dpEva_nominal,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
@@ -259,6 +259,10 @@ model Chiller "Base subsystem with heat recovery chiller"
         extent={{-10,-10},{10,10}},
         rotation=-90,
         origin={-100,-22})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaWatSupSet(final unit="K",
+      displayUnit="degC") "Heating water supply temperature set point"
+    annotation (Placement(transformation(extent={{-240,120},{-200,160}}),
+        iconTransformation(extent={{-140,-30},{-100,10}})));
 protected
   Modelica.Blocks.Sources.BooleanConstant hea(final k=true)
     "Use the heating mode to use the heat pump performance map"
@@ -287,13 +291,13 @@ equation
     annotation (Line(points={{-48,134},{-44,134},{-44,90},{-160,90},{-160,40},{
           -140,40},{-140,48}},                                                                     color={0,0,127}));
   connect(uHea,con.uHea)
-    annotation (Line(points={{-220,188},{-180,188},{-180,150},{-72,150}},color={255,0,255}));
+    annotation (Line(points={{-220,188},{-180,188},{-180,149},{-72,149}},color={255,0,255}));
   connect(uCoo,con.uCoo)
-    annotation (Line(points={{-220,168},{-186,168},{-186,146},{-72,146}},color={255,0,255}));
+    annotation (Line(points={{-220,168},{-186,168},{-186,147},{-72,147}},color={255,0,255}));
   connect(senTConEnt.T,con.TConWatEnt)
-    annotation (Line(points={{-31,40},{-78,40},{-78,130},{-72,130}},color={0,0,127}));
+    annotation (Line(points={{-31,40},{-78,40},{-78,131},{-72,131}},color={0,0,127}));
   connect(senTEvaEnt.T,con.TEvaWatEnt)
-    annotation (Line(points={{9,-40},{-80,-40},{-80,134},{-72,134}},color={0,0,127}));
+    annotation (Line(points={{9,-40},{-80,-40},{-80,133},{-72,133}},color={0,0,127}));
   connect(splConMix.port_2,port_bHeaWat)
     annotation (Line(points={{130,60},{200,60}},color={0,127,255}));
   connect(splEva.port_2,port_bChiWat)
@@ -339,12 +343,16 @@ equation
   connect(hea.y, chi.hea) annotation (Line(points={{-59,-110},{-40,-110},{-40,
           -2},{-26,-2},{-26,-2.1},{-11.1,-2.1}},
                                color={255,0,255}));
-  connect(con.TChiWatSupSet, TChiWatSupSet) annotation (Line(points={{-72,142},
-          {-186,142},{-186,140},{-220,140}}, color={0,0,127}));
-  connect(con.TEvaWatLvg, senTEvaLvg.T) annotation (Line(points={{-72,138},{-82,
-          138},{-82,-20},{-31,-20}}, color={0,0,127}));
+  connect(con.TChiWatSupSet, TChiWatSupSet) annotation (Line(points={{-72,139},
+          {-186,139},{-186,110},{-220,110}}, color={0,0,127}));
+  connect(con.TEvaWatLvg, senTEvaLvg.T) annotation (Line(points={{-72,137},{-82,
+          137},{-82,-20},{-31,-20}}, color={0,0,127}));
   connect(con.yChi, chi.ySet) annotation (Line(points={{-48,142},{-40,142},{-40,
           1.9},{-11.1,1.9}}, color={0,0,127}));
+  connect(con.THeaWatSupSet, THeaWatSupSet) annotation (Line(points={{-72,144},
+          {-192,144},{-192,140},{-220,140}}, color={0,0,127}));
+  connect(senTConLvg.T, con.TConWatLvg) annotation (Line(points={{9,20},{4,20},
+          {4,106},{-84,106},{-84,142},{-72,142}}, color={0,0,127}));
   annotation (
     defaultComponentName="chi",
     Icon(

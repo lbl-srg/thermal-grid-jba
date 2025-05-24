@@ -43,6 +43,8 @@ funnel_comp
 #########################################
 *.pyc
 __pycache__
+*checkpoint.ipynb
+*/.ipynb_checkpoints/*
 
 # VS Code
 #########################################
