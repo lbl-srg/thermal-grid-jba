@@ -3,24 +3,17 @@ model IdealPlantCombinedHub
   "District network with an ideal plant and a single combined hub"
   extends Modelica.Icons.Example;
 
-  parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
-    "Pipe diameter (without insulation)";
-  parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
   parameter Modelica.Units.SI.Radius thiGroLay=0.5
     "Dynamic ground layer thickness";
   package Medium = Buildings.Media.Water "Medium model";
-  parameter Real dpDis_length_nominal(final unit="Pa/m") = 250
-    "Pressure drop per pipe length at nominal flow rate - Distribution line";
-  parameter Real dpCon_length_nominal(final unit="Pa/m") = 250
-    "Pressure drop per pipe length at nominal flow rate - Connection line";
+
   parameter Boolean allowFlowReversalSer = true
     "Set to true to allow flow reversal in the service lines"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
   parameter Boolean allowFlowReversalBui = false
     "Set to true to allow flow reversal for in-building systems"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
-  parameter Modelica.Units.SI.Length dhPla(fixed=false,start=0.05,min=0.01)
-    "Hydraulic diameter of the distribution pipe before each connection";
+
   final parameter Integer nBui=datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
