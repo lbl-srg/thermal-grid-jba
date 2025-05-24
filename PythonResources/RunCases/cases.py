@@ -38,6 +38,22 @@ def get_cases():
         _add(case, cases)
 
         case = {
+            'name': "base_dDis_1.2",
+            'parameters': {
+                'datDis.dhDisSizFac': 1.2
+            }
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_dDis_0.8",
+            'parameters': {
+                'datDis.dhDisSizFac': 0.8
+            }
+        }
+        _add(case, cases)
+
+        case = {
             'name': 'heat',
             'parameters': {
                 'datDis.filNamInd' : [
