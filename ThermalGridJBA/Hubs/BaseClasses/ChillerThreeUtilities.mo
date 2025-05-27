@@ -12,7 +12,7 @@ model ChillerThreeUtilities
         final TiCol=TiCol,
         final THeaWatSupSetMin=THeaWatSupSetMin,
         final TChiWatSupSetMin=TChiWatSupSetMin,
-      TChiWatSupSetMax=TChiWatSupSetMax),
+        final TChiWatSupSetMax=TChiWatSupSetMax),
     nSysHea=1,
     nSouAmb=1,
     VTanHeaWat=datChi.PLRMin*datChi.mCon_flow_nominal*5*60/1000,
