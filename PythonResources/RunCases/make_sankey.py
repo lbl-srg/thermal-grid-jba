@@ -115,8 +115,8 @@ results = get_vars(var_list,
 data_dicts = [
     {
     ("Electricity import", "ETS chiller", "electricity") : 0,
-    ("Reservoir loop", "ETS chiller", "reservoir heat") : 0,
-    ("Reservoir loop", "ETS chiller", "reservoir cooling") : 0,
+    ("Reservoir loop", "ETS chiller", "cooling rejection") : 0,
+    ("Reservoir loop", "ETS chiller", "heat rejection") : 0,
     ("ETS chiller", "Cooling load", "cooling") : 0,
     ("ETS chiller", "Heating load", "space heating") : 0,
     ("ETS chiller", "DHW load", "domestic hot water") : 0,
@@ -150,9 +150,9 @@ for sea in range(5):
     for i in range(1,nBui+1):
         data_dict[("Electricity import", "ETS chiller", "electricity")] += \
             abs(integrate_result(results_sliced, f'bui[{i}].ets.PCoo'))
-        data_dict[("Reservoir loop", "ETS chiller", "reservoir heat")] += \
+        data_dict[("Reservoir loop", "ETS chiller", "cooling rejection")] += \
             abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'negative'))
-        data_dict[("Reservoir loop", "ETS chiller", "reservoir cooling")] += \
+        data_dict[("Reservoir loop", "ETS chiller", "heat rejection")] += \
             abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'positive'))
         data_dict[("ETS chiller", "Cooling load", "cooling")] += \
             abs(integrate_result(results_sliced, f'bui[{i}].dHChiWat_flow'))
@@ -205,13 +205,22 @@ for sea in range(5):
 #%% make sankey diagram
 
 # Map energy carriers to colors
+# Scheme:
+#   Electricity is green;
+#   Cooling l-t-r (left to right) is blue 'rgba(0, 0, 255, x)',
+#     Note that cooling _rejection_ from a chiller is r-t-l,
+#     therefore it follows the colour for heating l-t-r.
+#   Heating l-t-r is red 'rgba(255, 0, 0, x)',
+#     Note that heat _rejection_ from a chiller is r-t-l,
+#     therefore it follows the colour for cooling l-t-r.
+#   Storage / anergy forming a loop is yellow 'rgba(u, v, 0, x)'.
 dict_color = {
     "electricity": 'rgba(60, 179, 113, 0.8)',
     "cooling": 'rgba(0, 0, 255, 0.8)',
     "space heating": 'rgba(255, 0, 0, 0.8)',
     "domestic hot water": 'rgba(106, 90, 205, 0.8)',
-    "heat rejection": 'rgba(255, 0, 0, 0.4)',
-    "cooling rejection": 'rgba(0, 0, 255, 0.4)',
+    "heat rejection": 'rgba(0, 0, 255, 0.4)',
+    "cooling rejection": 'rgba(255, 0, 0, 0.4)',
     "reservoir heat": 'rgba(255, 0, 0, 0.6)',
     "reservoir cooling": 'rgba(0, 0, 255, 0.6)',
     "ground anergy": 'rgba(165, 165, 0, 0.8)',
