@@ -253,10 +253,10 @@ bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
     each delayTime(each displayUnit="min") = 300,
     each u_max(
       final unit="K",
-      each displayUnit="degC") = 298.15,
+      displayUnit="degC") = 298.15,
     each u_min(
       final unit="K",
-      each displayUnit="degC") = 282.65,
+      displayUnit="degC") = 282.65,
     each u(final unit="K", each displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for leaving water temperature on the secondary side of the heat exchanger in the ETS "
@@ -331,7 +331,10 @@ bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
  Buildings_Requirements.GreaterEqual reqEneCos(name="system", text="O-1-102: Energy cost must not be higher than 10% of cost computed in the architectural optimization.")
     "Requirement for energy cost"
     annotation (Placement(transformation(extent={{620,500},{640,520}})));
- Buildings_Requirements.GreaterEqual reqEneImp(name="system", text="O-2-103: Imported annual energy must not be higher than 10% of the imported energy computed in the architectural optimization.")
+ Buildings_Requirements.GreaterEqual reqEneImp(name="system",
+   text="O-2-103: Imported annual energy must not be higher than 10% of the imported energy computed in the architectural optimization.",
+      u_min(final unit="J", displayUnit="kWh"),
+      u_max(final unit="kW.h", displayUnit="kWh"))
     "Requirement for energy import"
     annotation (Placement(transformation(extent={{620,460},{640,480}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gaiMilCos(k=1.1)
