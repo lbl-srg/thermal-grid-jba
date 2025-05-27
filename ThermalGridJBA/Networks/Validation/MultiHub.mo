@@ -75,14 +75,16 @@ equation
           50},{66,20},{62,20}}, color={0,127,255}));
   connect(senTPlaLvg.port_b, dis.port_aDisSup)
     annotation (Line(points={{10,10},{30,10}}, color={0,127,255}));
-  connect(pla.port_bSerAmb, senTPlaLvg.port_a) annotation (Line(points={{-30,11.3333},
-          {-18,11.3333},{-18,10},{-10,10}}, color={0,127,255}));
+  connect(pla.port_bSerAmb, senTPlaLvg.port_a) annotation (Line(points={{-30,
+          11.3333},{-18,11.3333},{-18,10},{-10,10}},
+                                            color={0,127,255}));
   connect(senTPlaEnt.port_b, pla.port_aSerAmb) annotation (Line(points={{-70,10},
           {-54,10},{-54,11.3333},{-50,11.3333}}, color={0,127,255}));
   connect(dis.port_bDisSup, senTPlaEnt.port_a) annotation (Line(points={{70,10},
           {90,10},{90,-40},{-94,-40},{-94,10},{-90,10}}, color={0,127,255}));
-  connect(mDis.y, pla.mPum_flow) annotation (Line(points={{-69,50},{-58,50},{-58,
-          14.6667},{-51.3333,14.6667}}, color={0,0,127}));
+  connect(mDis.y, pla.mPum_flow) annotation (Line(points={{-69,50},{-58,50},{
+          -58,14.6667},{-51.3333,14.6667}},
+                                        color={0,0,127}));
   connect(bou.ports[1], senTPlaEnt.port_a) annotation (Line(points={{-50,-70},{-94,
           -70},{-94,10},{-90,10}}, color={0,127,255}));
 annotation(experiment(
