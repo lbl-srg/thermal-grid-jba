@@ -1,13 +1,12 @@
 within ThermalGridJBA.Networks.Validation;
 model DetailedPlantFiveHubsWithRequirementsVerification
   extends DetailedPlantFiveHubs;
-  Real fracPL[nBui + 2](each unit="Pa/m") = {dis.con[1].pipDis.dp / dis.con[1].pipDis.length,
+  Real fracPL[nBui + 1](each unit="Pa/m") = {dis.con[1].pipDis.dp / dis.con[1].pipDis.length,
 dis.con[2].pipDis.dp / dis.con[2].pipDis.length,
 dis.con[3].pipDis.dp / dis.con[3].pipDis.length,
 dis.con[4].pipDis.dp / dis.con[4].pipDis.length,
 dis.con[5].pipDis.dp / dis.con[5].pipDis.length,
-dis.pipEnd.dp / dis.pipEnd.length,
-conPla.pipDis.dp / conPla.pipDis.length}
+dis.pipEnd.dp / dis.pipEnd.length}
  "Pressure drop per length unit for each pipe (Pa/m)";
   Real y_value[5*3+4] = {bui[1].ets.hex.val2.y_actual,
 bui[2].ets.hex.val2.y_actual,
@@ -170,15 +169,15 @@ bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
   Modelica.Blocks.Sources.BooleanExpression HeaPumOn[nBui](y=bui.ets.chi.con.yPum)
     "ETS Heat pump signal on in each hub"
     annotation (Placement(transformation(extent={{540,420},{560,440}})));
-  Buildings_Requirements.GreaterEqual reqPDis[nBui + 2](
+  Buildings_Requirements.GreaterEqual reqPDis[nBui + 1](
     each name="District loop",
     each text="O-402: The pressure drop in the district loop and the service line must be no bigger than 125 Pa/m at full load.")
     "Requirement for pressure drop in the district loop"
     annotation (Placement(transformation(extent={{620,-520},{640,-500}})));
-  Modelica.Blocks.Sources.RealExpression PDis[nBui + 2](y(each unit="Pa/m")=fracPL)
+  Modelica.Blocks.Sources.RealExpression PDis[nBui + 1](y(each unit="Pa/m")=fracPL)
     "Pressure drop in the district loop"
     annotation (Placement(transformation(extent={{580,-540},{600,-520}})));
-  Modelica.Blocks.Sources.Constant fracPLMax[nBui + 2](each k(each unit="Pa/m")=125)
+  Modelica.Blocks.Sources.Constant fracPLMax[nBui + 1](each k(each unit="Pa/m")=125)
     "Maximum pressure drop per meter pipe setpoint"
     annotation (Placement(transformation(extent={{580,-500},{600,-480}})));
   Buildings_Requirements.WithinBand reqTHea[nBui](
