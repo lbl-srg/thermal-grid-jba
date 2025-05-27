@@ -7,7 +7,7 @@ def get_cases():
                 'start_time' : 0 * 24 * 3600,
                 'stop_time'  : 365* 24 * 3600,
                 'number_of_intervals' : 365 * 24,
-                'solver'     : 'cvode',
+                'solver'     : 'radau',
                 'simulate': True
             }
             # Combine the dictonaries
@@ -33,6 +33,22 @@ def get_cases():
             'name': "base_hBor_0.8",
             'parameters': {
                 'cenPla.borFie.hBor': 91*0.8
+            }
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_dDis_1.2",
+            'parameters': {
+                'datDis.dhDisSizFac': 1.2
+            }
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_dDis_0.8",
+            'parameters': {
+                'datDis.dhDisSizFac': 0.8
             }
         }
         _add(case, cases)

@@ -249,7 +249,6 @@ model CentralPlant "Central plant"
     mBorFiePer_flow_nominal=borFie.mPer_flow_nominal,
     mBorFieCen_flow_nominal=borFie.mCen_flow_nominal,
     mBorFiePer_flow_minimum=borFie.mPer_flow_nominal*2320/borFie.Re_nominal,
-    mBorFieCen_flow_minimum=borFie.mCen_flow_nominal*2320/borFie.Re_nominal,
     dpBorFiePer_nominal=borFie.dp_nominal,
     dpBorFieCen_nominal=borFie.dp_nominal,
     final mHeaPumWat_flow_nominal=mHeaPumWat_flow_nominal,
