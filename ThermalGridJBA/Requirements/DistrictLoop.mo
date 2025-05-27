@@ -16,7 +16,7 @@ block DistrictLoop "Requirements for district loop"
     "Pressure drop per meter pipe in service line"
     annotation (Placement(transformation(extent={{-140,-80},{-100,-40}})));
 
-  Buildings_Requirements.WithinBand_old disLooTem[:](
+  Buildings_Requirements.WithinBand     disLooTem[:](
     each name="District loop",
     each text=
         "O-401: The water that is served to each service line must be between 10.5◦C and 24◦C.",
