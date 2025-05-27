@@ -115,22 +115,22 @@ results = get_vars(var_list,
 data_dicts = [
     {
     ("Electricity import", "ETS chiller", "electricity") : 0,
-    ("Reservoir loop", "ETS chiller", "cooling rejection") : 0,
-    ("Reservoir loop", "ETS chiller", "heat rejection") : 0,
-    ("ETS chiller", "Cooling load", "cooling") : 0,
-    ("ETS chiller", "Heating load", "space heating") : 0,
+    ("Electricity import", "Central chiller", "electricity") : 0,
+    ("Dry cooler", "Central chiller", "plant heat rejection") : 0,
+    ("Dry cooler", "Central chiller", "plant cooling rejection") : 0,
+    ("Dry cooler", "Economizer", "plant heat rejection") : 0,
+    ("Dry cooler", "Economizer", "plant cooling rejection") : 0,
+    ("Central chiller", "Reservoir loop", "plant heating") : 0,
+    ("Central chiller", "Reservoir loop", "plant cooling") : 0,
+    ("Reservoir loop", "ETS chiller", "ETS cooling rejection") : 0,
+    ("Reservoir loop", "ETS chiller", "ETS heat rejection") : 0,
+    ("ETS chiller", "Cooling load", "cooling load") : 0,
+    ("ETS chiller", "Heating load", "space heating load") : 0,
     ("ETS chiller", "DHW load", "domestic hot water") : 0,
     ("Reservoir loop", "Ground", "ground anergy") : 0,
     ("Ground", "Reservoir loop", "ground anergy") : 0,
-    ("Dry cooler", "Economizer", "heat rejection") : 0,
-    ("Dry cooler", "Economizer", "cooling rejection") : 0,
-    ("Economizer", "Reservoir loop", "reservoir heat") : 0,
-    ("Economizer", "Reservoir loop", "reservoir cooling") : 0,
-    ("Electricity import", "Central chiller", "electricity") : 0,
-    ("Dry cooler", "Central chiller", "heat rejection") : 0,
-    ("Dry cooler", "Central chiller", "cooling rejection") : 0,
-    ("Central chiller", "Reservoir loop", "reservoir heat") : 0,
-    ("Central chiller", "Reservoir loop", "reservoir cooling") : 0,
+    ("Economizer", "Reservoir loop", "plant heating") : 0,
+    ("Economizer", "Reservoir loop", "plant cooling") : 0,
     ("Borefield center", "Reservoir loop", "borefield center anergy") : 0,
     ("Reservoir loop", "Borefield center", "borefield center anergy") : 0,
     ("Borefield perimeter", "Reservoir loop", "borefield perimeter anergy") : 0,
@@ -150,13 +150,13 @@ for sea in range(5):
     for i in range(1,nBui+1):
         data_dict[("Electricity import", "ETS chiller", "electricity")] += \
             abs(integrate_result(results_sliced, f'bui[{i}].ets.PCoo'))
-        data_dict[("Reservoir loop", "ETS chiller", "cooling rejection")] += \
-            abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'negative'))
-        data_dict[("Reservoir loop", "ETS chiller", "heat rejection")] += \
+        data_dict[("Reservoir loop", "ETS chiller", "ETS cooling rejection")] += \
             abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'positive'))
-        data_dict[("ETS chiller", "Cooling load", "cooling")] += \
+        data_dict[("Reservoir loop", "ETS chiller", "ETS heat rejection")] += \
+            abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'negative'))
+        data_dict[("ETS chiller", "Cooling load", "cooling load")] += \
             abs(integrate_result(results_sliced, f'bui[{i}].dHChiWat_flow'))
-        data_dict[("ETS chiller", "Heating load", "space heating")] += \
+        data_dict[("ETS chiller", "Heating load", "space heating load")] += \
             abs(integrate_result(results_sliced, f'bui[{i}].dHHeaWat_flow'))
         if i != 1: # bui[1] doesn't have dhw
             data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
@@ -171,25 +171,25 @@ for sea in range(5):
     
     # Central plant
     # economiser
-    data_dict[("Dry cooler", "Economizer", "heat rejection")] = \
+    data_dict[("Dry cooler", "Economizer", "plant heat rejection")] = \
         abs(integrate_result(results_sliced, 'cenPla.gen.hex.Q1_flow', 'negative'))
-    data_dict[("Dry cooler", "Economizer", "cooling rejection")] = \
+    data_dict[("Dry cooler", "Economizer", "plant cooling rejection")] = \
         abs(integrate_result(results_sliced, 'cenPla.gen.hex.Q1_flow', 'positive'))
-    data_dict[("Economizer", "Reservoir loop", "reservoir heat")] = \
-        data_dict[("Dry cooler", "Economizer", "cooling rejection")]
-    data_dict[("Economizer", "Reservoir loop", "reservoir cooling")] = \
-        data_dict[("Dry cooler", "Economizer", "heat rejection")]
+    data_dict[("Economizer", "Reservoir loop", "plant heating")] = \
+        data_dict[("Dry cooler", "Economizer", "plant cooling rejection")]
+    data_dict[("Economizer", "Reservoir loop", "plant cooling")] = \
+        data_dict[("Dry cooler", "Economizer", "plant heat rejection")]
     
     # central chiller
     data_dict[("Electricity import", "Central chiller", "electricity")] = \
         abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.P'))
-    data_dict[("Dry cooler", "Central chiller", "cooling rejection")] =\
+    data_dict[("Dry cooler", "Central chiller", "plant cooling rejection")] =\
         abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QEva_flow', 'negative'))
-    data_dict[("Dry cooler", "Central chiller", "heat rejection")] =\
+    data_dict[("Dry cooler", "Central chiller", "plant heat rejection")] =\
         abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QEva_flow', 'positive'))
-    data_dict[("Central chiller", "Reservoir loop", "reservoir heat")] =\
+    data_dict[("Central chiller", "Reservoir loop", "plant heating")] =\
         abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QCon_flow', 'positive'))
-    data_dict[("Central chiller", "Reservoir loop", "reservoir cooling")] =\
+    data_dict[("Central chiller", "Reservoir loop", "plant cooling")] =\
         abs(integrate_result(results_sliced,'cenPla.gen.heaPum.QCon_flow', 'negative'))
     
     # borefield
@@ -214,15 +214,18 @@ for sea in range(5):
 #     Note that heat _rejection_ from a chiller is r-t-l,
 #     therefore it follows the colour for cooling l-t-r.
 #   Storage / anergy forming a loop is yellow 'rgba(u, v, 0, x)'.
+#   DHW is magent 'rgba(165, 255, 0, x)'.
 dict_color = {
     "electricity": 'rgba(60, 179, 113, 0.8)',
-    "cooling": 'rgba(0, 0, 255, 0.8)',
-    "space heating": 'rgba(255, 0, 0, 0.8)',
-    "domestic hot water": 'rgba(106, 90, 205, 0.8)',
-    "heat rejection": 'rgba(0, 0, 255, 0.4)',
-    "cooling rejection": 'rgba(255, 0, 0, 0.4)',
-    "reservoir heat": 'rgba(255, 0, 0, 0.6)',
-    "reservoir cooling": 'rgba(0, 0, 255, 0.6)',
+    "plant heat rejection": 'rgba(0, 0, 255, 0.3)',
+    "plant cooling rejection": 'rgba(255, 0, 0, 0.3)',
+    "plant cooling": 'rgba(0, 0, 255, 0.5)',
+    "plant heating": 'rgba(255, 0, 0, 0.5)',
+    "ETS heat rejection": 'rgba(0, 0, 255, 0.7)',
+    "ETS cooling rejection": 'rgba(255, 0, 0, 0.7)',
+    "cooling load": 'rgba(0, 0, 255, 0.9)',
+    "space heating load": 'rgba(255, 0, 0, 0.9)',
+    "domestic hot water": 'rgba(106, 90, 205, 0.9)',
     "ground anergy": 'rgba(165, 165, 0, 0.8)',
     "borefield center anergy": 'rgba(255, 165, 0, 0.8)',
     "borefield perimeter anergy": 'rgba(165, 255, 0, 0.8)'
@@ -230,6 +233,8 @@ dict_color = {
 
 # Map node names to coordinates
 #   The origin is at the top left, from 0 to 1.
+#   The x-positions reflect the columns.
+#   The y-positions need to be manually adjusted after the diagram is generated.
 dict_coord = {
     "Electricity import": (0.1, 0.1),
     "Dry cooler": (0.1, 0.4),
@@ -284,8 +289,7 @@ for idx, data_dict in enumerate(data_dicts):
         )
     )])
     
-    fig.update_layout(title_text=f"Energy flow - {seasons[idx]}",
-                      font_size=30,
+    fig.update_layout(font_size=30,
                       font=dict(size = 20))
     fig.show()
 
@@ -295,43 +299,43 @@ for idx, data_dict in enumerate(data_dicts):
 
 print("### VALIDATION ###")
 print('\n- Integration of load -')
-print(f'total cooling load = {data_dicts[0][("ETS chiller", "Cooling load", "cooling")]*J_to_kWh:.3g} kWh')
+print(f'total cooling load = {data_dicts[0][("ETS chiller", "Cooling load", "cooling load")]*J_to_kWh:.3g} kWh')
 print(f'    reference from load files: {16908188:.3g} kWh')
-print(f'total heating load = {data_dicts[0][("ETS chiller", "Heating load", "space heating")]*J_to_kWh:.3g} kWh')
+print(f'total heating load = {data_dicts[0][("ETS chiller", "Heating load", "space heating load")]*J_to_kWh:.3g} kWh')
 print(f'    reference from load files: {10080563.2344998:.3g} kWh')
 print(f'total dhw load = {data_dicts[0][("ETS chiller", "DHW load", "domestic hot water")]*J_to_kWh:.3g} kWh')
 print(f'    reference from load files: {4748967.95197562:.3g} kWh')
 
 print('\n- ETS chiller -')
 ets_chi_in  = data_dicts[0][("Electricity import", "ETS chiller", "electricity")] \
-            + data_dicts[0][("Reservoir loop", "ETS chiller", "heat rejection")] \
-            + data_dicts[0][("ETS chiller", "Cooling load", "cooling")]
-ets_chi_out = data_dicts[0][("Reservoir loop", "ETS chiller", "cooling rejection")] \
-            + data_dicts[0][("ETS chiller", "Heating load", "space heating")] \
+            + data_dicts[0][("Reservoir loop", "ETS chiller", "ETS cooling rejection")] \
+            + data_dicts[0][("ETS chiller", "Cooling load", "cooling load")]
+ets_chi_out = data_dicts[0][("Reservoir loop", "ETS chiller", "ETS heat rejection")] \
+            + data_dicts[0][("ETS chiller", "Heating load", "space heating load")] \
             + data_dicts[0][("ETS chiller", "DHW load", "domestic hot water")]
 print(f"ets chiller ele + eva = {ets_chi_in*J_to_kWh:.3g} kWh")
 print(f"ets chiller con       = {ets_chi_out*J_to_kWh:.3g} kWh")
 
 print('\n- Central plant chiller -')
 cen_chi_in  = data_dicts[0][("Electricity import", "Central chiller", "electricity")] \
-            + data_dicts[0][("Dry cooler", "Central chiller", "cooling rejection")] \
-            + data_dicts[0][("Central chiller", "Reservoir loop", "reservoir cooling")]
-cen_chi_out = data_dicts[0][("Dry cooler", "Central chiller", "heat rejection")] \
-            + data_dicts[0][("Central chiller", "Reservoir loop", "reservoir heat")]
+            + data_dicts[0][("Dry cooler", "Central chiller", "plant cooling rejection")] \
+            + data_dicts[0][("Central chiller", "Reservoir loop", "plant cooling")]
+cen_chi_out = data_dicts[0][("Dry cooler", "Central chiller", "plant heat rejection")] \
+            + data_dicts[0][("Central chiller", "Reservoir loop", "plant heating")]
 print(f"central chiller ele + eva = {cen_chi_in*J_to_kWh:.3g} kWh")
 print(f"central chiller con       = {cen_chi_out*J_to_kWh:.3g} kWh")
 
 print('\n- Reservoir loop -')
-res_loo_in  = data_dicts[0][("Reservoir loop", "ETS chiller", "cooling rejection")] \
+res_loo_in  = data_dicts[0][("Reservoir loop", "ETS chiller", "ETS heat rejection")] \
             + data_dicts[0][("Ground", "Reservoir loop", "ground anergy")] \
-            + data_dicts[0][("Economizer", "Reservoir loop", "reservoir heat")] \
-            + data_dicts[0][("Central chiller", "Reservoir loop", "reservoir heat")] \
+            + data_dicts[0][("Economizer", "Reservoir loop", "plant heating")] \
+            + data_dicts[0][("Central chiller", "Reservoir loop", "plant heating")] \
             + data_dicts[0][("Borefield center", "Reservoir loop", "borefield center anergy")] \
             + data_dicts[0][("Borefield perimeter", "Reservoir loop", "borefield perimeter anergy")]
-res_loo_out = data_dicts[0][("Reservoir loop", "ETS chiller", "heat rejection")] \
+res_loo_out = data_dicts[0][("Reservoir loop", "ETS chiller", "ETS cooling rejection")] \
             + data_dicts[0][("Reservoir loop", "Ground", "ground anergy")] \
-            + data_dicts[0][("Economizer", "Reservoir loop", "reservoir cooling")] \
-            + data_dicts[0][("Central chiller", "Reservoir loop", "reservoir cooling")] \
+            + data_dicts[0][("Economizer", "Reservoir loop", "plant cooling")] \
+            + data_dicts[0][("Central chiller", "Reservoir loop", "plant cooling")] \
             + data_dicts[0][("Reservoir loop", "Borefield center", "borefield center anergy")] \
             + data_dicts[0][("Reservoir loop", "Borefield perimeter", "borefield perimeter anergy")]
 print(f"energy into reservoir loop   = {res_loo_in*J_to_kWh:.3g} kWh")
