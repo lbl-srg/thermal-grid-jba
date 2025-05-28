@@ -125,7 +125,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     annotation (Placement(transformation(extent={{580,60},{600,80}})));
   Modelica.Blocks.Sources.RealExpression THeaPumCon[nBui](y=bui.ets.chi.senTConLvg.T)
     "Heat pump condenser leaving water temperature "
-    annotation (Placement(transformation(extent={{580,-40},{600,-20}})));
+    annotation (Placement(transformation(extent={{540,-38},{560,-18}})));
   Buildings.Controls.OBC.CDL.Reals.GreaterThreshold valEvaOpen[nBui](each h=0.01)
     "Evaporator to ambient loop isolation valve open"
     annotation (Placement(transformation(extent={{580,10},{600,30}})));
@@ -299,7 +299,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Math.Add TRooCooDif[nBui](each k1=-1)
     "Room cooling temperature difference from setpoint"
     annotation (Placement(transformation(extent={{460,-330},{480,-310}})));
-  Modelica.Blocks.Continuous.Integrator IntRooCooDiff[nBui]
+  Modelica.Blocks.Continuous.Integrator intRooCooDiff[nBui]
     "Integration of the difference in temperature when flow rate is not null"
     annotation (Placement(transformation(extent={{540,-380},{560,-360}})));
   Buildings_Requirements.GreaterEqual reqTRooCoo[nBui](
@@ -326,7 +326,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
       each text="O-202: All control valves must show stable operation.")
     "Requirement to verify stability of control valves"
     annotation (Placement(transformation(extent={{620,340},{640,360}})));
-  Modelica.Blocks.Sources.RealExpression Valy[19](y=y_value)
+  Modelica.Blocks.Sources.RealExpression yVal[19](y=y_value)
     "Control valves position"
     annotation (Placement(transformation(extent={{580,344},{600,364}})));
   ThermalGridJBA.Data.MilpData milpData
@@ -366,10 +366,10 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Buildings.Controls.OBC.CDL.Reals.GreaterThreshold greThrRooHea[nBui]
     "Room heating flow rate not null"
     annotation (Placement(transformation(extent={{460,-110},{480,-90}})));
-  Modelica.Blocks.Logical.Switch switchRooCoo[nBui]
+  Modelica.Blocks.Logical.Switch swiRooCoo[nBui]
     "Difference in room temperature with the setpoint when cooling flow rate is not null"
     annotation (Placement(transformation(extent={{500,-380},{520,-360}})));
-  Modelica.Blocks.Continuous.Integrator IntQRooCooOn[nBui](each y_start=0.00001)
+  Modelica.Blocks.Continuous.Integrator intQRooCooOn[nBui](each y_start=0.00001)
     "Total time with room cooling flow rate on (start not 0 to avoid dividing by 0)"
     annotation (Placement(transformation(extent={{540,-420},{560,-400}})));
   Modelica.Blocks.Math.Division TRooCooAvgYea[nBui]
@@ -383,13 +383,13 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal QRooHeaOn[nBui]
     "1 when Room heating flow rate is not null, 0 otherwise"
     annotation (Placement(transformation(extent={{500,-240},{520,-220}})));
-  Modelica.Blocks.Continuous.Integrator IntQRooHeaOn[nBui](each y_start=0.00001)
+  Modelica.Blocks.Continuous.Integrator intQRooHeaOn[nBui](each y_start=0.00001)
     "Total time with room heating flow rate on"
     annotation (Placement(transformation(extent={{540,-240},{560,-220}})));
-  Modelica.Blocks.Logical.Switch switchRooHea[nBui]
+  Modelica.Blocks.Logical.Switch swiRooHea[nBui]
     "Difference in room temperature with the setpoint when heating flow rate is not null"
     annotation (Placement(transformation(extent={{500,-200},{520,-180}})));
-  Modelica.Blocks.Continuous.Integrator IntRooCooDiff1[nBui]
+  Modelica.Blocks.Continuous.Integrator intRooCooDiff1[nBui]
     "Integration of the difference in temperature when flow rate is not null"
     annotation (Placement(transformation(extent={{540,-200},{560,-180}})));
   Modelica.Blocks.Math.Division TRooHeaAvgYea[nBui]
@@ -411,8 +411,8 @@ equation
           {610,70},{610,56},{619,56}},     color={0,0,127}));
   connect(TmaxHeaPumConLvg.y,reqTHeaPumConLvg. u_max) annotation (Line(points={{601,-10},
           {612,-10},{612,-24},{619,-24}},          color={0,0,127}));
-  connect(THeaPumCon.y,reqTHeaPumConLvg. u_min) annotation (Line(points={{601,-30},
-          {612,-30},{612,-28},{619,-28}}, color={0,0,127}));
+  connect(THeaPumCon.y,reqTHeaPumConLvg. u_min) annotation (Line(points={{561,-28},
+          {619,-28}},                     color={0,0,127}));
   connect(THexWatEnt.y,reqTWatSer. u) annotation (Line(points={{601,-450},{610,-450},
           {610,-446},{619,-446}}, color={0,0,127}));
   connect(TDisWatSup.T,reqTPlaMix. u) annotation (Line(points={{-91,170},{-224,170},
@@ -485,7 +485,7 @@ equation
   connect(last_value.y,reqTRooCooAvg. active) annotation (Line(points={{441,-190},
           {460,-190},{460,-248},{520,-248},{520,-292},{570,-292},{570,-362},{618,
           -362}},                            color={255,0,255}));
-  connect(Valy.y,reqStaVal. u)
+  connect(yVal.y,reqStaVal. u)
     annotation (Line(points={{601,354},{619,354}}, color={0,0,127}));
   connect(gaiMilCos.y, reqEneCos.u_max) annotation (Line(points={{602,520},{610,
           520},{610,516},{619,516}},   color={0,0,127}));
@@ -507,39 +507,39 @@ equation
           255}));
   connect(QRooHea.y, greThrRooHea.u)
     annotation (Line(points={{441,-100},{458,-100}}, color={0,0,127}));
-  connect(switchRooCoo.y,IntRooCooDiff. u)
+  connect(swiRooCoo.y, intRooCooDiff.u)
     annotation (Line(points={{521,-370},{538,-370}}, color={0,0,127}));
-  connect(QRooCooOn.y,IntQRooCooOn. u)
+  connect(QRooCooOn.y,intQRooCooOn. u)
     annotation (Line(points={{522,-410},{538,-410}}, color={0,0,127}));
   connect(TRooCooAvgYea.y, reqTRooCooAvg.u_min) annotation (Line(points={{601,-390},
           {610,-390},{610,-356},{619,-356}}, color={0,0,127}));
-  connect(IntQRooCooOn.y, TRooCooAvgYea.u2) annotation (Line(points={{561,-410},
+  connect(intQRooCooOn.y, TRooCooAvgYea.u2) annotation (Line(points={{561,-410},
           {570,-410},{570,-396},{578,-396}}, color={0,0,127}));
-  connect(IntRooCooDiff.y, TRooCooAvgYea.u1) annotation (Line(points={{561,-370},
+  connect(intRooCooDiff.y, TRooCooAvgYea.u1) annotation (Line(points={{561,-370},
           {570,-370},{570,-384},{578,-384}}, color={0,0,127}));
-  connect(greThrRooCoo.y, switchRooCoo.u2) annotation (Line(points={{482,-280},{
+  connect(greThrRooCoo.y, swiRooCoo.u2) annotation (Line(points={{482,-280},{
           486,-280},{486,-370},{498,-370}}, color={255,0,255}));
-  connect(TRooCooDif.y, switchRooCoo.u1) annotation (Line(points={{481,-320},{492,
+  connect(TRooCooDif.y, swiRooCoo.u1) annotation (Line(points={{481,-320},{492,
           -320},{492,-362},{498,-362}}, color={0,0,127}));
-  connect(zero.y, switchRooCoo.u3) annotation (Line(points={{441,-250},{446,-250},
+  connect(zero.y, swiRooCoo.u3) annotation (Line(points={{441,-250},{446,-250},
           {446,-378},{498,-378}}, color={0,0,127}));
   connect(greThrRooCoo.y, QRooCooOn.u) annotation (Line(points={{482,-280},{486,
           -280},{486,-410},{498,-410}}, color={255,0,255}));
-  connect(greThrRooHea.y, switchRooHea.u2) annotation (Line(points={{482,-100},{
+  connect(greThrRooHea.y, swiRooHea.u2) annotation (Line(points={{482,-100},{
           486,-100},{486,-190},{498,-190}}, color={255,0,255}));
   connect(greThrRooHea.y, QRooHeaOn.u) annotation (Line(points={{482,-100},{486,
           -100},{486,-230},{498,-230}}, color={255,0,255}));
-  connect(TRooHeaDif.y, switchRooHea.u1) annotation (Line(points={{481,-140},{492,
+  connect(TRooHeaDif.y, swiRooHea.u1) annotation (Line(points={{481,-140},{492,
           -140},{492,-182},{498,-182}}, color={0,0,127}));
-  connect(zero.y, switchRooHea.u3) annotation (Line(points={{441,-250},{446,-250},
+  connect(zero.y, swiRooHea.u3) annotation (Line(points={{441,-250},{446,-250},
           {446,-198},{498,-198}}, color={0,0,127}));
-  connect(switchRooHea.y,IntRooCooDiff1. u)
+  connect(swiRooHea.y, intRooCooDiff1.u)
     annotation (Line(points={{521,-190},{538,-190}}, color={0,0,127}));
-  connect(QRooHeaOn.y,IntQRooHeaOn. u)
+  connect(QRooHeaOn.y,intQRooHeaOn. u)
     annotation (Line(points={{522,-230},{538,-230}}, color={0,0,127}));
-  connect(IntRooCooDiff1.y, TRooHeaAvgYea.u1) annotation (Line(points={{561,-190},
+  connect(intRooCooDiff1.y, TRooHeaAvgYea.u1) annotation (Line(points={{561,-190},
           {570,-190},{570,-204},{578,-204}}, color={0,0,127}));
-  connect(IntQRooHeaOn.y, TRooHeaAvgYea.u2) annotation (Line(points={{561,-230},
+  connect(intQRooHeaOn.y, TRooHeaAvgYea.u2) annotation (Line(points={{561,-230},
           {570,-230},{570,-216},{578,-216}}, color={0,0,127}));
   connect(TRooHeaAvgYea.y, reqTRooHeaAvg.u_min) annotation (Line(points={{601,-210},
           {610,-210},{610,-176},{619,-176}}, color={0,0,127}));
