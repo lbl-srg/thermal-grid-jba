@@ -309,10 +309,10 @@ model DetailedPlantFiveHubsWithRequirementsVerification
       final unit="K"),
     each delayTime(each displayUnit="s") = 0)
     "Requirement for the room temperature for heating (yearly average)"
-    annotation (Placement(transformation(extent={{620,-188},{640,-168}})));
+    annotation (Placement(transformation(extent={{620,-200},{640,-180}})));
   Modelica.Blocks.Sources.Constant dTMaxRooHeaYea[nBui](each k=0.05)
     "Maximum room temperature difference for heating over the all simulation"
-    annotation (Placement(transformation(extent={{580,-170},{600,-150}})));
+    annotation (Placement(transformation(extent={{580,-180},{600,-160}})));
   Buildings.Controls.OBC.CDL.Reals.MovingAverage dTRooCooAvg60min[nBui](each
       delta(each displayUnit="min") = 3600)
     "Room temperature difference for cooling over 60 minutes"
@@ -353,7 +353,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
       final unit="K"),
     each delayTime(each displayUnit="s") = 0)
     "Requirement for the room temperature for cooling (yearly average)"
-    annotation (Placement(transformation(extent={{620,-368},{640,-348}})));
+    annotation (Placement(transformation(extent={{620,-372},{640,-352}})));
   Modelica.Blocks.Sources.Constant dTMaxRooCooYea[nBui](each k=0.05)
     "Maximum room temperature difference for cooling over the all simulation"
     annotation (Placement(transformation(extent={{580,-350},{600,-330}})));
@@ -501,9 +501,9 @@ equation
   connect(dTMaxRooHea60min.y, reqTRooHea.u_max) annotation (Line(points={{601,-100},
           {610,-100},{610,-124},{619,-124}}, color={0,0,127}));
   connect(dTMaxRooHeaYea.y, reqTRooHeaAvg.u_max) annotation (Line(points={{601,
-          -160},{610,-160},{610,-172},{619,-172}}, color={0,0,127}));
-  connect(last_value.y,reqTRooHeaAvg. active) annotation (Line(points={{441,-190},
-          {460,-190},{460,-168},{576,-168},{576,-182},{618,-182}},
+          -170},{610,-170},{610,-184},{619,-184}}, color={0,0,127}));
+  connect(last_value.y,reqTRooHeaAvg. active) annotation (Line(points={{441,
+          -190},{460,-190},{460,-168},{576,-168},{576,-194},{618,-194}},
                                              color={255,0,255}));
   connect(TRooCooSet.y,TRooCooDif. u1) annotation (Line(points={{441,-300},{450,
           -300},{450,-314},{458,-314}}, color={0,0,127}));
@@ -516,10 +516,10 @@ equation
   connect(dTMaxRooCoo60min.y, reqTRooCoo.u_max) annotation (Line(points={{601,-280},
           {610,-280},{610,-304},{619,-304}}, color={0,0,127}));
   connect(dTMaxRooCooYea.y, reqTRooCooAvg.u_max) annotation (Line(points={{601,
-          -340},{610,-340},{610,-352},{619,-352}}, color={0,0,127}));
-  connect(last_value.y,reqTRooCooAvg. active) annotation (Line(points={{441,-190},
-          {460,-190},{460,-248},{520,-248},{520,-292},{570,-292},{570,-362},{618,
-          -362}},                            color={255,0,255}));
+          -340},{610,-340},{610,-356},{619,-356}}, color={0,0,127}));
+  connect(last_value.y,reqTRooCooAvg. active) annotation (Line(points={{441,
+          -190},{460,-190},{460,-248},{520,-248},{520,-292},{570,-292},{570,
+          -366},{618,-366}},                 color={255,0,255}));
   connect(yVal.y,reqStaVal. u)
     annotation (Line(points={{601,354},{619,354}}, color={0,0,127}));
   connect(gaiMilCos.y, reqEneCos.u_max) annotation (Line(points={{602,520},{610,
@@ -546,8 +546,9 @@ equation
     annotation (Line(points={{521,-370},{538,-370}}, color={0,0,127}));
   connect(QRooCooOn.y,intQRooCooOn. u)
     annotation (Line(points={{522,-410},{538,-410}}, color={0,0,127}));
-  connect(dTRooCooYea.y, reqTRooCooAvg.u_min) annotation (Line(points={{601,-390},
-          {610,-390},{610,-356},{619,-356}}, color={0,0,127}));
+  connect(dTRooCooYea.y, reqTRooCooAvg.u_min) annotation (Line(points={{601,
+          -390},{610,-390},{610,-360},{619,-360}},
+                                             color={0,0,127}));
   connect(intQRooCooOn.y, dTRooCooYea.u2) annotation (Line(points={{561,-410},{
           570,-410},{570,-396},{578,-396}}, color={0,0,127}));
   connect(intdTRooCoo.y, dTRooCooYea.u1) annotation (Line(points={{561,-370},{
@@ -577,7 +578,7 @@ equation
   connect(intQRooHeaOn.y, dTRooHeaAvgYea.u2) annotation (Line(points={{561,-230},
           {570,-230},{570,-216},{578,-216}}, color={0,0,127}));
   connect(dTRooHeaAvgYea.y, reqTRooHeaAvg.u_min) annotation (Line(points={{601,
-          -210},{610,-210},{610,-176},{619,-176}}, color={0,0,127}));
+          -210},{610,-210},{610,-188},{619,-188}}, color={0,0,127}));
   connect(greThrRooHea.y, reqTRooHea.active) annotation (Line(points={{482,-100},
           {486,-100},{486,-146},{610,-146},{610,-134},{618,-134}}, color={255,0,
           255}));
