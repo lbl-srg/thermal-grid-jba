@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 #
-# Start the script for the directory that contains the package
-# with your model
+# Script to automate the simulation of the case studies
 #
-# KNOWN ISSUES:
-#   Each run adds an entry to Dymola > Tools > Library Management > Modelica Path,
-#       after a point it may fail to add more and the simulation can't find Buildings.
-#       Manually deleting paths can help.
 #############################################################
 import os
-BRANCH="main"
-SHOW_DYMOLA_GUI = False
+BRANCH="issue88_distributionPipes"
+SHOW_DYMOLA_GUI = True
 KEEP_DYMOLA_OPEN = False
 FROM_GIT_HUB = True
 
