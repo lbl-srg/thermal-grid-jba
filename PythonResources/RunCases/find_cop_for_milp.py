@@ -23,10 +23,9 @@ from GetVariables import get_vars # python file under same folder
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-mat_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.mat")
-csv_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.csv")
+mat_file_name = os.path.join(CWD, "simulations", "2025-05-25", "DetailedPlantFiveHubs.mat")
 
-PRINT_RESULTS = False
+PRINT_RESULTS = True
 WRITE_TO_XLSX = True
 PATH_XLSX = os.path.join(CWD, "cop_for_milp.xlsx")
 nBui = 5
@@ -43,8 +42,7 @@ def get_commit_hash():
 if WRITE_REMARKS:
     remarks = pd.DataFrame(np.array([['Model', 'ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs'],
                                      ['Weather scenario', 'fTMY'],
-                                     ['Result file at commit', '343b6a5a47399dbee9441f1aaf96fb83d38b8aa6'],
-                                     ['This file generated at commit', get_commit_hash()]]))
+                                     ['Result file at commit', '418c50b5f58d31d87fa7d35beb31b2f020e8b66e']]))
 
 def safe_cop(QCon, PChi):
     """ Returns nan if PChi == 0.
@@ -96,8 +94,7 @@ var_list = generate_indexed_var_list(var_list_pre_index, index_holder, range(1,n
 #%% Read mat file
 result_full = get_vars(var_list,
                        mat_file_name,
-                       'dymola',
-                       csv_file_name)
+                       'dymola')
 
 # Convert the timestamp to datetime format
 result_full['datetime'] = pd.to_datetime(result_full['Time'], unit='s', origin='2025-01-01')
