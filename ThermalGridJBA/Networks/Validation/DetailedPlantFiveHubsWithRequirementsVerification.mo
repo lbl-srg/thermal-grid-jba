@@ -1,36 +1,40 @@
 within ThermalGridJBA.Networks.Validation;
 model DetailedPlantFiveHubsWithRequirementsVerification
   extends DetailedPlantFiveHubs;
-  Real fracPL[nBui + 1](each unit="Pa/m") = {dis.con[1].pipDis.dp / dis.con[1].pipDis.length,
-dis.con[2].pipDis.dp / dis.con[2].pipDis.length,
-dis.con[3].pipDis.dp / dis.con[3].pipDis.length,
-dis.con[4].pipDis.dp / dis.con[4].pipDis.length,
-dis.con[5].pipDis.dp / dis.con[5].pipDis.length,
-dis.pipEnd.dp / dis.pipEnd.length}
+  Real fracPL[nBui + 1](each unit="Pa/m") = {
+    dis.con[1].pipDis.dp / dis.con[1].pipDis.length,
+    dis.con[2].pipDis.dp / dis.con[2].pipDis.length,
+    dis.con[3].pipDis.dp / dis.con[3].pipDis.length,
+    dis.con[4].pipDis.dp / dis.con[4].pipDis.length,
+    dis.con[5].pipDis.dp / dis.con[5].pipDis.length,
+    dis.pipEnd.dp / dis.pipEnd.length}
  "Pressure drop per length unit for each pipe (Pa/m)";
-  Real y_value[5*3+4] = {bui[1].ets.hex.val2.y_actual,
-bui[2].ets.hex.val2.y_actual,
-bui[3].ets.hex.val2.y_actual,
-bui[4].ets.hex.val2.y_actual,
-bui[5].ets.hex.val2.y_actual,
-bui[1].ets.chi.valEva.y_actual,
-bui[2].ets.chi.valEva.y_actual,
-bui[3].ets.chi.valEva.y_actual,
-bui[4].ets.chi.valEva.y_actual,
-bui[5].ets.chi.valEva.y_actual,
-bui[1].ets.chi.valCon.y_actual,
-bui[2].ets.chi.valCon.y_actual,
-bui[3].ets.chi.valCon.y_actual,
-bui[4].ets.chi.valCon.y_actual,
-bui[5].ets.chi.valCon.y_actual,
-bui[2].ets.dhw.domHotWatTan.divVal.y_actual,
-bui[3].ets.dhw.domHotWatTan.divVal.y_actual,
-bui[4].ets.dhw.domHotWatTan.divVal.y_actual,
-bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
+  Real y_value[5*3+4] = {
+    bui[1].ets.hex.val2.y_actual,
+    bui[2].ets.hex.val2.y_actual,
+    bui[3].ets.hex.val2.y_actual,
+    bui[4].ets.hex.val2.y_actual,
+    bui[5].ets.hex.val2.y_actual,
+    bui[1].ets.chi.valEva.y_actual,
+    bui[2].ets.chi.valEva.y_actual,
+    bui[3].ets.chi.valEva.y_actual,
+    bui[4].ets.chi.valEva.y_actual,
+    bui[5].ets.chi.valEva.y_actual,
+    bui[1].ets.chi.valCon.y_actual,
+    bui[2].ets.chi.valCon.y_actual,
+    bui[3].ets.chi.valCon.y_actual,
+    bui[4].ets.chi.valCon.y_actual,
+    bui[5].ets.chi.valCon.y_actual,
+    bui[2].ets.dhw.domHotWatTan.divVal.y_actual,
+    bui[3].ets.dhw.domHotWatTan.divVal.y_actual,
+    bui[4].ets.dhw.domHotWatTan.divVal.y_actual,
+    bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
  "Valves actuator values for the control valves of each ETS (heat exchanger, condenser loop of the chiller, evaporator loop of the chiller, domestichot water when present)";
-  Modelica.Blocks.Sources.RealExpression senTemDhwSup[nBui](y={45 + 273.15,bui[2].ets.dhw.domHotWatTan.senTemHot.T,
-        bui[3].ets.dhw.domHotWatTan.senTemHot.T,bui[4].ets.dhw.domHotWatTan.senTemHot.T,
-        bui[5].ets.dhw.domHotWatTan.senTemHot.T})
+  Modelica.Blocks.Sources.RealExpression senTemDhwSup[nBui](
+    y={45 + 273.15,
+    bui[2].ets.dhw.domHotWatTan.senTemHot.T,
+    bui[3].ets.dhw.domHotWatTan.senTemHot.T,bui[4].ets.dhw.domHotWatTan.senTemHot.T,
+    bui[5].ets.dhw.domHotWatTan.senTemHot.T})
     "Domestic hot water supply temperature for each hub, except hub[1] that does not provide domestic hot water."
     annotation (Placement(transformation(extent={{580,304},{600,324}})));
   Buildings_Requirements.WithinBand reqTDhwSup[nBui](
@@ -392,7 +396,6 @@ bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
     "Average Temperature difference between Room heating and setpoint since the beginning of the simulation"
     annotation (Placement(transformation(extent={{580,-220},{600,-200}})));
 equation
-
 
   connect(senTemDhwSup.y,reqTDhwSup. u) annotation (Line(points={{601,314},{619,
           314}},                     color={0,0,127}));
