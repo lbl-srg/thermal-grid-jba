@@ -12,9 +12,7 @@ import plotly.graph_objects as go
 import plotly.io as pio
 pio.renderers.default='browser' # if the IDE doesn't render plotly output
 
-from scipy.integrate import trapz
-
-from GetVariables import get_vars, index_var_list
+from GetVariables import get_vars, index_var_list, integrate_with_condition
 # python file under same folder
 
 #CWD = os.getcwd()
@@ -24,104 +22,6 @@ mat_file_name = os.path.join(CWD, "simulations", "2025-05-19", "DetailedPlantFiv
 nBui = 5 # Ensure this is consistent with the mat file
 _i = r'%%i%%' # placeholder string to be replaced with index
 J_to_kWh = 2.7777777777777776e-07
-
-def integrate_with_condition(df, var, sign = None, condition = None):
-    """ Integrates df[var] along df['Time']
-        `sign` can be the following (case insensitive):
-            'positive' - Only integrates positive values of u,
-                           zero crossing points are found linearly and inserted
-                           to the series.
-            'negative' - Similar to above but negative.
-        `condition` is a Boolean array.
-            Only integrates u where condition is True,
-            when `condition` flips from True at t1 to False at t2,
-              a point (t2, 0) is inserted after (t2, u2) to create a step down;
-            when `condition` flips from False at t3 to True at t4,
-              a point (t4, 0) is inserted before (t4, u4) to create a step up;
-            set u = 0 for all points between t2 and t3.
-                           
-    """
-    
-    u = np.array(df[var])
-    t = np.array(df['Time'])
-    
-    # `condition` must to be evaluated before `sign`
-    #   because it relies on the original array length
-    #   and both `condition` and `sign` may add elements to the array.
-    if not condition is None:
-        
-        _t = []
-        _u = []
-        i = 0
-        
-        while i < len(t) - 1:
-            _t.append(t[i])
-            
-            if condition[i] and not condition[i + 1]:
-                # creates a step down at True to False
-                _t.append(t[i+1])
-                _u.append(u[i])
-                _u.append(0.)
-        
-            elif not condition[i] and condition[i + 1]:
-                # creates a step up at False to True
-                _t.append(t[i+1])
-                _u.append(0.)
-                _u.append(u[i+1])
-        
-            else:
-                if condition[i]:
-                    _u.append(u[i])
-                else:
-                    _u.append(0.)
-            i += 1
-        
-        # last point
-        _t.append(t[i])
-        _u.append(u[i])
-        
-        t = _t
-        u = _u
-    
-    def find_zero_crossings(t, u):
-        """ Find indices where the sign of u changes
-        """
-        sign_changes = np.where(np.diff(np.sign(u)))[0]
-        
-        # Initialize lists to store zero crossing times and values
-        zero_crossing_times = []
-        zero_crossing_values = []
-    
-        for i in sign_changes:
-            # Perform linear interpolation to find the exact zero crossing time
-            t1, t2 = t[i], t[i + 1]
-            u1, u2 = u[i], u[i + 1]
-            
-            # Calculate the zero crossing time
-            t_zero = t1 - u1 * (t2 - t1) / (u2 - u1)
-            u_zero = 0.0
-            
-            # Append the zero crossing time and value to the lists
-            zero_crossing_times.append(t_zero)
-            zero_crossing_values.append(u_zero)
-    
-        return zero_crossing_times, zero_crossing_values
-    
-    if sign in ['positive', 'negative']:
-        t_crossing, u_crossing = find_zero_crossings(t, u)
-        # Insert zero crossings into the original time series
-        for t_zero, u_zero in zip(t_crossing, u_crossing):
-            idx = np.searchsorted(t, t_zero)
-            t = np.insert(t, idx, t_zero)
-            u = np.insert(u, idx, u_zero)
-        
-        if sign == 'positive':
-            u[u<0] = 0
-        if sign == 'negative':
-            u[u>0] = 0
-        
-    I = trapz(u, t)
-    return I
 
 #%% read results file
 var_list = list()
