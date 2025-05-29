@@ -4,6 +4,8 @@
 Created on Fri Apr 11 11:50:10 2025
 
 @author: casper
+
+Code not cleaned yet.
 """
 
 import os
@@ -179,6 +181,16 @@ var_list_pre_index = list(var_dict_pre_index.keys())
 
 var_list = index_var_list(var_list_pre_index, index_holder, range(1,nBui+1))
 
+var_list_plant = [
+    'cenPla.gen.heaPum.COP',
+    'cenPla.gen.heaPum.P',
+    'cenPla.gen.heaPum.QCon_flow',
+    'cenPla.gen.heaPum.QEva_flow',
+    'cenPla.gen.heaPum.hea'
+    ]
+
+var_list += var_list_plant
+
 #%% Read mat file
 result_full = get_vars(var_list,
                        mat_file_name,
@@ -193,6 +205,8 @@ if WRITE_TO_XLSX:
     w = pd.ExcelWriter(PATH_XLSX, engine='xlsxwriter')
 
 month_order = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+#%% Computation for building ETS
 all_sums = {}
 for i in range(1,nBui+1):
 #for i in [1]:
@@ -201,16 +215,14 @@ for i in range(1,nBui+1):
     
     # indexed var names for this building
     var_list_bui += index_var_list(var_list_pre_index, index_holder, i)
-    result_bui = result_full[var_list_bui]
+    result_bui = result_full[var_list_bui].copy()
     
     # dict for renaming pd columns
     var_dict_indexed = {key.replace(index_holder, str(i)): value for key, value in var_dict_pre_index.items()}
     result_bui = result_bui.rename(columns=var_dict_indexed)
     
     # Filter
-    #result_bui = result_bui[result_bui['COP'] > 0.01] # only when chiller on
     result_bui = result_bui[result_bui['COP'] < 15.0] # remove transient at initialisation
-    #result_bui = result_bui[np.isclose(result_bui['Time'] % 3600, 0)] # only keep hourly sampled values
     result_bui = result_bui.iloc[:-1] # drop the last point which would be categorised to the next year
     
     # Section the data to each calendar month
@@ -230,8 +242,6 @@ for i in range(1,nBui+1):
     
     cop_mon_results = []
     for (month, mode), group in grouped:
-        # QCon_sum = group['QCon'].sum()
-        # PChi_sum = group['PChi'].sum()
         
         if mode == 'other':
             continue
@@ -350,12 +360,91 @@ cop_all_df_pivot = cop_all_df.pivot_table(
     aggfunc='first'
 ).swaplevel(axis=1).sort_index(axis=1)
 
+#%% Computation for central plant
+var_list_plant_results = ['Time', 'datetime'] + var_list_plant
+result_pla = result_full[var_list_plant_results].copy()
+
+# Filter
+result_pla = result_pla.iloc[:-2] # drop the last point which would be categorised to the next year
+
+# Section the data to each calendar month
+result_pla['month'] = result_pla['datetime'].dt.to_period('M')
+
+# Filter data based on operational modes
+conditions = [
+    result_pla['cenPla.gen.heaPum.hea'] == 1,
+    result_pla['cenPla.gen.heaPum.hea'] == 0
+              ]
+modes = ['heating', 'cooling']
+result_pla['mode'] = np.select(conditions, modes, default='other')
+
+# Monthly
+grouped = result_pla.groupby(['month', 'mode'])
+
+cop_mon_results_plant = []
+all_sums_plant = {}
+for (month, mode), group in grouped:
+    if mode == 'other':
+        continue
+    
+    condition = np.array(np.logical_and(result_pla['month'] == month,
+                                        result_pla['mode'] == mode))
+    
+    if mode == 'heating':
+        QCon_sum = integrate_with_condition(result_pla, 'cenPla.gen.heaPum.QCon_flow',
+                                            sign = None,
+                                            condition = condition)
+    else:
+        QCon_sum = integrate_with_condition(result_pla, 'cenPla.gen.heaPum.QEva_flow',
+                                            sign = None,
+                                            condition = condition)
+    PChi_sum = integrate_with_condition(result_pla, 'cenPla.gen.heaPum.P',
+                                        sign = None,
+                                        condition = condition)
+    
+    # print(f"# debug # (month, mode) = ({month}, {mode}):")
+    # print(f"    month match count = {np.sum(result_pla['month'] == month)}")
+    # print(f"    mode match count  = {np.sum(result_pla['mode'] == mode)}")
+    # print(f"    condition == True count = {np.sum(condition)}")
+    # print(f"    QCon = {QCon_sum}")
+    # print(f"    PChi = {PChi_sum}")
+    
+    if (month, mode) not in all_sums_plant:
+        all_sums_plant[(month, mode)] = {'QCon': 0, 'PChi': 0}
+    all_sums_plant[(month, mode)]['QCon'] += QCon_sum
+    all_sums_plant[(month, mode)]['PChi'] += PChi_sum
+    
+    COP_mon = safe_cop(QCon_sum,PChi_sum)
+    
+    cop_mon_results_plant.append((month, mode, COP_mon))
+    
+    column_names = ['COP_h']
+    
+    cop_mon_df_plant = pd.DataFrame(cop_mon_results_plant, columns=['month', 'mode'] + column_names)
+    
+    # Convert the 'month' column to abbreviated month names and order it
+    cop_mon_df_plant['month'] = cop_mon_df_plant['month'].dt.strftime('%b')
+    cop_mon_df_plant['month'] = pd.Categorical(cop_mon_df_plant['month'], categories=month_order, ordered=True)
+    
+    # Pivot the DataFrame
+    cop_mon_df_pivot_plant = cop_mon_df_plant.pivot_table(
+        index='month',
+        columns='mode',
+        values=column_names,
+        aggfunc='first'
+    ).swaplevel(axis=1).sort_index(axis=1)
+
+#%% print results
 if PRINT_RESULTS:
     print("COP across all buildings:")
     print(cop_all_df_pivot)
+    
+    print("COP of plant")
+    print(cop_mon_df_pivot_plant)
 
 if WRITE_TO_XLSX:
     cop_all_df_pivot.to_excel(w, sheet_name='All buildings', index=True)
+    cop_mon_df_pivot_plant.to_excel(w, sheet_name='Plant', index=True)
     if WRITE_REMARKS:
         remarks.to_excel(w, sheet_name="remarks", index=False)
     w.close()
