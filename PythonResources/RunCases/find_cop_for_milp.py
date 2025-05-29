@@ -45,8 +45,7 @@ def get_commit_hash():
 if WRITE_REMARKS:
     remarks = pd.DataFrame(np.array([['Model', 'ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs'],
                                      ['Weather scenario', 'fTMY'],
-                                     ['Result file at commit', '343b6a5a47399dbee9441f1aaf96fb83d38b8aa6'],
-                                     ['This file generated at commit', get_commit_hash()]]))
+                                     ['Result file at commit', '418c50b5f58d31d87fa7d35beb31b2f020e8b66e']]))
 
 def safe_cop(QCon, PChi):
     """ Returns nan if PChi == 0.
