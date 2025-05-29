@@ -27,10 +27,9 @@ from GetVariables import get_vars, index_var_list
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-#mat_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.mat")
 mat_file_name = os.path.join(CWD, "simulations", "2025-05-25", "DetailedPlantFiveHubs.mat")
 
-PRINT_RESULTS = False
+PRINT_RESULTS = True
 WRITE_TO_XLSX = True
 PATH_XLSX = os.path.join(CWD, "cop_for_milp.xlsx")
 nBui = 5

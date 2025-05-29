@@ -58,8 +58,6 @@ record GenericDistrict "District network design parameters"
   parameter Modelica.Units.SI.Temperature TLooMax=273.15 + 24
     "Maximum loop temperature";
 
-  parameter Real dp_length_nominal(unit="Pa/m")=250
-    "Pressure drop per pipe length at nominal flow rate";
   parameter Modelica.Units.SI.Length lDis[nBui+1]=fill(100, nBui + 1)
     "Length of distribution pipe, from plant to each building back to plant";
   parameter Modelica.Units.SI.Length lCon[nBui]=fill(10, nBui)
@@ -214,12 +212,65 @@ record GenericDistrict "District network design parameters"
   final parameter Real TLow(unit="K")=TLooMin + dTDisMar
     "Lower bound temperature"
     annotation (Dialog(tab="District pump"));
-  parameter Real dTSlo(unit="K")=2
+  parameter Real dTSlo(unit="K")=1
     "Temperature deadband for changing pump speed"
     annotation (Dialog(tab="District pump"));
-  parameter Real yDisPumMin(unit="1")=0.1
-    "District loop pump minimum speed"
+  parameter Real yDisPumMin(unit="1")=0.2/4
+    "District loop pump minimum speed, 20% minimum speed, and assuming 4 parallel pumps"
     annotation (Dialog(tab="District pump"));
+
+ ////////////////////////////////////////
+ // Distribution pipe sizing.
+ // Added here as records don't allow equation sections
+ final parameter Real dp_length_nominal(final unit="Pa/m") = 125
+   "Design pressure drop per meter pipe";
+
+ function f_dhDis "Function to compute the diameter"
+   input Modelica.Units.SI.Length u "Diameter";
+   input Real dp_length_nominal(final unit="Pa/m") "Nominal pressure difference per m pipe";
+   input Modelica.Units.SI.MassFlowRate m_flow "Mass flow rate";
+   input Modelica.Units.SI.Density rho "Mass density";
+   input Modelica.Units.SI.DynamicViscosity mu "Dynamic viscosity";
+   input Modelica.Units.SI.Length roughness "Roughness";
+   output Real y "Residual";
+ protected
+   constant Modelica.Units.SI.Length lUni = 1 "Unit length for unit check";
+ algorithm
+   y :=dp_length_nominal -
+      Modelica.Fluid.Pipes.BaseClasses.WallFriction.Detailed.pressureLoss_m_flow(
+       m_flow=m_flow,
+       rho_a=rho,
+       rho_b=rho,
+       mu_a=mu,
+       mu_b=mu,
+       length=1,
+       diameter=u,
+       roughness=roughness,
+       m_flow_small=1E4*m_flow)/lUni;
+ end f_dhDis;
+  final parameter Modelica.Units.SI.Length roughness(min=0) = 2.5e-5
+    "Absolute roughness of pipe";
+
+  final parameter Modelica.Units.SI.Velocity vDis_nominal=mPipDis_flow_nominal/(1000*ARound)
+    "Flow velocity in distribution pipe (assuming a round cross section area)";
+  final parameter Modelica.Units.SI.Length dhDis=
+    Modelica.Math.Nonlinear.solveOneNonlinearEquation(
+    function f_dhDis(
+      dp_length_nominal=dp_length_nominal,
+      m_flow=mPipDis_flow_nominal,
+      rho = 1000,
+      mu=8.9e-4,
+      roughness=roughness),
+    0.01,
+    10)
+    "Diameter distribution pipe";
+  parameter Real dhDisSizFac = 1 "Sizing factor to change distribution pipe diameter";
+  final parameter Modelica.Units.SI.Length dhDisAct = dhDisSizFac * dhDis
+    "Diameter distribution pipe";
+
+  final parameter Modelica.Units.SI.Area ARound=dhDisAct^2*Modelica.Constants.pi/4
+    "Cross sectional area (assuming a round cross section area)";
+
   annotation (
     defaultComponentName="datDis",
     defaultComponentPrefixes="inner",

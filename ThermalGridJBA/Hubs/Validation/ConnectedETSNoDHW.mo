@@ -115,7 +115,7 @@ equation
     __Dymola_Commands(
       file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Hubs/Validation/ConnectedETSNoDHW.mos" "Simulate and plot"),
     experiment(
-      StartTime=7776000,
+      StartTime=0,
       StopTime=8640000,
       Tolerance=1e-06),
     Documentation(info="<html>
