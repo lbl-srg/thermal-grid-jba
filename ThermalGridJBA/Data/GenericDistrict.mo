@@ -248,7 +248,7 @@ record GenericDistrict "District network design parameters"
        roughness=roughness,
        m_flow_small=1E4*m_flow)/lUni;
  end f_dhDis;
-  final parameter Modelica.Units.SI.Length roughness(min=0) = 2.5e-5
+  final parameter Modelica.Units.SI.Length roughness(min=0) = 1.5e-6
     "Absolute roughness of pipe";
 
   final parameter Modelica.Units.SI.Velocity vDis_nominal=mPipDis_flow_nominal/(1000*ARound)
