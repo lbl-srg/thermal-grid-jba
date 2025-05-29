@@ -25,11 +25,26 @@ nBui = 5 # Ensure this is consistent with the mat file
 _i = r'%%i%%' # placeholder string to be replaced with index
 J_to_kWh = 2.7777777777777776e-07
 
-def integrate_result(df, var, option = None):
+def integrate_with_condition(df, var, sign = None, condition = None):
     """ Integrates df[var] along df['Time']
-        option = [None, 'positive', 'negative']
-          to only integrate positive or negative values
+        `sign` can be the following (case insensitive):
+            'positive' - Only integrates positive values of u,
+                           zero crossing points are found linearly and inserted
+                           to the series.
+            'negative' - Similar to above but negative.
+        `condition` is a Boolean array.
+            Only integrates u where condition is True,
+            when `condition` flips from True at t1 to False at t2,
+              a point (t2, 0) is inserted after (t2, u2) to create a step down;
+            when `condition` flips from False at t3 to True at t4,
+              a point (t4, 0) is inserted before (t4, u4) to create a step up;
+            set u = 0 for all points between t2 and t3.
+                           
     """
+    
+    u = np.array(df[var])
+    t = np.array(df['Time'])
+    
     def find_zero_crossings(t, u):
         """ Find indices where the sign of u changes
         """
@@ -54,10 +69,7 @@ def integrate_result(df, var, option = None):
     
         return zero_crossing_times, zero_crossing_values
     
-    t = np.array(df['Time'])
-    u = np.array(df[var])
-    
-    if option in ['positive', 'negative']:
+    if sign in ['positive', 'negative']:
         t_crossing, u_crossing = find_zero_crossings(t, u)
         # Insert zero crossings into the original time series
         for t_zero, u_zero in zip(t_crossing, u_crossing):
@@ -65,11 +77,45 @@ def integrate_result(df, var, option = None):
             t = np.insert(t, idx, t_zero)
             u = np.insert(u, idx, u_zero)
         
-        if option == 'positive':
+        if sign == 'positive':
             u[u<0] = 0
-        if option == 'negative':
+        if sign == 'negative':
             u[u>0] = 0
-
+    
+    if not condition is None:
+        
+        _t = []
+        _u = []
+        i = 0
+        while i < len(t):
+            _t.append(t[i])
+            
+            if i < len(t) - 1 and (condition[i] and not condition[i + 1]):
+                # creates a step down at True to False
+                _t.append(t[i+1])
+                _u.append(u[i])
+                _u.append(0.)
+            
+            elif i < len(t) - 1 and (not condition[i] and condition[i + 1]):
+                # creates a step up at False to True
+                _t.append(t[i+1])
+                _u.append(0.)
+                _u.append(u[i+1])
+            
+            else:
+                if condition[i]:
+                    _u.append(u[i])
+                else:
+                    _u.append(0.)
+            
+            i += 1
+            
+        t = _t
+        u = _u
+        
+        print(f'  t = {t}')
+        print(f'  u = {u}')
+        
     I = trapz(u, t)
     return I
 
@@ -145,36 +191,43 @@ for sea in range(5):
         results_sliced = results[results['cenPla.gen.ind.ySea'] == sea]
     
     data_dict = data_dicts[sea]
+    t = np.array(results_sliced['Time'])
     
     # each building
     for i in range(1,nBui+1):
         data_dict[("Electricity import", "ETS chiller", "electricity")] += \
-            abs(integrate_result(results_sliced, f'bui[{i}].ets.PCoo'))
+            abs(integrate_with_condition(results_sliced, f'bui[{i}].ets.PCoo'))
         data_dict[("Reservoir loop", "ETS chiller", "ETS cooling rejection")] += \
-            abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'positive'))
+            abs(integrate_with_condition(results_sliced, f'QEtsHex_flow.u[{i}]',
+                                         sign = 'positive'))
         data_dict[("Reservoir loop", "ETS chiller", "ETS heat rejection")] += \
-            abs(integrate_result(results_sliced, f'QEtsHex_flow.u[{i}]', 'negative'))
+            abs(integrate_with_condition(results_sliced, f'QEtsHex_flow.u[{i}]',
+                                         sign = 'negative'))
         data_dict[("ETS chiller", "Cooling load", "cooling load")] += \
-            abs(integrate_result(results_sliced, f'bui[{i}].dHChiWat_flow'))
+            abs(integrate_with_condition(results_sliced, f'bui[{i}].dHChiWat_flow'))
         data_dict[("ETS chiller", "Heating load", "space heating load")] += \
-            abs(integrate_result(results_sliced, f'bui[{i}].dHHeaWat_flow'))
+            abs(integrate_with_condition(results_sliced, f'bui[{i}].dHHeaWat_flow'))
         if i != 1: # bui[1] doesn't have dhw
             data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
-                abs(integrate_result(results_sliced, f'bui[{i}].dHHotWat_flow'))
+                abs(integrate_with_condition(results_sliced, f'bui[{i}].dHHotWat_flow'))
     
     # ground
     for i in range(1,nBui+2):
         data_dict[("Reservoir loop", "Ground", "ground anergy")] += \
-            abs(integrate_result(results_sliced, f'dis.heatPorts[{i}].Q_flow','negative'))
+            abs(integrate_with_condition(results_sliced, f'dis.heatPorts[{i}].Q_flow',
+                                         sign = 'negative'))
         data_dict[("Ground", "Reservoir loop", "ground anergy")] += \
-            abs(integrate_result(results_sliced, f'dis.heatPorts[{i}].Q_flow','positive'))
+            abs(integrate_with_condition(results_sliced, f'dis.heatPorts[{i}].Q_flow',
+                                         sign = 'positive'))
     
     # Central plant
     # economiser
     data_dict[("Dry cooler", "Economizer", "plant heat rejection")] = \
-        abs(integrate_result(results_sliced, 'cenPla.gen.hex.Q1_flow', 'negative'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.gen.hex.Q1_flow',
+                                     sign = 'negative'))
     data_dict[("Dry cooler", "Economizer", "plant cooling rejection")] = \
-        abs(integrate_result(results_sliced, 'cenPla.gen.hex.Q1_flow', 'positive'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.gen.hex.Q1_flow',
+                                     sign = 'positive'))
     data_dict[("Economizer", "Reservoir loop", "plant heating")] = \
         data_dict[("Dry cooler", "Economizer", "plant cooling rejection")]
     data_dict[("Economizer", "Reservoir loop", "plant cooling")] = \
@@ -182,25 +235,33 @@ for sea in range(5):
     
     # central chiller
     data_dict[("Electricity import", "Central chiller", "electricity")] = \
-        abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.P'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.gen.heaPum.P'))
     data_dict[("Dry cooler", "Central chiller", "plant cooling rejection")] =\
-        abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QEva_flow', 'negative'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.gen.heaPum.QEva_flow',
+                                     sign = 'negative'))
     data_dict[("Dry cooler", "Central chiller", "plant heat rejection")] =\
-        abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QEva_flow', 'positive'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.gen.heaPum.QEva_flow',
+                                     sign = 'positive'))
     data_dict[("Central chiller", "Reservoir loop", "plant heating")] =\
-        abs(integrate_result(results_sliced, 'cenPla.gen.heaPum.QCon_flow', 'positive'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.gen.heaPum.QCon_flow',
+                                     sign = 'positive'))
     data_dict[("Central chiller", "Reservoir loop", "plant cooling")] =\
-        abs(integrate_result(results_sliced,'cenPla.gen.heaPum.QCon_flow', 'negative'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.gen.heaPum.QCon_flow',
+                                     sign = 'negative'))
     
     # borefield
     data_dict[("Borefield center", "Reservoir loop", "borefield center anergy")] =\
-        abs(integrate_result(results_sliced,'cenPla.QBorCen_flow', 'positive'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.QBorCen_flow',
+                                     sign = 'positive'))
     data_dict[("Reservoir loop", "Borefield center", "borefield center anergy")] =\
-        abs(integrate_result(results_sliced,'cenPla.QBorCen_flow', 'negative'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.QBorCen_flow',
+                                     sign = 'negative'))
     data_dict[("Borefield perimeter", "Reservoir loop", "borefield perimeter anergy")] =\
-        abs(integrate_result(results_sliced,'cenPla.QBorPer_flow', 'positive'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.QBorPer_flow',
+                                     sign = 'positive'))
     data_dict[("Reservoir loop", "Borefield perimeter", "borefield perimeter anergy")] =\
-        abs(integrate_result(results_sliced,'cenPla.QBorPer_flow', 'negative'))
+        abs(integrate_with_condition(results_sliced, 'cenPla.QBorPer_flow',
+                                     sign = 'negative'))
 
 #%% make sankey diagram
 
