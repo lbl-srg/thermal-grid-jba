@@ -103,7 +103,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each u_min(
       final unit="K",
       each displayUnit="degC"),
-    delayTime(each displayUnit="min") = 300)
+    each delayTime(each displayUnit="min") = 300)
     "Requirement for heat pump evaporator leaving water temperature"
     annotation (Placement(transformation(extent={{620,40},{640,60}})));
   Buildings_Requirements.GreaterEqual reqTHeaPumConLvg[nBui](
@@ -116,7 +116,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each u_min(
       final unit="K",
       each displayUnit="degC"),
-    delayTime(each displayUnit="min") = 300)
+    each delayTime(each displayUnit="min") = 300)
     "Requirement for heat pump condenser leaving water temperature"
     annotation (Placement(transformation(extent={{620,-40},{640,-20}})));
   Buildings_Requirements.WithinBand reqTWatSer[nBui](
@@ -139,12 +139,14 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Sources.RealExpression THeaPumCon[nBui](y=bui.ets.chi.senTConLvg.T)
     "Heat pump condenser leaving water temperature "
     annotation (Placement(transformation(extent={{540,-38},{560,-18}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold valEvaOpen[nBui](t=0.1,
-      each h=0.1)
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold valEvaOpen[nBui](
+    each t=0.1,
+    each h=0.1/2)
     "Evaporator to ambient loop isolation valve open"
     annotation (Placement(transformation(extent={{580,10},{600,30}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold valConOpen[nBui](t=0.1,
-      each h=0.1) "Condenser to ambient loop isolation valve open"
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold valConOpen[nBui](
+    each t=0.1,
+    each h=0.1/2) "Condenser to ambient loop isolation valve open"
     annotation (Placement(transformation(extent={{580,-70},{600,-50}})));
   Modelica.Blocks.Sources.RealExpression valIsoEvaPos[nBui](y=bui.ets.valIsoEva.y_actual)
     "Evaporator to ambient loop isolation valve position"
