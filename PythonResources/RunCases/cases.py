@@ -55,31 +55,27 @@ def get_cases():
 
         case = {
             'name': 'heat',
-            'parameters': {
-                'datDis.filNamInd' : [
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_heat.mos"],
-                         'datDis.filNamCom' :
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos"}
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.HeatWave'
         }
         _add(case, cases)
 
         case = {
             'name': 'cold',
-            'parameters': {
-                'datDis.filNamInd' : [
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"],
-                         'datDis.filNamCom' :
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos"}
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.ColdSnap'
         }
         _add(case, cases)
+
+        # case = {
+        #     'name': 'pree',
+        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.Baseline'
+        # }
+        # _add(case, cases)
+
+        # case = {
+        #     'name': 'post',
+        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM'
+        # }
+        # _add(case, cases)
 
         return cases
 
