@@ -154,21 +154,14 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Sources.RealExpression THeaPumCon[nBui](y=bui.ets.chi.senTConLvg.T)
     "Heat pump condenser leaving water temperature "
     annotation (Placement(transformation(extent={{540,-38},{560,-18}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold valEvaOpen[nBui](
-    each t=0.1,
-    each h=0.1/2)
-    "Evaporator to ambient loop isolation valve open"
+  Modelica.Blocks.Sources.BooleanExpression valIsoEvaCom[nBui](
+    y=bui.ets.conSup.conCol.truFalHol.y)
+    "Evaporator to ambient loop isolation valve command"
     annotation (Placement(transformation(extent={{580,10},{600,30}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold valConOpen[nBui](
-    each t=0.1,
-    each h=0.1/2) "Condenser to ambient loop isolation valve open"
-    annotation (Placement(transformation(extent={{580,-70},{600,-50}})));
-  Modelica.Blocks.Sources.RealExpression valIsoEvaPos[nBui](y=bui.ets.valIsoEva.y_actual)
-    "Evaporator to ambient loop isolation valve position"
-    annotation (Placement(transformation(extent={{540,10},{560,30}})));
-  Modelica.Blocks.Sources.RealExpression valIsoConPos[nBui](y=bui.ets.valIsoCon.y_actual)
-    "Condenser to ambient loop isolation valve position"
-    annotation (Placement(transformation(extent={{540,-70},{560,-50}})));
+  Modelica.Blocks.Sources.BooleanExpression valIsoConCom[nBui](
+    y=bui.ets.conSup.conHot.truFalHol.y)
+    "Condenser to ambient loop isolation valve command"
+    annotation (Placement(transformation(extent={{580,-50},{600,-30}})));
   Modelica.Blocks.Sources.Constant TMaxHeaPumConLvg[nBui](each k=31 + 273.15)
     "Maximum heat pump condenser leaving water temperature"
     annotation (Placement(transformation(extent={{580,-20},{600,0}})));
@@ -469,14 +462,6 @@ equation
 
   connect(TDhwSup.y, reqTDhwSup.u)
     annotation (Line(points={{601,354},{619,354}}, color={0,0,127}));
-  connect(valEvaOpen.y,reqTHeaPumEvaLvg. active) annotation (Line(points={{602,20},
-          {610,20},{610,46},{618,46}},color={255,0,255}));
-  connect(valConOpen.y,reqTHeaPumConLvg. active) annotation (Line(points={{602,-60},
-          {612,-60},{612,-34},{618,-34}}, color={255,0,255}));
-  connect(valIsoConPos.y,valConOpen. u)
-    annotation (Line(points={{561,-60},{578,-60}},   color={0,0,127}));
-  connect(valIsoEvaPos.y,valEvaOpen. u)
-    annotation (Line(points={{561,20},{578,20}},   color={0,0,127}));
   connect(THeaPumEvaLvg.y,reqTHeaPumEvaLvg. u_max) annotation (Line(points={{601,70},
           {610,70},{610,56},{619,56}},     color={0,0,127}));
   connect(TMaxHeaPumConLvg.y,reqTHeaPumConLvg. u_max) annotation (Line(points={{601,-10},
@@ -617,6 +602,10 @@ equation
           610,290},{610,306},{618,306}}, color={255,0,255}));
   connect(HeaPumCooOn.y, reqTCoo.active) annotation (Line(points={{561,230},{
           610,230},{610,246},{618,246}}, color={255,0,255}));
+  connect(reqTHeaPumConLvg.active, valIsoConCom.y) annotation (Line(points={{
+          618,-34},{610,-34},{610,-40},{601,-40}}, color={255,0,255}));
+  connect(valIsoEvaCom.y, reqTHeaPumEvaLvg.active) annotation (Line(points={{
+          601,20},{610,20},{610,46},{618,46}}, color={255,0,255}));
   annotation (Diagram(coordinateSystem(extent={{-400,-580},{680,580}})), Icon(
         coordinateSystem(extent={{-100,-100},{100,100}})));
 end DetailedPlantFiveHubsWithRequirementsVerification;
