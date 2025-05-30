@@ -40,28 +40,34 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each text="O-301: The domestic hot water supply temperature must be 45°C ± 1 K.",
     each delayTime=30,
     each u_max(
-      each unit="K",
-      each displayUnit="degC") = 319.15,
+      final unit="K",
+      displayUnit="degC") = 319.15,
     each u_min(
-      each unit="K",
-      each displayUnit="degC") = 317.15,
-    each u(each unit="K", each displayUnit="K"),
-    each witBan(u(each unit="K", each displayUnit="K")))
+      final unit="K",
+      displayUnit="degC") = 317.15,
+    each u(
+      final unit="K",
+      displayUnit="K"),
+    each witBan(u(
+      final unit="K",
+      displayUnit="K")))
     "Requirement for domestic hot water supply temperature"
     annotation (Placement(transformation(extent={{620,340},{640,360}})));
   Buildings_Requirements.WithinBand reqTDhwTan[nBui](
     each name="DHW",
     each text="O-302: The heating water temperature that serves the domestic hot water tank must be 50°C ± 1 K once the tank charging is on for 5 minutes.",
     each use_activeInput=true,
-    each delayTime(each displayUnit="min") = 300,
+    each delayTime(displayUnit="min") = 300,
     each u_max(
-      each unit="K",
-      each displayUnit="degC") = 324.15,
+      final unit="K",
+      displayUnit="degC") = 324.15,
     each u_min(
-      each unit="K",
-      each displayUnit="degC") = 322.15,
-    each u(each unit="K", each displayUnit="K"),
-    each witBan(u(each unit="K")))
+      final unit="K",
+      displayUnit="degC") = 322.15,
+    each u(
+      final unit="K",
+      displayUnit="K"),
+    each witBan(u(final unit="K")))
     "Requirement for the heating water temperature that serves the domestic hot water tank"
     annotation (Placement(transformation(extent={{620,180},{640,200}})));
   Modelica.Blocks.Sources.RealExpression TTanTop[nBui](y={50 + 273.15,bui[2].ets.dhw.domHotWatTan.TTanTop.T,
@@ -82,11 +88,13 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each delayTime(each displayUnit="min") = 300,
     each u_max(
       final unit="K",
-      each displayUnit="degC") = 301.15,
+      displayUnit="degC") = 301.15,
     each u_min(
       final unit="K",
-      each displayUnit="degC") = 279.65,
-    each u(final unit="K", each displayUnit="K"),
+      displayUnit="degC") = 279.65,
+    each u(
+      final unit="K",
+      displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for  leaving water temperature on the primary side of the heat exchanger in the ETS "
     annotation (Placement(transformation(extent={{620,100},{640,120}})));
@@ -99,11 +107,11 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each use_activeInput=true,
     each u_max(
       final unit="K",
-      each displayUnit="degC"),
+      displayUnit="degC"),
     each u_min(
       final unit="K",
-      each displayUnit="degC"),
-    each delayTime(each displayUnit="min") = 300)
+      displayUnit="degC"),
+    each delayTime(displayUnit="min") = 300)
     "Requirement for heat pump evaporator leaving water temperature"
     annotation (Placement(transformation(extent={{620,40},{640,60}})));
   Buildings_Requirements.GreaterEqual reqTHeaPumConLvg[nBui](
@@ -112,11 +120,11 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each use_activeInput=true,
     each u_max(
       final unit="K",
-      each displayUnit="degC"),
+      displayUnit="degC"),
     each u_min(
       final unit="K",
-      each displayUnit="degC"),
-    each delayTime(each displayUnit="min") = 300)
+      displayUnit="degC"),
+    each delayTime(displayUnit="min") = 300)
     "Requirement for heat pump condenser leaving water temperature"
     annotation (Placement(transformation(extent={{620,-40},{640,-20}})));
   Buildings_Requirements.WithinBand reqTWatSer[nBui](
@@ -125,11 +133,13 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each delayTime(each displayUnit="min") = 300,
     each u_max(
       final unit="K",
-      each displayUnit="degC") = 297.15,
+      displayUnit="degC") = 297.15,
     each u_min(
       final unit="K",
-      each displayUnit="degC") = 283.65,
-    each u(final unit="K", each displayUnit="K"),
+      displayUnit="degC") = 283.65,
+    each u(
+      final unit="K",
+      displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for water temperature serving each service line"
     annotation (Placement(transformation(extent={{620,-460},{640,-440}})));
@@ -163,14 +173,16 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Buildings_Requirements.WithinBand reqTPlaMix(
     each name="Central plant",
     each text="O-503: The mixing water temperature in the district loop after the central plant must be between 10.5°C and 24°C.",
-    each delayTime(each displayUnit="min") = 300,
+    each delayTime(displayUnit="min") = 300,
     each u_max(
       final unit="K",
-      each displayUnit="degC") = 297.15,
+      displayUnit="degC") = 297.15,
     each u_min(
       final unit="K",
-      each displayUnit="degC") = 283.65,
-    each u(final unit="K", each displayUnit="K"),
+      displayUnit="degC") = 283.65,
+    each u(
+      final unit="K",
+      displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for mixing water temperature in the district loop after the central plant"
     annotation (Placement(transformation(extent={{620,-580},{640,-560}})));
@@ -200,7 +212,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
        = fracPL)
     "Pressure drop per meter of pipe for each pipe of the district loop"
     annotation (Placement(transformation(extent={{580,-540},{600,-520}})));
-  Modelica.Blocks.Sources.Constant RMaxDisLoo[nBui + 1](each k(each unit="Pa/m")
+  Modelica.Blocks.Sources.Constant RMaxDisLoo[nBui + 1](each k(unit="Pa/m")
        = 125) "Maximum pressure drop per meter of pipe of the district loop"
     annotation (Placement(transformation(extent={{580,-500},{600,-480}})));
   Buildings_Requirements.WithinBand reqTHea[nBui](
@@ -211,11 +223,13 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each delayTime(each displayUnit="min") = 300,
     each u_max(
       final unit="K",
-      each displayUnit="K") = 1,
+      displayUnit="K") = 1,
     each u_min(
       final unit="K",
-      each displayUnit="K") = -1,
-    each u(final unit="K", each displayUnit="K"),
+      displayUnit="K") = -1,
+    each u(
+      final unit="K",
+      displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for tracking the space heating water supply temperature"
     annotation (Placement(transformation(extent={{620,300},{640,320}})));
@@ -227,11 +241,13 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each delayTime(each displayUnit="min") = 300,
     each u_max(
       final unit="K",
-      each displayUnit="K") = 1,
+      displayUnit="K") = 1,
     each u_min(
       final unit="K",
-      each displayUnit="K") = -1,
-    each u(final unit="K", each displayUnit="K"),
+      displayUnit="K") = -1,
+    each u(
+      final unit="K",
+      displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for tracking the space cooling water supply temperature"
     annotation (Placement(transformation(extent={{620,240},{640,260}})));
@@ -254,7 +270,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     "Space cooling water supply temperature set point"
     annotation (Placement(transformation(extent={{540,244},{560,264}})));
   Buildings.Controls.OBC.CDL.Reals.MovingAverage dTRooHeaAvg60min[nBui](each
-      delta(each displayUnit="min") = 3600)
+      delta(displayUnit="min") = 3600)
     "Room temperature difference for heating over 60 minutes"
     annotation (Placement(transformation(extent={{580,-140},{600,-120}})));
   Modelica.Blocks.Sources.RealExpression TRooHea[nBui](y=bui.bui.terUniHea.TLoaODE.TAir)
@@ -279,7 +295,9 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each u_min(
       final unit="K",
       displayUnit="degC") = 282.65,
-    each u(final unit="K", each displayUnit="K"),
+    each u(
+      final unit="K",
+      displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for leaving water temperature on the secondary side of the heat exchanger in the ETS "
     annotation (Placement(transformation(extent={{620,140},{640,160}})));
@@ -294,7 +312,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
       final unit="K"),
     each u_min(
       final unit="K"),
-    each delayTime(each displayUnit="min") = 3600)
+    each delayTime(displayUnit="min") = 3600)
     "Requirement for the room temperature for heating"
     annotation (Placement(transformation(extent={{620,-140},{640,-120}})));
   Modelica.Blocks.Sources.Constant dTMaxRooHea60min[nBui](each k=0.5)
@@ -308,14 +326,14 @@ model DetailedPlantFiveHubsWithRequirementsVerification
       final unit="K"),
     each u_min(
       final unit="K"),
-    each delayTime(each displayUnit="s") = 0)
+    each delayTime(displayUnit="s") = 0)
     "Requirement for the room temperature for heating (yearly average)"
     annotation (Placement(transformation(extent={{620,-200},{640,-180}})));
   Modelica.Blocks.Sources.Constant dTMaxRooHeaYea[nBui](each k=0.05)
     "Maximum room temperature difference for heating over the all simulation"
     annotation (Placement(transformation(extent={{580,-180},{600,-160}})));
   Buildings.Controls.OBC.CDL.Reals.MovingAverage dTRooCooAvg60min[nBui](each
-      delta(each displayUnit="min") = 3600)
+      delta(displayUnit="min") = 3600)
     "Room temperature difference for cooling over 60 minutes"
     annotation (Placement(transformation(extent={{580,-320},{600,-300}})));
   Modelica.Blocks.Sources.RealExpression TRooCoo[nBui](y=bui.bui.terUniCoo.TLoaODE.TAir)
@@ -352,7 +370,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
       final unit="K"),
     each u_min(
       final unit="K"),
-    each delayTime(each displayUnit="s") = 0)
+    each delayTime(displayUnit="s") = 0)
     "Requirement for the room temperature for cooling (yearly average)"
     annotation (Placement(transformation(extent={{620,-372},{640,-352}})));
   Modelica.Blocks.Sources.Constant dTMaxRooCooYea[nBui](each k=0.05)
@@ -590,5 +608,5 @@ equation
   connect(HeaPumCooOn.y, reqTCoo.active) annotation (Line(points={{561,230},{
           610,230},{610,246},{618,246}}, color={255,0,255}));
   annotation (Diagram(coordinateSystem(extent={{-400,-580},{680,580}})), Icon(
-        coordinateSystem(extent={{-400,-580},{680,580}})));
+        coordinateSystem(extent={{-100,-100},{100,100}})));
 end DetailedPlantFiveHubsWithRequirementsVerification;
