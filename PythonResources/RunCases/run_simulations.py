@@ -7,7 +7,7 @@ import os
 BRANCH="HPSizeParametricStudies"
 SHOW_DYMOLA_GUI = True
 KEEP_DYMOLA_OPEN = False
-FROM_GIT_HUB = True
+FROM_GIT_HUB = False
 
 CHECK_LOG_FILES = 'failed'
 """ Case insensitive:
