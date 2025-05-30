@@ -21,63 +21,95 @@ def get_cases():
         }
         _add(case, cases)
 
+        # case = {
+        #     'name': "base_hBor_1.2",
+        #     'parameters': {
+        #         'cenPla.borFie.hBor': 91*1.2,
+        #     }
+        # }
+        # _add(case, cases)
+
+        # case = {
+        #     'name': "base_hBor_0.8",
+        #     'parameters': {
+        #         'cenPla.borFie.hBor': 91*0.8
+        #     }
+        # }
+        # _add(case, cases)
+
+        # case = {
+        #     'name': "base_dDis_1.2",
+        #     'parameters': {
+        #         'datDis.dhDisSizFac': 1.2
+        #     }
+        # }
+        # _add(case, cases)
+
+        # case = {
+        #     'name': "base_dDis_0.8",
+        #     'parameters': {
+        #         'datDis.dhDisSizFac': 0.8
+        #     }
+        # }
+        # _add(case, cases)
+
+        # case = {
+        #     'name': 'heat',
+        #     'parameters': {
+        #         'datDis.filNamInd' : [
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_heat.mos",
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_heat.mos",
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_heat.mos",
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_heat.mos",
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_heat.mos"],
+        #                  'datDis.filNamCom' :
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos"}
+        # }
+        # _add(case, cases)
+
+        # case = {
+        #     'name': 'cold',
+        #     'parameters': {
+        #         'datDis.filNamInd' : [
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_cold.mos",
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_cold.mos",
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_cold.mos",
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_cold.mos",
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"],
+        #                  'datDis.filNamCom' :
+        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos"}
+        # }
+        # _add(case, cases)
+
         case = {
-            'name': "base_hBor_1.2",
+            'name': "base_heaPumSizFac_1.05",
             'parameters': {
-                'cenPla.borFie.hBor': 91*1.2,
+                'datDis.heaPumSizFac': 1.05
             }
         }
         _add(case, cases)
 
         case = {
-            'name': "base_hBor_0.8",
+            'name': "base_heaPumSizFac_1.1",
             'parameters': {
-                'cenPla.borFie.hBor': 91*0.8
+                'datDis.heaPumSizFac': 1.1
             }
         }
         _add(case, cases)
 
         case = {
-            'name': "base_dDis_1.2",
+            'name': "base_heaPumSizFac_1.15",
             'parameters': {
-                'datDis.dhDisSizFac': 1.2
+                'datDis.heaPumSizFac': 1.15
             }
         }
         _add(case, cases)
 
         case = {
-            'name': "base_dDis_0.8",
+            'name': "base_heaPumSizFac_1.2",
             'parameters': {
-                'datDis.dhDisSizFac': 0.8
+                'datDis.heaPumSizFac': 1.2
             }
-        }
-        _add(case, cases)
-
-        case = {
-            'name': 'heat',
-            'parameters': {
-                'datDis.filNamInd' : [
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_heat.mos"],
-                         'datDis.filNamCom' :
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos"}
-        }
-        _add(case, cases)
-
-        case = {
-            'name': 'cold',
-            'parameters': {
-                'datDis.filNamInd' : [
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"],
-                         'datDis.filNamCom' :
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos"}
         }
         _add(case, cases)
 
