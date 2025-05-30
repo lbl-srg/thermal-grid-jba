@@ -30,9 +30,14 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     bui[4].ets.dhw.domHotWatTan.divVal.y_actual,
     bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
  "Valves actuator values for the control valves of each ETS (heat exchanger, condenser loop of the chiller, evaporator loop of the chiller, domestichot water when present)";
-  Modelica.Blocks.Sources.RealExpression TDhwSup[nBui](y={45 + 273.15,bui[2].ets.dhw.domHotWatTan.senTemHot.T,
-        bui[3].ets.dhw.domHotWatTan.senTemHot.T,bui[4].ets.dhw.domHotWatTan.senTemHot.T,
-        bui[5].ets.dhw.domHotWatTan.senTemHot.T})
+  Modelica.Blocks.Sources.RealExpression TDhwSup[nBui](
+    y=if time < tStart + 3600 then
+       datBuiSet.THotWatSupFix_nominal*ones(nBui) else
+       { datBuiSet.THotWatSupFix_nominal,
+         bui[2].ets.dhw.theMixVal.senTMix.T,
+         bui[3].ets.dhw.theMixVal.senTMix.T,
+         bui[4].ets.dhw.theMixVal.senTMix.T,
+         bui[5].ets.dhw.theMixVal.senTMix.T})
     "Domestic hot water supply temperature for each hub, except hub[1] that does not provide domestic hot water."
     annotation (Placement(transformation(extent={{580,344},{600,364}})));
   Buildings_Requirements.WithinBand reqTDhwSup[nBui](
@@ -455,6 +460,11 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Sources.BooleanExpression HeaPumCooOn[nBui](y=bui.ets.conSup.yCoo)
     "ETS Heat pump cooling signal on in each hub"
     annotation (Placement(transformation(extent={{540,220},{560,240}})));
+protected
+  parameter Modelica.Units.SI.Time tStart(fixed=false)
+    "Start of the simulation";
+initial equation
+  tStart = time;
 equation
 
   connect(TDhwSup.y, reqTDhwSup.u)
