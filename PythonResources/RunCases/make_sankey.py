@@ -17,7 +17,7 @@ from GetVariables import get_vars, index_var_list, integrate_with_condition
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-mat_file_name = os.path.join(CWD, "simulations", "2025-05-19", "DetailedPlantFiveHubs.mat")
+mat_file_name = os.path.join(CWD, "simulations", "2025-05-25", "DetailedPlantFiveHubs.mat")
 
 nBui = 5 # Ensure this is consistent with the mat file
 _i = r'%%i%%' # placeholder string to be replaced with index
@@ -70,10 +70,10 @@ data_dicts = [
     ("Dry cooler", "Central chiller", "plant cooling rejection") : 0,
     ("Dry cooler", "Economizer", "plant heat rejection") : 0,
     ("Dry cooler", "Economizer", "plant cooling rejection") : 0,
-    ("Central chiller", "Reservoir loop", "plant heating") : 0,
     ("Central chiller", "Reservoir loop", "plant cooling") : 0,
-    ("Reservoir loop", "ETS chiller", "ETS cooling rejection") : 0,
+    ("Central chiller", "Reservoir loop", "plant heating") : 0,
     ("Reservoir loop", "ETS chiller", "ETS heat rejection") : 0,
+    ("Reservoir loop", "ETS chiller", "ETS cooling rejection") : 0,
     ("ETS chiller", "Cooling load", "cooling load") : 0,
     ("ETS chiller", "Heating load", "space heating load") : 0,
     ("ETS chiller", "DHW load", "domestic hot water") : 0,
@@ -89,6 +89,7 @@ data_dicts = [
     for _ in range(5)]
 
 for sea in range(5):
+# for sea in range(1):
     if sea == 0:
         condition = None
     else:
@@ -272,8 +273,7 @@ for idx, data_dict in enumerate(data_dicts):
         )
     )])
     
-    fig.update_layout(font_size=30,
-                      font=dict(size = 20))
+    fig.update_layout(font=dict(size = 30))
     fig.show()
 
 #%% validation
