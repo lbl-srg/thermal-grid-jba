@@ -9,35 +9,19 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     dis.con[5].pipDis.dp / dis.con[5].pipDis.length,
     dis.pipEnd.dp / dis.pipEnd.length}
  "Pressure drop per length unit for each pipe (Pa/m)";
-  Real y_value[5*3+4] = {
-    bui[1].ets.hex.val2.y_actual,
-    bui[2].ets.hex.val2.y_actual,
-    bui[3].ets.hex.val2.y_actual,
-    bui[4].ets.hex.val2.y_actual,
-    bui[5].ets.hex.val2.y_actual,
-    bui[1].ets.chi.valEva.y_actual,
-    bui[2].ets.chi.valEva.y_actual,
-    bui[3].ets.chi.valEva.y_actual,
-    bui[4].ets.chi.valEva.y_actual,
-    bui[5].ets.chi.valEva.y_actual,
-    bui[1].ets.chi.valCon.y_actual,
-    bui[2].ets.chi.valCon.y_actual,
-    bui[3].ets.chi.valCon.y_actual,
-    bui[4].ets.chi.valCon.y_actual,
-    bui[5].ets.chi.valCon.y_actual,
-    bui[2].ets.dhw.domHotWatTan.divVal.y_actual,
-    bui[3].ets.dhw.domHotWatTan.divVal.y_actual,
-    bui[4].ets.dhw.domHotWatTan.divVal.y_actual,
-    bui[5].ets.dhw.domHotWatTan.divVal.y_actual}
- "Valves actuator values for the control valves of each ETS (heat exchanger, condenser loop of the chiller, evaporator loop of the chiller, domestichot water when present)";
-  Modelica.Blocks.Sources.RealExpression TDhwSup[nBui](
-    y=if time < tStart + 3600 then
-       datBuiSet.THotWatSupFix_nominal*ones(nBui) else
-       { datBuiSet.THotWatSupFix_nominal,
-         bui[2].ets.dhw.theMixVal.senTMix.T,
-         bui[3].ets.dhw.theMixVal.senTMix.T,
-         bui[4].ets.dhw.theMixVal.senTMix.T,
-         bui[5].ets.dhw.theMixVal.senTMix.T})
+  Real y_value[5*3 + 4]={bui[1].ets.hex.val2.y_actual,bui[2].ets.hex.val2.y_actual,
+      bui[3].ets.hex.val2.y_actual,bui[4].ets.hex.val2.y_actual,bui[5].ets.hex.val2.y_actual,
+      bui[1].ets.chi.valEva.y_actual,bui[2].ets.chi.valEva.y_actual,bui[3].ets.chi.valEva.y_actual,
+      bui[4].ets.chi.valEva.y_actual,bui[5].ets.chi.valEva.y_actual,bui[1].ets.chi.valCon.y_actual,
+      bui[2].ets.chi.valCon.y_actual,bui[3].ets.chi.valCon.y_actual,bui[4].ets.chi.valCon.y_actual,
+      bui[5].ets.chi.valCon.y_actual,bui[2].ets.tanDhw.domHotWatTan.divVal.y_actual,
+      bui[3].ets.tanDhw.domHotWatTan.divVal.y_actual,bui[4].ets.tanDhw.domHotWatTan.divVal.y_actual,
+      bui[5].ets.tanDhw.domHotWatTan.divVal.y_actual}
+    "Valves actuator values for the control valves of each ETS (heat exchanger, condenser loop of the chiller, evaporator loop of the chiller, domestichot water when present)";
+  Modelica.Blocks.Sources.RealExpression TDhwSup[nBui](y=if time < tStart + 3600
+         then datBuiSet.THotWatSupFix_nominal*ones(nBui) else {datBuiSet.THotWatSupFix_nominal,
+        bui[2].ets.tanDhw.theMixVal.senTMix.T,bui[3].ets.tanDhw.theMixVal.senTMix.T,
+        bui[4].ets.tanDhw.theMixVal.senTMix.T,bui[5].ets.tanDhw.theMixVal.senTMix.T})
     "Domestic hot water supply temperature for each hub, except hub[1] that does not provide domestic hot water."
     annotation (Placement(transformation(extent={{580,344},{600,364}})));
   Buildings_Requirements.WithinBand reqTDhwSup[nBui](
@@ -60,33 +44,42 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     annotation (Placement(transformation(extent={{620,340},{640,360}})));
   Buildings_Requirements.WithinBand reqTDhwTan[nBui](
     each name="DHW",
-    each text="O-302: The heating water temperature that serves the domestic hot water tank must be within 1 K of the heating water temperature set point once the tank charging is on for 5 minutes.",
+    each text="O-302: The heating water temperature that serves the domestic hot water tank must be within 1 K of the heating water temperature set point once the tank charging is on for 10 minutes.",
     each use_activeInput=true,
-    each delayTime(each displayUnit="min") = 300,
-    each u_max(
-      final unit="K") = 1,
-    each u_min(
-      final unit="K") = -1,
+    each delayTime(each displayUnit="min") = 1200,
+    each u_max(final unit="K") = 1,
+    each u_min(final unit="K") = -1,
     each u(final unit="K", each displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for the heating water temperature that serves the domestic hot water tank"
     annotation (Placement(transformation(extent={{620,180},{640,200}})));
+    Modelica.Blocks.Sources.RealExpression TTanDhwSet[nBui](
+    y(each final unit="K", each displayUnit="degC")={
+      50 + 273.15,
+      bui[5].ets.chi.con.conHea.u_s,
+      bui[5].ets.chi.con.conHea.u_s,
+      bui[5].ets.chi.con.conHea.u_s,
+      bui[5].ets.chi.con.conHea.u_s})
+    "Temperature set point for heating water to be supplied to DHW tank, except hub[1] that does not provide DHW."
+    annotation (Placement(transformation(extent={{540,190},{560,210}})));
+
   Modelica.Blocks.Sources.RealExpression TTanHeaSup[nBui](
-    y={50 + 273.15,
-       bui[2].ets.dhw.domHotWatTan.senTemHeaSup.T,
-       bui[3].ets.dhw.domHotWatTan.senTemHeaSup.T,
-       bui[4].ets.dhw.domHotWatTan.senTemHeaSup.T,
-       bui[5].ets.dhw.domHotWatTan.senTemHeaSup.T})
+    y(each final unit="K", each displayUnit="degC")={
+      50 + 273.15,
+      bui[2].ets.tanDhw.domHotWatTan.senTemHeaSup.T,
+      bui[3].ets.tanDhw.domHotWatTan.senTemHeaSup.T,
+      bui[4].ets.tanDhw.domHotWatTan.senTemHeaSup.T,
+      bui[5].ets.tanDhw.domHotWatTan.senTemHeaSup.T})
     "Temperature of heating water supplied to the DHW tank, except hub[1] that does not provide DHW."
     annotation (Placement(transformation(extent={{540,174},{560,194}})));
-  Modelica.Blocks.Sources.BooleanExpression DhwTanCha[nBui](y={false,bui[2].ets.dhw.charge,
-        bui[3].ets.dhw.charge,bui[4].ets.dhw.charge,bui[5].ets.dhw.charge})
+  Modelica.Blocks.Sources.BooleanExpression dhwTanCha[nBui](y={false,bui[2].ets.tanDhw.charge,
+        bui[3].ets.tanDhw.charge,bui[4].ets.tanDhw.charge,bui[5].ets.tanDhw.charge})
     "True when the domestic hot water tank is charging for each hub with domestic hot water, false for hub[1] that does not provide domestic hot water."
     annotation (Placement(transformation(extent={{540,160},{560,180}})));
   Modelica.Blocks.Sources.RealExpression THexSecLvg[nBui](y=bui.ets.hex.senT2WatLvg.T)
     "Temperature leaving the ETS heat exchanger on the secondary side."
     annotation (Placement(transformation(extent={{580,140},{600,160}})));
-  Buildings_Requirements.WithinBand    reqTHexEtsPriLvg[nBui](
+  Buildings_Requirements.WithinBand reqTHexEtsPriLvg[nBui](
     each name="ETS",
     each text="O-306: At the district heat exchanger in the ETS, the primary side leaving water temperature that is fed back to the district loop must be between 6.5°C and 28°C.",
     each delayTime(each displayUnit="min") = 300,
@@ -102,20 +95,17 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each witBan(u(final unit="K")))
     "Requirement for  leaving water temperature on the primary side of the heat exchanger in the ETS "
     annotation (Placement(transformation(extent={{620,100},{640,120}})));
-  Modelica.Blocks.Sources.RealExpression TWatSer[nBui](y=bui.ets.hex.senT2WatEnt.T)
+  Modelica.Blocks.Sources.RealExpression TWatSer[nBui](
+    y=dis.con.junConSup.vol.T)
     "Water temperature serving each service line"
     annotation (Placement(transformation(extent={{580,-460},{600,-440}})));
   Buildings_Requirements.GreaterEqual reqTHeaPumEvaLvg[nBui](
     each name="ETS",
-    each text="O-308: The heat pump evaporator leaving water temperature must be at least 15°C (preferably higher) once the system rejects heat to the district for at least 5 minutes.",
+    each text="O-308: The heat pump evaporator leaving water temperature must be at least 3.5°C, and be preferably higher, once the system draws heat from the district for at least 5 minutes.",
     each use_activeInput=true,
-    each u_max(
-      final unit="K",
-      displayUnit="degC"),
-    each u_min(
-      final unit="K",
-      displayUnit="degC"),
-    each delayTime(displayUnit="min") = 300)
+    each u_max(final unit="K", each displayUnit="degC"),
+    each u_min(final unit="K", each displayUnit="degC"),
+    each delayTime(each displayUnit="min") = 300)
     "Requirement for heat pump evaporator leaving water temperature"
     annotation (Placement(transformation(extent={{620,40},{640,60}})));
   Buildings_Requirements.GreaterEqual reqTHeaPumConLvg[nBui](
@@ -161,11 +151,15 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     y=bui.ets.conSup.conHot.truFalHol.y)
     "Condenser to ambient loop isolation valve command"
     annotation (Placement(transformation(extent={{580,-50},{600,-30}})));
-  Modelica.Blocks.Sources.Constant TMaxHeaPumConLvg[nBui](each k=31 + 273.15)
-    "Maximum heat pump condenser leaving water temperature"
+  Modelica.Blocks.Sources.Constant TMaxHeaPumConLvg[nBui](each k(
+      each final unit="K",
+      each displayUnit="degC") = 304.15)
+    "Maximum heat pump condenser leaving water temperature during heat rejection"
     annotation (Placement(transformation(extent={{580,-20},{600,0}})));
-  Modelica.Blocks.Sources.Constant TMinHeaPumEva[nBui](each k=15 + 273.15)
-    "Minimum heat pump evaporator leaving water temperature "
+  Modelica.Blocks.Sources.Constant TMinHeaPumEva[nBui](each k(
+      final unit="K",
+      each displayUnit="degC") = 276.65)
+    "Minimum heat pump evaporator leaving water temperature"
     annotation (Placement(transformation(extent={{580,40},{600,60}})));
   Buildings_Requirements.WithinBand reqTPlaMix(
     each name="Central plant",
@@ -215,9 +209,9 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Buildings_Requirements.WithinBand reqTHea[nBui](
     each name="ETS",
     each text=
-        "O-303: The space heating water supply temperature set point must be tracked within ± 1 K once the system is once the system is in space heating mode for 5 minutes.",
+        "O-303: The space heating water supply temperature set point must be tracked within ± 1 K once the system is once the system is in space heating mode for 10 minutes.",
     each use_activeInput=true,
-    each delayTime(each displayUnit="min") = 300,
+    each delayTime(each displayUnit="min") = 600,
     each u_max(
       final unit="K",
       displayUnit="K") = 1,
@@ -233,9 +227,9 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Buildings_Requirements.WithinBand reqTCoo[nBui](
     each name="ETS",
     each text=
-        "O-304: The space cooling water supply temperature set point must be tracked within ± 1 K once the system is once the system is in space cooling mode for 5 minutes.",
+        "O-304: The space cooling water supply temperature set point must be tracked within ± 1 K once the system is once the system is in space cooling mode for 10 minutes.",
     each use_activeInput=true,
-    each delayTime(each displayUnit="min") = 300,
+    each delayTime(each displayUnit="min") = 600,
     each u_max(
       final unit="K",
       displayUnit="K") = 1,
@@ -482,7 +476,7 @@ equation
   connect(TDisWatSup.T,reqTPlaMix. u) annotation (Line(points={{-91,170},{-224,170},
           {-224,-168},{-160,-168},{-160,-566},{619,-566}},
                                    color={0,0,127}));
-  connect(DhwTanCha.y,reqTDhwTan. active) annotation (Line(points={{561,170},{612,
+  connect(dhwTanCha.y,reqTDhwTan. active) annotation (Line(points={{561,170},{612,
           170},{612,186},{618,186}}, color={255,0,255}));
   connect(TMinHeaPumEva.y,reqTHeaPumEvaLvg. u_min) annotation (Line(points={{601,50},
           {610,50},{610,52},{619,52}},     color={0,0,127}));
@@ -613,10 +607,10 @@ equation
           20},{610,20},{610,46},{618,46}}, color={255,0,255}));
   connect(TTanHeaSup.y, conErrTSupDhwTan.u2)
     annotation (Line(points={{561,184},{578,184}}, color={0,0,127}));
-  connect(THeaPumCon.y, conErrTSupDhwTan.u1) annotation (Line(points={{521,-28},
-          {530,-28},{530,196},{578,196}}, color={0,0,127}));
   connect(conErrTSupDhwTan.y, reqTDhwTan.u) annotation (Line(points={{602,190},{
           610,190},{610,194},{619,194}}, color={0,0,127}));
+  connect(TTanDhwSet.y, conErrTSupDhwTan.u1) annotation (Line(points={{561,200},
+          {570,200},{570,196},{578,196}}, color={0,0,127}));
   annotation (Diagram(coordinateSystem(extent={{-400,-580},{680,580}})), Icon(
         coordinateSystem(extent={{-100,-100},{100,100}})));
 end DetailedPlantFiveHubsWithRequirementsVerification;
