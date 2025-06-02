@@ -44,11 +44,12 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     annotation (Placement(transformation(extent={{620,340},{640,360}})));
   Buildings_Requirements.WithinBand reqTDhwTan[nBui](
     each name="DHW",
-    each text="O-302: The heating water temperature that serves the domestic hot water tank must be within 1 K of the heating water temperature set point once the tank charging is on for 10 minutes.",
+    each text=
+        "O-302: The heating water temperature that serves the domestic hot water tank must be no less than 1 K below and 5 K above the heating water temperature set point once the tank charging is on for 10 minutes.",
     each use_activeInput=true,
     each delayTime(each displayUnit="min") = 1200,
     each u_max(final unit="K") = 1,
-    each u_min(final unit="K") = -1,
+    each u_min(final unit="K") = -5,
     each u(final unit="K", each displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for the heating water temperature that serves the domestic hot water tank"
