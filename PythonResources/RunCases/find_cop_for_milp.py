@@ -17,7 +17,7 @@ from GetVariables import get_vars, index_var_list, integrate_with_condition
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-result_folder = os.path.join(CWD, "simulations", "2025-05-25")
+result_folder = os.path.join(CWD, "simulations", "base")
 mat_file_name = os.path.join(result_folder, "DetailedPlantFiveHubs.mat")
 
 PRINT_RESULTS = True
