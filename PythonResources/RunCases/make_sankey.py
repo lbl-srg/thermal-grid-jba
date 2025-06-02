@@ -239,6 +239,11 @@ for idx, data_dict in enumerate(data_dicts):
     node_indices = {node: idx for idx, node in enumerate(nodes)}
     nodex = [dict_coord[node][0] for node in nodes]
     nodey = [dict_coord[node][1] for node in nodes]
+    label = ["District loop" if item == "Reservoir loop" else item for item in nodes]
+    # Replaces the node name "Reservoir loop" with the label display "District loop".
+    #   The reason for not directly naming the node "District loop" is
+    #   that it triggers a Plotly bug that renders link direction incorrectly.
+    #   This bug seems to be related to how the node name strings are sorted.
     
     # Creat source, target, and value lists
     source = [node_indices[src] for src, tgt, crr in data_dict.keys()]
@@ -255,7 +260,7 @@ for idx, data_dict in enumerate(data_dicts):
             pad=15,
             thickness=20,
             line=dict(color="black", width=0.5),
-            label=nodes,
+            label=label,
             align='center',
             x=nodex,
             y=nodey,
