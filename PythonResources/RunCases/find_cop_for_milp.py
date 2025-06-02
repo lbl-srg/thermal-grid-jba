@@ -37,8 +37,8 @@ def find_commit(fn):
                 if line.startswith("commit="):
                     return line.split("commit=", 1)[1].strip()
     except Exception:
-        return "Unknown"
-    return "Unknown"
+        return "unspecified"
+    return "unspecified"
 
 if WRITE_REMARKS:
     remarks = pd.DataFrame(np.array([['Model', 'ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs'],
