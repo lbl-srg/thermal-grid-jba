@@ -8,6 +8,7 @@ Created on Mon May 19 11:27:46 2025
 
 import os
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
 pio.renderers.default='browser' # if the IDE doesn't render plotly output
@@ -276,6 +277,17 @@ for idx, data_dict in enumerate(data_dicts):
     
     fig.update_layout(font=dict(size = 30))
     fig.show()
+
+#%% output to Excel
+with pd.ExcelWriter('sankey.xlsx', engine='openpyxl') as writer:
+    for season, data_dict in zip(seasons, data_dicts):
+        # Convert the dictionary to a DataFrame
+        df = pd.DataFrame(list(data_dict.items()), columns=['From-To-Energy Carrier', 'kWh'])
+        df[['From', 'To', 'Energy carrier']] = pd.DataFrame(df['From-To-Energy Carrier'].tolist(), index=df.index)
+        df['kWh'] = df['kWh'] * J_to_kWh
+        df = df[['From', 'To', 'Energy carrier', 'kWh']]
+        
+        df.to_excel(writer, sheet_name=season, index=False)
 
 #%% validation
 # checks first-law conservation
