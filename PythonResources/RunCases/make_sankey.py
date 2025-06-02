@@ -43,11 +43,7 @@ var_list += index_var_list(f'dis.heatPorts[{_i}].Q_flow',
                            _i,
                            range(1,nBui+2))
 # variables without an index
-var_list += ['datDis.cpWatLiq',
-             'cenPla.gen.ind.ySea',
-             'TDisWatSup.T',
-             'TDisWatRet.T',
-             'pumDis.m_flow',
+var_list += ['cenPla.gen.ind.ySea',
              'cenPla.gen.hex.Q1_flow',
              'cenPla.gen.heaPum.P',
              'cenPla.gen.heaPum.QCon_flow',
