@@ -27,7 +27,8 @@ from GetVariables import get_vars, index_var_list, integrate_with_condition
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-mat_file_name = os.path.join(CWD, "simulations", "2025-05-25", "DetailedPlantFiveHubs.mat")
+result_folder = os.path.join(CWD, "simulations", "2025-05-25")
+mat_file_name = os.path.join(result_folder, "DetailedPlantFiveHubs.mat")
 
 PRINT_RESULTS = True
 WRITE_TO_XLSX = True
@@ -37,16 +38,22 @@ nBui = 5
 # remarks to be written to the output file
 WRITE_REMARKS = True
 
-def get_commit_hash():
-    import git
-    repo = git.Repo(search_parent_directories=True)
-    sha = repo.head.object.hexsha
-    return sha
+def find_commit(fn):
+    """ Returns the text after "version=" in the text file `fn`.
+    """
+    try:
+        with open(fn, 'r') as file:
+            for line in file:
+                if line.startswith("commit="):
+                    return line.split("commit=", 1)[1].strip()
+    except Exception:
+        return "Unknown"
+    return "Unknown"
 
 if WRITE_REMARKS:
     remarks = pd.DataFrame(np.array([['Model', 'ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs'],
                                      ['Weather scenario', 'fTMY'],
-                                     ['Result file at commit', '418c50b5f58d31d87fa7d35beb31b2f020e8b66e']]))
+                                     ['Result file at commit', find_commit(os.path.join(result_folder,'version.txt'))]]))
 
 def safe_cop(QCon, PChi):
     """ Returns nan if PChi == 0.
