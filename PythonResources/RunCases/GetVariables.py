@@ -68,6 +68,7 @@ def get_vars(var_list,
         # Install this with
         #    <...>/Dymola-2025x-x86_64/Modelica/Library/python_interface/dymola-2024.1-py3-none-any.whl
         dymola = DymolaInterface("/usr/local/bin/dymola")
+        # Replace the argument with the location of your Dymola excecutable.
         dymola_command = generate_dymola_command(var_list,
                                                  mat_file_path,
                                                  csv_file_path)

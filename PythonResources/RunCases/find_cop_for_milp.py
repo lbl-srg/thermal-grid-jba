@@ -9,18 +9,8 @@ Code not cleaned yet.
 """
 
 import os
-#import glob
 import pandas as pd
 import numpy as np
-#from buildingspy.io.outputfile import Reader
-from scipy import trapz
-
-# Dymola-python interface: see Dymola user manual 12.3
-from dymola.dymola_interface import DymolaInterface
-# Install this with
-#    <...>/Dymola-2025x-x86_64/Modelica/Library/python_interface/dymola-2024.1-py3-none-any.whl
-dymola = DymolaInterface("/usr/local/bin/dymola")
-# Replace the argument with the location of your Dymola excecutable.
 
 from GetVariables import get_vars, index_var_list, integrate_with_condition
 # python file under same folder
