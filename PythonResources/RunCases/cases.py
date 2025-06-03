@@ -122,7 +122,7 @@ def get_cases():
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_1.30",
+            'name': "base_heaPumSizFac_1.3",
             'parameters': {
                 'datDis.heaPumSizFac': 1.30
             }
@@ -138,7 +138,7 @@ def get_cases():
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_1.40",
+            'name': "base_heaPumSizFac_1.4",
             'parameters': {
                 'datDis.heaPumSizFac': 1.40
             }
