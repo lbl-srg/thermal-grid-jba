@@ -10,7 +10,7 @@ def get_cases():
                 'solver'     : 'cvode',
                 'simulate': True
             }
-            # Combine the dictonaries
+            # Combine the dictionaries
             case.update(common)
             cases.append(case)
 
@@ -78,6 +78,22 @@ def get_cases():
                     "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"],
                          'datDis.filNamCom' :
                     "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos"}
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0.8",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.8
+            }
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0.9",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.9
+            }
         }
         _add(case, cases)
 
