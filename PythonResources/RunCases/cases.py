@@ -10,7 +10,7 @@ def get_cases():
                 'solver'     : 'radau',
                 'simulate': True
             }
-            # Combine the dictonaries
+            # Combine the dictionaries
             case.update(common)
             cases.append(case)
 
@@ -21,126 +21,78 @@ def get_cases():
         }
         _add(case, cases)
 
-        # case = {
-        #     'name': "base_hBor_1.2",
-        #     'parameters': {
-        #         'cenPla.borFie.hBor': 91*1.2,
-        #     }
-        # }
-        # _add(case, cases)
-
-        # case = {
-        #     'name': "base_hBor_0.8",
-        #     'parameters': {
-        #         'cenPla.borFie.hBor': 91*0.8
-        #     }
-        # }
-        # _add(case, cases)
-
-        # case = {
-        #     'name': "base_dDis_1.2",
-        #     'parameters': {
-        #         'datDis.dhDisSizFac': 1.2
-        #     }
-        # }
-        # _add(case, cases)
-
-        # case = {
-        #     'name': "base_dDis_0.8",
-        #     'parameters': {
-        #         'datDis.dhDisSizFac': 0.8
-        #     }
-        # }
-        # _add(case, cases)
-
-        # case = {
-        #     'name': 'heat',
-        #     'parameters': {
-        #         'datDis.filNamInd' : [
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_heat.mos",
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_heat.mos",
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_heat.mos",
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_heat.mos",
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_heat.mos"],
-        #                  'datDis.filNamCom' :
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos"}
-        # }
-        # _add(case, cases)
-
-        # case = {
-        #     'name': 'cold',
-        #     'parameters': {
-        #         'datDis.filNamInd' : [
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_cold.mos",
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_cold.mos",
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_cold.mos",
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_cold.mos",
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"],
-        #                  'datDis.filNamCom' :
-        #             "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos"}
-        # }
-        # _add(case, cases)
-
         case = {
-            'name': "base_heaPumSizFac_1.05",
+            'name': "base_hBor_1.2",
             'parameters': {
-                'datDis.heaPumSizFac': 1.05
+                'cenPla.borFie.hBor': 91*1.2,
             }
         }
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_1.1",
+            'name': "base_hBor_0.8",
             'parameters': {
-                'datDis.heaPumSizFac': 1.1
+                'cenPla.borFie.hBor': 91*0.8
             }
         }
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_1.15",
+            'name': "base_dDis_1.2",
             'parameters': {
-                'datDis.heaPumSizFac': 1.15
+                'datDis.dhDisSizFac': 1.2
             }
         }
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_1.2",
+            'name': "base_dDis_0.8",
             'parameters': {
-                'datDis.heaPumSizFac': 1.2
+                'datDis.dhDisSizFac': 0.8
             }
         }
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_1.25",
+            'name': 'heat',
             'parameters': {
-                'datDis.heaPumSizFac': 1.25
+                'datDis.filNamInd' : [
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_heat.mos",
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_heat.mos",
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_heat.mos",
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_heat.mos",
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_heat.mos"],
+                         'datDis.filNamCom' :
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos"}
+        }
+        _add(case, cases)
+
+        case = {
+            'name': 'cold',
+            'parameters': {
+                'datDis.filNamInd' : [
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_cold.mos",
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_cold.mos",
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_cold.mos",
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_cold.mos",
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"],
+                         'datDis.filNamCom' :
+                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos"}
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0.8",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.8
             }
         }
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_1.3",
+            'name': "base_heaPumSizFac_0.9",
             'parameters': {
-                'datDis.heaPumSizFac': 1.30
-            }
-        }
-        _add(case, cases)
-
-        case = {
-            'name': "base_heaPumSizFac_1.35",
-            'parameters': {
-                'datDis.heaPumSizFac': 1.35
-            }
-        }
-        _add(case, cases)
-
-        case = {
-            'name': "base_heaPumSizFac_1.4",
-            'parameters': {
-                'datDis.heaPumSizFac': 1.40
+                'datDis.heaPumSizFac': 0.9
             }
         }
         _add(case, cases)

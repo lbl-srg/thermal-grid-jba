@@ -161,9 +161,9 @@ record GenericDistrict "District network design parameters"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // Downsize the heat pump capacity by considering the heating supply from borefield
   parameter Real heaPumSizFac=1;
-  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=(QPlaPeaCoo_flow + 0.5*
-    10e6)*heaPumSizFac
-    "Nominal cooling capacity"
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=
+    (QPlaPeaCoo_flow + 0.5*10e6)*heaPumSizFac*1.25
+    "Nominal cooling capacity. Factor 1.25 added based on https://github.com/lbl-srg/thermal-grid-jba/pull/98"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
   parameter Modelica.Units.SI.TemperatureDifference dTCooCha(min=0)=4
