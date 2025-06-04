@@ -81,37 +81,37 @@ def get_cases():
         # }
         # _add(case, cases)
 
-        # case = {
-        #     'name': "base_heaPumSizFac_1.05",
-        #     'parameters': {
-        #         'datDis.heaPumSizFac': 1.05
-        #     }
-        # }
-        # _add(case, cases)
+        case = {
+            'name': "base_heaPumSizFac_1.05",
+            'parameters': {
+                'datDis.heaPumSizFac': 1.05
+            }
+        }
+        _add(case, cases)
 
-        # case = {
-        #     'name': "base_heaPumSizFac_1.1",
-        #     'parameters': {
-        #         'datDis.heaPumSizFac': 1.1
-        #     }
-        # }
-        # _add(case, cases)
+        case = {
+            'name': "base_heaPumSizFac_1.1",
+            'parameters': {
+                'datDis.heaPumSizFac': 1.1
+            }
+        }
+        _add(case, cases)
 
-        # case = {
-        #     'name': "base_heaPumSizFac_1.15",
-        #     'parameters': {
-        #         'datDis.heaPumSizFac': 1.15
-        #     }
-        # }
-        # _add(case, cases)
+        case = {
+            'name': "base_heaPumSizFac_1.15",
+            'parameters': {
+                'datDis.heaPumSizFac': 1.15
+            }
+        }
+        _add(case, cases)
 
-        # case = {
-        #     'name': "base_heaPumSizFac_1.2",
-        #     'parameters': {
-        #         'datDis.heaPumSizFac': 1.2
-        #     }
-        # }
-        # _add(case, cases)
+        case = {
+            'name': "base_heaPumSizFac_1.2",
+            'parameters': {
+                'datDis.heaPumSizFac': 1.2
+            }
+        }
+        _add(case, cases)
 
         case = {
             'name': "base_heaPumSizFac_1.25",
