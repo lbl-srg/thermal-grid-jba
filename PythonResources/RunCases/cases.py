@@ -7,7 +7,7 @@ def get_cases():
                 'start_time' : 0 * 24 * 3600,
                 'stop_time'  : 365* 24 * 3600,
                 'number_of_intervals' : 365 * 24,
-                'solver'     : 'radau',
+                'solver'     : 'cvode',
                 'simulate': True
             }
             # Combine the dictonaries
