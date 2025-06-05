@@ -52,7 +52,8 @@ model ConnectedETSNoDHW
     "Cumulative enthalpy difference of domestic hot water"
     annotation (Placement(transformation(extent={{40,10},{60,30}})));
   Buildings.DHC.Networks.BaseClasses.DifferenceEnthalpyFlowRate senHFlo(
-      redeclare final package Medium1 = Medium, final m_flow_nominal=bui.ets.hex.m1_flow_nominal)
+      redeclare final package Medium1 = Medium,
+      final m_flow_nominal=bui.ets.hex.m1_flow_nominal)
     "Variation of enthalpy flow rate" annotation (Placement(transformation(
         extent={{10,10},{-10,-10}},
         rotation=180,

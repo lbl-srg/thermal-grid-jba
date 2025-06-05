@@ -65,7 +65,6 @@ model StorageTankWithExternalHeatExchanger
   Buildings.Fluid.FixedResistances.Junction junTop(
     redeclare package Medium = MediumHea,
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal=dat.mHex_flow_nominal*{1,1,1},
     dp_nominal=zeros(3)) "Flow junction at top of tank"
     annotation (Placement(transformation(extent={{10,20},{30,40}})));

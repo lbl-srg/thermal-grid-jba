@@ -142,8 +142,7 @@ model DetailedPlantFiveHubs
   final parameter Integer nBui=datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
-  parameter ThermalGridJBA.Data.Districts.FiveHubs datDis(
-    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
+  parameter ThermalGridJBA.Data.Districts.FiveHubs datDis(mCon_flow_nominal=bui.ets.hex2.m1_flow_nominal)
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-380,180},{-360,200}})));
 

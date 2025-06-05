@@ -18,7 +18,7 @@ model IdealPlantCombinedHub
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
   inner replaceable parameter ThermalGridJBA.Data.Districts.SingleHub datDis(
-    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
+      mCon_flow_nominal=bui.ets.hex2.m1_flow_nominal)
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
@@ -122,7 +122,8 @@ model IdealPlantCombinedHub
     each final allowFlowReversalSer=allowFlowReversalSer,
     each final TDisWatMin=datDis.TLooMin,
     each final TDisWatMax=datDis.TLooMax,
-    ets(chi(pumEva(each use_riseTime=true))),
+    ets(heaPum(
+            pumEva(each use_riseTime=true))),
     each have_eleNonHva=true)                 "Building and ETS"
     annotation (Placement(transformation(extent={{-10,170},{10,190}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)

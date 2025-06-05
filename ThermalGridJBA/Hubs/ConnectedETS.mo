@@ -1,9 +1,9 @@
 within ThermalGridJBA.Hubs;
 model ConnectedETS
   "Load connected to the network via ETS with or without DHW integration"
-  extends ThermalGridJBA.Hubs.BaseClasses.PartialConnectedETS(
-    redeclare ThermalGridJBA.Hubs.BaseClasses.ChillerThreeUtilities ets(
-      final have_hotWat= QHotWat_flow_nominal > Modelica.Constants.eps,
+  extends ThermalGridJBA.Hubs.BaseClasses.PartialConnectedETS(redeclare
+      ThermalGridJBA.Hubs.BaseClasses.HeatPumpThreeUtilities ets(
+      final have_hotWat=QHotWat_flow_nominal > Modelica.Constants.eps,
       have_weaBus=true,
       QChiWat_flow_nominal=QCoo_flow_nominal,
       QHeaWat_flow_nominal=QHea_flow_nominal,
@@ -15,23 +15,25 @@ model ConnectedETS
       T_b1Hex_nominal=279.65,
       T_a2Hex_nominal=276.65,
       T_b2Hex_nominal=282.65,
-      VTanHeaWat=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
-      VTanChiWat=datChi.mEva_flow_nominal*datBuiSet.dTChiWat_nominal*5*60/1000,
+      VTanHeaWat=datHeaPum.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/
+          1000,
+      VTanChiWat=datHeaPum.mEva_flow_nominal*datBuiSet.dTChiWat_nominal*5*60/
+          1000,
       dpCon_nominal=40E3,
       dpEva_nominal=40E3,
-      datChi=datChi,
       datDhw=datDhw,
-      TCon_start=if have_hotWat
-                 then min(datBuiSet.THeaWatSup_nominal,datBuiSet.THotWatSupTan_nominal)
-                 else datBuiSet.THeaWatSup_nominal,
+      TCon_start=if have_hotWat then min(datBuiSet.THeaWatSup_nominal,
+          datBuiSet.THotWatSupTan_nominal) else datBuiSet.THeaWatSup_nominal,
       TEva_start=datBuiSet.TChiWatSup_nominal,
-      TConLvgHotSet(final k=datBuiSet.THotWatSupTan_nominal)));
+      datHeaPum=datHeaPum));
 
   parameter Boolean have_eleNonHva "The ETS has non-HVAC electricity load"
     annotation (Dialog(group="Configuration"));
 
-  parameter Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger datDhw(
-    VTan=datChi.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
+  parameter
+    Buildings.DHC.Loads.HotWater.Data.GenericDomesticHotWaterWithHeatExchanger
+    datDhw(
+    VTan=datHeaPum.mCon_flow_nominal*datBuiSet.dTHeaWat_nominal*5*60/1000,
     mDom_flow_nominal=datDhw.QHex_flow_nominal/4200/(datDhw.TDom_nominal -
         datDhw.TCol_nominal),
     QHex_flow_nominal=if have_hotWat then QHotWat_flow_nominal else
@@ -120,14 +122,14 @@ model ConnectedETS
     annotation (Placement(transformation(extent={{270,-10},{290,10}})));
 equation
 
-  connect(ets.QReqHotWat_flow, bui.QReqHotWat_flow) annotation (Line(points={{-34,-74},
-          {-36,-74},{-36,-146},{84,-146},{84,-2},{28,-2},{28,4}},      color={0,
+  connect(ets.QReqHotWat_flow, bui.QReqHotWat_flow) annotation (Line(points={{-34,-54},
+          {-40,-54},{-40,-120},{84,-120},{84,-2},{28,-2},{28,4}},      color={0,
           0,127}));
-  connect(ets.THotWatSupSet, THotWatSupSet.y) annotation (Line(points={{-34,-66},
-          {-72,-66},{-72,-10},{-118,-10}},
+  connect(ets.THotWatSupSet, THotWatSupSet.y) annotation (Line(points={{-34,-46},
+          {-72,-46},{-72,-10},{-118,-10}},
                                        color={0,0,127}));
   connect(TColWat.y, ets.TColWat) annotation (Line(points={{-118,-50},{-76,-50},
-          {-76,-70},{-34,-70}}, color={0,0,127}));
+          {-76,-50},{-34,-50}}, color={0,0,127}));
   connect(ets.dHChiWat_flow, dHChiWat_flow) annotation (Line(points={{28,-90},{
           28,-100},{280,-100},{280,-80},{320,-80}}, color={0,0,127}));
   connect(dHHeaWat_flow, ets.dHHeaWat_flow) annotation (Line(points={{320,-120},
