@@ -424,30 +424,30 @@ equation
           -248.5},{-40,-248.5},{-40,-140},{40,-140},{40,-88},{166,-88},{166,50},
           {122,50}}, color={0,0,127}));
   connect(heaPum.uHeaSpa, tanHeaWat.charge) annotation (Line(points={{-12,-2},{
-          -20,-2},{-20,106},{-180,106}}, color={255,0,255}));
-  connect(heaPum.uHeaDhw, tanDhw.charge) annotation (Line(points={{-12,-4},{-24,
-          -4},{-24,110},{-152,110},{-152,222},{-180,222}}, color={255,0,255}));
+          -20,-2},{-20,107},{-178,107}}, color={255,0,255}));
   connect(heaPum.uCoo, tanChiWat.charge) annotation (Line(points={{-12,-6},{-16,
           -6},{-16,107},{178,107}}, color={255,0,255}));
   connect(heaPum.THeaWatSupSet, THeaWatSupSet) annotation (Line(points={{-12,-8},
-          {-28,-8},{-28,-20},{-320,-20}}, color={0,0,127}));
-  connect(heaPum.TChiWatSupSet, TChiWatSupSet) annotation (Line(points={{-12,
-          -10},{-26,-10},{-26,-24},{-240,-24},{-240,-60},{-312,-60},{-312,-56},
-          {-310,-56},{-310,-58},{-308,-58}}, color={0,0,127}));
+          {-30,-8},{-30,-20},{-320,-20}}, color={0,0,127}));
+  connect(heaPum.TChiWatSupSet, TChiWatSupSet) annotation (Line(points={{-12,-10},
+          {-26,-10},{-26,-24},{-240,-24},{-240,-60},{-312,-60},{-312,-56},{-310,
+          -56},{-310,-60},{-320,-60}},       color={0,0,127}));
   connect(opeEtsHex.y, hex.u) annotation (Line(points={{-58,-230},{-50,-230},{
           -50,-252},{-12,-252}}, color={0,0,127}));
   connect(opeEtsHex.yVal1, valIsoEva.y_actual) annotation (Line(points={{-82,
-          -234},{-92,-234},{-92,-180},{46,-180},{46,-112},{56,-112}}, color={0,
+          -234},{-92,-234},{-92,-180},{46,-180},{46,-113},{55,-113}}, color={0,
           0,127}));
   connect(opeEtsHex.yVal2, valIsoCon.y_actual) annotation (Line(points={{-82,
-          -238.2},{-94,-238.2},{-94,-178},{-44,-178},{-44,-112},{-56,-112}},
+          -238.2},{-94,-238.2},{-94,-178},{-44,-178},{-44,-113},{-55,-113}},
         color={0,0,127}));
   connect(opeEtsHex.u1, tanChiWat.charge) annotation (Line(points={{-82,-222.2},
-          {-84,-222.2},{-84,-184},{90,-184},{90,106},{180,106}}, color={255,0,
+          {-84,-222.2},{-84,-184},{90,-184},{90,107},{178,107}}, color={255,0,
           255}));
   connect(twoTanCoo.y, opeEtsHex.u2) annotation (Line(points={{-118,180},{-106,
-          180},{-106,132},{-28,132},{-28,-182},{-88,-182},{-88,-226},{-80,-226}},
+          180},{-106,132},{-28,132},{-28,-182},{-88,-182},{-88,-226},{-82,-226}},
         color={255,0,255}));
+  connect(heaPum.uHeaDhw, twoTanCoo.yDhw) annotation (Line(points={{-12,-4},{
+          -22,-4},{-22,130},{-110,130},{-110,175},{-118,175}}, color={255,0,255}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},

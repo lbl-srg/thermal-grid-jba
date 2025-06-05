@@ -19,6 +19,13 @@ block TwoTankCoordination
     if have_hotWat "Mixing valve control signal" annotation (Placement(
         transformation(extent={{100,20},{140,60}}),  iconTransformation(extent={{100,30},
             {140,70}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput yDhw
+    "Charge command from DHW tank, or false if no tank present" annotation (
+      Placement(transformation(extent={{100,-60},{140,-20}}),
+        iconTransformation(extent={{100,-70},{140,-30}})));
+  Buildings.Controls.OBC.CDL.Logical.Sources.Constant con(k=false) if not have_hotWat
+    "Output true as dummy signal if no DHW is present"
+    annotation (Placement(transformation(extent={{40,-50},{60,-30}})));
 
 block WithDHW
   extends Modelica.Blocks.Icons.Block;
@@ -70,6 +77,7 @@ end WithoutDHW;
     annotation (Placement(transformation(extent={{-10,24},{10,44}})));
   WithoutDHW withoutDHW if not have_hotWat
     annotation (Placement(transformation(extent={{-8,-10},{12,10}})));
+
 equation
   connect(withoutDHW.uHea, uHea) annotation (Line(points={{-10,0},{-40,0},{-40,
           -40},{-120,-40}}, color={255,0,255}));
@@ -85,6 +93,10 @@ equation
         color={255,0,255}));
   connect(withoutDHW.y, y) annotation (Line(points={{14,0},{120,0}},
                color={255,0,255}));
+  connect(uDhw, yDhw) annotation (Line(points={{-120,60},{80,60},{80,-40},{120,-40}},
+        color={255,0,255}));
+  connect(con.y, yDhw)
+    annotation (Line(points={{62,-40},{120,-40}}, color={255,0,255}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
 Documentation(info="
