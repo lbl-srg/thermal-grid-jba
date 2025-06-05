@@ -1,7 +1,7 @@
 within ThermalGridJBA.Networks.Validation;
 model IdealPlantFiveHubs "District with an ideal plant and five hubs"
   extends ThermalGridJBA.Networks.Validation.IdealPlantCombinedHub(redeclare
-      ThermalGridJBA.Data.Districts.FiveHubs datDis(mCon_flow_nominal=bui.ets.hex2.m1_flow_nominal),
+      ThermalGridJBA.Data.Districts.FiveHubs datDis(mCon_flow_nominal=bui.ets.hex.m1_flow_nominal),
       bui(ets(heaPum(pumEva(each use_riseTime=false)))));
   annotation (
   Diagram(

@@ -18,7 +18,7 @@ model IdealPlantCombinedHub
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
   inner replaceable parameter ThermalGridJBA.Data.Districts.SingleHub datDis(
-      mCon_flow_nominal=bui.ets.hex2.m1_flow_nominal)
+      mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 

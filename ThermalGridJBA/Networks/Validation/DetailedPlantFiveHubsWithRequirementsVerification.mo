@@ -9,8 +9,8 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     dis.con[5].pipDis.dp / dis.con[5].pipDis.length,
     dis.pipEnd.dp / dis.pipEnd.length}
  "Pressure drop per length unit for each pipe (Pa/m)";
-  Real y_value[5*3 + 4]={bui[1].ets.hex2.val2.y_actual,bui[2].ets.hex2.val2.y_actual,
-      bui[3].ets.hex2.val2.y_actual,bui[4].ets.hex2.val2.y_actual,bui[5].ets.hex2.val2.y_actual,
+  Real y_value[5*3 + 4]={bui[1].ets.hex.val2.y_actual,bui[2].ets.hex.val2.y_actual,
+      bui[3].ets.hex.val2.y_actual,bui[4].ets.hex.val2.y_actual,bui[5].ets.hex.val2.y_actual,
       bui[1].ets.heaPum.valEva.y_actual,bui[2].ets.heaPum.valEva.y_actual,bui[3].ets.heaPum.valEva.y_actual,
       bui[4].ets.heaPum.valEva.y_actual,bui[5].ets.heaPum.valEva.y_actual,bui[1].ets.heaPum.valCon.y_actual,
       bui[2].ets.heaPum.valCon.y_actual,bui[3].ets.heaPum.valCon.y_actual,bui[4].ets.heaPum.valCon.y_actual,
@@ -73,7 +73,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
         bui[3].ets.tanDhw.charge,bui[4].ets.tanDhw.charge,bui[5].ets.tanDhw.charge})
     "True when the domestic hot water tank is charging for each hub with domestic hot water, false for hub[1] that does not provide domestic hot water."
     annotation (Placement(transformation(extent={{540,160},{560,180}})));
-  Modelica.Blocks.Sources.RealExpression THexSecLvg[nBui](y=bui.ets.hex2.senT2WatLvg.T)
+  Modelica.Blocks.Sources.RealExpression THexSecLvg[nBui](y=bui.ets.hex.senT2WatLvg.T)
     "Temperature leaving the ETS heat exchanger on the secondary side."
     annotation (Placement(transformation(extent={{580,140},{600,160}})));
   Buildings_Requirements.WithinBand reqTHexEtsPriLvg[nBui](

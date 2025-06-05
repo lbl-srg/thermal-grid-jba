@@ -5,7 +5,7 @@ model MultiHub "Multiple prosumer hubs in a district loop"
     "Medium model";
 
   parameter Integer nBui=3 "Number of buildings";
-  parameter Modelica.Units.SI.MassFlowRate mDis_flow_nominal=sum(bui[:].ets.hex2.m2_flow_nominal)
+  parameter Modelica.Units.SI.MassFlowRate mDis_flow_nominal=sum(bui[:].ets.hex.m2_flow_nominal)
       *1.1 "Nominal mass flow rate of district";
   parameter Modelica.Units.SI.Temperature TDis_nominal=273.15+15 "Nominal temperature of district supply";
 
