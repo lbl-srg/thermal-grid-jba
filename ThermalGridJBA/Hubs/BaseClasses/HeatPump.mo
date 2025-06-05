@@ -149,6 +149,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumCon(
     redeclare final package Medium=Medium,
     final allowFlowReversal=allowFlowReversal,
+    use_riseTime=true,
     final m_flow_nominal=dat.mCon_flow_nominal,
     final dp_nominal=dpCon_nominal + dpValCon_nominal + 2*0.05*dpValCon_nominal,
     dpMax=Modelica.Constants.inf)
@@ -157,6 +158,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumEva(
     redeclare final package Medium=Medium,
     final allowFlowReversal=allowFlowReversal,
+    use_riseTime=true,
     final m_flow_nominal=dat.mEva_flow_nominal,
     final dp_nominal=dpEva_nominal + dpValEva_nominal + dpEva_nominal*0.05)
     "Evaporator pump"
@@ -193,17 +195,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=90,origin={-20,-40})));
   Buildings.DHC.ETS.BaseClasses.Junction splEva(
     redeclare final package Medium=Medium,
-    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    m_flow_nominal=dat.mCon_flow_nominal*{1,-1,-1})
-    "Flow splitter for the evaporator water circuit"
-    annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=0,origin={-140,-60})));
-  Buildings.DHC.ETS.BaseClasses.Junction splConMix(
-    redeclare final package Medium=Medium,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
          else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
@@ -211,6 +203,18 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
          else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
     m_flow_nominal=dat.mEva_flow_nominal*{1,-1,-1})
+    "Flow splitter for the evaporator water circuit"
+    annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=0,origin={-140,-60})));
+  Buildings.DHC.ETS.BaseClasses.Junction splConMix(
+    redeclare final package Medium=Medium,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
+         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    m_flow_nominal=dat.mCon_flow_nominal*{1,-1,-1})
     "Flow splitter"
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},rotation=0,origin={120,60})));
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valEva(

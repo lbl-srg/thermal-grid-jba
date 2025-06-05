@@ -135,7 +135,7 @@ model HeatPumpThreeUtilities
   Buildings.Fluid.FixedResistances.Junction junDomHotWat(
     redeclare final package Medium = MediumBui,
     final dp_nominal={0,0,0},
-    final energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
+    final energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final tau=1,
     final m_flow_nominal=datHeaPum.mCon_flow_nominal*{1,-1,-1}) if have_hotWat
     "Junction to domestic hot water tank" annotation (Placement(transformation(
@@ -244,7 +244,7 @@ model HeatPumpThreeUtilities
   Buildings.Fluid.FixedResistances.Junction junChiWat(
     redeclare final package Medium = MediumBui,
     final dp_nominal={0,0,0},
-    final energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
+    final energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final tau=1,
     final m_flow_nominal=datHeaPum.mCon_flow_nominal*{1,-1,-1})
     "Junction at chilled water tank" annotation (Placement(transformation(
@@ -254,7 +254,7 @@ model HeatPumpThreeUtilities
   Buildings.Fluid.FixedResistances.Junction junHeaWat(
     redeclare final package Medium = MediumBui,
     final dp_nominal={0,0,0},
-    final energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
+    final energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final tau=1,
     final m_flow_nominal=datHeaPum.mCon_flow_nominal*{1,-1,-1})
     "Junction at heating water tank" annotation (Placement(transformation(
