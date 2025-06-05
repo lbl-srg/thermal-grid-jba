@@ -113,11 +113,12 @@ model HeatPump "Heat pump controller"
     annotation (Placement(transformation(extent={{-30,140},{-10,160}})));
   Buildings.Controls.OBC.CDL.Reals.Switch swi
     "Switch to select heating or cooling control signal"
-    annotation (Placement(transformation(extent={{120,140},{140,160}})));
+    annotation (Placement(transformation(extent={{92,140},{112,160}})));
   Buildings.Controls.OBC.CDL.Reals.LimitSlewRate ramLimCom(
     raisingSlewRate=1/(15*60),
+    fallingSlewRate=-1/30,
     Td=1) "Ramp limiter to avoid sudden load increase from chiller"
-    annotation (Placement(transformation(extent={{180,140},{200,160}})));
+    annotation (Placement(transformation(extent={{240,110},{260,130}})));
 
   Buildings.Controls.OBC.CDL.Logical.Or hea "Heating requested"
     annotation (Placement(transformation(extent={{-180,190},{-160,210}})));
@@ -132,10 +133,10 @@ model HeatPump "Heat pump controller"
     annotation (Placement(transformation(extent={{60,140},{80,160}})));
   Buildings.Controls.OBC.CDL.Reals.Switch swi1
     "Switch to select heating or cooling control signal"
-    annotation (Placement(transformation(extent={{222,132},{242,152}})));
+    annotation (Placement(transformation(extent={{202,110},{222,130}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer(final k=0)
     "Outputs zero"
-    annotation (Placement(transformation(extent={{182,110},{202,130}})));
+    annotation (Placement(transformation(extent={{148,80},{168,100}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant TSupSetDhw(
     y(final unit="K",
       displayUnit="degC"),
@@ -177,10 +178,17 @@ model HeatPump "Heat pump controller"
   y(final unit="K", displayUnit="degC"))
   "Maximum to pick the larger value of space heating or hot water supply temperature setpoint"
     annotation (Placement(transformation(extent={{-140,36},{-120,56}})));
+  Buildings.Controls.OBC.CDL.Logical.TrueDelay delSta(delayTime=30)
+    "Delay start of compressor to ensure pumps have sufficient speed"
+    annotation (Placement(transformation(extent={{148,110},{168,130}})));
+  Buildings.Controls.OBC.CDL.Logical.TrueDelay delPumOff(delayTime=30)
+    "Delay pump off signal to allow compressor to ramp down"
+    annotation (Placement(transformation(extent={{202,180},{222,200}})));
+  Buildings.Controls.OBC.CDL.Logical.Not not1
+    annotation (Placement(transformation(extent={{160,180},{180,200}})));
+  Buildings.Controls.OBC.CDL.Logical.Not not2
+    annotation (Placement(transformation(extent={{240,180},{260,200}})));
 equation
-  connect(heaOrCoo.y,yPum)
-    annotation (Line(points={{-118,190},{300,190}},
-                                                color={255,0,255}));
   connect(uCoo,heaOrCoo.u2)
     annotation (Line(points={{-300,120},{-194,120},{-194,182},{-142,182}},
                                                                       color={255,0,255}));
@@ -200,8 +208,9 @@ equation
   connect(hea.y, heaOrCoo.u1) annotation (Line(points={{-158,200},{-150,200},{
           -150,190},{-142,190}},
                             color={255,0,255}));
-  connect(hea.y, conHea.uEna) annotation (Line(points={{-158,200},{-140,200},{-140,
-          130},{-24,130},{-24,138}},   color={255,0,255}));
+  connect(hea.y, conHea.uEna) annotation (Line(points={{-158,200},{-150,200},{
+          -150,130},{-24,130},{-24,138}},
+                                       color={255,0,255}));
   connect(movAveHea.u, conHea.y) annotation (Line(points={{18,170},{0,170},{0,150},
           {-8,150}},              color={0,0,127}));
   connect(conCoo.y, movAveCoo.u) annotation (Line(points={{-8,100},{0,100},{0,120},
@@ -211,23 +220,13 @@ equation
   connect(movAveCoo.y, heaDom.u2) annotation (Line(points={{42,120},{50,120},{
           50,142},{58,142}},   color={0,0,127}));
   connect(heaDom.y, swi.u2)
-    annotation (Line(points={{82,150},{118,150}},  color={255,0,255}));
-  connect(conHea.y, swi.u1) annotation (Line(points={{-8,150},{0,150},{0,188},{100,
-          188},{100,158},{118,158}},           color={0,0,127}));
-  connect(conCoo.y, swi.u3) annotation (Line(points={{-8,100},{100,100},{100,142},
-          {118,142}}, color={0,0,127}));
-  connect(ramLimCom.u, swi.y)
-    annotation (Line(points={{178,150},{142,150}},
-                                                color={0,0,127}));
-  connect(heaOrCoo.y, swi1.u2) annotation (Line(points={{-118,190},{208,190},{208,
-          142},{220,142}}, color={255,0,255}));
-  connect(swi1.u1, ramLimCom.y) annotation (Line(points={{220,150},{202,150}},
-                          color={0,0,127}));
-  connect(zer.y, swi1.u3) annotation (Line(points={{204,120},{208,120},{208,134},
-          {220,134}}, color={0,0,127}));
-  connect(swi1.y, yChi)
-    annotation (Line(points={{244,142},{272,142},{272,150},{300,150}},
-                                                   color={0,0,127}));
+    annotation (Line(points={{82,150},{90,150}},   color={255,0,255}));
+  connect(conHea.y, swi.u1) annotation (Line(points={{-8,150},{0,150},{0,186},{
+          88,186},{88,158},{90,158}},          color={0,0,127}));
+  connect(conCoo.y, swi.u3) annotation (Line(points={{-8,100},{72,100},{72,142},
+          {90,142}},  color={0,0,127}));
+  connect(zer.y, swi1.u3) annotation (Line(points={{170,90},{188,90},{188,112},
+          {200,112}}, color={0,0,127}));
   connect(swiTSupSetHea.u2, uHeaDhw) annotation (Line(points={{-102,40},{-112,40},
           {-112,160},{-300,160}}, color={255,0,255}));
   connect(swiTSupSetHea.y, conHea.u_s) annotation (Line(points={{-78,40},{-72,40},
@@ -269,6 +268,24 @@ equation
           -50},{-210,-140},{-20,-140},{-20,-122}}, color={0,0,127}));
   connect(resTCooSup.TWatSupSet, offSetCoo.u) annotation (Line(points={{-238,
           -10},{-220,-10},{-220,-110},{-62,-110}}, color={0,0,127}));
+  connect(delSta.y, swi1.u2)
+    annotation (Line(points={{170,120},{200,120}}, color={255,0,255}));
+  connect(delSta.u, heaOrCoo.y) annotation (Line(points={{146,120},{140,120},{
+          140,190},{-118,190}}, color={255,0,255}));
+  connect(swi.y, swi1.u1) annotation (Line(points={{114,150},{180,150},{180,128},
+          {198,128}}, color={0,0,127}));
+  connect(swi1.y, ramLimCom.u)
+    annotation (Line(points={{224,120},{240,120}}, color={0,0,127}));
+  connect(ramLimCom.y, yChi) annotation (Line(points={{262,120},{272,120},{272,
+          148},{280,148}}, color={0,0,127}));
+  connect(heaOrCoo.y, not1.u)
+    annotation (Line(points={{-118,190},{158,190}}, color={255,0,255}));
+  connect(not1.y, delPumOff.u)
+    annotation (Line(points={{182,190},{200,190}}, color={255,0,255}));
+  connect(delPumOff.y, not2.u)
+    annotation (Line(points={{224,190},{238,190}}, color={255,0,255}));
+  connect(not2.y, yPum)
+    annotation (Line(points={{262,190},{300,190}}, color={255,0,255}));
   annotation (
     Icon(
       coordinateSystem(
