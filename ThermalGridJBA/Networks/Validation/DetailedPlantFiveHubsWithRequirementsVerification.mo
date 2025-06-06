@@ -76,7 +76,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Sources.BooleanExpression dhwTanCha[nBui](y={false,bui[2].ets.tanDhw.charge,
         bui[3].ets.tanDhw.charge,bui[4].ets.tanDhw.charge,bui[5].ets.tanDhw.charge})
     "True when the domestic hot water tank is charging for each hub with domestic hot water, false for hub[1] that does not provide domestic hot water."
-    annotation (Placement(transformation(extent={{540,160},{560,180}})));
+    annotation (Placement(transformation(extent={{420,156},{440,176}})));
   Modelica.Blocks.Sources.RealExpression THexSecLvg[nBui](y=bui.ets.hex.senT2WatLvg.T)
     "Temperature leaving the ETS heat exchanger on the secondary side."
     annotation (Placement(transformation(extent={{580,140},{600,160}})));
@@ -188,7 +188,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each text="O-201_1: The heat pump must remain off for at least 10 minutes.",
     each durationMin(displayUnit="min") = 600) "Requirement for heat pump off"
     annotation (Placement(transformation(extent={{620,420},{640,440}})));
-  Modelica.Blocks.Logical.Not HeaPumOff[nBui] "ETS Heat pump off"
+  Modelica.Blocks.Logical.Not heaPumOff[nBui] "ETS Heat pump off"
     annotation (Placement(transformation(extent={{580,420},{600,440}})));
   Modelica.Blocks.Sources.BooleanExpression HeaPumOn[nBui](y=bui.ets.chi.con.yPum)
     "ETS Heat pump signal on in each hub"
@@ -207,21 +207,18 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Sources.Constant RMaxDisLoo[nBui + 1](each k(unit="Pa/m") = 125.01)
               "Maximum pressure drop per meter of pipe of the district loop"
     annotation (Placement(transformation(extent={{580,-500},{600,-480}})));
-  Buildings_Requirements.WithinBand reqTHea[nBui](
+  Buildings_Requirements.WithinBand reqTSpaHeaSup[nBui](
     each name="ETS",
-    each text=
-        "O-303: The space heating water supply temperature set point must be tracked within ± 1 K once the system is once the system is in space heating mode for 10 minutes.",
+    each text="O-303: The space heating water supply temperature set point must be tracked within ± 1 K once the system is once the system is in space heating mode for 10 minutes.",
     each use_activeInput=true,
     each delayTime(each displayUnit="min") = 600,
     each u_max(
       final unit="K",
-      displayUnit="K") = 1,
+      each displayUnit="K") = 1,
     each u_min(
       final unit="K",
-      displayUnit="K") = -1,
-    each u(
-      final unit="K",
-      displayUnit="K"),
+      each displayUnit="K") = -1,
+    each u(final unit="K", each displayUnit="K"),
     each witBan(u(final unit="K")))
     "Requirement for tracking the space heating water supply temperature"
     annotation (Placement(transformation(extent={{620,300},{640,320}})));
@@ -249,7 +246,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Math.Add dTCoo[nBui](each k2=-1)
     "Space cooling water supply temperature difference"
     annotation (Placement(transformation(extent={{580,250},{600,270}})));
-  Modelica.Blocks.Sources.RealExpression THeaSup[nBui](y=bui.bui.disFloHea.senTSup.T)
+  Modelica.Blocks.Sources.RealExpression THeaSup[nBui](y=bui.ets.senTSpaHeaSup.T)
     "Space heating water supply temperature"
     annotation (Placement(transformation(extent={{540,316},{560,336}})));
   Modelica.Blocks.Sources.RealExpression THeaSupSet[nBui](y=bui.THeaWatSupSet.y)
@@ -445,12 +442,18 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Math.Division dTRooHeaAvgYea[nBui]
     "Average Temperature difference between Room heating and setpoint since the beginning of the simulation"
     annotation (Placement(transformation(extent={{580,-220},{600,-200}})));
-  Modelica.Blocks.Sources.BooleanExpression HeaPumHeaOn[nBui](y=bui.ets.conSup.yHea)
-    "ETS Heat pump heating signal on in each hub"
-    annotation (Placement(transformation(extent={{540,280},{560,300}})));
   Modelica.Blocks.Sources.BooleanExpression HeaPumCooOn[nBui](y=bui.ets.conSup.yCoo)
     "ETS Heat pump cooling signal on in each hub"
     annotation (Placement(transformation(extent={{540,220},{560,240}})));
+  Modelica.Blocks.Sources.BooleanExpression staVer[nBui](
+    each y=time >= tStart + 3600) "Outputs true if system is ready for verification"
+    annotation (Placement(transformation(extent={{480,550},{500,570}})));
+  Modelica.Blocks.Logical.Not dhWChaOff[nBui]
+    "Output true if DHW tank is not charging"
+    annotation (Placement(transformation(extent={{462,260},{482,280}})));
+  Buildings.Controls.OBC.CDL.Logical.MultiAnd verTHeaSup[nBui](each nin=3)
+    "Output true if heating supply temperature should be verified"
+    annotation (Placement(transformation(extent={{540,280},{560,300}})));
 protected
   parameter Modelica.Units.SI.Time tStart(fixed=false)
     "Start of the simulation";
@@ -477,22 +480,22 @@ equation
   connect(TDisWatSup.T,reqTPlaMix. u) annotation (Line(points={{-91,170},{-224,170},
           {-224,-168},{-160,-168},{-160,-566},{619,-566}},
                                    color={0,0,127}));
-  connect(dhwTanCha.y,reqTDhwTan. active) annotation (Line(points={{561,170},{612,
-          170},{612,186},{618,186}}, color={255,0,255}));
+  connect(dhwTanCha.y,reqTDhwTan. active) annotation (Line(points={{441,166},{612,
+          166},{612,186},{618,186}}, color={255,0,255}));
   connect(TMinHeaPumEva.y,reqTHeaPumEvaLvg. u_min) annotation (Line(points={{601,50},
           {610,50},{610,52},{619,52}},     color={0,0,127}));
   connect(HeaPumOn.y,reqHeaPumOn. u)
     annotation (Line(points={{561,470},{618,470}}, color={255,0,255}));
-  connect(HeaPumOff.y,reqHeaPumOff. u)
+  connect(heaPumOff.y,reqHeaPumOff. u)
     annotation (Line(points={{601,430},{618,430}}, color={255,0,255}));
-  connect(HeaPumOn.y,HeaPumOff. u) annotation (Line(points={{561,470},{570,470},
+  connect(HeaPumOn.y,heaPumOff. u) annotation (Line(points={{561,470},{570,470},
           {570,430},{578,430}}, color={255,0,255}));
   connect(RMaxDisLoo.y, reqRDis.u_max) annotation (Line(points={{601,-490},{610,
           -490},{610,-504},{619,-504}}, color={0,0,127}));
   connect(RDisLoo.y, reqRDis.u_min) annotation (Line(points={{601,-530},{610,-530},
           {610,-508},{619,-508}}, color={0,0,127}));
-  connect(dTHea.y, reqTHea.u) annotation (Line(points={{601,320},{610,320},{610,
-          314},{619,314}}, color={0,0,127}));
+  connect(dTHea.y, reqTSpaHeaSup.u) annotation (Line(points={{601,320},{610,320},
+          {610,314},{619,314}}, color={0,0,127}));
   connect(dTCoo.y, reqTCoo.u) annotation (Line(points={{601,260},{610,260},{610,
           254},{619,254}}, color={0,0,127}));
   connect(TCooSup.y, dTCoo.u1)
@@ -598,8 +601,6 @@ equation
           -210},{610,-210},{610,-188},{619,-188}}, color={0,0,127}));
   connect(thrRooHea.y, reqTRooHea.active) annotation (Line(points={{482,-100},{486,
           -100},{486,-146},{610,-146},{610,-134},{618,-134}}, color={255,0,255}));
-  connect(HeaPumHeaOn.y, reqTHea.active) annotation (Line(points={{561,290},{
-          610,290},{610,306},{618,306}}, color={255,0,255}));
   connect(HeaPumCooOn.y, reqTCoo.active) annotation (Line(points={{561,230},{
           610,230},{610,246},{618,246}}, color={255,0,255}));
   connect(reqTHeaPumConLvg.active, valIsoConCom.y) annotation (Line(points={{618,
@@ -612,6 +613,20 @@ equation
           610,190},{610,194},{619,194}}, color={0,0,127}));
   connect(TTanDhwSet.y, conErrTSupDhwTan.u1) annotation (Line(points={{561,200},
           {570,200},{570,196},{578,196}}, color={0,0,127}));
+  connect(dhwTanCha.y, dhWChaOff.u) annotation (Line(points={{441,166},{450,166},
+          {450,270},{460,270}}, color={255,0,255}));
+  connect(verTHeaSup.y, reqTSpaHeaSup.active) annotation (Line(points={{562,290},
+          {608,290},{608,306},{618,306}}, color={255,0,255}));
+  for i in 1:nBui loop
+  connect(staVer[i].y, verTHeaSup[i].u[1]) annotation (Line(points={{501,560},{
+            514,560},{514,287.667},{538,287.667}},
+                                color={255,0,255}));
+    connect(thrRooHea[i].y, verTHeaSup[i].u[2]) annotation (Line(points={{482,-100},
+            {491.5,-100},{491.5,290},{538,290}},color={255,0,255}));
+  connect(dhWChaOff[i].y, verTHeaSup[i].u[3]) annotation (Line(points={{483,270},
+            {509.5,270},{509.5,292.333},{538,292.333}},
+                                  color={255,0,255}));
+  end for;
   annotation (Diagram(coordinateSystem(extent={{-400,-580},{680,580}})), Icon(
         coordinateSystem(extent={{-100,-100},{100,100}})));
 end DetailedPlantFiveHubsWithRequirementsVerification;
