@@ -14,4 +14,8 @@ for ff in `find . -name dslog.txt`; do echo "========================"; echo "==
 # Postprocess results
 # This will also create plots and tables in the img folder
 rm -rf img
-jupyter nbconvert --execute --to notebook --inplace post_process.ipynb
+posProFil="central_plant borefield_histogram"
+for pos in $posProFil; do
+    echo "Post processing ${pos}"
+    jupyter nbconvert --execute --to notebook --inplace post_process_${pos}.ipynb
+done
