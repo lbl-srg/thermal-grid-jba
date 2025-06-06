@@ -11,9 +11,9 @@ nohub ./run_simulationsAndPostprocess.sh &
 The `export MODELICAPATH` command sets the path to the Modelica libraries
 and sets it to a directory that contains the libraries
 
-- Buildings(version="12.1.0")
-- Modelica_Requirements(version="0.7")
-- Buildings_Requirements;
+- Buildings, version 12.1.0
+- Modelica_Requirements, version 0.7
+- Buildings_Requirements.
 
 Also used is Modelica 4.0 which is distributed with Dymola 2025x.
 
@@ -35,8 +35,8 @@ write all figures to the directory img as pdf and png files.
 They also write LaTeX snippets for the project report.
 
 Ubuntu, the following version of matplotlib was used
-
-> pip freeze | grep matplotlib
-> matplotlib==3.5.1
-
+```
+pip freeze | grep matplotlib
+matplotlib==3.5.1
+```
 Some older versions return an error because they do not support some plot configurations.
