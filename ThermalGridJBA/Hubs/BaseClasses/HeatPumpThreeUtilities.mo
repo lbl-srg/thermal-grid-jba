@@ -75,6 +75,7 @@ model HeatPumpThreeUtilities
 
   replaceable ThermalGridJBA.Hubs.BaseClasses.HeatPump heaPum(
     redeclare final package Medium = MediumBui,
+    allowFlowReversal=true,
     final dpCon_nominal=dpCon_nominal,
     final dpEva_nominal=dpEva_nominal,
     final dat=datHeaPum,
@@ -225,7 +226,7 @@ model HeatPumpThreeUtilities
         origin={150,80})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTChiWatRet(
     redeclare package Medium = MediumBui,
-    allowFlowReversal=false,
+    allowFlowReversal=true,
     final m_flow_nominal=datHeaPum.mCon_flow_nominal)
     "Return chilled water temperature to chiller, prior to chiller valve"
     annotation (Placement(transformation(
@@ -234,7 +235,7 @@ model HeatPumpThreeUtilities
         origin={70,-12})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTHeaWatRet(
     redeclare package Medium = MediumBui,
-    allowFlowReversal=false,
+    allowFlowReversal=true,
     final m_flow_nominal=datHeaPum.mCon_flow_nominal)
     "Return heating water temperature to chiller, prior to chiller valve"
     annotation (Placement(transformation(
