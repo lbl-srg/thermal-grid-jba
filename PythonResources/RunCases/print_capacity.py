@@ -10,16 +10,16 @@ import os
 
 from buildingspy.io.outputfile import Reader
 
-import unyt as uy
+import unyt as yt
 # There appears to be no way to remove a user-defined unit from the
 #   UnitRegistry once defined. The console must be restarted.
-uy.define_unit("kBTU", 1000 * uy.BTU)
-uy.define_unit("RT", 12000 * uy.Unit("BTU/hr")) # refrigeration ton
-#uy.define_unit("inH2O", 249.089 * uy.Unit("Pa"))
-uy.define_unit("GPM_H2O", 1/15.85 * uy.Unit("kg/s"))
-uy.define_unit("GPM_Glycol", 1/15.85/1.11 * uy.Unit("kg/s"))
+yt.define_unit("kBTU", 1000 * yt.BTU)
+yt.define_unit("RT", 12000 * yt.Unit("BTU/hr")) # refrigeration ton
+#yt.define_unit("inH2O", 249.089 * yt.Unit("Pa"))
+yt.define_unit("GPM_H2O", 1/15.85 * yt.Unit("kg/s"))
+yt.define_unit("GPM_Glycol", 1/15.85/1.11 * yt.Unit("kg/s"))
 # glycol density = 1.11e3 kg/m3
-uy.define_unit("CFM_Air", 1/1.293*3.28**3*60 * uy.Unit("kg/s"))
+yt.define_unit("CFM_Air", 1/1.293*3.28**3*60 * yt.Unit("kg/s"))
 # 1 kg/s / 1.293 kg/m3 * 3.28^3 (ft3/m3) * 60 min/s = 1637 cfm
 
 # CWD = os.getcwd()
@@ -66,8 +66,8 @@ def write_row(val,
     
     tab = ""
     
-    val_si = float((val * uy.Unit(unit_mat)).in_units(uy.Unit(unit_si)).value)
-    val_ip = float((val * uy.Unit(unit_mat)).in_units(uy.Unit(unit_ip)).value)
+    val_si = float((val * yt.Unit(unit_mat)).in_units(yt.Unit(unit_si)).value)
+    val_ip = float((val * yt.Unit(unit_mat)).in_units(yt.Unit(unit_ip)).value)
     if display_si is None:
         display_si = unit_si
     if display_ip is None:
