@@ -8,6 +8,7 @@ def get_cases():
                 'stop_time'  : 365* 24 * 3600,
                 'number_of_intervals' : 365 * 24,
                 'solver'     : 'cvode',
+                'tolerance'  : '1e-7',
                 'simulate': True
             }
             # Combine the dictionaries
