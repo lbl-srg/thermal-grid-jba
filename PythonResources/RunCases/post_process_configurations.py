@@ -727,15 +727,15 @@ def write_latex_capacity_table(r,
                   display_ip = None):
         
         """ Returns one row for the latex table.
-            `val`           the value to be put in the table,
-            `desc`          description of the value,
-            `unit_mat`      the input unit,
-            `unit_si`       the si unit to be printed,
-            `unit_ip`       the ip unit to be printed,
+            `val`           input value,
+            `desc`          description,
+            `unit_mat`      input unit,
+            `unit_si`       output si unit,
+            `unit_ip`       output ip unit,
             `format_si`     format control string of the si number,
             `format_ip`     format control string of the ip number,
-            `display_si`    how the unit is printed, leave as None if same as `unit_si`
-            `display_ip`    same as above. 
+            `display_si`    how the unit is to be printed, leave as None if same as `unit_si`,
+            `display_ip`    same as above.
         """
         
         tab = ""
