@@ -290,6 +290,6 @@ record GenericDistrict "District network design parameters"
     defaultComponentPrefixes="inner",
     Documentation(info="<html>
 <p>
-This record contains parameter declarations of a district system.
+This record contains parameter declarations of the district system.
 </html>"));
 end GenericDistrict;
