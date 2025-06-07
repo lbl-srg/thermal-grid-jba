@@ -5,6 +5,8 @@ record GenericDistrict "District network design parameters"
   final package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.40) "Glycol medium";
   constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
   constant Real cpGly=MediumG.cp_const;
+  constant Modelica.Units.SI.Area AFlo = 111997
+    "Total conditioned floor area of all buildings";
   parameter Integer nBui
     "Number of served buildings"
     annotation(Evaluate=true, Dialog(group="Load"));
