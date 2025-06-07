@@ -1,7 +1,8 @@
 within ThermalGridJBA.Data;
 record GenericDistrict "District network design parameters"
   extends Modelica.Icons.Record;
-  final package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.40) "Glycol";
+  final package MediumW = Buildings.Media.Water "Water medium";
+  final package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.40) "Glycol medium";
   constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
   constant Real cpGly=MediumG.cp_const;
   parameter Integer nBui
@@ -159,9 +160,10 @@ record GenericDistrict "District network design parameters"
 //     "Nominal cooling capacity"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // Downsize the heat pump capacity by considering the heating supply from borefield
-  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=QPlaPeaCoo_flow + 0.5*
-    10e6
-    "Nominal cooling capacity"
+  parameter Real heaPumSizFac=1;
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=
+    (QPlaPeaCoo_flow + 0.5*10e6)*heaPumSizFac*1.25
+    "Nominal cooling capacity. Factor 1.25 added based on https://github.com/lbl-srg/thermal-grid-jba/pull/98"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
   parameter Modelica.Units.SI.TemperatureDifference dTCooCha(min=0)=4
@@ -231,7 +233,7 @@ record GenericDistrict "District network design parameters"
    input Modelica.Units.SI.MassFlowRate m_flow "Mass flow rate";
    input Modelica.Units.SI.Density rho "Mass density";
    input Modelica.Units.SI.DynamicViscosity mu "Dynamic viscosity";
-   input Modelica.Units.SI.Length roughness "Roughness";
+   input Modelica.Units.SI.Length roughness "Roughness of district loop and borefield pipes";
    output Real y "Residual";
  protected
    constant Modelica.Units.SI.Length lUni = 1 "Unit length for unit check";
@@ -258,11 +260,11 @@ record GenericDistrict "District network design parameters"
     function f_dhDis(
       dp_length_nominal=dp_length_nominal,
       m_flow=mPipDis_flow_nominal,
-      rho = 1000,
-      mu=8.9e-4,
+      rho=rho_default,
+      mu=mu_default,
       roughness=roughness),
-    0.01,
-    10)
+    u_min=0.01,
+    u_max=10)
     "Diameter distribution pipe";
   parameter Real dhDisSizFac = 1 "Sizing factor to change distribution pipe diameter";
   final parameter Modelica.Units.SI.Length dhDisAct = dhDisSizFac * dhDis
@@ -271,6 +273,16 @@ record GenericDistrict "District network design parameters"
   final parameter Modelica.Units.SI.Area ARound=dhDisAct^2*Modelica.Constants.pi/4
     "Cross sectional area (assuming a round cross section area)";
 
+  final parameter MediumW.ThermodynamicState state_default=
+    MediumW.setState_pTX(
+      T=MediumW.T_default,
+      p=MediumW.p_default,
+      X=MediumW.X_default[1:MediumW.nXi]) "Default state";
+  final parameter Modelica.Units.SI.Density rho_default=MediumW.density(state_default)
+    "Density at nominal condition";
+  final parameter Modelica.Units.SI.DynamicViscosity mu_default=
+      MediumW.dynamicViscosity(state_default)
+    "Dynamic viscosity at nominal condition";
   annotation (
     defaultComponentName="datDis",
     defaultComponentPrefixes="inner",

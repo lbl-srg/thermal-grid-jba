@@ -5,7 +5,7 @@
 #############################################################
 import os
 BRANCH="main"
-SHOW_DYMOLA_GUI = True
+SHOW_DYMOLA_GUI = False
 KEEP_DYMOLA_OPEN = False
 FROM_GIT_HUB = True
 
@@ -109,6 +109,7 @@ def _simulate(spec):
         s.setSolver(spec['solver'])
     else:
         s.setSolver("Cvode")
+        s.addPreProcessingStatement("Advanced.Translation.SparseActivate = true;")
     if 'number_of_intervals' in spec:
         s.setNumberOfIntervals(n=spec['number_of_intervals'])
     if 'modifiers' in spec:

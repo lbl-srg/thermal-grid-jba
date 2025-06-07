@@ -7,10 +7,10 @@ def get_cases():
                 'start_time' : 0 * 24 * 3600,
                 'stop_time'  : 365* 24 * 3600,
                 'number_of_intervals' : 365 * 24,
-                'solver'     : 'radau',
+                'solver'     : 'cvode',
                 'simulate': True
             }
-            # Combine the dictonaries
+            # Combine the dictionaries
             case.update(common)
             cases.append(case)
 
@@ -65,6 +65,24 @@ def get_cases():
         }
         _add(case, cases)
 
+        case = {
+            'name': "base_heaPumSizFac_0.8",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.8
+            }
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0.9",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.9
+            }
+        }
+        _add(case, cases)
+
+        # The commented cases below are for pre-ECM base case and the post-ECM with TMY3.
+        # They are supported but not part of the regular batch of runs
         # case = {
         #     'name': 'pree',
         #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.Baseline'

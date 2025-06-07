@@ -817,37 +817,10 @@ equation
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
 <p>
-Adapted from
-<a href=\"modelica://Buildings.DHC.Examples.Combined.BaseClasses.PartialSeries\">
-Buildings.DHC.Examples.Combined.BaseClasses.PartialSeries</a>.
+This is the system model for Joint Base Andrews that contains
+the central plant, the district loop and all energy transfer stations
+which are connected to the building loads.
 </p>
-<ul>
-<li>
-This model has a configuration of one single central plant in the loop
-instead of two.
-</li>
-<li>
-The plant is replaced with an idealized component.
-The plant pump control is replaced with a constant block.
-Parameters in the record class related to the plant are also removed.
-</li>
-<li>
-The two pipe segments in to and out of the connection component are removed.
-</li>
-<li>
-The building array is replaced with the new component from the JBA library.
-</li>
-<li>
-The main pump control block is copied here as is.
-Note that, the same as in the original model, this control block only
-regulates the outgoing temperature from each building connection,
-and <code>use_temperatureShift==false</code>.
-This means only the <code>TMix_in[]</code> input connectors are useful.
-</li>
-<li>
-The pressurization point of the loop is moved to upstream the main pump.
-</li>
-</ul>
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
 end DetailedPlantFiveHubs;
