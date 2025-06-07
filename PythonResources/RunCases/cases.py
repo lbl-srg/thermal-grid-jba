@@ -54,6 +54,18 @@ def get_cases():
         }
         _add(case, cases)
 
+        # Disable plant economizer by setting a small flow rate (as
+        # the flow rate is also used to size the dry cooler) and
+        # setting the approach that commands the economizer on to 100 K
+        case = {
+            'name': "base_noEco",
+            'parameters': {
+                'datDis.mPlaHexGly_flow_nominal': 1,
+                'cenPla.TApp': 100
+            }
+        }
+        _add(case, cases)
+
         case = {
             'name': 'heat',
             'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.HeatWave'
