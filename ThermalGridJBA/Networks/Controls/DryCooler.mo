@@ -5,10 +5,7 @@ block DryCooler "Dry cooler and the associated pump control"
     final quantity="TemperatureDifference",
     final unit="K")=2
     "Dry cooler approach setpoint";
-  parameter Real TApp(
-    final quantity="TemperatureDifference",
-    final unit="K")=4
-    "Approach temperature for checking if the dry cooler should be enabled";
+
   parameter Real minFanSpe(
     final min=0,
     final max=1,

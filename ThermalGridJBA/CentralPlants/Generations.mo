@@ -148,8 +148,8 @@ model Generations
   parameter Real TApp(
     final quantity="TemperatureDifference",
     final unit="K")=2
-    "Approach temperatue for enabling economizer"
-    annotation (Dialog(tab="Controls", group="Dry cooler"));
+    "Approach temperature for enabling economizer"
+    annotation (Dialog(tab="Controls", group="Economizer"));
 
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
@@ -771,12 +771,12 @@ model Generations
     final staDowDel=staDowDel) "Load indicator"
     annotation (Placement(transformation(extent={{-520,250},{-500,270}})));
   ThermalGridJBA.Networks.Controls.HeatExchanger hexCon(final
-      mHexGly_flow_nominal=mHexGly_flow_nominal, final TApp=TApp)
+      mHexGly_flow_nominal=mHexGly_flow_nominal,
+      final TApp=TApp)
     "Heat exchanger economizer and the associated pump and valves control"
     annotation (Placement(transformation(extent={{-460,220},{-440,240}})));
   ThermalGridJBA.Networks.Controls.DryCooler dryCooCon(
     final TAppSet=TDryAppSet,
-    final TApp=TApp,
     final minFanSpe=minFanSpe,
     final fanConTyp=fanConTyp,
     final kFan=kFan,
