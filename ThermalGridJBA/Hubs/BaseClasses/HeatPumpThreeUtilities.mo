@@ -205,7 +205,6 @@ model HeatPumpThreeUtilities
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     m_flow_nominal=datHeaPum.mCon_flow_nominal,
     dpValve_nominal=dpCon_nominal*0.05,
-    dpFixed_nominal=dpCon_nominal*0.05*{1,1},
     linearized={true,true})
     "Diversion valve used to reject heat and not flow through the whole tank"
     annotation (Placement(transformation(
@@ -217,7 +216,6 @@ model HeatPumpThreeUtilities
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     m_flow_nominal=datHeaPum.mEva_flow_nominal,
     dpValve_nominal=dpEva_nominal*0.05,
-    dpFixed_nominal=dpEva_nominal*0.05*{1,1},
     linearized={true,true})
     "Diversion valve used to reject cold and not flow through the whole tank"
     annotation (Placement(transformation(
