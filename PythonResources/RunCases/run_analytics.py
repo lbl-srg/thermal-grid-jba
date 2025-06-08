@@ -42,31 +42,124 @@ units = {'power':
               'displayUnit' : uy.s}
         }
 
+# 'caption' is optional.
+# if 'quantity' not given, treated as unit 1.
+variables = [
+                {'name' : 'EChi.u',
+                 'quantity': 'power',
+                 'action'  : max,
+                 'caption' : 'ETS heat recovery chiller peak electric power input'
+                 },
+                {'name' : 'EChi.y',
+                 'quantity': 'energy',
+                 'action'  : lambda y: y[-1],
+                 'caption' : 'ETS heat recovery chiller total electrical consumption'
+                 },
+                {'name' : 'bui.bui.QReqHea_flow',
+                 'quantity': 'power',
+                 'action'  : max,
+                 'caption' : 'Peak end-use space heating load'
+                 },
+                {'name' : 'bui.bui.QReqCoo_flow',
+                 'quantity': 'power',
+                 'action'  : min,
+                 'caption' : 'Peak end-use cooling load'
+                 },
+                {'name' : 'dHHeaWat.y',
+                 'quantity': 'energy',
+                 'action'  : lambda y: y[-1],
+                 'caption' : 'Total end-use space heating load'
+                 },
+                {'name' : 'dHChiWat.y',
+                 'quantity': 'energy',
+                 'action'  : lambda y: y[-1],
+                 'caption' : 'Total end-use cooling load'
+                 },
+                {'name' : 'bui.ets.heaPum.heaPum.ySet',
+                 'quantity': 'time',
+                 'action'  : lambda y: condition_duration(t, y, lambda y: y > 0.99),
+                 'caption' : 'Total duration of chiller speed > 0.99'}
+            ]
+
+# scenarios = [
+#                 {'name'    : 'fTMY',
+#                   'matFile' : os.path.join('cluster_B_futu','ConnectedETSWithDHW.mat'),
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'Heat wave',
+#                   'matFile' : os.path.join('cluster_B_heat','ConnectedETSWithDHW.mat'),
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'Cold snap',
+#                   'matFile' : os.path.join('cluster_B_cold','ConnectedETSWithDHW.mat'),
+#                   'results' : {}
+#                   }
+#             ]
+
+scenarios = [
+                {'name'    : 'A',
+                  'matFile' : os.path.join('cluster_A_futu','ConnectedETSNoDHW.mat'),
+                  'results' : {}
+                  },
+                {'name'    : 'B',
+                  'matFile' : os.path.join('cluster_B_futu','ConnectedETSWithDHW.mat'),
+                  'results' : {}
+                  },
+                {'name'    : 'C',
+                  'matFile' : os.path.join('cluster_C_futu','ConnectedETSWithDHW.mat'),
+                  'results' : {}
+                  },
+                {'name'    : 'D',
+                  'matFile' : os.path.join('cluster_D_futu','ConnectedETSWithDHW.mat'),
+                  'results' : {}
+                  },
+                {'name'    : 'E',
+                  'matFile' : os.path.join('cluster_E_futu','ConnectedETSWithDHW.mat'),
+                  'results' : {}
+                  }
+            ]
+
+# scenarios = [
+#                 {'name'    : 'fTMY',
+#                   'matFile' : 'ETS_All_futu/ConnectedETSWithDHW.mat',
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'Heat wave',
+#                   'matFile' : 'ETS_All_heat/ConnectedETSWithDHW.mat',
+#                   'results' : {}
+#                   },
+#                 {'name'    : 'Cold snap',
+#                   'matFile' : 'ETS_All_cold/ConnectedETSWithDHW.mat',
+#                   'results' : {}
+#                   }
+#             ]
+
 def find_var(n, print_message = True):
     """ Find the exact var name in results.
         If variable found, returns the values;
         Else, prints error message unless print_message == False.
     """
-    
+
     if r.varNames(f'^{n}$'):
         (t, y) = r.values(n)
     else:
         y = []
         if print_message:
             print(f'No variable found with name: "{n}".')
-        
+
     return y
 
 def section_data(t, y, timeperiod):
     """ Take out a section of the data.
     """
-    seconds_start = timeperiod[0]
-    seconds_end = timeperiod[1]
-    mask = (t >= seconds_start) & (t < seconds_end)
-    t_sectioned = t[mask]
-    y_sectioned = y[mask]
-    
-    return t_sectioned, y_sectioned
+    indices = np.where(condition(y))[0]
+    duration = 0.0
+    for i in range(1, len(indices)):
+        if indices[i] == indices[i-1] + 1:  # Check if the indices are consecutive
+            duration += t[indices[i]] - t[indices[i-1]]
+
+    return duration
+
 
 #%%
 analysis = analyses.get_analysis(WHAT_TO_RUN)
@@ -94,7 +187,7 @@ for var in analysis['variables']:
     else:
         row = var['name']
     print(row)
-    
+
     if 'quantity' in var.keys():
         unit_with_bracket = f"[{units[var['quantity']]['displayUnit']}]"
     else:
@@ -119,4 +212,4 @@ for var in analysis['variables']:
                 displayValue += f' ({displayCompare})'
         row += f" | {displayValue:>{TABLE_WIDTH}}"
     print(row)
-    
+

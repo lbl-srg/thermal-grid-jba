@@ -37,7 +37,7 @@ record BuildingSetPoints "Set points for the buildings"
     50 + 273.15 "Nominal domestic hot water supply temperature to the tank"
     annotation (Dialog(group="Domestic hot water"));
   parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSupFix_nominal(displayUnit="degC") =
-    40 + 273.15 "Nominal domestic hot water supply temperature to the fixture"
+    45 + 273.15 "Nominal domestic hot water supply temperature to the fixture"
     annotation (Dialog(group="Domestic hot water"));
   parameter Modelica.Units.SI.ThermodynamicTemperature TColWat_nominal(displayUnit="degC") =
     15 + 273.15 "Nominal domestic cold water temperature"

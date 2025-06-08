@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 #
-# Start the script for the directory that contains the package
-# with your model
+# Script to automate the simulation of the case studies
 #
-# KNOWN ISSUES:
-#   Each run adds an entry to Dymola > Tools > Library Management > Modelica Path,
-#       after a point it may fail to add more and the simulation can't find Buildings.
-#       Manually deleting paths can help.
 #############################################################
 import os
 BRANCH="main"
@@ -114,6 +109,9 @@ def _simulate(spec):
         s.setSolver(spec['solver'])
     else:
         s.setSolver("Cvode")
+    s.addPreProcessingStatement("Advanced.Translation.SparseActivate = true;")
+    if 'tolerance' in spec:
+        s.setTolerance(spec['tolerance'])
     if 'number_of_intervals' in spec:
         s.setNumberOfIntervals(n=spec['number_of_intervals'])
     if 'modifiers' in spec:
@@ -122,7 +120,6 @@ def _simulate(spec):
         s.addParameters(spec['parameters'])
     s.setStartTime(spec["start_time"])
     s.setStopTime(spec["stop_time"])
-    s.setTolerance(1E-6)
     s.showGUI(SHOW_DYMOLA_GUI)
     s.exitSimulator(not KEEP_DYMOLA_OPEN)
     print("Starting simulation in {}".format(out_dir))

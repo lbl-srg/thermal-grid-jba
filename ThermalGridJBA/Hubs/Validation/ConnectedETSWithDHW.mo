@@ -10,7 +10,9 @@ annotation(
     __Dymola_Commands(
       file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Hubs/Validation/ConnectedETSWithDHW.mos" "Simulate and plot"),
     experiment(
-      StopTime=4320000,
+      StartTime=8640000,
+      StopTime=11232000,
+      __Dymola_NumberOfIntervals=5000,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
 Documentation(info="<html>

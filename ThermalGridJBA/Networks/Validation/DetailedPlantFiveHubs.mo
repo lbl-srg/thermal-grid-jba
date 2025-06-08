@@ -4,26 +4,16 @@ model DetailedPlantFiveHubs
   extends Modelica.Icons.Example;
   package Medium = Buildings.Media.Water "Medium model";
 
-  parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
-    "Pipe diameter (without insulation)";
-  parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
   parameter Modelica.Units.SI.Radius thiGroLay=1.0
     "Dynamic ground layer thickness";
-  parameter Real dpDis_length_nominal(unit="Pa/m")=250
-    "Pressure drop per pipe length at nominal flow rate - Distribution line";
-  parameter Real dpCon_length_nominal(unit="Pa/m")=250
-    "Pressure drop per pipe length at nominal flow rate - Connection line";
+
   parameter Boolean allowFlowReversalSer = false
     "Set to true to allow flow reversal in the service lines"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
   parameter Boolean allowFlowReversalBui = false
     "Set to true to allow flow reversal for in-building systems"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
-  parameter Modelica.Units.SI.Length dhPla(
-    fixed=false,
-    min=0.01,
-    start=0.05)
-    "Hydraulic diameter of the distribution pipe before each connection";
+
   // Central plant
   parameter Real staDowDel(unit="s")=datDis.staDowDel
     "Minimum stage down delay, to avoid quickly staging down"
@@ -153,6 +143,7 @@ model DetailedPlantFiveHubs
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
   parameter ThermalGridJBA.Data.Districts.FiveHubs datDis(
+    sce=ThermalGridJBA.Types.Scenario.FutureTMY,
     mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-380,180},{-360,200}})));
@@ -161,18 +152,19 @@ model DetailedPlantFiveHubs
     "Parameter for the building set points"
     annotation (Placement(transformation(extent={{-380,142},{-360,162}})));
 
-  Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipeGroundCouplingMulti[nBui + 1](
+  Buildings.Fluid.FixedResistances.BuriedPipes.PipeGroundCoupling pipGroCou[nBui + 1](
     lPip=datDis.lDis,
-    each rPip=rPip,
+    each rPip=datDis.dhDisAct/2,
     each thiGroLay=thiGroLay,
     each nSeg=1,
-    each nSta=2,
+    each nSta=4,
+    each dep=1 + datDis.dhDisAct/2,
     redeclare parameter ThermalGridJBA.Networks.Data.Andrew_AFB cliCon,
     redeclare parameter Buildings.HeatTransfer.Data.Soil.Generic soiDat(
       each k=2.3,
       each c=1000,
-      each d=2600))
-    annotation (Placement(transformation(extent={{-10,180},{12,160}})));
+      each d=2600)) "Soil for pipe coupling to ground"
+    annotation (Placement(transformation(extent={{-10,182},{12,162}})));
 
   Buildings.DHC.Networks.Distribution1PipePlugFlow_v dis(
     nCon=nBui,
@@ -184,9 +176,11 @@ model DetailedPlantFiveHubs
     mCon_flow_nominal=datDis.mCon_flow_nominal,
     lDis=datDis.lDis[1:end - 1],
     lEnd=datDis.lDis[end],
-    dIns=0.02,
-    kIns=0.2)
+    dIns=0.005,
+    kIns=0.4,
+    v_nominal=datDis.vDis_nominal) "District pipe network"
     annotation (Placement(transformation(extent={{-20,190},{20,210}})));
+
   Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumDis(
     redeclare final package Medium = Medium,
     final m_flow_nominal=datDis.mPumDis_flow_nominal,
@@ -204,18 +198,6 @@ model DetailedPlantFiveHubs
         extent={{-10,-10},{10,10}},
         rotation=180,
         origin={128,-40})));
-  Buildings.DHC.Networks.Connections.Connection1Pipe_R conPla(
-    redeclare final package Medium = Medium,
-    final mDis_flow_nominal=datDis.mPipDis_flow_nominal,
-    final mCon_flow_nominal=sum(datDis.mCon_flow_nominal),
-    lDis=50,
-    final allowFlowReversal=allowFlowReversalSer,
-    dhDis=dhPla)
-    "Connection to the plant (pressure drop lumped in plant and network model)"
-    annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=90,
-        origin={-80,-10})));
   Buildings.Fluid.Sensors.TemperatureTwoPort TDisWatSup(
     redeclare final package Medium = Medium,
     allowFlowReversal=false,
@@ -293,6 +275,7 @@ model DetailedPlantFiveHubs
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
     final uMax(final unit="K", displayUnit="degC")=datDis.TLooMax,
     u(each final unit="K", each displayUnit="degC"),
+    y(fixed=false),
     nu=2)
     "Check if loop temperatures are within given range"
     annotation (Placement(transformation(extent={{-220,220},{-200,240}})));
@@ -542,6 +525,29 @@ model DetailedPlantFiveHubs
     annotation (Placement(transformation(extent={{300,-280},{320,-260}})));
   CentralPlants.BorefieldMILP borMil "Energy exchange with borefield as computed by MILP"
     annotation (Placement(transformation(extent={{340,-280},{360,-260}})));
+
+  Buildings.Fluid.FixedResistances.Junction junDisRet(
+    redeclare final package Medium = Medium,
+    final portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    final dp_nominal={0,0,50*datDis.dp_length_nominal},
+    final energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    final m_flow_nominal=datDis.mPipDis_flow_nominal*{1,-1,-1})
+    "Junction at district return"
+    annotation (Placement(transformation(extent={{-10,10},{10,-10}},
+        rotation=90,
+        origin={-80,-40})));
+  Buildings.Fluid.FixedResistances.Junction junDisSup(
+    redeclare final package Medium = Medium,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    final dp_nominal={0,0,0},
+    final energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    final m_flow_nominal=datDis.mPipDis_flow_nominal*{1,-1,-1})
+    "Junction at district supply" annotation (Placement(transformation(
+        extent={{-10,10},{10,-10}},
+        rotation=90,
+        origin={-80,0})));
 equation
  for i in 1:nBui loop
    connect(weaDat.weaBus, bui[i].weaBus) annotation (Line(
@@ -553,15 +559,8 @@ equation
           {-14,210},{-14,240},{-10,240}},color={0,127,255}));
   connect(dis.ports_aCon, bui.port_bSerAmb) annotation (Line(points={{12,210},{
           16,210},{16,240},{10,240}}, color={0,127,255}));
-  connect(pipeGroundCouplingMulti[1:(nBui+1)].heatPorts[1], dis.heatPorts)
-    annotation (Line(points={{1,175},{1,196},{0.4,196},{0.4,197.8}},
-        color={127,0,0}));
-  connect(conPla.port_bDis, TDisWatSup.port_a)
-    annotation (Line(points={{-80,0},{-80,160}},color={0,127,255},
-      thickness=0.5));
-  connect(TDisWatRet.port_b, conPla.port_aDis)
-    annotation (Line(points={{-80,-70},{-80,-20}}, color={0,127,255},
-      thickness=0.5));
+  connect(pipGroCou[1:(nBui + 1)].heatPorts[1], dis.heatPorts) annotation (Line(
+        points={{1,177},{1,196},{0.4,196},{0.4,197.8}}, color={127,0,0}));
   connect(PPumETS.y, EPumETS.u)
     annotation (Line(points={{142,200},{238,200}}, color={0,0,127}));
   connect(pumDis.P, EPumDis.u)
@@ -594,10 +593,6 @@ equation
   connect(pumDis.port_a, bou.ports[1]) annotation (Line(points={{90,-50},{90,
           -40},{118,-40}},                     color={0,127,255},
       thickness=0.5));
-  connect(conPla.port_bCon, cenPla.port_a) annotation (Line(points={{-90,-10},{-100,
-          -10},{-100,-26},{-208,-26},{-208,0},{-180,0}}, color={0,127,255}));
-  connect(conPla.port_aCon, cenPla.port_b) annotation (Line(points={{-90,-4},{-100,
-          -4},{-100,0},{-160,0}}, color={0,127,255}));
   connect(looPumSpe.yDisPum, gai.u)
     annotation (Line(points={{-196,190},{-182,190}},color={0,0,127}));
   connect(gai.y, pumDis.m_flow_in) annotation (Line(points={{-158,190},{-146,
@@ -642,7 +637,7 @@ equation
   connect(cenPla.PCom, EComPla.u) annotation (Line(points={{-158,-10},{-114,-10},
           {-114,30},{238,30}},color={0,0,127}));
   connect(cenPla.PPumHeaPumWat, EPumHeaPumWat.u) annotation (Line(points={{-158,
-          -12},{-112,-12},{-112,10},{138,10}},
+          -12},{-110,-12},{-110,20},{14,20},{14,10},{138,10}},
                                              color={0,0,127}));
   connect(cenPla.PPumCirPum, EPumCirPum.u) annotation (Line(points={{-158,-14},
           {-108,-14},{-108,-28},{178,-28}}, color={0,0,127}));
@@ -789,6 +784,26 @@ equation
     annotation (Line(points={{141,280},{178,280}}, color={0,0,127}));
   connect(PFanBuiSum.y, multiSum.u[14]) annotation (Line(points={{202,280},{224,
           280},{224,-148},{240,-148},{240,-146.75}}, color={0,0,127}));
+  connect(TDisWatRet.port_b, junDisRet.port_1) annotation (Line(
+      points={{-80,-70},{-80,-50}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(junDisRet.port_2, junDisSup.port_1) annotation (Line(
+      points={{-80,-30},{-80,-10}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(TDisWatSup.port_a, junDisSup.port_2) annotation (Line(
+      points={{-80,160},{-80,10}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(junDisSup.port_3, cenPla.port_b) annotation (Line(
+      points={{-90,0},{-160,0}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(junDisRet.port_3, cenPla.port_a) annotation (Line(
+      points={{-90,-40},{-190,-40},{-190,0},{-180,0}},
+      color={0,127,255},
+      thickness=0.5));
   annotation (
   Diagram(
   coordinateSystem(preserveAspectRatio=false, extent={{-400,-300},{400,300}})),
@@ -796,43 +811,16 @@ equation
   file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Networks/Validation/DetailedPlantFiveHubs.mos"
   "Simulate and plot"),
   experiment(
-      StopTime=31536000,
+      StopTime=86400,
       Interval=3600.00288,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
 <p>
-Adapted from
-<a href=\"modelica://Buildings.DHC.Examples.Combined.BaseClasses.PartialSeries\">
-Buildings.DHC.Examples.Combined.BaseClasses.PartialSeries</a>.
+This is the system model for Joint Base Andrews that contains
+the central plant, the district loop and all energy transfer stations
+which are connected to the building loads.
 </p>
-<ul>
-<li>
-This model has a configuration of one single central plant in the loop
-instead of two.
-</li>
-<li>
-The plant is replaced with an idealized component.
-The plant pump control is replaced with a constant block.
-Parameters in the record class related to the plant are also removed.
-</li>
-<li>
-The two pipe segments in to and out of the connection component are removed.
-</li>
-<li>
-The building array is replaced with the new component from the JBA library.
-</li>
-<li>
-The main pump control block is copied here as is.
-Note that, the same as in the original model, this control block only
-regulates the outgoing temperature from each building connection,
-and <code>use_temperatureShift==false</code>.
-This means only the <code>TMix_in[]</code> input connectors are useful.
-</li>
-<li>
-The pressurization point of the loop is moved to upstream the main pump.
-</li>
-</ul>
 </html>"),
     Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
 end DetailedPlantFiveHubs;

@@ -3,29 +3,22 @@ model IdealPlantCombinedHub
   "District network with an ideal plant and a single combined hub"
   extends Modelica.Icons.Example;
 
-  parameter Modelica.Units.SI.Length diameter=sqrt(4*datDis.mPipDis_flow_nominal/1000/1.5/Modelica.Constants.pi)
-    "Pipe diameter (without insulation)";
-  parameter Modelica.Units.SI.Radius rPip=diameter/2 "Pipe external radius";
   parameter Modelica.Units.SI.Radius thiGroLay=0.5
     "Dynamic ground layer thickness";
   package Medium = Buildings.Media.Water "Medium model";
-  parameter Real dpDis_length_nominal(final unit="Pa/m") = 250
-    "Pressure drop per pipe length at nominal flow rate - Distribution line";
-  parameter Real dpCon_length_nominal(final unit="Pa/m") = 250
-    "Pressure drop per pipe length at nominal flow rate - Connection line";
+
   parameter Boolean allowFlowReversalSer = true
     "Set to true to allow flow reversal in the service lines"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
   parameter Boolean allowFlowReversalBui = false
     "Set to true to allow flow reversal for in-building systems"
     annotation(Dialog(tab="Assumptions"), Evaluate=true);
-  parameter Modelica.Units.SI.Length dhPla(fixed=false,start=0.05,min=0.01)
-    "Hydraulic diameter of the distribution pipe before each connection";
+
   final parameter Integer nBui=datDis.nBui
     "Number of buildings connected to DHC system"
     annotation (Evaluate=true);
   inner replaceable parameter ThermalGridJBA.Data.Districts.SingleHub datDis(
-    mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
+      mCon_flow_nominal=bui.ets.hex.m1_flow_nominal)
     "Parameters for the district network"
     annotation (Placement(transformation(extent={{-360,220},{-340,240}})));
 
@@ -129,7 +122,8 @@ model IdealPlantCombinedHub
     each final allowFlowReversalSer=allowFlowReversalSer,
     each final TDisWatMin=datDis.TLooMin,
     each final TDisWatMax=datDis.TLooMax,
-    ets(chi(pumEva(each use_riseTime=true))),
+    ets(heaPum(
+            pumEva(each use_riseTime=true))),
     each have_eleNonHva=true)                 "Building and ETS"
     annotation (Placement(transformation(extent={{-10,170},{10,190}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(nin=nBui)

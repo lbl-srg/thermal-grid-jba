@@ -148,8 +148,8 @@ model Generations
   parameter Real TApp(
     final quantity="TemperatureDifference",
     final unit="K")=2
-    "Approach temperatue for enabling economizer"
-    annotation (Dialog(tab="Controls", group="Dry cooler"));
+    "Approach temperature for enabling economizer"
+    annotation (Dialog(tab="Controls", group="Economizer"));
 
   parameter Real TDryBulSum(
     final quantity="ThermodynamicTemperature",
@@ -169,6 +169,8 @@ model Generations
   parameter Real TEvaInMax(unit="K")
     "Maximum evaporator inlet temperature"
     annotation (Dialog(tab="Controls", group="Heat pump"));
+  parameter Modelica.Units.SI.PressureDifference dpHeaPum_nominal=30000
+    "Pressure drop of heat pump evaporator and condenser at nominal mass flow rate";
   parameter Real offTim(unit="s")=12*3600
      "Heat pump off time due to the low compressor speed"
     annotation (Dialog(tab="Controls", group="Heat pump"));
@@ -360,7 +362,8 @@ model Generations
     final m_flow_nominal=mHeaPumWat_flow_nominal,
     final dpValve_nominal=dpValve_nominal,
     use_strokeTime=true,
-    final strokeTime=heaPumIsoValStrTim)
+    final strokeTime=heaPumIsoValStrTim,
+    dpFixed_nominal=dpHeaPum_nominal)
     "Heat pump water loop valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-130})));
@@ -370,6 +373,7 @@ model Generations
     final use_riseTime=true,
     final riseTime=heaPumPumRis,
     final m_flow_nominal=mHeaPumWat_flow_nominal,
+    dp_nominal=dpHeaPum_nominal + dpValve_nominal,
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-40})));
@@ -498,14 +502,14 @@ model Generations
       use_minFlowCtr=false),
     dTCon_nominal=dTHex_nominal,
     mCon_flow_nominal=mHeaPumWat_flow_nominal,
-    dpCon_nominal=30000,
+    dpCon_nominal=0,
     use_conCap=false,
     CCon=3000,
     GConOut=100,
     GConIns=1000,
     dTEva_nominal=dTHex_nominal,
     mEva_flow_nominal=mHeaPumGly_flow_nominal,
-    dpEva_nominal=30000,
+    dpEva_nominal=dpHeaPum_nominal,
     use_evaCap=false,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final QHea_flow_nominal=QHeaPumHea_flow_nominal,
@@ -767,12 +771,12 @@ model Generations
     final staDowDel=staDowDel) "Load indicator"
     annotation (Placement(transformation(extent={{-520,250},{-500,270}})));
   ThermalGridJBA.Networks.Controls.HeatExchanger hexCon(final
-      mHexGly_flow_nominal=mHexGly_flow_nominal, final TApp=TApp)
+      mHexGly_flow_nominal=mHexGly_flow_nominal,
+      final TApp=TApp)
     "Heat exchanger economizer and the associated pump and valves control"
     annotation (Placement(transformation(extent={{-460,220},{-440,240}})));
   ThermalGridJBA.Networks.Controls.DryCooler dryCooCon(
     final TAppSet=TDryAppSet,
-    final TApp=TApp,
     final minFanSpe=minFanSpe,
     final fanConTyp=fanConTyp,
     final kFan=kFan,
