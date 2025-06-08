@@ -88,9 +88,9 @@ model CentralPlant "Central plant"
   parameter Real TDryAppSet(unit="K")=2
     "Dry cooler approach setpoint"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
-  parameter Real TApp(unit="K")=4
-    "Approach temperature for checking if the dry cooler should be enabled"
-    annotation (Dialog(tab="Controls", group="Dry cooler"));
+  parameter Real TApp(unit="K")=2
+    "Approach temperature for checking if the economizer should be enabled"
+    annotation (Dialog(tab="Controls", group="Economizer"));
   parameter Real minFanSpe(unit="1")=0.1
     "Minimum dry cooler fan speed"
     annotation (Dialog(tab="Controls", group="Dry cooler"));
@@ -271,7 +271,7 @@ model CentralPlant "Central plant"
     final dTHex_nominal=dTHex_nominal,
     final minFanSpe=minFanSpe,
     fanConTyp=Buildings.Controls.OBC.CDL.Types.SimpleController.PI,
-    TApp=2,
+    final TApp=TApp,
     final TDryBulSum=TDryBulSum,
     final dTCooCha=dTCooCha,
     final TConInMin=TConInMin,

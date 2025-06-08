@@ -1,8 +1,8 @@
 within ThermalGridJBA.Data;
-record Chiller "Parameters for the modular expandable chiller"
+record HeatPump
+  "Parameters for the modular expandable heat pump in energy transfer station"
   extends Modelica.Icons.Record;
   constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
-
 
   parameter Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.GenericHeatPump dat
     = Buildings.Fluid.HeatPumps.ModularReversible.Data.TableData2D.EN14511.WAMAK_WaterToWater_220kW()
@@ -21,7 +21,7 @@ record Chiller "Parameters for the modular expandable chiller"
   parameter Modelica.Units.SI.HeatFlowRate QHea_flow_nominal(min=Modelica.Constants.eps)
     "Nominal heating capacity"
     annotation (Dialog(group="Condenser"));
-  parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(max=0)=0
+  parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(max=0)
     "Nominal cooling capacity"
     annotation (Dialog(group="Evaporator"));
   parameter Modelica.Units.SI.TemperatureDifference dTCon_nominal
@@ -36,14 +36,14 @@ record Chiller "Parameters for the modular expandable chiller"
   parameter Modelica.Units.SI.TemperatureDifference TEvaLvg_nominal(
      displayUnit="degC") "Nominal evaporator leaving temperature"
     annotation (Dialog(group="Evaporator"));
-  parameter Modelica.Units.SI.Temperature TConEntMin(displayUnit="degC") =
-    25 + 273.15
-    "Minimum of condenser water entering temperature"
-    annotation (Dialog(group="Condenser"));
-  parameter Modelica.Units.SI.Temperature TEvaEntMax(displayUnit="degC") =
-    20 + 273.15
-    "Maximum of evaporator water entering temperature"
-    annotation (Dialog(group="Evaporator"));
+//  parameter Modelica.Units.SI.Temperature TConEntMin(displayUnit="degC") =
+//    25 + 273.15
+//    "Minimum of condenser water entering temperature"
+//    annotation (Dialog(group="Condenser"));
+//  parameter Modelica.Units.SI.Temperature TEvaEntMax(displayUnit="degC") =
+//    20 + 273.15
+//    "Maximum of evaporator water entering temperature"
+//    annotation (Dialog(group="Evaporator"));
   parameter Modelica.Units.SI.Temperature TEvaLvgMin(displayUnit="degC") =
     4 + 273.15
     "Minimum value for leaving evaporator temperature"
@@ -62,4 +62,4 @@ record Chiller "Parameters for the modular expandable chiller"
     annotation (Dialog(group="Evaporator"));
 
 annotation(defaultComponentName="datChi");
-end Chiller;
+end HeatPump;

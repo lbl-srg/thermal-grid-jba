@@ -28,7 +28,7 @@ units = {'power':
               'displayUnit' : uy.s}
         }
 
-# 'caption' is optional. 
+# 'caption' is optional.
 # if 'quantity' not given, treated as unit 1.
 variables = [
                 {'name' : 'EChi.u',
@@ -61,7 +61,7 @@ variables = [
                  'action'  : lambda y: y[-1],
                  'caption' : 'Total end-use cooling load'
                  },
-                {'name' : 'bui.ets.chi.chi.ySet',
+                {'name' : 'bui.ets.heaPum.heaPum.ySet',
                  'quantity': 'time',
                  'action'  : lambda y: condition_duration(t, y, lambda y: y > 0.99),
                  'caption' : 'Total duration of chiller speed > 0.99'}
@@ -125,14 +125,14 @@ def find_var(n, print_message = True):
         If variable found, returns the values;
         Else, prints error message unless print_message == False.
     """
-    
+
     if r.varNames(f'^{n}$'):
         (t, y) = r.values(n)
     else:
         y = []
         if print_message:
             print(f'No variable found with name: "{n}".')
-        
+
     return y
 
 def condition_duration(t, y, condition):
@@ -143,10 +143,10 @@ def condition_duration(t, y, condition):
     for i in range(1, len(indices)):
         if indices[i] == indices[i-1] + 1:  # Check if the indices are consecutive
             duration += t[indices[i]] - t[indices[i-1]]
-            
+
     return duration
-    
-    
+
+
 #%%
 for scenario in scenarios:
     mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", scenario['matFile']))
@@ -170,7 +170,7 @@ for var in variables:
     else:
         row = var['name']
     print(row)
-    
+
     if 'quantity' in var.keys():
         unit_with_bracket = f"[{units[var['quantity']]['displayUnit']}]"
     else:
@@ -190,4 +190,4 @@ for var in variables:
                 displayValue += f' ({displayCompare})'
         row += f" | {displayValue:>{TABLE_WIDTH}}"
     print(row)
-    
+

@@ -11,10 +11,10 @@ model DetailedPlantFiveHubsWithRequirementsVerification
  "Pressure drop per length unit for each pipe (Pa/m)";
   Real y_value[5*3 + 4]={bui[1].ets.hex.val2.y_actual,bui[2].ets.hex.val2.y_actual,
       bui[3].ets.hex.val2.y_actual,bui[4].ets.hex.val2.y_actual,bui[5].ets.hex.val2.y_actual,
-      bui[1].ets.chi.valEva.y_actual,bui[2].ets.chi.valEva.y_actual,bui[3].ets.chi.valEva.y_actual,
-      bui[4].ets.chi.valEva.y_actual,bui[5].ets.chi.valEva.y_actual,bui[1].ets.chi.valCon.y_actual,
-      bui[2].ets.chi.valCon.y_actual,bui[3].ets.chi.valCon.y_actual,bui[4].ets.chi.valCon.y_actual,
-      bui[5].ets.chi.valCon.y_actual,bui[2].ets.tanDhw.domHotWatTan.divVal.y_actual,
+      bui[1].ets.heaPum.valEva.y_actual,bui[2].ets.heaPum.valEva.y_actual,bui[3].ets.heaPum.valEva.y_actual,
+      bui[4].ets.heaPum.valEva.y_actual,bui[5].ets.heaPum.valEva.y_actual,bui[1].ets.heaPum.valCon.y_actual,
+      bui[2].ets.heaPum.valCon.y_actual,bui[3].ets.heaPum.valCon.y_actual,bui[4].ets.heaPum.valCon.y_actual,
+      bui[5].ets.heaPum.valCon.y_actual,bui[2].ets.tanDhw.domHotWatTan.divVal.y_actual,
       bui[3].ets.tanDhw.domHotWatTan.divVal.y_actual,bui[4].ets.tanDhw.domHotWatTan.divVal.y_actual,
       bui[5].ets.tanDhw.domHotWatTan.divVal.y_actual}
     "Valves actuator values for the control valves of each ETS (heat exchanger, condenser loop of the chiller, evaporator loop of the chiller, domestichot water when present)";
@@ -53,13 +53,10 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each witBan(u(final unit="K")))
     "Requirement for the heating water temperature that serves the domestic hot water tank"
     annotation (Placement(transformation(extent={{620,180},{640,200}})));
-    Modelica.Blocks.Sources.RealExpression TTanDhwSet[nBui](
-    y(each final unit="K", each displayUnit="degC")={
-      50 + 273.15,
-      bui[5].ets.chi.con.conHea.u_s,
-      bui[5].ets.chi.con.conHea.u_s,
-      bui[5].ets.chi.con.conHea.u_s,
-      bui[5].ets.chi.con.conHea.u_s})
+  Modelica.Blocks.Sources.RealExpression TTanDhwSet[nBui](y(
+      each final unit="K",
+      each displayUnit="degC") = {50 + 273.15,bui[5].ets.heaPum.con.conHea.u_s,
+      bui[5].ets.heaPum.con.conHea.u_s,bui[5].ets.heaPum.con.conHea.u_s,bui[5].ets.heaPum.con.conHea.u_s})
     "Temperature set point for heating water to be supplied to DHW tank, except hub[1] that does not provide DHW."
     annotation (Placement(transformation(extent={{540,190},{560,210}})));
 
@@ -137,10 +134,10 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     each witBan(u(final unit="K")))
     "Requirement for water temperature serving each service line"
     annotation (Placement(transformation(extent={{620,-460},{640,-440}})));
-  Modelica.Blocks.Sources.RealExpression THeaPumEvaLvg[nBui](y=bui.ets.chi.senTEvaLvg.T)
+  Modelica.Blocks.Sources.RealExpression THeaPumEvaLvg[nBui](y=bui.ets.heaPum.senTEvaLvg.T)
     "Temperature of the water leaving the heat pump on the evaporator side."
     annotation (Placement(transformation(extent={{580,60},{600,80}})));
-  Modelica.Blocks.Sources.RealExpression THeaPumCon[nBui](y=bui.ets.chi.senTConLvg.T)
+  Modelica.Blocks.Sources.RealExpression THeaPumCon[nBui](y=bui.ets.heaPum.senTConLvg.T)
     "Heat pump condenser leaving water temperature "
     annotation (Placement(transformation(extent={{500,-38},{520,-18}})));
   Modelica.Blocks.Sources.BooleanExpression valIsoEvaCom[nBui](
@@ -189,7 +186,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     annotation (Placement(transformation(extent={{620,420},{640,440}})));
   Modelica.Blocks.Logical.Not HeaPumOff[nBui] "ETS Heat pump off"
     annotation (Placement(transformation(extent={{580,420},{600,440}})));
-  Modelica.Blocks.Sources.BooleanExpression HeaPumOn[nBui](y=bui.ets.chi.con.yPum)
+  Modelica.Blocks.Sources.BooleanExpression HeaPumOn[nBui](y=bui.ets.heaPum.con.yPum)
     "ETS Heat pump signal on in each hub"
     annotation (Placement(transformation(extent={{540,460},{560,480}})));
   Buildings_Requirements.GreaterEqual reqRDis[nBui + 1](

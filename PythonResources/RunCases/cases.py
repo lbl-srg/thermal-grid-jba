@@ -8,6 +8,7 @@ def get_cases():
                 'stop_time'  : 365* 24 * 3600,
                 'number_of_intervals' : 365 * 24,
                 'solver'     : 'cvode',
+                'tolerance'  : '1e-7',
                 'simulate': True
             }
             # Combine the dictionaries
@@ -49,6 +50,18 @@ def get_cases():
             'name': "base_dDis_0.8",
             'parameters': {
                 'datDis.dhDisSizFac': 0.8
+            }
+        }
+        _add(case, cases)
+
+        # Disable plant economizer by setting a small flow rate (as
+        # the flow rate is also used to size the dry cooler) and
+        # setting the approach that commands the economizer on to 100 K
+        case = {
+            'name': "base_noEco",
+            'parameters': {
+                'datDis.mPlaHexGly_flow_nominal': 1,
+                'cenPla.TApp': 100
             }
         }
         _add(case, cases)
