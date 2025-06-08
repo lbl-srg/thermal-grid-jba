@@ -812,8 +812,8 @@ equation
   "Simulate and plot"),
   experiment(
       StopTime=86400,
-      Interval=3600.00288,
-      Tolerance=1e-06,
+      Interval=3600,
+      Tolerance=1e-07,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
 <p>
