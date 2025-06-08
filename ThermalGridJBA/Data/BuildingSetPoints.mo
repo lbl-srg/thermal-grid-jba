@@ -10,7 +10,7 @@ record BuildingSetPoints "Set points for the buildings"
     annotation (Dialog(group="Chilled water"));
   final parameter Modelica.Units.SI.ThermodynamicTemperature TChiWatRet_nominal = TChiWatSup_nominal + dTChiWat_nominal
     "Nominal chilled water return temperature";
-  final parameter Modelica.Units.SI.ThermodynamicTemperature THeaRooSet = 273.15+20.5
+  final parameter Modelica.Units.SI.ThermodynamicTemperature THeaRooSet = 273.15+21
     "Room air temperature set point for heating system at which control is at zero demand";
   final parameter Modelica.Units.SI.ThermodynamicTemperature TCooRooSet = 273.15+23.5
     "Room air temperature set point for cooling system at which control is at zero demand";
@@ -24,13 +24,10 @@ record BuildingSetPoints "Set points for the buildings"
     "Nominal heating hot water supply temperature"
     annotation (Dialog(group="Heating hot water"));
   parameter Modelica.Units.SI.TemperatureDifference dTHeaWat_nominal = 10
-    "Nominal heating hot water temperature difference"
-    annotation (Dialog(group="Heating hot water"));
-  final parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatRet_nominal = THeaWatSup_nominal - dTHeaWat_nominal
-    "Nominal heating hot water supply temperature";
+    "Nominal heating hot water temperature difference";
   parameter Real tabHeaWatRes[2,2]=[
       THeaRooSet-1, THeaWatSup_nominal;
-      THeaRooSet, THeaRooSet+1.5]
+      THeaRooSet, THeaRooSet+2]
     "Heating hot water supply temperature reset schedule"
     annotation (Dialog(group="Heating hot water"));
   parameter Modelica.Units.SI.ThermodynamicTemperature THotWatSupTan_nominal(displayUnit="degC") =
@@ -42,7 +39,10 @@ record BuildingSetPoints "Set points for the buildings"
   parameter Modelica.Units.SI.ThermodynamicTemperature TColWat_nominal(displayUnit="degC") =
     15 + 273.15 "Nominal domestic cold water temperature"
     annotation (Dialog(group="Domestic hot water"));
-    annotation(defaultComponentName="datBuiSet",
+  final parameter Modelica.Units.SI.ThermodynamicTemperature THeaWatRet_nominal = THeaWatSup_nominal - dTHeaWat_nominal
+    "Nominal heating hot water return temperature";
+    annotation (Dialog(group="Heating hot water"),
+               defaultComponentName="datBuiSet",
     Documentation(info="<html>
 <p>
 Unified set point declarations. All buildings use the same set points.
