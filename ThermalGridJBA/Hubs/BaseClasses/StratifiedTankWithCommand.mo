@@ -109,20 +109,26 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
   Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(
     p=if isHotWat then -2 else 0.5) "Offset"
     annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
+  Buildings.Fluid.FixedResistances.Junction junTop(
+    redeclare package Medium = Medium,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    T_start=T_start,
+    m_flow_nominal=m_flow_nominal*{1,-1,-1},
+    dp_nominal=zeros(3)) "Fluid junction at top of tank"
+    annotation (Placement(transformation(extent={{10,50},{-10,70}})));
+  Buildings.Fluid.FixedResistances.Junction junBot(
+    redeclare package Medium = Medium,
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    T_start=T_start,
+    m_flow_nominal=m_flow_nominal*{1,-1,1},
+    dp_nominal=zeros(3)) "Fluid junction at bottom of tank"
+    annotation (Placement(transformation(extent={{-10,-50},{10,-70}})));
 protected
   Modelica.Thermal.HeatTransfer.Components.ThermalCollector theCol(
     m=3)
     "Connector to assign multiple heat ports to one heat port"
     annotation (Placement(transformation(extent={{-6,-6},{6,6}},rotation=-90,origin={-60,0})));
 equation
-  connect(port_genTop, tan.port_a) annotation (Line(points={{100,60},{-20,60},{
-          -20,10},{0,10}}, color={0,127,255}));
-  connect(port_loaTop, tan.fluPorVol[1]) annotation (Line(points={{-100,60},{-40,
-          60},{-40,20},{0,20},{0,-1.33333},{-5,-1.33333}}, color={0,127,255}));
-  connect(tan.port_b, port_genBot) annotation (Line(points={{0,-10},{20,-10},{
-          20,-60},{100,-60}}, color={0,127,255}));
-  connect(port_loaBot, tan.fluPorVol[nSeg]) annotation (Line(points={{-100,-60},
-          {0,-60},{0,0},{-5,0}}, color={0,127,255}));
   connect(tan.Ql_flow,Ql_flow)
     annotation (Line(points={{11,7.2},{80,7.2},{80,30},{120,30}},  color={0,0,127}));
   connect(tan.heaPorVol[nSeg],senTBot.port)
@@ -152,6 +158,18 @@ equation
   connect(dTOff.u, TTanSet)
     annotation (Line(points={{-82,90},{-120,90}}, color={0,0,127}));
 
+  connect(junTop.port_3, tan.port_a)
+    annotation (Line(points={{0,50},{0,10}}, color={0,127,255}));
+  connect(tan.port_b, junBot.port_3)
+    annotation (Line(points={{0,-10},{0,-50}}, color={0,127,255}));
+  connect(port_loaBot, junBot.port_1)
+    annotation (Line(points={{-100,-60},{-10,-60}}, color={0,127,255}));
+  connect(junBot.port_2, port_genBot)
+    annotation (Line(points={{10,-60},{100,-60}}, color={0,127,255}));
+  connect(port_loaTop, junTop.port_2)
+    annotation (Line(points={{-100,60},{-10,60}}, color={0,127,255}));
+  connect(junTop.port_1, port_genTop)
+    annotation (Line(points={{10,60},{100,60}}, color={0,127,255}));
   annotation (
     Icon(
       coordinateSystem(
