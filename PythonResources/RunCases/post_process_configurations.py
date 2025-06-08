@@ -14,8 +14,6 @@ plt.rcParams['legend.framealpha'] = 0.75
 plt.rcParams['legend.edgecolor'] = 'none'
 plt.rcParams['savefig.dpi'] = 300
 
-AFlo = 111997 # Floor area in m2
-
 def save_plot(figure, file_name):
     """ Save the figure to a pdf and png file in the directory `img`
     """
@@ -127,6 +125,7 @@ def plot_energy(results : list, case_names: list):
     n = len(results)
     # Conversion from J to kWh/m2
 
+    (_, AFlo) = results[0].values('datDis.AFlo')[0]
     conv = 1/3600./1000./AFlo
     width = 0.5       # the width of the bars: can also be len(x) sequence
 
