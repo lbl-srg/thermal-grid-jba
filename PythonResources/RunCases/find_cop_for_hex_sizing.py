@@ -21,7 +21,7 @@ mat_file_path = os.path.realpath(os.path.join(CWD, "simulations", MAT_FILE_NAME)
 
 r=Reader(mat_file_path, "dymola")
 
-(t,y) = r.values('bui.ets.chi.chi.COP')
+(t,y) = r.values('bui.ets.heaPum.heaPum.COP')
 COP = np.array(y)
 (t,y) = r.values('bui.ets.valIsoEva.y_actual')
 yIsoEva = np.array(y)
@@ -67,7 +67,7 @@ TEvaLvg_heaRej = TEvaLvg[mask_heaRej][max_index_heaRej]
 def temp_c_f(T):
     c = T - 273.15
     f = c * 9 / 5 + 32
-    
+
     return f"{c:.2f} C / {f:.2f} F"
 
 

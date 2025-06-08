@@ -7,10 +7,11 @@ def get_cases():
                 'start_time' : 0 * 24 * 3600,
                 'stop_time'  : 365* 24 * 3600,
                 'number_of_intervals' : 365 * 24,
-                'solver'     : 'radau',
+                'solver'     : 'cvode',
+                'tolerance'  : '1e-7',
                 'simulate': True
             }
-            # Combine the dictonaries
+            # Combine the dictionaries
             case.update(common)
             cases.append(case)
 
@@ -53,33 +54,59 @@ def get_cases():
         }
         _add(case, cases)
 
+        # Disable plant economizer by setting a small flow rate (as
+        # the flow rate is also used to size the dry cooler) and
+        # setting the approach that commands the economizer on to 100 K
+        case = {
+            'name': "base_noEco",
+            'parameters': {
+                'datDis.mPlaHexGly_flow_nominal': 1,
+                'cenPla.TApp': 100
+            }
+        }
+        _add(case, cases)
+
         case = {
             'name': 'heat',
-            'parameters': {
-                'datDis.filNamInd' : [
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_heat.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_heat.mos"],
-                         'datDis.filNamCom' :
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos"}
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.HeatWave'
         }
         _add(case, cases)
 
         case = {
             'name': 'cold',
-            'parameters': {
-                'datDis.filNamInd' : [
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_cold.mos",
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"],
-                         'datDis.filNamCom' :
-                    "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos"}
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.ColdSnap'
         }
         _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0.8",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.8
+            }
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0.9",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.9
+            }
+        }
+        _add(case, cases)
+
+        # The commented cases below are for pre-ECM base case and the post-ECM with TMY3.
+        # They are supported but not part of the regular batch of runs
+        # case = {
+        #     'name': 'pree',
+        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.Baseline'
+        # }
+        # _add(case, cases)
+
+        # case = {
+        #     'name': 'post',
+        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM'
+        # }
+        # _add(case, cases)
 
         return cases
 

@@ -1,6 +1,6 @@
-Chiller
-ChillerThreeUtilities
 DHWConsumption
+HeatPump
+HeatPumpThreeUtilities
 PartialConnectedETS
 PartialParallel
 StorageTankWithExternalHeatExchanger

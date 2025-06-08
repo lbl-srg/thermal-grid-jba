@@ -5,6 +5,8 @@ record GenericDistrict "District network design parameters"
   final package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.40) "Glycol medium";
   constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
   constant Real cpGly=MediumG.cp_const;
+  constant Modelica.Units.SI.Area AFlo = 111997
+    "Total conditioned floor area of all buildings";
   parameter Integer nBui
     "Number of served buildings"
     annotation(Evaluate=true, Dialog(group="Load"));
@@ -160,9 +162,10 @@ record GenericDistrict "District network design parameters"
 //     "Nominal cooling capacity"
 //     annotation (Dialog(tab="Central plant", group="Heat pump"));
   // Downsize the heat pump capacity by considering the heating supply from borefield
-  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=QPlaPeaCoo_flow + 0.5*
-    10e6
-    "Nominal cooling capacity"
+  parameter Real heaPumSizFac=1;
+  parameter Real QPlaHeaPumCoo_flow_nominal(unit="W")=
+    (QPlaPeaCoo_flow + 0.5*10e6)*heaPumSizFac*1.25
+    "Nominal cooling capacity. Factor 1.25 added based on https://github.com/lbl-srg/thermal-grid-jba/pull/98"
     annotation (Dialog(tab="Central plant", group="Heat pump"));
 
   parameter Modelica.Units.SI.TemperatureDifference dTCooCha(min=0)=4
@@ -287,6 +290,6 @@ record GenericDistrict "District network design parameters"
     defaultComponentPrefixes="inner",
     Documentation(info="<html>
 <p>
-This record contains parameter declarations of a district system.
+This record contains parameter declarations of the district system.
 </html>"));
 end GenericDistrict;
