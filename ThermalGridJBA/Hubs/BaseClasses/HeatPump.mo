@@ -196,35 +196,35 @@ model HeatPump "Base subsystem with heat recovery heat pump"
   Buildings.DHC.ETS.BaseClasses.Junction splEva(
     redeclare final package Medium=Medium,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Entering,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Leaving,
     m_flow_nominal=dat.mEva_flow_nominal*{1,-1,-1})
     "Flow splitter for the evaporator water circuit"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=0,origin={-140,-60})));
   Buildings.DHC.ETS.BaseClasses.Junction splConMix(
     redeclare final package Medium=Medium,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+      else Modelica.Fluid.Types.PortFlowDirection.Entering,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Leaving,
     m_flow_nominal=dat.mCon_flow_nominal*{1,-1,-1})
     "Flow splitter"
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},rotation=0,origin={120,60})));
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valEva(
     redeclare final package Medium = Medium,
-    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Entering,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Entering,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     from_dp=false,
     use_strokeTime=false,
@@ -238,12 +238,12 @@ model HeatPump "Base subsystem with heat recovery heat pump"
         origin={120,-60})));
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valCon(
     redeclare final package Medium = Medium,
-    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Leaving
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
-    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Entering
-         else Modelica.Fluid.Types.PortFlowDirection.Bidirectional,
+    final portFlowDirection_1=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Entering,
+    final portFlowDirection_2=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    final portFlowDirection_3=if allowFlowReversal then Modelica.Fluid.Types.PortFlowDirection.Bidirectional
+         else Modelica.Fluid.Types.PortFlowDirection.Entering,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     from_dp=false,
     use_strokeTime=false,
