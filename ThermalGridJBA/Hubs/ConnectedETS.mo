@@ -25,7 +25,16 @@ model ConnectedETS
       TCon_start=if have_hotWat then min(datBuiSet.THeaWatSup_nominal,
           datBuiSet.THotWatSupTan_nominal) else datBuiSet.THeaWatSup_nominal,
       TEva_start=datBuiSet.TChiWatSup_nominal,
-      datHeaPum=datHeaPum));
+      datHeaPum=datHeaPum),
+      bui(
+        k=200,
+        T_aLoaHea_nominal=datBuiSet.THeaRooSet,
+        T_aLoaCoo_nominal=datBuiSet.TCooRooSet,
+        T_aHeaWat_nominal_ref=datBuiSet.THeaWatSup_nominal,
+        T_aLoaHea_nominal_ref=datBuiSet.THeaRooSet,
+        T_aChiWat_nominal_ref=datBuiSet.TChiWatSup_nominal,
+        T_aLoaCoo_nominal_ref=datBuiSet.TCooRooSet,
+        maxTSet(k=datBuiSet.THeaRooSet)));
 
   parameter Boolean have_eleNonHva "The ETS has non-HVAC electricity load"
     annotation (Dialog(group="Configuration"));
@@ -60,7 +69,7 @@ model ConnectedETS
     u(final unit="K", displayUnit="degC"),
     y(final unit="K", displayUnit="degC"))
     "Heating water supply temperature set point"
-    annotation (Placement(transformation(extent={{-140,60},{-120,80}})));
+    annotation (Placement(transformation(extent={{-140,120},{-120,140}})));
   Buildings.Controls.SetPoints.Table TChiWatSupSet(
     final table=datBuiSet.tabChiWatRes,
     final offset=0,
@@ -124,10 +133,34 @@ model ConnectedETS
     annotation (Placement(transformation(extent={{270,-10},{290,10}})));
   Modelica.Blocks.Sources.RealExpression TRooAirHea(y=bui.terUniHea.TLoaODE.TAir)
     "Room air temperature"
-    annotation (Placement(transformation(extent={{-180,60},{-160,80}})));
+    annotation (Placement(transformation(extent={{-240,120},{-220,140}})));
   Modelica.Blocks.Sources.RealExpression TRooAirCoo(y=bui.terUniCoo.TLoaODE.TAir)
     "Room air temperature"
     annotation (Placement(transformation(extent={{-180,20},{-160,40}})));
+  Buildings.Controls.OBC.CDL.Reals.PID conPIDTHeSupSet(
+    controllerType=Buildings.Controls.OBC.CDL.Types.SimpleController.P,
+    u_s(final unit="K", displayUnit="degC"),
+    u_m(final unit="K", displayUnit="degC"),
+    k=0.5,
+    Ti=1800) "Controller for heating supply water set point"
+    annotation (Placement(transformation(extent={{-180,80},{-160,100}})));
+  Buildings.Controls.OBC.CDL.Reals.AddParameter THeaSupSet(
+    u(final unit="K", displayUnit="degC"),
+    y(final unit="K", displayUnit="degC"),
+    p(final unit="K", displayUnit="degC")=273.15 + 22)
+    "Outputs set point for heating supply water temperature"
+    annotation (Placement(transformation(extent={{-100,80},{-80,100}})));
+protected
+  Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter gaiTHeaSupSet(
+    u(final unit="1"),
+    y(final unit="K", displayUnit="K"),
+    k(final unit="K")= THeaWatSup_nominal - (273.15 + 22))
+    "Gain for heating supply setpoint temperature"
+    annotation (Placement(transformation(extent={{-140,80},{-120,100}})));
+  Modelica.Blocks.Sources.RealExpression TRooAirSetHea(y=datBuiSet.THeaRooSet -
+        0.5)
+    "Room air temperature setpoint for heating"
+    annotation (Placement(transformation(extent={{-240,80},{-220,100}})));
 equation
 
   connect(ets.QReqHotWat_flow, bui.QReqHotWat_flow) annotation (Line(points={{-34,-54},
@@ -144,8 +177,6 @@ equation
           {280,-120},{280,-106},{24,-106},{24,-90}}, color={0,0,127}));
   connect(ets.dHHotWat_flow, dHHotWat_flow) annotation (Line(points={{20,-90},{
           20,-112},{276,-112},{276,-160},{320,-160}}, color={0,0,127}));
-  connect(THeaWatSupSet.y, ets.THeaWatSupSet) annotation (Line(points={{-119,70},
-          {-64,70},{-64,-58},{-34,-58}}, color={0,0,127}));
   connect(TChiWatSupSet.y, ets.TChiWatSupSet) annotation (Line(points={{-119,30},
           {-68,30},{-68,-62},{-34,-62}}, color={0,0,127}));
   connect(mulPEleNonHva.y, PEleNonHva)
@@ -153,9 +184,20 @@ equation
   connect(loaEleNonHva.y[1], mulPEleNonHva.u)
     annotation (Line(points={{181,0},{268,0}}, color={0,0,127}));
   connect(TRooAirHea.y, THeaWatSupSet.u)
-    annotation (Line(points={{-159,70},{-142,70}}, color={0,0,127}));
+    annotation (Line(points={{-219,130},{-142,130}},
+                                                   color={0,0,127}));
   connect(TChiWatSupSet.u, TRooAirCoo.y)
     annotation (Line(points={{-142,30},{-159,30}}, color={0,0,127}));
+  connect(TRooAirHea.y, conPIDTHeSupSet.u_m) annotation (Line(points={{-219,130},
+          {-200,130},{-200,68},{-170,68},{-170,78}}, color={0,0,127}));
+  connect(TRooAirSetHea.y, conPIDTHeSupSet.u_s)
+    annotation (Line(points={{-219,90},{-182,90}}, color={0,0,127}));
+  connect(conPIDTHeSupSet.y, gaiTHeaSupSet.u)
+    annotation (Line(points={{-158,90},{-142,90}}, color={0,0,127}));
+  connect(gaiTHeaSupSet.y, THeaSupSet.u)
+    annotation (Line(points={{-118,90},{-102,90}}, color={0,0,127}));
+  connect(THeaSupSet.y, ets.THeaWatSupSet) annotation (Line(points={{-78,90},{-64,
+          90},{-64,-58},{-34,-58}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
         defaultComponentName = "bui");
