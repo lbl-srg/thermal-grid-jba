@@ -28,27 +28,27 @@ def get_vars(var_list,
              method : _methods = 'buildingspy',
              csv_file_path = None,
              delete_csv = True):
-    """    
+    """
     """
     def generate_dymola_command(var_list, mat_file_path, csv_file_path):
         """ Generate Dymola command to export csv from large mat file
-        """ 
+        """
         s = ''
         s += f'DataFiles.convertMATtoCSV("{mat_file_path}", '
         s += '{"'
         s += '","'.join(var_list)
         s += '"}, '
         s += f'"{csv_file_path}");'
-            
-        return s    
-        # __ref = r'DataFiles.convertMATtoCSV("/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/DetailedPlantFiveHubs.mat", {"bui[1].ets.chi.chi.COP","bui[1].ets.chi.uCoo"}, "/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/trimmed.csv");'
-    
+
+        return s
+        # __ref = r'DataFiles.convertMATtoCSV("/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/DetailedPlantFiveHubs.mat", {"bui[1].ets.heaPum.heaPum.COP","bui[1].ets.chi.uCoo"}, "/home/casper/gitRepo/thermal-grid-jba/PythonResources/RunCases/simulations/2025-05-05-simulations/detailed_plant_five_hubs_futu/trimmed.csv");'
+
     if csv_file_path is None:
         csv_file_path = mat_file_path.replace('.mat', '.csv')
-    
+
     df = pd.DataFrame()
     methods = list(get_args(_methods))
-    
+
     if method == methods[0]:
         # 'buildingspy'
         from buildingspy.io.outputfile import Reader
@@ -58,7 +58,7 @@ def get_vars(var_list,
             if len(t) > 2 and not 'Time' in df.columns:
                 df['Time'] = t # writes the time stamp
             df[var] = y
-    
+
     if method == methods[1]:
         # 'dymola'
         # Dymola-python interface: see Dymola user manual 12.3
@@ -71,23 +71,22 @@ def get_vars(var_list,
                                                  csv_file_path)
         dymola.ExecuteCommand(dymola_command)
         df = pd.read_csv(csv_file_path, header = 0)
-        
+
         if delete_csv:
             os.remove(csv_file_path)
-            
-    return df        
+
+    return df
 
 #%%
 if __name__ == "__main__":
     mat_file_path = os.path.join(CWD, "simulations", "ETS_All_futu", "ConnectedETSWithDHW.mat")
     #csv_file_path = os.path.join(CWD, "simulations", "ETS_All_futu", "ConnectedETSWithDHW.csv")
-    
+
     var_list = ['EChi.u', 'EChi.y']
-    
+
     df_bp = get_vars(var_list,
                      mat_file_path,
                      'buildingspy')
     df_dy = get_vars(var_list,
                      mat_file_path,
                      'dymola')
-    
