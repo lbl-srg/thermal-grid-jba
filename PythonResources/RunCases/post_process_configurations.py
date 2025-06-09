@@ -295,7 +295,7 @@ def plot_loop_temperatures(results : list, case_names: list):
         plt.tight_layout()
         #plt.title()
 
-        save_plot(plt, f"{case_names[i]}loopTemperatures")
+        save_plot(plt, f"{case_names[i]}_loopTemperatures")
 
 
 def plotPlant(lis, res, filePrefix, days):
