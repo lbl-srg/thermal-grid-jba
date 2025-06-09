@@ -141,7 +141,7 @@ model ConnectedETS
     controllerType=Buildings.Controls.OBC.CDL.Types.SimpleController.P,
     u_s(final unit="K", displayUnit="degC"),
     u_m(final unit="K", displayUnit="degC"),
-    k=0.5,
+    k=2,
     Ti=1800) "Controller for heating supply water set point"
     annotation (Placement(transformation(extent={{-180,80},{-160,100}})));
   Buildings.Controls.OBC.CDL.Reals.AddParameter THeaSupSet(
@@ -157,8 +157,8 @@ protected
     k(final unit="K")= THeaWatSup_nominal - (273.15 + 22))
     "Gain for heating supply setpoint temperature"
     annotation (Placement(transformation(extent={{-140,80},{-120,100}})));
-  Modelica.Blocks.Sources.RealExpression TRooAirSetHea(y=datBuiSet.THeaRooSet -
-        0.5)
+  Modelica.Blocks.Sources.RealExpression TRooAirSetHea(y=datBuiSet.THeaRooSet
+         - 1)
     "Room air temperature setpoint for heating"
     annotation (Placement(transformation(extent={{-240,80},{-220,100}})));
 equation
