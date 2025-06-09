@@ -125,7 +125,7 @@ def plot_energy(results : list, case_names: list):
     n = len(results)
     # Conversion from J to kWh/m2
 
-    (_, AFlo) = results[0].values('datDis.AFlo')[0]
+    AFlo = results[0].max('datDis.AFlo')
     conv = 1/3600./1000./AFlo
     width = 0.5       # the width of the bars: can also be len(x) sequence
 
