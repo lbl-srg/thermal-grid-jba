@@ -7,8 +7,8 @@ def get_cases():
                 'start_time' : 0 * 24 * 3600,
                 'stop_time'  : 365* 24 * 3600,
                 'number_of_intervals' : 365 * 24,
-                'solver'     : 'cvode',
-                'tolerance'  : '1e-7',
+                'solver'     : 'radau',
+                'tolerance'  : '1e-6',
                 'simulate': True
             }
             # Combine the dictionaries
