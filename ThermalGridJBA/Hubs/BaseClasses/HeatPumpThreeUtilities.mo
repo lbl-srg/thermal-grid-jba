@@ -12,16 +12,16 @@ model HeatPumpThreeUtilities
     colHeaWat(mCon_flow_nominal={colAmbWat.mDis_flow_nominal,datHeaPum.mCon_flow_nominal}),
     colAmbWat(mCon_flow_nominal={hex.m2_flow_nominal}),
     nPorts_bChiWat=1,
-    nPorts_aChiWat=1,
     nPorts_aHeaWat=1,
-    nPorts_bHeaWat=1,
     totPHea(nin=1),
     totPCoo(nin=1),
     totPPum(nin=if have_hotWat then 3 else 2),
     tanHeaWat(final T_start=TCon_start),
     tanChiWat(final T_start=TEva_start),
     valIsoCon(linearized=true),
-    valIsoEva(linearized=true));
+    valIsoEva(linearized=true),
+    nPorts_bHeaWat=1,
+    nPorts_aChiWat=1);
 
   parameter ThermalGridJBA.Data.HeatPump datHeaPum "Heat pump performance data"
     annotation (
@@ -293,17 +293,29 @@ model HeatPumpThreeUtilities
   Controls.EtsHex                        opeEtsHex
     "Output true to operate ETS heat exchanger"
     annotation (Placement(transformation(extent={{-80,-240},{-60,-220}})));
+  Buildings.Fluid.Sensors.TemperatureTwoPort senTSpaHeaSup(
+    redeclare package Medium = MediumBui,
+    allowFlowReversal=true,
+    final m_flow_nominal=datHeaPum.mCon_flow_nominal)
+    "Supply temperature for space heating" annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=0,
+        origin={130,260})));
+  Buildings.Fluid.Sensors.TemperatureTwoPort senTSpaCooSup(
+    redeclare package Medium = MediumBui,
+    allowFlowReversal=true,
+    final m_flow_nominal=datHeaPum.mEva_flow_nominal)
+    "Supply temperature for space cooling" annotation (Placement(transformation(
+        extent={{10,-10},{-10,10}},
+        rotation=0,
+        origin={130,200})));
 equation
   connect(dHFloChiWat.port_b1, ports_bChiWat[1]) annotation (Line(points={{280,140},
           {280,200},{300,200}}, color={0,127,255}));
-  connect(dHFloChiWat.port_a2, ports_aChiWat[1]) annotation (Line(points={{268,140},
-          {268,200},{-300,200}}, color={0,127,255}));
   connect(dHFloHeaWat.port_a2, ports_aHeaWat[1]) annotation (Line(points={{-280,
           190},{-280,260},{-300,260}}, color={0,127,255}));
-  connect(dHFloHeaWat.port_b1, ports_bHeaWat[1]) annotation (Line(points={{-268,
-          190},{-268,260},{300,260}}, color={0,127,255}));
   connect(dHFloHeaWat.dH_flow, dHHeaWat_flow) annotation (Line(points={{-271,
-          192},{-271,264},{274,264},{274,160},{320,160}},
+          192},{-271,294},{274,294},{274,160},{320,160}},
                                  color={0,0,127}));
   connect(dHFloChiWat.dH_flow, dHChiWat_flow) annotation (Line(points={{277,142},
           {277,148},{292,148},{292,120},{320,120}}, color={0,0,127}));
@@ -329,8 +341,8 @@ equation
           170},{-268,116},{-200,116}},       color={0,127,255}));
   connect(tanHeaWat.port_loaBot, dHFloHeaWat.port_b2) annotation (Line(points={{-200,
           104},{-280,104},{-280,170}},       color={0,127,255}));
-  connect(reaPasDhwPum.y, totPPum.u[3]) annotation (Line(points={{-59,240},{-48,
-          240},{-48,252},{240,252},{240,-60},{258,-60}}, color={0,0,127}));
+  connect(reaPasDhwPum.y, totPPum.u[3]) annotation (Line(points={{-59,240},{-46,
+          240},{-46,216},{242,216},{242,-60},{258,-60}}, color={0,0,127}));
   connect(tanDhw.charge,twoTanCoo.uDhw)  annotation (Line(points={{-178,222},{
           -152,222},{-152,184},{-142,184}},
                                        color={255,0,255}));
@@ -449,6 +461,14 @@ equation
         color={255,0,255}));
   connect(heaPum.uHeaDhw, twoTanCoo.yDhw) annotation (Line(points={{-12,-4},{
           -22,-4},{-22,130},{-110,130},{-110,175},{-118,175}}, color={255,0,255}));
+  connect(dHFloHeaWat.port_b1, senTSpaHeaSup.port_a) annotation (Line(points={{
+          -268,190},{-268,260},{120,260}}, color={0,127,255}));
+  connect(senTSpaHeaSup.port_b, ports_bHeaWat[1])
+    annotation (Line(points={{140,260},{300,260}}, color={0,127,255}));
+  connect(dHFloChiWat.port_a2, senTSpaCooSup.port_a) annotation (Line(points={{
+          268,140},{268,200},{140,200}}, color={0,127,255}));
+  connect(senTSpaCooSup.port_b, ports_aChiWat[1])
+    annotation (Line(points={{120,200},{-300,200}}, color={0,127,255}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},
