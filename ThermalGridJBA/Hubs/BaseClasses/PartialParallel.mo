@@ -97,13 +97,13 @@ model PartialParallel
     final dpValve_nominal=dpValIso_nominal,
     final m_flow_nominal=colAmbWat.mDis_flow_nominal)
                           "Evaporator to ambient loop isolation valve"
-    annotation (Placement(transformation(extent={{70,-130},{50,-110}})));
+    annotation (Placement(transformation(extent={{80,-130},{60,-110}})));
   Buildings.Fluid.Actuators.Valves.TwoWayLinear valIsoCon(
     redeclare final package Medium = MediumBui,
     final dpValve_nominal=dpValIso_nominal,
     final m_flow_nominal=colAmbWat.mDis_flow_nominal)
                          "Condenser to ambient loop isolation valve"
-    annotation (Placement(transformation(extent={{-70,-130},{-50,-110}})));
+    annotation (Placement(transformation(extent={{-84,-130},{-64,-110}})));
 
   HeatExchanger                                       hex(
     redeclare final package Medium1=MediumSer,
@@ -204,6 +204,21 @@ model PartialParallel
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={-20,-210})));
+  Buildings.Fluid.Sensors.MassFlowRate senMasFlo1(redeclare package Medium =
+        MediumBui) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=90,
+        origin={30,-234})));
+  Buildings.Fluid.Sensors.MassFlowRate senMasFlo2(redeclare package Medium =
+        MediumBui) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=0,
+        origin={44,-120})));
+  Buildings.Fluid.Sensors.MassFlowRate senMasFlo3(redeclare package Medium =
+        MediumBui) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=0,
+        origin={-44,-120})));
 protected
   parameter Boolean have_val1Hex=
     conCon ==Buildings.DHC.ETS.Types.ConnectionConfiguration.TwoWayValve
@@ -212,15 +227,11 @@ equation
   connect(totPPum.y,PPum)
     annotation (Line(points={{282,-60},{290,-60},{290,-40},{320,-40}},
                                                   color={0,0,127}));
-  connect(valIsoEva.port_b,colAmbWat.port_bDisSup)
-    annotation (Line(points={{50,-120},{30,-120},{30,-106},{20,-106}},color={0,127,255}));
-  connect(valIsoCon.port_b,colAmbWat.port_aDisSup)
-    annotation (Line(points={{-50,-120},{-30,-120},{-30,-106},{-20,-106}},color={0,127,255}));
   connect(valIsoEva.port_a,colChiWat.ports_aCon[1])
-    annotation (Line(points={{70,-120},{90,-120},{90,-34},{106,-34},{106,-40},{
+    annotation (Line(points={{80,-120},{90,-120},{90,-34},{106,-34},{106,-40},{
           108,-40}},                                         color={0,127,255}));
   connect(valIsoCon.port_a,colHeaWat.ports_aCon[1])
-    annotation (Line(points={{-70,-120},{-90,-120},{-90,-34},{-108,-34},{-108,
+    annotation (Line(points={{-84,-120},{-90,-120},{-90,-34},{-108,-34},{-108,
           -40}},                                                color={0,127,255}));
   connect(totPHea.y,PHea)
     annotation (Line(points={{282,60},{290,60},{290,80},{320,80}},
@@ -245,12 +256,22 @@ equation
         points={{-20,-200},{-20,-146},{12,-146},{12,-116}}, color={0,127,255}));
   connect(hex.port_b2, senTHexBuiLvg.port_a) annotation (Line(points={{-10,-244},
           {-20,-244},{-20,-220}}, color={0,127,255}));
-  connect(hex.port_a2, senTHexBuiEnt.port_b) annotation (Line(points={{10,-244},
-          {30,-244},{30,-220}}, color={0,127,255}));
   connect(senTHexBuiEnt.port_a, colAmbWat.ports_bCon[1]) annotation (Line(
         points={{30,-200},{30,-152},{-12,-152},{-12,-116}}, color={0,127,255}));
   connect(totPPum.u[1], hex.PPum) annotation (Line(points={{258,-60},{220,-60},
           {220,-250},{12,-250}}, color={0,0,127}));
+  connect(hex.port_a2, senMasFlo1.port_a)
+    annotation (Line(points={{10,-244},{30,-244}}, color={0,127,255}));
+  connect(senMasFlo1.port_b, senTHexBuiEnt.port_b)
+    annotation (Line(points={{30,-224},{30,-220}}, color={0,127,255}));
+  connect(valIsoEva.port_b, senMasFlo2.port_b)
+    annotation (Line(points={{60,-120},{54,-120}}, color={0,127,255}));
+  connect(senMasFlo2.port_a, colAmbWat.port_bDisSup) annotation (Line(points={{
+          34,-120},{30,-120},{30,-106},{20,-106}}, color={0,127,255}));
+  connect(valIsoCon.port_b, senMasFlo3.port_a)
+    annotation (Line(points={{-64,-120},{-54,-120}}, color={0,127,255}));
+  connect(senMasFlo3.port_b, colAmbWat.port_aDisSup) annotation (Line(points={{
+          -34,-120},{-30,-120},{-30,-106},{-20,-106}}, color={0,127,255}));
   annotation (
     Icon(
       coordinateSystem(

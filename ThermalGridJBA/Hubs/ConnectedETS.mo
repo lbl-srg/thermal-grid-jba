@@ -27,14 +27,21 @@ model ConnectedETS
       TEva_start=datBuiSet.TChiWatSup_nominal,
       datHeaPum=datHeaPum),
       bui(
-        k=200,
         T_aLoaHea_nominal=datBuiSet.THeaRooSet,
         T_aLoaCoo_nominal=datBuiSet.TCooRooSet,
         T_aHeaWat_nominal_ref=datBuiSet.THeaWatSup_nominal,
         T_aLoaHea_nominal_ref=datBuiSet.THeaRooSet,
         T_aChiWat_nominal_ref=datBuiSet.TChiWatSup_nominal,
         T_aLoaCoo_nominal_ref=datBuiSet.TCooRooSet,
-        maxTSet(k=datBuiSet.THeaRooSet)));
+        maxTSet(k=datBuiSet.THeaRooSet),
+        terUniHea(
+//          hex(use_dynamicFlowRegime=true),
+          have_speVar=false),
+        terUniCoo(
+//          hexWetNtu(
+//            use_dynamicFlowRegime=true,
+//            energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial),
+          have_speVar=false)));
 
   parameter Boolean have_eleNonHva "The ETS has non-HVAC electricity load"
     annotation (Dialog(group="Configuration"));
