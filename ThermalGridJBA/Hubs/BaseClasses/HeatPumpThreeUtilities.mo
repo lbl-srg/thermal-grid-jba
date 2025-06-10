@@ -291,11 +291,6 @@ model HeatPumpThreeUtilities
   Controls.EtsHex                        opeEtsHex
     "Output true to operate ETS heat exchanger"
     annotation (Placement(transformation(extent={{-80,-240},{-60,-220}})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFlo(redeclare package Medium =
-        MediumBui) annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=90,
-        origin={150,0})));
 equation
   connect(dHFloChiWat.port_b1, ports_bChiWat[1]) annotation (Line(points={{280,140},
           {280,200},{300,200}}, color={0,127,255}));
@@ -450,10 +445,8 @@ equation
         color={255,0,255}));
   connect(heaPum.uHeaDhw, twoTanCoo.yDhw) annotation (Line(points={{-12,-4},{
           -22,-4},{-22,130},{-110,130},{-110,175},{-118,175}}, color={255,0,255}));
-  connect(colChiWat.port_aDisSup, senMasFlo.port_a) annotation (Line(points={{
-          140,-50},{150,-50},{150,-10}}, color={0,127,255}));
-  connect(senMasFlo.port_b, valDivEva.port_2)
-    annotation (Line(points={{150,10},{150,70}}, color={0,127,255}));
+  connect(valDivEva.port_2, colChiWat.port_aDisSup) annotation (Line(points={{
+          150,70},{150,-50},{140,-50}}, color={0,127,255}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},

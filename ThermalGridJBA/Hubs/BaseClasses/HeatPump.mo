@@ -125,7 +125,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
   Buildings.Fluid.HeatPumps.ModularReversible.TableData2D heaPum(
     redeclare package MediumCon = Medium,
     redeclare package MediumEva = Medium,
-    linearized=true,
+    linearized=false,
     final datTabHea=dat.dat,
     final allowDifferentDeviceIdentifiers=true,
     final allowFlowReversalEva=allowFlowReversal,
@@ -231,7 +231,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     use_strokeTime=false,
     final m_flow_nominal=dat.mEva_flow_nominal,
     final dpValve_nominal=dpValEva_nominal,
-    linearized={true,true})
+    linearized={false,false})
     "Control valve for maximum evaporator water entering temperature"
     annotation (Placement(transformation(
         extent={{-10,10},{10,-10}},
@@ -249,7 +249,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     use_strokeTime=false,
     final m_flow_nominal=dat.mCon_flow_nominal,
     final dpValve_nominal=dpValCon_nominal,
-    linearized={true,true})
+    linearized={false,false})
     "Control valve for minimum condenser water entering temperature"
     annotation (Placement(transformation(
         extent={{-10,10},{10,-10}},
@@ -275,21 +275,6 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     annotation (Placement(transformation(extent={{-240,90},{-200,130}}),
         iconTransformation(extent={{-140,-40},{-100,0}})));
 
-  Buildings.Fluid.Sensors.MassFlowRate senMasFlo2(redeclare package Medium =
-        Medium) annotation (Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=0,
-        origin={50,-100})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFlo1(redeclare package Medium =
-        Medium) annotation (Placement(transformation(
-        extent={{10,-10},{-10,10}},
-        rotation=0,
-        origin={160,-60})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFlo3(redeclare package Medium =
-        Medium) annotation (Placement(transformation(
-        extent={{10,-10},{-10,10}},
-        rotation=0,
-        origin={62,-60})));
 protected
   Modelica.Blocks.Sources.BooleanConstant hea(final k=true)
     "Use the heating mode to use the heat pump performance map"
@@ -371,18 +356,12 @@ equation
           {4,106},{-84,106},{-84,142},{-72,142}}, color={0,0,127}));
   connect(con.uHeaDhw, uHeaDhw) annotation (Line(points={{-72,148},{-184,148},{
           -184,170},{-220,170}}, color={255,0,255}));
-  connect(splEva.port_3, senMasFlo2.port_a) annotation (Line(points={{-140,-70},
-          {-140,-100},{40,-100}}, color={0,127,255}));
-  connect(senMasFlo2.port_b, valEva.port_3) annotation (Line(points={{60,-100},
-          {120,-100},{120,-70}}, color={0,127,255}));
-  connect(port_aChiWat, senMasFlo1.port_a)
-    annotation (Line(points={{200,-60},{170,-60}}, color={0,127,255}));
-  connect(senMasFlo1.port_b, valEva.port_1)
-    annotation (Line(points={{150,-60},{130,-60}}, color={0,127,255}));
-  connect(valEva.port_2, senMasFlo3.port_a)
-    annotation (Line(points={{110,-60},{72,-60}}, color={0,127,255}));
-  connect(senMasFlo3.port_b, senTEvaEnt.port_a)
-    annotation (Line(points={{52,-60},{20,-60},{20,-50}}, color={0,127,255}));
+  connect(splEva.port_3, valEva.port_3) annotation (Line(points={{-140,-70},{
+          -140,-100},{120,-100},{120,-70}}, color={0,127,255}));
+  connect(valEva.port_2, senTEvaEnt.port_a)
+    annotation (Line(points={{110,-60},{20,-60},{20,-50}}, color={0,127,255}));
+  connect(valEva.port_1, port_aChiWat)
+    annotation (Line(points={{130,-60},{200,-60}}, color={0,127,255}));
   annotation (
     defaultComponentName="chi",
     Icon(
