@@ -125,7 +125,7 @@ def plot_energy(results : list, case_names: list):
     n = len(results)
     # Conversion from J to kWh/m2
 
-    (_, AFlo) = results[0].values('datDis.AFlo')[0]
+    AFlo = results[0].max('datDis.AFlo')
     conv = 1/3600./1000./AFlo
     width = 0.5       # the width of the bars: can also be len(x) sequence
 
@@ -156,32 +156,33 @@ def plot_energy(results : list, case_names: list):
 
 
     bottom = np.zeros(n)
-    p0 = plt.bar(idx, EHeaPum, width, bottom=bottom)
+    p0 = plt.bar(idx, EHeaPum, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EHeaPum)
-    p1 = plt.bar(idx, EComPla, width, bottom=bottom)
+    p1 = plt.bar(idx, EComPla, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EComPla)
-    p2 = plt.bar(idx, EPumETS, width, bottom=bottom)
+    p2 = plt.bar(idx, EPumETS, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EPumETS)
-    p3 = plt.bar(idx, EPumDis, width, bottom=bottom)
+    p3 = plt.bar(idx, EPumDis, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EPumDis)
-    p4 = plt.bar(idx, EPumPla, width, bottom=bottom)
+    p4 = plt.bar(idx, EPumPla, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EPumPla)
-    p5 = plt.bar(idx, EFanDry, width, bottom=bottom)
+    p5 = plt.bar(idx, EFanDry, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EFanDry)
-    p6 = plt.bar(idx, EFanBui, width, bottom=bottom)
+    p6 = plt.bar(idx, EFanBui, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EFanBui)
-    p7 = plt.bar(idx, EEleNon, width, bottom=bottom)
+    p7 = plt.bar(idx, EEleNon, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EEleNon)
 
     print(f"All electricity use = {EAllTot}")
     print(f"Sum of plot = {bottom}")
     np.testing.assert_allclose(EAllTot, bottom, err_msg="Expected energy to be the same.")
 
+    plt.yticks(np.arange(0, 270, 20))
+    plt.grid(linestyle='-', axis='y', zorder=0)
     plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
     plt.xticks(idx, case_names)
     plt.tick_params(axis=u'x', which=u'both',length=0)
 
-    #plt.yticks(np.arange(0, 81, 10))
     plt.legend(tuple(reversed((p0[0], p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0]))), \
                tuple(reversed(('heat pumps in ETS', 'heat pump in plant', 'pumps in ETS', 'pumps for district loop', 'pumps in  plant', 'fans in plant', 'fans in buildings', 'non-HVAC electricity for buildings'))), \
                bbox_to_anchor=(1.5, 0.75), loc='right')
@@ -294,7 +295,7 @@ def plot_loop_temperatures(results : list, case_names: list):
         plt.tight_layout()
         #plt.title()
 
-        save_plot(plt, f"{case_names[i]}loopTemperatures")
+        save_plot(plt, f"{case_names[i]}_loopTemperatures")
 
 
 def plotPlant(lis, res, filePrefix, days):
