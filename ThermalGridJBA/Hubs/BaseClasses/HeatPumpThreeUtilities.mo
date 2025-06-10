@@ -291,6 +291,11 @@ model HeatPumpThreeUtilities
   Controls.EtsHex                        opeEtsHex
     "Output true to operate ETS heat exchanger"
     annotation (Placement(transformation(extent={{-80,-240},{-60,-220}})));
+  Buildings.Fluid.Sensors.MassFlowRate senMasFlo(redeclare package Medium =
+        MediumBui) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=90,
+        origin={150,0})));
 equation
   connect(dHFloChiWat.port_b1, ports_bChiWat[1]) annotation (Line(points={{280,140},
           {280,200},{300,200}}, color={0,127,255}));
@@ -362,8 +367,6 @@ equation
           {200,116},{268,116},{268,120}}, color={0,127,255}));
   connect(tanChiWat.port_loaBot, dHFloChiWat.port_a1) annotation (Line(points={
           {200,104},{280,104},{280,120}}, color={0,127,255}));
-  connect(colChiWat.port_aDisSup, valDivEva.port_2) annotation (Line(points={{140,-50},
-          {150,-50},{150,70}},          color={0,127,255}));
   connect(valDivEva.port_1, tanChiWat.port_genTop) annotation (Line(points={{150,90},
           {150,116},{180,116}},          color={0,127,255}));
   connect(heaPum.port_aChiWat, senTChiWatRet.port_b)
@@ -396,11 +399,11 @@ equation
           {-80,76},{-144,76},{-144,80}}, color={0,127,255}));
   connect(conAmbEva.u, tanChiWat.charge) annotation (Line(points={{98,50},{90,
           50},{90,107},{178,107}},                     color={255,0,255}));
-  connect(valIsoEva.y, conAmbEva.y) annotation (Line(points={{60,-108},{60,-88},
+  connect(valIsoEva.y, conAmbEva.y) annotation (Line(points={{70,-108},{70,-88},
           {166,-88},{166,50},{122,50}}, color={0,0,127}));
   connect(conDivValHea.y, valDivCon.y) annotation (Line(points={{-68,182},{-54,
           182},{-54,90},{-132,90}}, color={0,0,127}));
-  connect(valIsoCon.y, conAmbCon.y) annotation (Line(points={{-60,-108},{-60,
+  connect(valIsoCon.y, conAmbCon.y) annotation (Line(points={{-74,-108},{-74,
           -90},{-40,-90},{-40,152},{-68,152}}, color={0,0,127}));
   connect(twoTanCoo.y, conDivValHea.u) annotation (Line(points={{-118,180},{
           -106,180},{-106,182},{-92,182}}, color={255,0,255}));
@@ -434,19 +437,23 @@ equation
   connect(opeEtsHex.y, hex.u) annotation (Line(points={{-58,-230},{-50,-230},{
           -50,-252},{-12,-252}}, color={0,0,127}));
   connect(opeEtsHex.yVal1, valIsoEva.y_actual) annotation (Line(points={{-82,
-          -234},{-92,-234},{-92,-180},{46,-180},{46,-113},{55,-113}}, color={0,
+          -234},{-92,-234},{-92,-180},{46,-180},{46,-113},{65,-113}}, color={0,
           0,127}));
   connect(opeEtsHex.yVal2, valIsoCon.y_actual) annotation (Line(points={{-82,
-          -238.2},{-94,-238.2},{-94,-178},{-44,-178},{-44,-113},{-55,-113}},
+          -238.2},{-94,-238.2},{-94,-178},{-44,-178},{-44,-113},{-69,-113}},
         color={0,0,127}));
   connect(opeEtsHex.u1, tanChiWat.charge) annotation (Line(points={{-82,-222.2},
-          {-84,-222.2},{-84,-184},{90,-184},{90,107},{178,107}}, color={255,0,
+          {-88,-222.2},{-88,-184},{86,-184},{86,107},{178,107}}, color={255,0,
           255}));
   connect(twoTanCoo.y, opeEtsHex.u2) annotation (Line(points={{-118,180},{-106,
           180},{-106,132},{-28,132},{-28,-182},{-88,-182},{-88,-226},{-82,-226}},
         color={255,0,255}));
   connect(heaPum.uHeaDhw, twoTanCoo.yDhw) annotation (Line(points={{-12,-4},{
           -22,-4},{-22,130},{-110,130},{-110,175},{-118,175}}, color={255,0,255}));
+  connect(colChiWat.port_aDisSup, senMasFlo.port_a) annotation (Line(points={{
+          140,-50},{150,-50},{150,-10}}, color={0,127,255}));
+  connect(senMasFlo.port_b, valDivEva.port_2)
+    annotation (Line(points={{150,10},{150,70}}, color={0,127,255}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},
