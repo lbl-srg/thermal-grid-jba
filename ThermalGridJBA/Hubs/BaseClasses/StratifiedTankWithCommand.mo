@@ -107,7 +107,9 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
         transformation(extent={{100,-50},{140,-10}}),iconTransformation(extent={{100,-50},
             {140,-10}})));
   Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(
-    p=if isHotWat then +2 else -0.5)
+    p=if isHotWat then +2 else -0.5,
+    u(final unit="K", displayUnit="degC"),
+    y(final unit="K", displayUnit="degC"))
     "Offset"
     annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
   Buildings.Fluid.FixedResistances.Junction junTop(
