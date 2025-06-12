@@ -164,11 +164,13 @@ model HeatPump "Heat pump controller"
     "Offset temperature for 3-way valve control during cooling"
     annotation (Placement(transformation(extent={{-60,-120},{-40,-100}})));
 
-  Buildings.DHC.ETS.Combined.Controls.Reset resTHeaSup(final TWatSupSetMinMax=
+  Buildings.DHC.ETS.Combined.Controls.Reset resTHeaSup(dTOffSet=2,
+                                                       final TWatSupSetMinMax=
         THeaWatSupSetMin)
     "Heating water supply temperature reset"
     annotation (Placement(transformation(extent={{-260,70},{-240,90}})));
-  Buildings.DHC.ETS.Combined.Controls.Reset resTCooSup(final TWatSupSetMinMax=
+  Buildings.DHC.ETS.Combined.Controls.Reset resTCooSup(dTOffSet=-0.5,
+                                                       final TWatSupSetMinMax=
         TChiWatSupSetMax)
     "Chilled water supply temperature reset"
     annotation (Placement(transformation(extent={{-260,-20},{-240,0}})));
@@ -273,11 +275,11 @@ equation
   connect(delSta.u, heaOrCoo.y) annotation (Line(points={{146,120},{140,120},{
           140,190},{-118,190}}, color={255,0,255}));
   connect(swi.y, swi1.u1) annotation (Line(points={{114,150},{180,150},{180,128},
-          {198,128}}, color={0,0,127}));
+          {200,128}}, color={0,0,127}));
   connect(swi1.y, ramLimCom.u)
-    annotation (Line(points={{224,120},{240,120}}, color={0,0,127}));
+    annotation (Line(points={{224,120},{238,120}}, color={0,0,127}));
   connect(ramLimCom.y, yChi) annotation (Line(points={{262,120},{272,120},{272,
-          148},{280,148}}, color={0,0,127}));
+          150},{300,150}}, color={0,0,127}));
   connect(heaOrCoo.y, not1.u)
     annotation (Line(points={{-118,190},{158,190}}, color={255,0,255}));
   connect(not1.y, delPumOff.u)
