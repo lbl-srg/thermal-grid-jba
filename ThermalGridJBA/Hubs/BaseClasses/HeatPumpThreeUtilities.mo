@@ -11,17 +11,17 @@ model HeatPumpThreeUtilities
     colChiWat(mCon_flow_nominal={colAmbWat.mDis_flow_nominal,datHeaPum.mEva_flow_nominal}),
     colHeaWat(mCon_flow_nominal={colAmbWat.mDis_flow_nominal,datHeaPum.mCon_flow_nominal}),
     colAmbWat(mCon_flow_nominal={hex.m2_flow_nominal}),
+    nPorts_bChiWat=1,
+    nPorts_aChiWat=1,
+    nPorts_aHeaWat=1,
+    nPorts_bHeaWat=1,
     totPHea(nin=1),
     totPCoo(nin=1),
     totPPum(nin=if have_hotWat then 3 else 2),
     tanHeaWat(final T_start=TCon_start),
     tanChiWat(final T_start=TEva_start),
     valIsoCon(linearized=true),
-    valIsoEva(linearized=true),
-    nPorts_bHeaWat=1,
-    nPorts_aChiWat=1,
-    nPorts_aHeaWat=1,
-    nPorts_bChiWat=1);
+    valIsoEva(linearized=true));
 
   parameter ThermalGridJBA.Data.HeatPump datHeaPum "Heat pump performance data"
     annotation (
@@ -551,8 +551,8 @@ equation
   connect(conPIDTCooWatSup.u_s, TChiWatSupSet) annotation (Line(points={{158,
           240},{66,240},{66,210},{-26,210},{-26,-24},{-240,-24},{-240,-60},{
           -320,-60}}, color={0,0,127}));
-  connect(conPIDTHeaWatSup.u_s, THeaWatSupSet) annotation (Line(points={{-258,
-          274},{-288,274},{-288,-20},{-300,-20},{-300,-18},{-310,-18}}, color={
+  connect(conPIDTHeaWatSup.u_s, THeaWatSupSet) annotation (Line(points={{-258,274},
+          {-288,274},{-288,-20},{-300,-20},{-300,-20},{-320,-20}},      color={
           0,0,127}));
   annotation (Icon(graphics={
         Rectangle(
