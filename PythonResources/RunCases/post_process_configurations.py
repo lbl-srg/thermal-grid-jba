@@ -126,7 +126,8 @@ def plot_energy(results : list, case_names: list):
     # Conversion from J to kWh/m2
 
     AFlo = results[0].max('datDis.AFlo')
-    conv = 1/3600./1000./AFlo
+    #conv = 1/3600./1000./AFlo
+    conv = 1/3600./1E9
     width = 0.5       # the width of the bars: can also be len(x) sequence
 
     EHeaPum = np.zeros(n)
@@ -177,9 +178,10 @@ def plot_energy(results : list, case_names: list):
     print(f"Sum of plot = {bottom}")
     np.testing.assert_allclose(EAllTot, bottom, err_msg="Expected energy to be the same.")
 
-    plt.yticks(np.arange(0, 270, 20))
+    plt.yticks(np.arange(0, 30, 2))
     plt.grid(linestyle='-', axis='y', zorder=0)
-    plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
+    #plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
+    plt.ylabel('site electricity use $\mathrm{[GWh/a]}$')
     plt.xticks(idx, case_names)
     plt.tick_params(axis=u'x', which=u'both',length=0)
 
@@ -199,6 +201,7 @@ def plot_energy(results : list, case_names: list):
     # Energy [GWh/a] Energy [kWh/(m a)] Energy costs [USD/a]  Energy costs [USD/(m2 a)]
     #
     k=0
+    GWH_to_kWh_m2 = 1E9/AFlo/1000
     head=u"""
 \\begin{tabular}{ld{3.2}d{3.2}}
  &  \\multicolumn{1}{l}{Energy} &
@@ -208,12 +211,12 @@ def plot_energy(results : list, case_names: list):
  \\multicolumn{1}{l}{$\mathrm{[kWh/(m2 \, a)]}$} \\\\ \hline"""
 
     vals=f"""
-Heat pumps in ETS   & {EHeaPum[k]*AFlo*1000/1e9:.2f} &  {EHeaPum[k]:.1f} \\\\
-Heat pumps in plant & {EComPla[k]*AFlo*1000/1e9:.2f} &  {EComPla[k]:.1f} \\\\
-Pumps               & {(EPumETS[k]+EPumDis[k]+EPumPla[k])*AFlo*1000/1e9:.2f} &  {(EPumETS[k]+EPumDis[k]+EPumPla[k]):.1f} \\\\
-Fans                & {(EFanDry[k]+EFanBui[k])*AFlo*1000/1e9:.2f} &  {(EFanDry[k]+EFanBui[k]):.1f} \\\\
-Non-HVAC electricity for buildings & {EEleNon[k]*AFlo*1000/1e9:.2f} &  {EEleNon[k]:.1f}  \\\\ \hline
-Total & {EAllTot[k]*AFlo*1000/1e9:.2f} &  {EAllTot[k]:.1f} \\\\ \hline"""
+Heat pumps in ETS   & {EHeaPum[k]:.2f} &  {EHeaPum[k]*GWH_to_kWh_m2:.1f} \\\\
+Heat pumps in plant & {EComPla[k]:.2f} &  {EComPla[k]*GWH_to_kWh_m2:.1f} \\\\
+Pumps               & {(EPumETS[k]+EPumDis[k]+EPumPla[k]):.2f} &  {(EPumETS[k]+EPumDis[k]+EPumPla[k])*GWH_to_kWh_m2:.1f} \\\\
+Fans                & {(EFanDry[k]+EFanBui[k]):.2f} &  {(EFanDry[k]+EFanBui[k])*GWH_to_kWh_m2:.1f} \\\\
+Non-HVAC electricity for buildings & {EEleNon[k]:.2f} &  {EEleNon[k]*GWH_to_kWh_m2:.1f}  \\\\ \hline
+Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \hline"""
     foot=u"""
     \end{tabular}
     """
