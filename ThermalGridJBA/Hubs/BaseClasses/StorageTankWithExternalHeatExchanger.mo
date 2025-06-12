@@ -65,7 +65,6 @@ model StorageTankWithExternalHeatExchanger
   Buildings.Fluid.FixedResistances.Junction junTop(
     redeclare package Medium = MediumHea,
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
-    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Entering,
     m_flow_nominal=dat.mHex_flow_nominal*{1,1,1},
     dp_nominal=zeros(3)) "Flow junction at top of tank"
     annotation (Placement(transformation(extent={{10,20},{30,40}})));
@@ -109,6 +108,12 @@ model StorageTankWithExternalHeatExchanger
     "Output true if tank needs to be charged, false if it is sufficiently charged"
     annotation (Placement(transformation(extent={{100,-100},{140,-60}}),
         iconTransformation(extent={{100,-110},{140,-70}})));
+  Buildings.Fluid.Sensors.TemperatureTwoPort senTemHeaSup(
+    redeclare package Medium = MediumHea,
+    final allowFlowReversal=allowFlowReversalHea,
+    final m_flow_nominal=dat.mHex_flow_nominal)
+    "Temperature sensor for supply water temperature from heating system"
+    annotation (Placement(transformation(extent={{80,20},{60,40}})));
 protected
   parameter Modelica.Units.SI.SpecificHeatCapacity cpHea_default =
     MediumHea.specificHeatCapacityCp(MediumHea.setState_pTX(
@@ -134,8 +139,6 @@ equation
                                             color={0,127,255}));
   connect(pumHex.P, PEle) annotation (Line(points={{-49,-11},{-50,-11},{-50,-32},
           {86,-32},{86,0},{110,0}},     color={0,0,127}));
-  connect(junTop.port_2, port_aHea) annotation (Line(points={{30,30},{84,30},{84,
-          -60},{100,-60}},     color={0,127,255}));
   connect(hex.port_b1, senMasFlo.port_a)
     annotation (Line(points={{-40,60},{-20,60}}, color={0,127,255}));
   connect(senMasFlo.port_b, senTemHot.port_a)
@@ -187,6 +190,10 @@ equation
           -50},{-20,-50}}, color={0,127,255}));
   connect(TTanBot.T, conCha.TTanBot) annotation (Line(points={{61,-20},{62,-20},
           {62,-88},{70,-88}}, color={0,0,127}));
+  connect(junTop.port_2, senTemHeaSup.port_b)
+    annotation (Line(points={{30,30},{60,30}}, color={0,127,255}));
+  connect(senTemHeaSup.port_a, port_aHea) annotation (Line(points={{80,30},{84,30},
+          {84,-60},{100,-60}}, color={0,127,255}));
   annotation (
   defaultComponentName="domHotWatTan",
   Documentation(info="<html>

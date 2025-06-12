@@ -20,7 +20,7 @@ partial model PartialConnectedETS
   parameter ThermalGridJBA.Data.BuildingSetPoints datBuiSet
     "Building set points" annotation (Placement(
       transformation(extent={{20,140},{40,160}})));
-  parameter ThermalGridJBA.Data.Chiller datChi(
+  parameter ThermalGridJBA.Data.HeatPump datHeaPum(
     PLRMin=0.2/3 "20%, and assume 3 chillers in parallel",
     QHea_flow_nominal=max(QHea_flow_nominal, abs(QCoo_flow_nominal)*1.2),
     QCoo_flow_nominal=QCoo_flow_nominal,
@@ -28,7 +28,7 @@ partial model PartialConnectedETS
     final dTEva_nominal=datBuiSet.dTChiWat_nominal,
     final TConLvg_nominal=max(datBuiSet.THeaWatSup_nominal, datBuiSet.THotWatSupTan_nominal),
     final TEvaLvg_nominal=datBuiSet.TChiWatSup_nominal)
-    "Heat recovery chiller parameters"
+    "Heat recovery heat pump parameters"
     annotation (Placement(transformation(extent={{20,180},{40,200}})));
 
   parameter Modelica.Units.SI.HeatFlowRate QCoo_flow_nominal(
