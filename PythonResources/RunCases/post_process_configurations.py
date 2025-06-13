@@ -113,7 +113,7 @@ def hide_tick_labels(ax):
 
 
 
-def plot_energy(results : list, case_names: list):
+def plot_energy(cases : list):
     import os
     import matplotlib.pyplot as plt
     import numpy as np
@@ -121,6 +121,15 @@ def plot_energy(results : list, case_names: list):
     from buildingspy.io.outputfile import Reader
 
     plt.clf()
+
+    results = []
+    case_names = []
+    labels = []
+    for cas in cases:
+        if cas['postProcess']:
+            results.append(cas['reader'])
+            case_names.append(cas['name'])
+            labels.append(cas['label'])
 
     n = len(results)
     # Conversion from J to kWh/m2
@@ -130,6 +139,7 @@ def plot_energy(results : list, case_names: list):
     conv = 1/3600./1E9
     width = 0.5       # the width of the bars: can also be len(x) sequence
 
+    EPvBat = np.zeros(n)
     EHeaPum = np.zeros(n)
     EComPla = np.zeros(n)
     EPumETS = np.zeros(n)
@@ -145,6 +155,7 @@ def plot_energy(results : list, case_names: list):
     for i in idx:
         res = results[i]
 
+        EPvBat[i]         = res.min('EPvBat.y') * conv
         EHeaPum[i]        = res.max('EHeaPum.y') * conv
         EComPla[i]        = res.max('EComPla.y') * conv
         EPumETS[i]        = res.max('EPumETS.y') * conv
@@ -155,10 +166,11 @@ def plot_energy(results : list, case_names: list):
         EEleNon[i]        = res.max('EEleNonHvaETS.y') * conv
         EAllTot[i]        = res.max('ETot.y') * conv
 
-
     bottom = np.zeros(n)
-    p0 = plt.bar(idx, EHeaPum, width, bottom=bottom, zorder=3)
-    bottom = np.add(bottom, EHeaPum)
+#    pM1 = plt.bar(idx, EPvBat, width, bottom=bottom, zorder=3)
+#    bottom = np.add(bottom, EPvBat)
+    p0 = plt.bar(idx, EHeaPum, width, bottom=EPvBat, zorder=3)
+    bottom = np.add(EPvBat, EHeaPum)
     p1 = plt.bar(idx, EComPla, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EComPla)
     p2 = plt.bar(idx, EPumETS, width, bottom=bottom, zorder=3)
@@ -173,22 +185,24 @@ def plot_energy(results : list, case_names: list):
     bottom = np.add(bottom, EFanBui)
     p7 = plt.bar(idx, EEleNon, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EEleNon)
+#    n1 = plt.bar(idx, -EPvBat, width, bottom=EPvBat, zorder=3)
+#    n2 = plt.bar(idx, EPvBat+EAllTot)
 
     print(f"All electricity use = {EAllTot}")
     print(f"Sum of plot = {bottom}")
     np.testing.assert_allclose(EAllTot, bottom, err_msg="Expected energy to be the same.")
 
-    plt.yticks(np.arange(0, 30, 2))
+    plt.yticks(np.arange(-12, 14, 2))
     plt.grid(linestyle='-', axis='y', zorder=0)
     #plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
     plt.ylabel('site electricity use $\mathrm{[GWh/a]}$')
-    plt.xticks(idx, case_names)
+    plt.xticks(idx, labels, rotation=90)
     plt.tick_params(axis=u'x', which=u'both',length=0)
 
     plt.legend(tuple(reversed((p0[0], p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0]))), \
-               tuple(reversed(('heat pumps in ETS', 'heat pump in plant', 'pumps in ETS', 'pumps for district loop', 'pumps in  plant', 'fans in plant', 'fans in buildings', 'non-HVAC electricity for buildings'))), \
+               tuple(reversed(('PVs and batteries', 'heat pumps in ETS', 'heat pump in plant', 'pumps in ETS', 'pumps for district loop', 'pumps in  plant', 'fans in plant', 'fans in buildings', 'non-HVAC electricity for buildings'))), \
                bbox_to_anchor=(1.5, 0.75), loc='right')
-    plt.tight_layout()
+    #plt.tight_layout()
 
     save_plot(plt, "energy")
 
@@ -216,6 +230,7 @@ Heat pumps in plant & {EComPla[k]:.2f} &  {EComPla[k]*GWH_to_kWh_m2:.1f} \\\\
 Pumps               & {(EPumETS[k]+EPumDis[k]+EPumPla[k]):.2f} &  {(EPumETS[k]+EPumDis[k]+EPumPla[k])*GWH_to_kWh_m2:.1f} \\\\
 Fans                & {(EFanDry[k]+EFanBui[k]):.2f} &  {(EFanDry[k]+EFanBui[k])*GWH_to_kWh_m2:.1f} \\\\
 Non-HVAC electricity for buildings & {EEleNon[k]:.2f} &  {EEleNon[k]*GWH_to_kWh_m2:.1f}  \\\\ \hline
+PVs and batteries  & {EPvBat[k]:.2f} &  {EPvBat[k]*GWH_to_kWh_m2:.1f} \\\\
 Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \hline"""
     foot=u"""
     \end{tabular}
@@ -226,9 +241,16 @@ Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \hline"""
         f.write(tab)
 
 
-def plot_loop_temperatures(results : list, case_names: list):
+def plot_loop_temperatures(cases : list):
     from buildingspy.io.outputfile import Reader
     import matplotlib.pyplot as plt
+
+    results = []
+    case_names = []
+    for cas in cases:
+        if cas['postProcess']:
+            results.append(cas['reader'])
+            case_names.append(cas['name'])
 
     nCas = len(case_names)
 
