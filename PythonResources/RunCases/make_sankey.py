@@ -31,12 +31,15 @@ var_list_pre_index = [
     f'bui[{_i}].ets.PCoo',
     f'bui[{_i}].dHChiWat_flow',
     f'bui[{_i}].dHHeaWat_flow',
+    f'bui[{_i}].bui.disFloHea.PPum',
+    f'bui[{_i}].bui.disFloCoo.PPum',
     f'QEtsHex_flow.u[{_i}]']
 var_list += index_var_list(var_list_pre_index,
                            _i,
                            range(1,nBui+1))
 # bui[1] doesn't have dhw
-var_list += index_var_list(f'bui[{_i}].dHHotWat_flow',
+var_list += index_var_list([f'bui[{_i}].dHHotWat_flow',
+                            f'bui[{_i}].ets.tanDhw.PEle'],
                            _i,
                            range(2,nBui+1))
 # ground connection has (nBui + 1) elements
@@ -50,7 +53,12 @@ var_list += ['cenPla.gen.ind.ySea',
              'cenPla.gen.heaPum.QCon_flow',
              'cenPla.gen.heaPum.QEva_flow',
              'cenPla.QBorPer_flow',
-             'cenPla.QBorCen_flow'
+             'cenPla.QBorCen_flow',
+             'cenPla.gen.fanDryCoo.P',
+             'cenPla.gen.pumDryCoo.P',
+             'cenPla.gen.dryCoo.Q1_flow',
+             'pumDis.P',
+             'PEleNonHva.y'
              ]
 results = get_vars(var_list,
                    mat_file_name,
@@ -63,10 +71,18 @@ data_dicts = [
     {
     ("Electricity import", "ETS chiller", "electricity") : 0,
     ("Electricity import", "Central chiller", "electricity") : 0,
+    ("Electricity import", "Dry cooler", "electricity") : 0,
+    ("Electricity import", "Reservoir loop", "electricity") : 0,
+    ("Electricity import", "Pumps - cooling load", "electricity") : 0,
+    ("Electricity import", "Pumps - space heating load", "electricity") : 0,
+    ("Electricity import", "Pumps - DHW load", "electricity") : 0,
+    ("Electricity import", "Electricity consumption", "electricity") : 0,
     ("Dry cooler", "Central chiller", "plant heat rejection") : 0,
     ("Dry cooler", "Central chiller", "plant cooling rejection") : 0,
     ("Dry cooler", "Economizer", "plant heat rejection") : 0,
     ("Dry cooler", "Economizer", "plant cooling rejection") : 0,
+    ("Ambient", "Dry cooler", "Dry cooler heat rejection") : 0,
+    ("Ambient", "Dry cooler", "Dry cooler cooling rejection") : 0,
     ("Central chiller", "Reservoir loop", "plant cooling") : 0,
     ("Central chiller", "Reservoir loop", "plant heating") : 0,
     ("Reservoir loop", "ETS chiller", "ETS heat rejection") : 0,
@@ -110,12 +126,18 @@ for sea in range(5):
         data_dict[("ETS chiller", "Cooling load", "cooling load")] += \
             abs(integrate_with_condition(results, f'bui[{i}].dHChiWat_flow',
                                          condition = condition))
-        data_dict[("ETS chiller", "Heating load", "space heating load")] += \
-            abs(integrate_with_condition(results, f'bui[{i}].dHHeaWat_flow',
+        data_dict[("Electricity import", "Pumps - cooling load", "electricity")] += \
+            abs(integrate_with_condition(results, f'bui[{i}].bui.disFloCoo.PPum',
+                                         condition = condition))
+        data_dict[("Electricity import", "Pumps - space heating load", "electricity")] += \
+            abs(integrate_with_condition(results, f'bui[{i}].bui.disFloHea.PPum',
                                          condition = condition))
         if i != 1: # bui[1] doesn't have dhw
             data_dict[("ETS chiller", "DHW load", "domestic hot water")] += \
                 abs(integrate_with_condition(results, f'bui[{i}].dHHotWat_flow',
+                                             condition = condition))
+            data_dict[("Electricity import", "Pumps - DHW load", "electricity")] += \
+                abs(integrate_with_condition(results, f'bui[{i}].ets.tanDhw.PEle',
                                              condition = condition))
     
     # ground
@@ -129,7 +151,28 @@ for sea in range(5):
                                          sign = 'positive',
                                          condition = condition))
     
+    # loop
+    data_dict[("Electricity import", "Reservoir loop", "electricity")] = \
+        abs(integrate_with_condition(results, 'pumDis.P',
+                                     condition = condition))
+    
     # Central plant
+    # dry cooler
+    data_dict[("Electricity import", "Dry cooler", "electricity")] = \
+        abs(integrate_with_condition(results, 'cenPla.gen.fanDryCoo.P',
+                                     condition = condition)) + \
+        abs(integrate_with_condition(results, 'cenPla.gen.pumDryCoo.P',
+                                     condition = condition))
+    data_dict[("Ambient", "Dry cooler", "Dry cooler heat rejection")] = \
+        abs(integrate_with_condition(results, 'cenPla.gen.dryCoo.Q1_flow',
+                                     sign = 'negative',
+                                     condition = condition))
+    data_dict[("Ambient", "Dry cooler", "Dry cooler cooling rejection")] = \
+        abs(integrate_with_condition(results, 'cenPla.gen.dryCoo.Q1_flow',
+                                     sign = 'positive',
+                                     condition = condition))
+    
+    
     # economiser
     data_dict[("Dry cooler", "Economizer", "plant heat rejection")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.hex.Q1_flow',
@@ -148,39 +191,44 @@ for sea in range(5):
     data_dict[("Electricity import", "Central chiller", "electricity")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.heaPum.P',
                                      condition = condition))
-    data_dict[("Dry cooler", "Central chiller", "plant cooling rejection")] =\
+    data_dict[("Dry cooler", "Central chiller", "plant cooling rejection")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.heaPum.QEva_flow',
                                      sign = 'negative',
                                      condition = condition))
-    data_dict[("Dry cooler", "Central chiller", "plant heat rejection")] =\
+    data_dict[("Dry cooler", "Central chiller", "plant heat rejection")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.heaPum.QEva_flow',
                                      sign = 'positive',
                                      condition = condition))
-    data_dict[("Central chiller", "Reservoir loop", "plant heating")] =\
+    data_dict[("Central chiller", "Reservoir loop", "plant heating")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.heaPum.QCon_flow',
                                      sign = 'positive',
                                      condition = condition))
-    data_dict[("Central chiller", "Reservoir loop", "plant cooling")] =\
+    data_dict[("Central chiller", "Reservoir loop", "plant cooling")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.heaPum.QCon_flow',
                                      sign = 'negative',
                                      condition = condition))
     
     # borefield
-    data_dict[("Borefield center", "Reservoir loop", "borefield center anergy")] =\
+    data_dict[("Borefield center", "Reservoir loop", "borefield center anergy")] = \
         abs(integrate_with_condition(results, 'cenPla.QBorCen_flow',
                                      sign = 'positive',
                                      condition = condition))
-    data_dict[("Reservoir loop", "Borefield center", "borefield center anergy")] =\
+    data_dict[("Reservoir loop", "Borefield center", "borefield center anergy")] = \
         abs(integrate_with_condition(results, 'cenPla.QBorCen_flow',
                                      sign = 'negative',
                                      condition = condition))
-    data_dict[("Borefield perimeter", "Reservoir loop", "borefield perimeter anergy")] =\
+    data_dict[("Borefield perimeter", "Reservoir loop", "borefield perimeter anergy")] = \
         abs(integrate_with_condition(results, 'cenPla.QBorPer_flow',
                                      sign = 'positive',
                                      condition = condition))
-    data_dict[("Reservoir loop", "Borefield perimeter", "borefield perimeter anergy")] =\
+    data_dict[("Reservoir loop", "Borefield perimeter", "borefield perimeter anergy")] = \
         abs(integrate_with_condition(results, 'cenPla.QBorPer_flow',
                                      sign = 'negative',
+                                     condition = condition))
+
+    # electricity
+    data_dict[("Electricity import", "Electricity consumption", "electricity")] = \
+        abs(integrate_with_condition(results, 'PEleNonHva.y',
                                      condition = condition))
 
 #%% make sankey diagram
@@ -198,6 +246,8 @@ for sea in range(5):
 #   DHW is magent 'rgba(165, 255, 0, x)'.
 dict_color = {
     "electricity": 'rgba(60, 179, 113, 0.8)',
+    "dry cooler heat rejection": 'rgba(0, 0, 255, 0.2)',
+    "dry cooler cooling rejection": 'rgba(255, 0, 0, 0.2)',
     "plant heat rejection": 'rgba(0, 0, 255, 0.3)',
     "plant cooling rejection": 'rgba(255, 0, 0, 0.3)',
     "plant cooling": 'rgba(0, 0, 255, 0.5)',
@@ -217,18 +267,19 @@ dict_color = {
 #   The x-positions reflect the columns.
 #   The y-positions need to be manually adjusted after the diagram is generated.
 dict_coord = {
-    "Electricity import": (0.1, 0.1),
-    "Dry cooler": (0.1, 0.4),
-    "Central chiller": (0.3, 0.4),
-    "Economizer": (0.3, 0.6),
-    "Borefield center": (0.3, 0.7),
-    "Borefield perimeter": (0.3, 0.8),
-    "Ground": (0.3, 0.85),
-    "Reservoir loop": (0.5, 0.6),
-    "ETS chiller": (0.7, 0.35),
-    "Cooling load": (0.9, 0.2),
-    "Heating load": (0.9, 0.6),
-    "DHW load": (0.9, 0.8)
+    "Electricity import": (0.0, 0.1),
+    "Ambient": (0.0,0.4),
+    "Dry cooler": (0.2, 0.4),
+    "Central chiller": (0.4, 0.4),
+    "Economizer": (0.4, 0.6),
+    "Borefield center": (0.4, 0.7),
+    "Borefield perimeter": (0.4, 0.8),
+    "Ground": (0.4, 0.85),
+    "Reservoir loop": (0.6, 0.6),
+    "ETS chiller": (0.8, 0.35),
+    "Cooling load": (1., 0.2),
+    "Heating load": (1., 0.6),
+    "DHW load": (1., 0.8)
     }
 
 # Season names
