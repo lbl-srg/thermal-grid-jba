@@ -9,7 +9,8 @@ def get_cases():
                 'number_of_intervals' : 365 * 24,
                 'solver'     : 'cvode',
                 'tolerance'  : '1e-7',
-                'simulate': True
+                'simulate': True,
+                'postProcess': True
             }
             # Combine the dictionaries
             case.update(common)
@@ -18,39 +19,46 @@ def get_cases():
         # Build list of cases to be simulated
         cases = list()
         case = {
-            'name': "base"
+            # Name will be used in output file. Must not contain a period.
+            'name': "base",
+            # label will be used in plot label
+            'label': 'base'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_hBor_1.2",
+            'name': "base_hBor_1_2",
             'parameters': {
                 'cenPla.borFie.hBor': 91*1.2,
-            }
+            },
+            'label': '$1.2 \, h_{bor}$'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_hBor_0.8",
+            'name': "base_hBor_0_8",
             'parameters': {
                 'cenPla.borFie.hBor': 91*0.8
-            }
+            },
+            'label': '$0.8 \, h_{bor}$'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_dDis_1.2",
+            'name': "base_dDis_1_2",
             'parameters': {
                 'datDis.dhDisSizFac': 1.2
-            }
+            },
+            'label': '$1.2 \, h_{dis}$'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_dDis_0.8",
+            'name': "base_dDis_0_8",
             'parameters': {
                 'datDis.dhDisSizFac': 0.8
-            }
+            },
+            'label': '$0.8 \, d_{dis}$'
         }
         _add(case, cases)
 
@@ -62,35 +70,40 @@ def get_cases():
             'parameters': {
                 'datDis.mPlaHexGly_flow_nominal': 1,
                 'cenPla.TApp': 100
-            }
+            },
+            'label': 'no economizer'
         }
         _add(case, cases)
 
         case = {
             'name': 'heat',
-            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.HeatWave'
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.HeatWave',
+            'label': 'heat wave'
         }
         _add(case, cases)
 
         case = {
             'name': 'cold',
-            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.ColdSnap'
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.ColdSnap',
+            'label': 'cold snap'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_0.8",
+            'name': "base_heaPumSizFac_0_8",
             'parameters': {
                 'datDis.heaPumSizFac': 0.8
-            }
+            },
+            'label': '$0.8 \, \dot Q_{hea,pum,0}$'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_heaPumSizFac_0.9",
+            'name': "base_heaPumSizFac_0_9",
             'parameters': {
                 'datDis.heaPumSizFac': 0.9
-            }
+            },
+            'label': '$0.9 \, \dot Q_{hea,pum,0}$'
         }
         _add(case, cases)
 

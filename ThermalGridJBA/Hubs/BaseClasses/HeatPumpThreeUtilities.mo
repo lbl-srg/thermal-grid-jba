@@ -18,10 +18,7 @@ model HeatPumpThreeUtilities
     tanChiWat(final T_start=TEva_start),
     valIsoCon(linearized=true),
     valIsoEva(linearized=true),
-    nPorts_bHeaWat=1,
-    nPorts_aChiWat=1,
-    nPorts_aHeaWat=1,
-    nPorts_bChiWat=1);
+    hex(val2(linearized={true,true})));
 
   parameter ThermalGridJBA.Data.HeatPump datHeaPum "Heat pump performance data"
     annotation (
@@ -33,10 +30,10 @@ model HeatPumpThreeUtilities
     "Performance data of the domestic hot water component"
     annotation (Placement(transformation(extent={{-40,220},{-20,240}})));
   parameter Modelica.Units.SI.PressureDifference dpCon_nominal(displayUnit="Pa")
-    "Nominal pressure drop accross condenser"
+    "Nominal pressure drop across condenser"
     annotation (Dialog(group="Chiller"));
   parameter Modelica.Units.SI.PressureDifference dpEva_nominal(displayUnit="Pa")
-    "Nominal pressure drop accross evaporator"
+    "Nominal pressure drop across evaporator"
     annotation (Dialog(group="Chiller"));
   parameter Buildings.Controls.OBC.CDL.Types.SimpleController controllerType=
     Buildings.Controls.OBC.CDL.Types.SimpleController.PI
@@ -309,11 +306,11 @@ model HeatPumpThreeUtilities
         extent={{10,-10},{-10,10}},
         rotation=0,
         origin={170,190})));
-  Buildings.Fluid.Actuators.Valves.ThreeWayLinear valTHeaSup(
+  Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valTHeaSup(
     redeclare package Medium = MediumBui,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     m_flow_nominal=datHeaPum.mCon_flow_nominal,
-    dpValve_nominal=3000) if have_hotWat
+    dpValve_nominal=3000)
     "Three way valve for heating supply temperature control"
     annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
@@ -324,7 +321,7 @@ model HeatPumpThreeUtilities
     final dp_nominal={0,0,0},
     final energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final tau=1,
-    final m_flow_nominal=datHeaPum.mCon_flow_nominal*{1,-1,-1}) if have_hotWat
+    final m_flow_nominal=datHeaPum.mCon_flow_nominal*{1,-1,-1})
     "Junction at heating water return" annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
         rotation=90,
@@ -345,11 +342,11 @@ model HeatPumpThreeUtilities
     u_s(final unit="K", displayUnit="degC"),
     u_m(final unit="K", displayUnit="degC")) "Controller for cooling water supply temperature"
     annotation (Placement(transformation(extent={{160,230},{180,250}})));
-  Buildings.Fluid.Actuators.Valves.ThreeWayLinear valTCooSup(
+  Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valTCooSup(
     redeclare package Medium = MediumBui,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     m_flow_nominal=datHeaPum.mEva_flow_nominal,
-    dpValve_nominal=3000) if have_hotWat
+    dpValve_nominal=3000)
     "Three way valve for cooling supply temperature control" annotation (
       Placement(transformation(
         extent={{10,10},{-10,-10}},
@@ -360,7 +357,7 @@ model HeatPumpThreeUtilities
     final dp_nominal={0,0,0},
     final energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
     final tau=1,
-    final m_flow_nominal=datHeaPum.mEva_flow_nominal*{1,-1,-1}) if have_hotWat
+    final m_flow_nominal=datHeaPum.mEva_flow_nominal*{1,-1,-1})
     "Junction at cooling water return" annotation (Placement(transformation(
         extent={{10,10},{-10,-10}},
         rotation=90,
@@ -551,8 +548,13 @@ equation
   connect(conPIDTCooWatSup.u_s, TChiWatSupSet) annotation (Line(points={{158,
           240},{66,240},{66,210},{-26,210},{-26,-24},{-240,-24},{-240,-60},{
           -320,-60}}, color={0,0,127}));
+<<<<<<< HEAD
   connect(conPIDTHeaWatSup.u_s, THeaWatSupSet) annotation (Line(points={{-258,
           274},{-288,274},{-288,-20},{-300,-20},{-300,-18},{-310,-18}}, color={
+=======
+  connect(conPIDTHeaWatSup.u_s, THeaWatSupSet) annotation (Line(points={{-258,274},
+          {-288,274},{-288,-20},{-300,-20},{-300,-20},{-320,-20}},      color={
+>>>>>>> issue101_etsControl
           0,0,127}));
   annotation (Icon(graphics={
         Rectangle(

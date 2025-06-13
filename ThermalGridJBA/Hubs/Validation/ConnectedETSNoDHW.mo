@@ -116,9 +116,9 @@ equation
     __Dymola_Commands(
       file="modelica://ThermalGridJBA/Resources/Scripts/Dymola/Hubs/Validation/ConnectedETSNoDHW.mos" "Simulate and plot"),
     experiment(
-      StartTime=0,
-      StopTime=8640000,
-      Tolerance=1e-06),
+      StopTime=86400,
+      Tolerance=1e-06,
+      __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
 <p>
 Validation model for a single building without DHW integration in the ETS.

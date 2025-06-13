@@ -146,7 +146,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     final datTabCoo=dat.datCoo)
                     "Heat recovery heat pump"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
-  Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumCon(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumCon(
     redeclare final package Medium=Medium,
     final allowFlowReversal=allowFlowReversal,
     use_riseTime=true,
@@ -155,7 +155,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     dpMax=Modelica.Constants.inf)
     "Condenser pump"
     annotation (Placement(transformation(extent={{-110,50},{-90,70}})));
-  Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumEva(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumEva(
     redeclare final package Medium=Medium,
     final allowFlowReversal=allowFlowReversal,
     use_riseTime=true,

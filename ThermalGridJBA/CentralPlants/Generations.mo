@@ -321,7 +321,7 @@ model Generations
     "Fluid connector for waterflow to the district"
     annotation (Placement(transformation(extent={{-550,-250},{-530,-230}}),
       iconTransformation(extent={{-110,-210},{-90,-190}})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaPri(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumCenPlaPri(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     addPowerToMedium=false,
@@ -367,7 +367,7 @@ model Generations
     "Heat pump water loop valve"
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-130})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumWat(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumHeaPumWat(
     redeclare final package Medium = MediumW,
     final addPowerToMedium=false,
     final use_riseTime=true,
@@ -377,7 +377,7 @@ model Generations
     dpMax=Modelica.Constants.inf) "Pump for heat pump waterside loop"
      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=90, origin={310,-40})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumDryCoo(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumDryCoo(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
     use_riseTime=true,
@@ -385,7 +385,7 @@ model Generations
     final m_flow_nominal=mGly_flow_nominal,
     dpMax=Modelica.Constants.inf) "Dry cooler pump"
     annotation (Placement(transformation(extent={{-98,54},{-78,74}})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHeaPumGly(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumHeaPumGly(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
     final use_riseTime=true,
@@ -440,7 +440,7 @@ model Generations
         extent={{-10,-10},{10,10}},
         rotation=0,
         origin={136,64})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumHexGly(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumHexGly(
     redeclare final package Medium = MediumG,
     final addPowerToMedium=false,
     use_riseTime=true,
@@ -530,7 +530,7 @@ model Generations
     final TEvaCoo_nominal=TEvaCoo_nominal) "Reversible heat pump"
     annotation (Placement(transformation(extent={{330,-10},{350,-30}})));
 
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumCenPlaSec(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumCenPlaSec(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     addPowerToMedium=false,
@@ -631,7 +631,7 @@ model Generations
         extent={{-10,-10},{10,10}},
         rotation=0,
         origin={30,-160})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumBorFieCen(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumBorFieCen(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     final addPowerToMedium=false,
@@ -643,7 +643,7 @@ model Generations
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={180,-110})));
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow pumBorFiePer(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumBorFiePer(
     redeclare final package Medium = MediumW,
     allowFlowReversal=false,
     final addPowerToMedium=false,
@@ -901,7 +901,7 @@ model Generations
         MediumA, nPorts=1) "Pressure boundary condition for air"
     annotation (Placement(transformation(extent={{-20,80},{0,100}})));
 
-  Buildings.Fluid.Movers.Preconfigured.FlowControlled_m_flow fanDryCoo(
+  ThermalGridJBA.BaseClasses.Pump_m_flow fanDryCoo(
     redeclare package Medium = MediumA,
     energyDynamics=Modelica.Fluid.Types.Dynamics.SteadyState,
     final addPowerToMedium=false,
