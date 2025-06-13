@@ -21,7 +21,8 @@ model HeatPumpThreeUtilities
     tanHeaWat(final T_start=TCon_start),
     tanChiWat(final T_start=TEva_start),
     valIsoCon(linearized=true),
-    valIsoEva(linearized=true));
+    valIsoEva(linearized=true),
+    hex(val2(linearized={true,true})));
 
   parameter ThermalGridJBA.Data.HeatPump datHeaPum "Heat pump performance data"
     annotation (
