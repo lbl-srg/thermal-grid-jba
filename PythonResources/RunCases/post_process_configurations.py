@@ -684,3 +684,64 @@ def dT_hour(time, TLooMin, TLooMax, TLooMinMea, TLooMaxMea):
         dT.append(max(0, dt_min, dt_max))
     dTHou = (np.trapezoid(dT, time)) / 3600
     return dTHou
+
+
+"""
+Function to compute life cycle and other financial parameters
+@author: remi
+"""
+import pandas as pd
+import os
+import numpy as np
+
+
+
+def calc_finance(If, Iv, C, l, alpha):
+    r"""
+
+    Parameters
+    ----------
+    If    : Fixed part of the investment cost
+    Iv    : Variable part of the investment cost, cost per unit
+    C     : Capacity of the equipment
+    l     : Lifetime if the equipment
+    alpha : percentage of the investment cost associated with operation and maintenance expenses
+
+    Returns
+    -------
+    y : TYPE
+        DESCRIPTION.
+
+    """
+    duration = 20 # of investment, but not life time of equipment
+    i = .05 # Interest rate for JBA
+    g = .03 # Interest rate for JBA
+
+
+    r = (i - g) / (1 + g)
+    crf = (r * ( 1 + r) ** 20) / (( 1 + r) ** 20 - 1)
+
+    # Investment cost
+    I = If + Iv * C
+
+    # Replacement cost
+    RC = 0
+    l_new = l
+    while l_new < duration:
+        RC = RC + I / (1 + r) ** l_new
+        l_new = l_new + l
+
+    # Salvage revenue
+    SR = I * ((l_new - duration) / l) / (1 + r) ** duration
+
+    # O&M
+    OM = 0
+    for k in np.arange(1, duration + 1):
+        OM = OM + alpha * I / (1 + r) ** k
+
+    # Life-cycle cost
+    LCC = I + RC - SR + OM
+
+    ALCC = LCC * crf
+
+    return [ALCC, LCC, I, OM, RC, SR, crf]

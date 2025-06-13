@@ -229,6 +229,8 @@ record GenericDistrict "District network design parameters"
  final parameter Real dp_length_nominal(final unit="Pa/m") = 125
    "Design pressure drop per meter pipe";
 
+ constant Modelica.Units.SI.Length lUni = 1 "Unit length for unit check";
+
  function f_dhDis "Function to compute the diameter"
    input Modelica.Units.SI.Length u "Diameter";
    input Real dp_length_nominal(final unit="Pa/m") "Nominal pressure difference per m pipe";
@@ -237,8 +239,6 @@ record GenericDistrict "District network design parameters"
    input Modelica.Units.SI.DynamicViscosity mu "Dynamic viscosity";
    input Modelica.Units.SI.Length roughness "Roughness of district loop and borefield pipes";
    output Real y "Residual";
- protected
-   constant Modelica.Units.SI.Length lUni = 1 "Unit length for unit check";
  algorithm
    y :=dp_length_nominal -
       Modelica.Fluid.Pipes.BaseClasses.WallFriction.Detailed.pressureLoss_m_flow(
@@ -271,6 +271,18 @@ record GenericDistrict "District network design parameters"
   parameter Real dhDisSizFac = 1 "Sizing factor to change distribution pipe diameter";
   final parameter Modelica.Units.SI.Length dhDisAct = dhDisSizFac * dhDis
     "Diameter distribution pipe";
+  final parameter Real dpAct_length_nominal(final unit="Pa/m") =
+    Modelica.Fluid.Pipes.BaseClasses.WallFriction.Detailed.pressureLoss_m_flow(
+       m_flow=mPipDis_flow_nominal,
+       rho_a=rho_default,
+       rho_b=rho_default,
+       mu_a=mu_default,
+       mu_b=mu_default,
+       length=1,
+       diameter=dhDisAct,
+       roughness=roughness,
+       m_flow_small=1E4*mPipDis_flow_nominal)/lUni
+     "Actual nominal pressure difference per m pipe, taking into account dhDisSizFac";
 
   final parameter Modelica.Units.SI.Area ARound=dhDisAct^2*Modelica.Constants.pi/4
     "Cross sectional area (assuming a round cross section area)";
