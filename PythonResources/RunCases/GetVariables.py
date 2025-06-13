@@ -162,8 +162,8 @@ def integrate_with_condition(df, var, sign = None, condition = None):
         _t.append(t[i])
         _u.append(u[i])
         
-        t = _t
-        u = _u
+        t = np.array(_t)
+        u = np.array(_u)
     
     def find_zero_crossings(t, u):
         """ Find indices where the sign of u changes
