@@ -56,8 +56,8 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     annotation (Placement(transformation(extent={{620,180},{640,200}})));
   Modelica.Blocks.Sources.RealExpression TTanDhwSet[nBui](y(
       each final unit="K",
-      each displayUnit="degC") = {50 + 273.15,bui[5].ets.heaPum.con.conHea.u_s,
-      bui[5].ets.heaPum.con.conHea.u_s,bui[5].ets.heaPum.con.conHea.u_s,bui[5].ets.heaPum.con.conHea.u_s})
+      each displayUnit="degC") = {50 + 273.15,bui[2].ets.heaPum.con.conHea.u_s,
+      bui[3].ets.heaPum.con.conHea.u_s,bui[4].ets.heaPum.con.conHea.u_s,bui[5].ets.heaPum.con.conHea.u_s})
     "Temperature set point for heating water to be supplied to DHW tank, except hub[1] that does not provide DHW."
     annotation (Placement(transformation(extent={{540,190},{560,210}})));
 
@@ -390,25 +390,26 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     annotation (Placement(transformation(extent={{540,510},{560,530}})));
   inner Modelica_Requirements.Verify.PrintViolations printViolations
     annotation (Placement(transformation(extent={{660,560},{680,580}})));
-  Modelica.Blocks.Sources.RealExpression QRooCoo[nBui](y=bui.bui.QReqCoo_flow)
-    "Room cooling flow rate"
+  Modelica.Blocks.Sources.RealExpression cooAct[nBui](y=bui.ets.senTSpaCooSup.port_a.m_flow
+         ./ bui.ets.senTSpaCooSup.m_flow_nominal)
+    "Outputs how much cooling is provided based on the normalized mass flow measurement"
     annotation (Placement(transformation(extent={{420,-290},{440,-270}})));
-  Buildings.Controls.OBC.CDL.Reals.LessThreshold thrRooCoo[nBui](
-    each t=-100,
-    each h=50)
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold
+                                                 thrRooCoo[nBui](each t=0.05,
+      each h=0.05/2)
     "Room cooling flow rate not null"
     annotation (Placement(transformation(extent={{460,-290},{480,-270}})));
-  Modelica.Blocks.Sources.RealExpression QRooHea[nBui](y=bui.bui.QReqHea_flow)
-    "Room heating flow rate"
+  Modelica.Blocks.Sources.RealExpression heaAct[nBui](y=bui.ets.senTSpaHeaSup.port_a.m_flow
+         ./ bui.ets.senTSpaHeaSup.m_flow_nominal)
+    "Outputs an indicator for how much space heating is provided based on the mass flow rate"
     annotation (Placement(transformation(extent={{420,-110},{440,-90}})));
-  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold thrRooHea[nBui](
-    each t=100,
-    each h=50)
+  Buildings.Controls.OBC.CDL.Reals.GreaterThreshold thrRooHea[nBui](each t=0.05,
+      each h=0.05/2)
     "Room heating flow rate not null"
     annotation (Placement(transformation(extent={{460,-110},{480,-90}})));
   Modelica.Blocks.Logical.Switch swiRooCoo[nBui]
     "Difference in room temperature with the setpoint when cooling flow rate is not null"
-    annotation (Placement(transformation(extent={{500,-380},{520,-360}})));
+    annotation (Placement(transformation(extent={{510,-380},{530,-360}})));
   Modelica.Blocks.Continuous.Integrator intQRooCooOn[nBui](each y_start=0.00001)
     "Total time with room cooling flow rate on (start not 0 to avoid dividing by 0)"
     annotation (Placement(transformation(extent={{540,-420},{560,-400}})));
@@ -417,7 +418,7 @@ model DetailedPlantFiveHubsWithRequirementsVerification
     annotation (Placement(transformation(extent={{580,-400},{600,-380}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal QRooCooOn[nBui]
     "1 when Room cooling flow rate is not null, 0 otherwise"
-    annotation (Placement(transformation(extent={{500,-420},{520,-400}})));
+    annotation (Placement(transformation(extent={{510,-420},{530,-400}})));
   Modelica.Blocks.Sources.Constant zero[nBui](each k=0) "Signal with value 0"
     annotation (Placement(transformation(extent={{420,-260},{440,-240}})));
   Buildings.Controls.OBC.CDL.Conversions.BooleanToReal QRooHeaOn[nBui]
@@ -435,18 +436,29 @@ model DetailedPlantFiveHubsWithRequirementsVerification
   Modelica.Blocks.Math.Division dTRooHeaAvgYea[nBui]
     "Average Temperature difference between Room heating and setpoint since the beginning of the simulation"
     annotation (Placement(transformation(extent={{580,-220},{600,-200}})));
-  Modelica.Blocks.Sources.BooleanExpression heaPumCooOn[nBui](y=bui.ets.heaPum.con.yPum)
-    "ETS heat pump cooling signal on in each hub"
-    annotation (Placement(transformation(extent={{540,220},{560,240}})));
-  Modelica.Blocks.Sources.BooleanExpression staVer[nBui](
-    each y=time >= tStart + 3600) "Outputs true if system is ready for verification"
+  Modelica.Blocks.Sources.BooleanExpression staVer(
+    y=time >= tStart + 3600) "Outputs true if system is ready for verification"
     annotation (Placement(transformation(extent={{480,550},{500,570}})));
   Modelica.Blocks.Logical.Not dhWChaOff[nBui]
     "Output true if DHW tank is not charging"
     annotation (Placement(transformation(extent={{462,260},{482,280}})));
-  Buildings.Controls.OBC.CDL.Logical.MultiAnd verTHeaSup[nBui](each nin=3)
+  Buildings.Controls.OBC.CDL.Logical.MultiAnd verTHeaSup[nBui](each nin=4)
     "Output true if heating supply temperature should be verified"
     annotation (Placement(transformation(extent={{540,280},{560,300}})));
+  Buildings.Controls.OBC.CDL.Logical.MultiAnd verTCooSup[nBui](each nin=3)
+    "Output true if cooling supply temperature should be verified"
+    annotation (Placement(transformation(extent={{540,220},{560,240}})));
+  Modelica.Blocks.Sources.BooleanExpression plaReaForHea[nBui](y={bui[i].ets.heaPum.valCon.y_actual
+         > 0.95 for i in 1:nBui})
+    "Outputs true if the heat pump is ready to serve the heat load"
+    annotation (Placement(transformation(extent={{460,294},{480,314}})));
+  Modelica.Blocks.Sources.BooleanExpression plaReaForCoo[nBui](y={bui[i].ets.heaPum.valEva.y_actual
+         > 0.95 for i in 1:nBui})
+    "Outputs true if the heat pump is ready to serve the cooling load"
+    annotation (Placement(transformation(extent={{460,226},{480,246}})));
+  Buildings.Controls.OBC.CDL.Logical.MultiAnd verTDhwSup[nBui](each nin=3)
+    "Output true if domestic hot water supply temperature should be verified"
+    annotation (Placement(transformation(extent={{540,150},{560,170}})));
 protected
   parameter Modelica.Units.SI.Time tStart(fixed=false)
     "Start of the simulation";
@@ -473,8 +485,6 @@ equation
   connect(TDisWatSup.T,reqTPlaMix. u) annotation (Line(points={{-91,170},{-224,170},
           {-224,-168},{-160,-168},{-160,-566},{619,-566}},
                                    color={0,0,127}));
-  connect(dhwTanCha.y,reqTDhwTan. active) annotation (Line(points={{441,166},{612,
-          166},{612,186},{618,186}}, color={255,0,255}));
   connect(TMinHeaPumEva.y,reqTHeaPumEvaLvg. u_min) annotation (Line(points={{601,50},
           {610,50},{610,52},{619,52}},     color={0,0,127}));
   connect(heaPumOn.y,reqHeaPumOn. u)
@@ -549,16 +559,16 @@ equation
     annotation (Line(points={{561,560},{578,560}}, color={0,0,127}));
   connect(milImp.y, gaiMilImp.u)
     annotation (Line(points={{561,520},{578,520}}, color={0,0,127}));
-  connect(QRooCoo.y, thrRooCoo.u)
+  connect(cooAct.y, thrRooCoo.u)
     annotation (Line(points={{441,-280},{458,-280}}, color={0,0,127}));
   connect(thrRooCoo.y, reqTRooCoo.active) annotation (Line(points={{482,-280},{486,
           -280},{486,-324},{610,-324},{610,-314},{618,-314}}, color={255,0,255}));
-  connect(QRooHea.y, thrRooHea.u)
+  connect(heaAct.y, thrRooHea.u)
     annotation (Line(points={{441,-100},{458,-100}}, color={0,0,127}));
   connect(swiRooCoo.y, intdTRooCoo.u)
-    annotation (Line(points={{521,-370},{538,-370}}, color={0,0,127}));
+    annotation (Line(points={{531,-370},{538,-370}}, color={0,0,127}));
   connect(QRooCooOn.y,intQRooCooOn. u)
-    annotation (Line(points={{522,-410},{538,-410}}, color={0,0,127}));
+    annotation (Line(points={{532,-410},{538,-410}}, color={0,0,127}));
   connect(dTRooCooYea.y, reqTRooCooAvg.u_min) annotation (Line(points={{601,
           -390},{610,-390},{610,-360},{619,-360}},
                                              color={0,0,127}));
@@ -566,14 +576,14 @@ equation
           570,-410},{570,-396},{578,-396}}, color={0,0,127}));
   connect(intdTRooCoo.y, dTRooCooYea.u1) annotation (Line(points={{561,-370},{
           570,-370},{570,-384},{578,-384}}, color={0,0,127}));
-  connect(thrRooCoo.y, swiRooCoo.u2) annotation (Line(points={{482,-280},{486,-280},
-          {486,-370},{498,-370}}, color={255,0,255}));
-  connect(TRooCooDif.y, swiRooCoo.u1) annotation (Line(points={{481,-320},{492,
-          -320},{492,-362},{498,-362}}, color={0,0,127}));
-  connect(zero.y, swiRooCoo.u3) annotation (Line(points={{441,-250},{446,-250},
-          {446,-378},{498,-378}}, color={0,0,127}));
-  connect(thrRooCoo.y, QRooCooOn.u) annotation (Line(points={{482,-280},{486,-280},
-          {486,-410},{498,-410}}, color={255,0,255}));
+  connect(thrRooCoo.y, swiRooCoo.u2) annotation (Line(points={{482,-280},{494,-280},
+          {494,-370},{508,-370}}, color={255,0,255}));
+  connect(TRooCooDif.y, swiRooCoo.u1) annotation (Line(points={{481,-320},{492,-320},
+          {492,-362},{508,-362}},       color={0,0,127}));
+  connect(zero.y, swiRooCoo.u3) annotation (Line(points={{441,-250},{446,-250},{
+          446,-378},{508,-378}},  color={0,0,127}));
+  connect(thrRooCoo.y, QRooCooOn.u) annotation (Line(points={{482,-280},{494,-280},
+          {494,-410},{508,-410}}, color={255,0,255}));
   connect(thrRooHea.y, swiRooHea.u2) annotation (Line(points={{482,-100},{486,-100},
           {486,-190},{498,-190}}, color={255,0,255}));
   connect(thrRooHea.y, QRooHeaOn.u) annotation (Line(points={{482,-100},{486,-100},
@@ -594,8 +604,6 @@ equation
           -210},{610,-210},{610,-188},{619,-188}}, color={0,0,127}));
   connect(thrRooHea.y, reqTRooHea.active) annotation (Line(points={{482,-100},{486,
           -100},{486,-146},{610,-146},{610,-134},{618,-134}}, color={255,0,255}));
-  connect(heaPumCooOn.y, reqTCoo.active) annotation (Line(points={{561,230},{
-          610,230},{610,246},{618,246}}, color={255,0,255}));
   connect(reqTHeaPumConLvg.active, valIsoConCom.y) annotation (Line(points={{618,
           -34},{610,-34},{610,-40},{601,-40}}, color={255,0,255}));
   connect(valIsoEvaCom.y, reqTHeaPumEvaLvg.active) annotation (Line(points={{601,
@@ -611,15 +619,40 @@ equation
   connect(verTHeaSup.y, reqTSpaHeaSup.active) annotation (Line(points={{562,290},
           {608,290},{608,306},{618,306}}, color={255,0,255}));
   for i in 1:nBui loop
-  connect(staVer[i].y, verTHeaSup[i].u[1]) annotation (Line(points={{501,560},{
-            514,560},{514,287.667},{538,287.667}},
+    connect(staVer.y, verTHeaSup[i].u[1]) annotation (Line(points={{501,560},{514,
+            560},{514,287.375},{538,287.375}},
                                 color={255,0,255}));
     connect(thrRooHea[i].y, verTHeaSup[i].u[2]) annotation (Line(points={{482,-100},
-            {491.5,-100},{491.5,290},{538,290}},color={255,0,255}));
-  connect(dhWChaOff[i].y, verTHeaSup[i].u[3]) annotation (Line(points={{483,270},
-            {509.5,270},{509.5,292.333},{538,292.333}},
+            {491.5,-100},{491.5,289.125},{538,289.125}},
+                                                color={255,0,255}));
+    connect(dhWChaOff[i].y, verTHeaSup[i].u[3]) annotation (Line(points={{483,270},
+            {509.5,270},{509.5,290.875},{538,290.875}},
                                   color={255,0,255}));
+    connect(verTCooSup[i].u[1], staVer.y) annotation (Line(points={{538,227.667},
+            {514,227.667},{514,560},{501,560}},
+                                     color={255,0,255}));
+    connect(thrRooCoo[i].y, verTCooSup[i].u[2]) annotation (Line(points={{482,-280},
+            {494,-280},{494,230},{538,230}},    color={255,0,255}));
+
+    connect(plaReaForHea[i].y, verTHeaSup[i].u[4]) annotation (Line(points={{481,304},
+          {510,304},{510,292.625},{538,292.625}}, color={255,0,255}));
+    connect(plaReaForCoo[i].y, verTCooSup[i].u[3]) annotation (Line(points={{481,236},
+            {500,236},{500,232.333},{538,232.333}},
+                                                  color={255,0,255}));
+    connect(dhwTanCha[i].y, verTDhwSup[i].u[1]) annotation (Line(points={{441,166},
+            {490,166},{490,157.667},{538,157.667}},
+                                                  color={255,0,255}));
+    connect(verTDhwSup[i].u[2], staVer.y) annotation (Line(points={{538,160},{528,160},
+          {528,350},{514,350},{514,560},{501,560}}, color={255,0,255}));
+    connect(plaReaForHea[i].y, verTDhwSup[i].u[3]) annotation (Line(points={{481,304},
+            {510,304},{510,162.333},{538,162.333}},
+                                                  color={255,0,255}));
+
   end for;
+  connect(verTCooSup.y, reqTCoo.active) annotation (Line(points={{562,230},{608,
+          230},{608,246},{618,246}}, color={255,0,255}));
+  connect(verTDhwSup.y, reqTDhwTan.active) annotation (Line(points={{562,160},{612,
+          160},{612,186},{618,186}}, color={255,0,255}));
   annotation (Diagram(coordinateSystem(extent={{-400,-580},{680,580}})), Icon(
         coordinateSystem(extent={{-100,-100},{100,100}})),
     experiment(
