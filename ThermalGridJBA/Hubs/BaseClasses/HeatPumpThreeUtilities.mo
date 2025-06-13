@@ -548,13 +548,8 @@ equation
   connect(conPIDTCooWatSup.u_s, TChiWatSupSet) annotation (Line(points={{158,
           240},{66,240},{66,210},{-26,210},{-26,-24},{-240,-24},{-240,-60},{
           -320,-60}}, color={0,0,127}));
-<<<<<<< HEAD
-  connect(conPIDTHeaWatSup.u_s, THeaWatSupSet) annotation (Line(points={{-258,
-          274},{-288,274},{-288,-20},{-300,-20},{-300,-18},{-310,-18}}, color={
-=======
   connect(conPIDTHeaWatSup.u_s, THeaWatSupSet) annotation (Line(points={{-258,274},
           {-288,274},{-288,-20},{-300,-20},{-300,-20},{-320,-20}},      color={
->>>>>>> issue101_etsControl
           0,0,127}));
   annotation (Icon(graphics={
         Rectangle(
