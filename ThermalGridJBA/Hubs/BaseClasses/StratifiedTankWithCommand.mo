@@ -24,6 +24,9 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
     annotation(Dialog(tab = "Initialization"));
   parameter Boolean isHotWat
     "True if the tank supplies hot water, false for chilled water";
+  parameter Modelica.Units.SI.TemperatureDifference dTOffSet=if tanCha.isHotWat
+       then +1 else -1
+    "Offset for set point to have a slightly higher (or lower) temperature than the required supply from the load";
 
   // IO CONNECTORS
   Modelica.Fluid.Interfaces.FluidPort_a port_genTop(
@@ -90,9 +93,8 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
   Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor senTTop
     "Tank top temperature"
     annotation (Placement(transformation(extent={{30,30},{50,50}})));
-  ThermalGridJBA.Hubs.Controls.TankChargingController tanCha(
-    hysTop=if isHotWat then -1 else -0.3,
-    hysBot=if isHotWat then -1 else -0.3,
+  ThermalGridJBA.Hubs.Controls.TankChargingController tanCha(final dTOffSet=
+        dTOffSet,
     final isHotWat=isHotWat)
     "Tank charging command"
     annotation (Placement(transformation(extent={{70,-40},{90,-20}})));
@@ -106,12 +108,6 @@ model StratifiedTankWithCommand "Stratified buffer tank model"
     "Outputs true if tank should be charged" annotation (Placement(
         transformation(extent={{100,-50},{140,-10}}),iconTransformation(extent={{100,-50},
             {140,-10}})));
-  Buildings.Controls.OBC.CDL.Reals.AddParameter dTOff(
-    p=if isHotWat then +2 else -0.5,
-    u(final unit="K", displayUnit="degC"),
-    y(final unit="K", displayUnit="degC"))
-    "Offset"
-    annotation (Placement(transformation(extent={{-80,80},{-60,100}})));
   Buildings.Fluid.FixedResistances.Junction junTop(
     redeclare package Medium = Medium,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
@@ -156,10 +152,6 @@ equation
           {60,-38},{68,-38}}, color={0,0,127}));
   connect(tanCha.charge, charge)
     annotation (Line(points={{92,-30},{120,-30}}, color={255,0,255}));
-  connect(tanCha.TTanSet, dTOff.y) annotation (Line(points={{69,-22},{24,-22},{
-          24,90},{-58,90}}, color={0,0,127}));
-  connect(dTOff.u, TTanSet)
-    annotation (Line(points={{-82,90},{-120,90}}, color={0,0,127}));
 
   connect(junTop.port_3, tan.port_a)
     annotation (Line(points={{0,50},{0,10}}, color={0,127,255}));
@@ -173,6 +165,8 @@ equation
     annotation (Line(points={{-100,60},{-10,60}}, color={0,127,255}));
   connect(junTop.port_1, port_genTop)
     annotation (Line(points={{10,60},{100,60}}, color={0,127,255}));
+  connect(TTanSet, tanCha.TTanSet) annotation (Line(points={{-120,90},{64,90},{64,
+          -22},{69,-22}}, color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(

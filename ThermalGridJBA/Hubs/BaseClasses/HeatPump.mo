@@ -36,6 +36,15 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     displayUnit="degC")
     "Maximum value of chilled water supply temperature set point"
     annotation (Dialog(group="Controls"));
+  parameter Modelica.Units.SI.TemperatureDifference dTOffSetHea(
+    min=0.5,
+    displayUnit="K")
+    "Temperature to be added to the set point in order to be slightly above what the heating load requires";
+  parameter Modelica.Units.SI.TemperatureDifference dTOffSetCoo(
+    max=-0.5,
+    displayUnit="K")
+    "Temperature to be added to the set point in order to be slightly below what the cooling load requires";
+
   // IO CONNECTORS
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uHeaSpa
     "True if space heating is required from tank" annotation (Placement(
@@ -166,7 +175,9 @@ model HeatPump "Base subsystem with heat recovery heat pump"
   ThermalGridJBA.Hubs.Controls.HeatPump con(
     final PLRMin=dat.PLRMin,
     THeaWatSupSetMin=THeaWatSupSetMin,
-    TChiWatSupSetMax=TChiWatSupSetMax)
+    TChiWatSupSetMax=TChiWatSupSetMax,
+    final dTOffSetHea=dTOffSetHea,
+    final dTOffSetCoo=dTOffSetCoo)
                              "Controller"
     annotation (Placement(transformation(extent={{-70,130},{-50,150}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTConLvg(
@@ -339,7 +350,7 @@ equation
   connect(pumCon.P,add2.u1)
     annotation (Line(points={{-89,69},{80,69},{80,-134},{158,-134}},  color={0,0,127}));
   connect(con.yPum,booToRea.u)
-    annotation (Line(points={{-48,146},{-36,146},{-36,180},{-58,180}},color={255,0,255}));
+    annotation (Line(points={{-48,148},{-36,148},{-36,180},{-58,180}},color={255,0,255}));
   connect(booToRea.y,gai2.u)
     annotation (Line(points={{-82,180},{-120,180},{-120,0},{-100,0},{-100,-10}},color={0,0,127}));
   connect(gai2.y,pumEva.m_flow_in)
@@ -354,7 +365,7 @@ equation
           {-186,139},{-186,80},{-220,80}},   color={0,0,127}));
   connect(con.TEvaWatLvg, senTEvaLvg.T) annotation (Line(points={{-72,137},{-82,
           137},{-82,-40},{-31,-40}}, color={0,0,127}));
-  connect(con.yChi, heaPum.ySet) annotation (Line(points={{-48,142},{-40,142},{
+  connect(con.yCom, heaPum.ySet) annotation (Line(points={{-48,142},{-40,142},{
           -40,1.9},{-11.1,1.9}}, color={0,0,127}));
   connect(con.THeaWatSupSet, THeaWatSupSet) annotation (Line(points={{-72,144},
           {-192,144},{-192,110},{-220,110}}, color={0,0,127}));

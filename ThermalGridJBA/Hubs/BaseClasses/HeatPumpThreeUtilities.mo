@@ -77,7 +77,9 @@ model HeatPumpThreeUtilities
     final dpEva_nominal=dpEva_nominal,
     final dat=datHeaPum,
     THeaWatSupSetMin=303.15,
-    final TChiWatSupSetMax=TChiWatSupSetMax)
+    final TChiWatSupSetMax=TChiWatSupSetMax,
+    dTOffSetHea=2*dTOffSetHea,
+    dTOffSetCoo=2*dTOffSetCoo)
                          "Heat pump" annotation (Dialog(group="Chiller"),
       Placement(transformation(extent={{-10,-16},{10,4}})));
   Buildings.DHC.Networks.BaseClasses.DifferenceEnthalpyFlowRate dHFloHeaWat(
