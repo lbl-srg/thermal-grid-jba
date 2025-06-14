@@ -113,7 +113,7 @@ def hide_tick_labels(ax):
 
 
 
-def plot_energy(results : list, case_names: list):
+def plot_energy(cases : list):
     import os
     import matplotlib.pyplot as plt
     import numpy as np
@@ -122,13 +122,24 @@ def plot_energy(results : list, case_names: list):
 
     plt.clf()
 
+    results = []
+    case_names = []
+    labels = []
+    for cas in cases:
+        if cas['postProcess']:
+            results.append(cas['reader'])
+            case_names.append(cas['name'])
+            labels.append(cas['label'])
+
     n = len(results)
     # Conversion from J to kWh/m2
 
     AFlo = results[0].max('datDis.AFlo')
-    conv = 1/3600./1000./AFlo
+    #conv = 1/3600./1000./AFlo
+    conv = 1/3600./1E9
     width = 0.5       # the width of the bars: can also be len(x) sequence
 
+    EPvBat = np.zeros(n)
     EHeaPum = np.zeros(n)
     EComPla = np.zeros(n)
     EPumETS = np.zeros(n)
@@ -144,6 +155,7 @@ def plot_energy(results : list, case_names: list):
     for i in idx:
         res = results[i]
 
+        EPvBat[i]         = res.min('EPvBat.y') * conv
         EHeaPum[i]        = res.max('EHeaPum.y') * conv
         EComPla[i]        = res.max('EComPla.y') * conv
         EPumETS[i]        = res.max('EPumETS.y') * conv
@@ -154,10 +166,11 @@ def plot_energy(results : list, case_names: list):
         EEleNon[i]        = res.max('EEleNonHvaETS.y') * conv
         EAllTot[i]        = res.max('ETot.y') * conv
 
-
     bottom = np.zeros(n)
-    p0 = plt.bar(idx, EHeaPum, width, bottom=bottom, zorder=3)
-    bottom = np.add(bottom, EHeaPum)
+#    pM1 = plt.bar(idx, EPvBat, width, bottom=bottom, zorder=3)
+#    bottom = np.add(bottom, EPvBat)
+    p0 = plt.bar(idx, EHeaPum, width, bottom=EPvBat, zorder=3)
+    bottom = np.add(EPvBat, EHeaPum)
     p1 = plt.bar(idx, EComPla, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EComPla)
     p2 = plt.bar(idx, EPumETS, width, bottom=bottom, zorder=3)
@@ -172,19 +185,22 @@ def plot_energy(results : list, case_names: list):
     bottom = np.add(bottom, EFanBui)
     p7 = plt.bar(idx, EEleNon, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EEleNon)
+#    n1 = plt.bar(idx, -EPvBat, width, bottom=EPvBat, zorder=3)
+#    n2 = plt.bar(idx, EPvBat+EAllTot)
 
     print(f"All electricity use = {EAllTot}")
     print(f"Sum of plot = {bottom}")
     np.testing.assert_allclose(EAllTot, bottom, err_msg="Expected energy to be the same.")
 
-    plt.yticks(np.arange(0, 270, 20))
+    plt.yticks(np.arange(-12, 14, 2))
     plt.grid(linestyle='-', axis='y', zorder=0)
-    plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
-    plt.xticks(idx, case_names)
+    #plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
+    plt.ylabel('site electricity use $\mathrm{[GWh/a]}$')
+    plt.xticks(idx, labels, rotation=90)
     plt.tick_params(axis=u'x', which=u'both',length=0)
 
     plt.legend(tuple(reversed((p0[0], p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0]))), \
-               tuple(reversed(('heat pumps in ETS', 'heat pump in plant', 'pumps in ETS', 'pumps for district loop', 'pumps in  plant', 'fans in plant', 'fans in buildings', 'non-HVAC electricity for buildings'))), \
+               tuple(reversed(('PVs and batteries', 'heat pumps in ETS', 'heat pump in plant', 'pumps in ETS', 'pumps for district loop', 'pumps in  plant', 'fans in plant', 'fans in buildings', 'non-HVAC electricity for buildings'))), \
                bbox_to_anchor=(1.5, 0.75), loc='right')
     #plt.tight_layout()
 
@@ -199,6 +215,7 @@ def plot_energy(results : list, case_names: list):
     # Energy [GWh/a] Energy [kWh/(m a)] Energy costs [USD/a]  Energy costs [USD/(m2 a)]
     #
     k=0
+    GWH_to_kWh_m2 = 1E9/AFlo/1000
     head=u"""
 \\begin{tabular}{ld{3.2}d{3.2}}
  &  \\multicolumn{1}{l}{Energy} &
@@ -208,12 +225,13 @@ def plot_energy(results : list, case_names: list):
  \\multicolumn{1}{l}{$\mathrm{[kWh/(m2 \, a)]}$} \\\\ \hline"""
 
     vals=f"""
-Heat pumps in ETS   & {EHeaPum[k]*AFlo*1000/1e9:.2f} &  {EHeaPum[k]:.1f} \\\\
-Heat pumps in plant & {EComPla[k]*AFlo*1000/1e9:.2f} &  {EComPla[k]:.1f} \\\\
-Pumps               & {(EPumETS[k]+EPumDis[k]+EPumPla[k])*AFlo*1000/1e9:.2f} &  {(EPumETS[k]+EPumDis[k]+EPumPla[k]):.1f} \\\\
-Fans                & {(EFanDry[k]+EFanBui[k])*AFlo*1000/1e9:.2f} &  {(EFanDry[k]+EFanBui[k]):.1f} \\\\
-Non-HVAC electricity for buildings & {EEleNon[k]*AFlo*1000/1e9:.2f} &  {EEleNon[k]:.1f}  \\\\ \hline
-Total & {EAllTot[k]*AFlo*1000/1e9:.2f} &  {EAllTot[k]:.1f} \\\\ \hline"""
+Heat pumps in ETS   & {EHeaPum[k]:.2f} &  {EHeaPum[k]*GWH_to_kWh_m2:.1f} \\\\
+Heat pumps in plant & {EComPla[k]:.2f} &  {EComPla[k]*GWH_to_kWh_m2:.1f} \\\\
+Pumps               & {(EPumETS[k]+EPumDis[k]+EPumPla[k]):.2f} &  {(EPumETS[k]+EPumDis[k]+EPumPla[k])*GWH_to_kWh_m2:.1f} \\\\
+Fans                & {(EFanDry[k]+EFanBui[k]):.2f} &  {(EFanDry[k]+EFanBui[k])*GWH_to_kWh_m2:.1f} \\\\
+Non-HVAC electricity for buildings & {EEleNon[k]:.2f} &  {EEleNon[k]*GWH_to_kWh_m2:.1f}  \\\\ \hline
+PVs and batteries  & {EPvBat[k]:.2f} &  {EPvBat[k]*GWH_to_kWh_m2:.1f} \\\\
+Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \hline"""
     foot=u"""
     \end{tabular}
     """
@@ -223,9 +241,16 @@ Total & {EAllTot[k]*AFlo*1000/1e9:.2f} &  {EAllTot[k]:.1f} \\\\ \hline"""
         f.write(tab)
 
 
-def plot_loop_temperatures(results : list, case_names: list):
+def plot_loop_temperatures(cases : list):
     from buildingspy.io.outputfile import Reader
     import matplotlib.pyplot as plt
+
+    results = []
+    case_names = []
+    for cas in cases:
+        if cas['postProcess']:
+            results.append(cas['reader'])
+            case_names.append(cas['name'])
 
     nCas = len(case_names)
 
@@ -238,16 +263,16 @@ def plot_loop_temperatures(results : list, case_names: list):
         (tP, TLooMax)     = results[i].values('cenPla.TLooMax')
         (t, TLooMinMea)   = results[i].values('cenPla.TLooMinMea')
         (t, TLooMaxMea)   = results[i].values('cenPla.TLooMaxMea')
+        (t, TDisWatSup)      = results[i].values('TDisWatSup.T')
+        (t, TDisWatRet)      = results[i].values('TDisWatRet.T')
         (t, TSoiPer)      = results[i].values('dTSoiPer.T')
         (t, TSoiCen)      = results[i].values('dTSoiCen.T')
 
-        fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True)
+        fig, axs = plt.subplots(nrows=3, ncols=1, sharex=True)
 
         axs[0].plot(t/24./3600., TDryBul-273.15, 'k', label='Outside air temperature', linewidth=0.1)
-        axs[0].plot(t/24./3600., TLooMinMea-273.15, 'b', label='Minimum loop temperature', linewidth=0.2)
         axs[0].plot(t/24./3600., TLooMaxMea-273.15, 'r', label='Maximum loop temperature', linewidth=0.2)
-        axs[0].plot(t/24./3600., TSoiCen-273.15, 'k', label='Average temperature center borefield', linewidth=0.5)
-        axs[0].plot(t/24./3600., TSoiPer-273.15, 'g', label='Average temperature perimeter borefield', linewidth=0.5)
+        axs[0].plot(t/24./3600., TLooMinMea-273.15, 'b', label='Minimum loop temperature', linewidth=0.2)
 
         rect1 = matplotlib.patches.Rectangle((tP[0], 0), 365, TLooMin[0]-273.15, color='mistyrose')
         axs[0].add_patch(rect1)
@@ -261,6 +286,26 @@ def plot_loop_temperatures(results : list, case_names: list):
         axs[0].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
         #ax.set_aspect(5)
         configure_axes(axs[0])
+
+        # Plant
+#        axs[1].plot(t/24./3600., TDisWatSup-273.15, 'g', label='Supply temperature to district', linewidth=0.1)
+        axs[1].plot(t/24./3600., TDisWatRet-273.15, 'k', label='Return temperature from district loop', linewidth=0.2)
+        axs[1].plot(t/24./3600., TSoiPer-273.15, 'r',   marker=",", label='Spatially averaged temperature perimeter borefield', linewidth=0.75, markevery=30000, markersize=3)
+        axs[1].plot(t/24./3600., TSoiCen-273.15, 'b',   marker=">", label='Spatially averaged temperature center borefield', linewidth=0.75, markevery=30000, markersize=3)
+
+        rect1 = matplotlib.patches.Rectangle((tP[0], 0), 365, TLooMin[0]-273.15, color='mistyrose')
+        axs[1].add_patch(rect1)
+        rect1 = matplotlib.patches.Rectangle((tP[0], TLooMax[0]-273.15), 365, 30, color='mistyrose')
+        axs[1].add_patch(rect1)
+
+        axs[1].set_ylabel(r'Temperature [$^\circ$C]')
+        #axs[0].set_xticks(list(range(25)))
+        axs[1].set_xlim([0, 365])
+        axs[1].set_ylim([5, 25])
+        axs[1].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
+        #ax.set_aspect(5)
+        configure_axes(axs[1])
+
 
         # Energy
         (t, EETS)     = results[i].values('ETotEts.y')
@@ -277,22 +322,23 @@ def plot_loop_temperatures(results : list, case_names: list):
         for k in range(len(t)-1):
             EPip[k+1] = EPip[k] + (QPip[k+1]+QPip[k])/2.*(t[k+1]-t[k])
 
-        axs[1].plot(t/24./3600., -EETS/3600./1E9,    'b', label='Energy from ETS heat exchanger', marker=">", linewidth=0.5, markevery=60000, markersize=3)
-        axs[1].plot(t/24./3600., EHexDry/3600./1E9, 'r', label='Energy from central plant economizer', marker=",", linewidth=0.5, markevery=3000, markersize=3)
-        axs[1].plot(t/24./3600., -EBorCen/3600./1E9, 'k-+', label='Energy from center borefield', linewidth=0.2, markevery=60000, markersize=3)
-        axs[1].plot(t/24./3600., -EBorPer/3600./1E9, 'k-*', label='Energy from perimeter borefield', linewidth=0.2, markevery=30000, markersize=3)
-        axs[1].plot(t/24./3600., EPip/3600./1E9,    'k-o', label='Energy from soil into distribution pipe', linewidth=0.2, markevery=50000, markersize=3)
-        axs[1].plot(t/24./3600., EHPCen/3600./1E9,  'g', label='Energy from central heat pump', marker="<", linewidth=0.5, markevery=60000, markersize=3)
+        axs[2].plot(t/24./3600., -EETS/3600./1E9,    'k--+',     label='Energy from ETS heat exchanger', linewidth=0.2, markevery=60000, markersize=3)
+        axs[2].plot(t/24./3600., EHexDry/3600./1E9,  'k-*', label='Energy from central plant economizer', linewidth=0.2, markevery=30000, markersize=3)
+        axs[2].plot(t/24./3600., -EBorPer/3600./1E9, 'r',   marker=",", label='Energy from perimeter borefield', linewidth=0.75, markevery=30000, markersize=3)
+        axs[2].plot(t/24./3600., -EBorCen/3600./1E9, 'b',   marker=">", label='Energy from center borefield', linewidth=0.75, markevery=30000, markersize=3)
+        axs[2].plot(t/24./3600., EPip/3600./1E9,     'g-o',   label='Energy from soil into distribution pipe', linewidth=0.2, markevery=50000, markersize=3)
+        axs[2].plot(t/24./3600., EHPCen/3600./1E9,   'k',   marker="<", label='Energy from central heat pump', linewidth=0.5, markevery=60000, markersize=3)
 
 
-        axs[1].set_xlabel('Time [d]')
-        axs[1].set_ylabel('Energy [GWh/a]')
-        #axs[1].set_xticks(list(range(25)))
-        axs[1].set_xlim([0, 365])
-        axs[1].set_ylim([-12, 12])
-        axs[1].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
-        configure_axes(axs[1])
+        axs[2].set_xlabel('Time [d]')
+        axs[2].set_ylabel('Energy [GWh/a]')
+        #axs[2].set_xticks(list(range(25)))
+        axs[2].set_xlim([0, 365])
+        axs[2].set_ylim([-12, 12])
+        axs[2].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
         plt.tight_layout()
+        configure_axes(axs[2])
+
         #plt.title()
 
         save_plot(plt, f"{case_names[i]}_loopTemperatures")

@@ -61,7 +61,7 @@ model IdealPlantCombinedHub
     dIns=0.02,
     kIns=0.2)
     annotation (Placement(transformation(extent={{-20,132},{20,152}})));
-  Buildings.DHC.ETS.BaseClasses.Pump_m_flow pumDis(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pumDis(
     redeclare final package Medium = Medium,
     final m_flow_nominal=datDis.mPumDis_flow_nominal,
     final allowFlowReversal=allowFlowReversalSer,

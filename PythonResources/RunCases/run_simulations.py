@@ -4,7 +4,7 @@
 #
 #############################################################
 import os
-BRANCH="main"
+BRANCH="issue101_etsControl"
 SHOW_DYMOLA_GUI = False
 KEEP_DYMOLA_OPEN = False
 FROM_GIT_HUB = True

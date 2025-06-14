@@ -225,7 +225,7 @@ equation
     annotation (Line(points={{82,150},{90,150}},   color={255,0,255}));
   connect(conHea.y, swi.u1) annotation (Line(points={{-8,150},{0,150},{0,186},{
           88,186},{88,158},{90,158}},          color={0,0,127}));
-  connect(conCoo.y, swi.u3) annotation (Line(points={{-8,100},{72,100},{72,142},
+  connect(conCoo.y, swi.u3) annotation (Line(points={{-8,100},{86,100},{86,142},
           {90,142}},  color={0,0,127}));
   connect(zer.y, swi1.u3) annotation (Line(points={{170,90},{188,90},{188,112},
           {200,112}}, color={0,0,127}));
