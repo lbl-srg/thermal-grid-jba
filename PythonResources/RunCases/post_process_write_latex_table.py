@@ -5,7 +5,6 @@ def write_latex_capacity_table(r,
         r : BuildingsPy Reader object;
         nBui : Number of ETS, if not given will read `nBui` from mat file.
     """
-    # yt.define_unit("MWh", 1E-6/3600 * yt.Unit("J"))
     
     # conversion factors
     conv_W_kBH = 3.412141633 * 1e-3 # W to kBtu/hr
