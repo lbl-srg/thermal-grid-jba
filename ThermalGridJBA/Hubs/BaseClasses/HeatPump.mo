@@ -161,7 +161,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     use_riseTime=true,
     final m_flow_nominal=dat.mCon_flow_nominal,
     final dp_nominal=dpCon_nominal + dpValCon_nominal + 2*0.05*dpValCon_nominal,
-    dpMax=Modelica.Constants.inf)
+    dpMax=3*(dpCon_nominal + dpValCon_nominal + 2*0.05*dpValCon_nominal))
     "Condenser pump"
     annotation (Placement(transformation(extent={{-110,50},{-90,70}})));
   ThermalGridJBA.BaseClasses.Pump_m_flow pumEva(
@@ -169,7 +169,8 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     final allowFlowReversal=allowFlowReversal,
     use_riseTime=true,
     final m_flow_nominal=dat.mEva_flow_nominal,
-    final dp_nominal=dpEva_nominal + dpValEva_nominal + dpEva_nominal*0.05)
+    final dp_nominal=dpEva_nominal + dpValEva_nominal + dpEva_nominal*0.05,
+    dpMax=3*(dpEva_nominal + dpValEva_nominal + dpEva_nominal*0.05))
     "Evaporator pump"
     annotation (Placement(transformation(extent={{10,-10},{-10,10}},rotation=0,origin={-100,-60})));
   ThermalGridJBA.Hubs.Controls.HeatPump con(
@@ -241,7 +242,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     use_strokeTime=false,
     final m_flow_nominal=dat.mEva_flow_nominal,
     final dpValve_nominal=dpValEva_nominal,
-    linearized={false,false})
+    linearized={true,true})
     "Control valve for maximum evaporator water entering temperature"
     annotation (Placement(transformation(
         extent={{-10,10},{10,-10}},
@@ -260,7 +261,7 @@ model HeatPump "Base subsystem with heat recovery heat pump"
     use_strokeTime=false,
     final m_flow_nominal=dat.mCon_flow_nominal,
     final dpValve_nominal=dpValCon_nominal,
-    linearized={false,false})
+    linearized={true,true})
     "Control valve for minimum condenser water entering temperature"
     annotation (Placement(transformation(
         extent={{-10,10},{10,-10}},
