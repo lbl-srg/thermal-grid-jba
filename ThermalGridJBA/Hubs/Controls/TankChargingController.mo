@@ -89,8 +89,6 @@ equation
     annotation (Line(points={{-58,40},{-22,40}}, color={0,0,127}));
   connect(TTanTop, chaTopHea.u2) annotation (Line(points={{-120,0},{-40,0},{-40,
           62},{-22,62}}, color={0,0,127}));
-  connect(chaTBotHea.u2, TTanTop) annotation (Line(points={{-22,32},{-40,32},{-40,
-          0},{-120,0}}, color={0,0,127}));
   connect(chaTopHea.y, chaTopBot.u1) annotation (Line(points={{2,70},{24,70},{24,
           40},{28,40}}, color={255,0,255}));
   connect(chaTBotHea.y, chaTopBot.u2) annotation (Line(points={{2,40},{16,40},{16,
@@ -103,8 +101,8 @@ equation
           -60},{-34,40},{-58,40}}, color={0,0,127}));
   connect(chaTBotCoo.u1, dTOffChaOn.y) annotation (Line(points={{-22,-30},{-50,-30},
           {-50,70},{-58,70}}, color={0,0,127}));
-  connect(chaTBotCoo.u2, TTanBot) annotation (Line(points={{-22,-38},{-60,-38},{
-          -60,-60},{-120,-60}}, color={0,0,127}));
+  connect(chaTBotCoo.u2, TTanBot) annotation (Line(points={{-22,-38},{-56,-38},
+          {-56,-60},{-120,-60}},color={0,0,127}));
   connect(chaTTopCoo.u2, TTanTop) annotation (Line(points={{-22,-68},{-40,-68},{
           -40,0},{-120,0}}, color={0,0,127}));
   connect(chaTBotCoo.y, chaTopBot.u1) annotation (Line(points={{2,-30},{6,-30},{
@@ -117,6 +115,8 @@ equation
           {38,0}}, color={255,0,255}));
   connect(dTOffChaOff.u, TTanSet) annotation (Line(points={{-82,40},{-90,40},{-90,
           70},{-120,70}}, color={0,0,127}));
+  connect(chaTBotHea.u2, TTanBot) annotation (Line(points={{-22,32},{-56,32},{
+          -56,-60},{-120,-60}}, color={0,0,127}));
   annotation (
   defaultComponentName="tanCha",
   Icon(coordinateSystem(preserveAspectRatio=false), graphics={
