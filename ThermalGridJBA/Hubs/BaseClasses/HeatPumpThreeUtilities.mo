@@ -11,10 +11,6 @@ model HeatPumpThreeUtilities
     colChiWat(mCon_flow_nominal={colAmbWat.mDis_flow_nominal,datHeaPum.mEva_flow_nominal}),
     colHeaWat(mCon_flow_nominal={colAmbWat.mDis_flow_nominal,datHeaPum.mCon_flow_nominal}),
     colAmbWat(mCon_flow_nominal={hex.m2_flow_nominal}),
-    nPorts_bChiWat=1,
-    nPorts_aChiWat=1,
-    nPorts_aHeaWat=1,
-    nPorts_bHeaWat=1,
     totPHea(nin=1),
     totPCoo(nin=1),
     totPPum(nin=if have_hotWat then 3 else 2),
@@ -34,10 +30,10 @@ model HeatPumpThreeUtilities
     "Performance data of the domestic hot water component"
     annotation (Placement(transformation(extent={{-40,220},{-20,240}})));
   parameter Modelica.Units.SI.PressureDifference dpCon_nominal(displayUnit="Pa")
-    "Nominal pressure drop accross condenser"
+    "Nominal pressure drop across condenser"
     annotation (Dialog(group="Chiller"));
   parameter Modelica.Units.SI.PressureDifference dpEva_nominal(displayUnit="Pa")
-    "Nominal pressure drop accross evaporator"
+    "Nominal pressure drop across evaporator"
     annotation (Dialog(group="Chiller"));
   parameter Buildings.Controls.OBC.CDL.Types.SimpleController controllerType=
     Buildings.Controls.OBC.CDL.Types.SimpleController.PI
@@ -81,7 +77,9 @@ model HeatPumpThreeUtilities
     final dpEva_nominal=dpEva_nominal,
     final dat=datHeaPum,
     THeaWatSupSetMin=303.15,
-    final TChiWatSupSetMax=TChiWatSupSetMax)
+    final TChiWatSupSetMax=TChiWatSupSetMax,
+    dTOffSetHea=dTOffSetHea,
+    dTOffSetCoo=dTOffSetCoo)
                          "Heat pump" annotation (Dialog(group="Chiller"),
       Placement(transformation(extent={{-10,-16},{10,4}})));
   Buildings.DHC.Networks.BaseClasses.DifferenceEnthalpyFlowRate dHFloHeaWat(
