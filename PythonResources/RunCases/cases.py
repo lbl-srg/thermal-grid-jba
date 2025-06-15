@@ -27,6 +27,15 @@ def get_cases():
         _add(case, cases)
 
         case = {
+            'name': "base_hBor_0_8",
+            'parameters': {
+                'cenPla.borFie.hBor': 91*0.8
+            },
+            'label': '$0.8 \, h_{bor}$'
+        }
+        _add(case, cases)
+
+        case = {
             'name': "base_hBor_1_2",
             'parameters': {
                 'cenPla.borFie.hBor': 91*1.2,
@@ -36,11 +45,11 @@ def get_cases():
         _add(case, cases)
 
         case = {
-            'name': "base_hBor_0_8",
+            'name': "base_dDis_0_8",
             'parameters': {
-                'cenPla.borFie.hBor': 91*0.8
+                'datDis.dhDisSizFac': 0.8
             },
-            'label': '$0.8 \, h_{bor}$'
+            'label': '$0.8 \, d_{dis}$'
         }
         _add(case, cases)
 
@@ -54,11 +63,20 @@ def get_cases():
         _add(case, cases)
 
         case = {
-            'name': "base_dDis_0_8",
+            'name': "base_heaPumSizFac_0_8",
             'parameters': {
-                'datDis.dhDisSizFac': 0.8
+                'datDis.heaPumSizFac': 0.8
             },
-            'label': '$0.8 \, d_{dis}$'
+            'label': '$0.8 \, \dot Q_{hea,pum,0}$'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0_9",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.9
+            },
+            'label': '$0.9 \, \dot Q_{hea,pum,0}$'
         }
         _add(case, cases)
 
@@ -86,24 +104,6 @@ def get_cases():
             'name': 'cold',
             'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.ColdSnap',
             'label': 'cold snap'
-        }
-        _add(case, cases)
-
-        case = {
-            'name': "base_heaPumSizFac_0_8",
-            'parameters': {
-                'datDis.heaPumSizFac': 0.8
-            },
-            'label': '$0.8 \, \dot Q_{hea,pum,0}$'
-        }
-        _add(case, cases)
-
-        case = {
-            'name': "base_heaPumSizFac_0_9",
-            'parameters': {
-                'datDis.heaPumSizFac': 0.9
-            },
-            'label': '$0.9 \, \dot Q_{hea,pum,0}$'
         }
         _add(case, cases)
 
