@@ -63,6 +63,45 @@ def get_cases():
         _add(case, cases)
 
         case = {
+            'name': "base_TCon_20",
+            'parameters': {
+                'bui[1].datHeaPum.TConLvgMin': 293.15,
+                'bui[2].datHeaPum.TConLvgMin': 293.15,
+                'bui[3].datHeaPum.TConLvgMin': 293.15,
+                'bui[4].datHeaPum.TConLvgMin': 293.15,
+                'bui[5].datHeaPum.TConLvgMin': 293.15
+            },
+            'label': '$T_{con,min} = 20^\circ \mathrm{C}$ ($68 \, F$)'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_TCon_25",
+            'parameters': {
+                'bui[1].datHeaPum.TConLvgMin': 298.15,
+                'bui[2].datHeaPum.TConLvgMin': 298.15,
+                'bui[3].datHeaPum.TConLvgMin': 298.15,
+                'bui[4].datHeaPum.TConLvgMin': 298.15,
+                'bui[5].datHeaPum.TConLvgMin': 298.15
+            },
+            'label': '$T_{con,min} = 25^\circ \mathrm{C}$ ($77 \, F$)'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_TCon_35",
+            'parameters': {
+                'bui[1].datHeaPum.TConLvgMin': 308.15,
+                'bui[2].datHeaPum.TConLvgMin': 308.15,
+                'bui[3].datHeaPum.TConLvgMin': 308.15,
+                'bui[4].datHeaPum.TConLvgMin': 308.15,
+                'bui[5].datHeaPum.TConLvgMin': 308.15
+            },
+            'label': '$T_{con,min} = 35^\circ \mathrm{C}$ ($95 \, F$)'
+        }
+        _add(case, cases)
+
+        case = {
             'name': "base_heaPumSizFac_0_8",
             'parameters': {
                 'datDis.heaPumSizFac': 0.8
