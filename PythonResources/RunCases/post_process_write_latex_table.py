@@ -1,11 +1,12 @@
 def write_latex_capacity_table(r,
                                nBui = None):
     """ Returns texts for a latex table.
-        Requires the `unyt` package for unit handling.
+
         r : BuildingsPy Reader object;
         nBui : Number of ETS, if not given will read `nBui` from mat file.
     """
-    
+    import os
+
     # conversion factors
     conv_W_kBH = 3.412141633 * 1e-3 # W to kBtu/hr
     conv_W_RT = 3.412141633 / 12000 # W to refrigeration ton
@@ -77,18 +78,18 @@ def write_latex_capacity_table(r,
     ## ETS
     for i in range(1,nBui+1):
 
-        # chiller
+        # heat recovery heat pump
         tab += f"ETS {i}" # This will go bofore the `&` of the first row
 
         tab += write_row(val = read_parameter(f'bui[{i}].ets.heaPum.heaPum.QHea_flow_nominal'),
-                         desc = "Heat recovery chiller - heating",
+                         desc = "Heat recovery heat pump - heating",
                          factor_si = 1e-3,
                          factor_ip = conv_W_kBH,
                          display_si = "kW",
                          display_ip = "kBtu/hr")
 
         tab += write_row(val = abs(read_parameter(f'bui[{i}].ets.heaPum.heaPum.QCoo_flow_nominal')),
-                         desc = "Heat recovery chiller - cooling",
+                         desc = "Heat recovery heat pump - cooling",
                          factor_si = 1e-3,
                          factor_ip = conv_W_RT,
                          display_si = "kW",
@@ -204,4 +205,6 @@ def write_latex_capacity_table(r,
     tab += "\\bottomrule\n"
     tab += "\\end{tabular}"
 
-    return tab
+    with open(os.path.join("img", "capacities.tex"), 'w') as f:
+        f.write(tab)
+    return
