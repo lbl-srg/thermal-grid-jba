@@ -4,8 +4,8 @@
 #
 #############################################################
 import os
-BRANCH="issue10_requirementImplementation"
-SHOW_DYMOLA_GUI = False
+BRANCH="issue106_TCon"
+SHOW_DYMOLA_GUI = True
 KEEP_DYMOLA_OPEN = False
 FROM_GIT_HUB = True
 
