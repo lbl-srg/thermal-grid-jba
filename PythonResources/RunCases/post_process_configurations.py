@@ -192,7 +192,7 @@ def plot_energy(cases : list):
     print(f"Sum of plot = {bottom}")
     np.testing.assert_allclose(EAllTot, bottom, err_msg="Expected energy to be the same.")
 
-    plt.yticks(np.arange(-12, 14, 2))
+    plt.yticks(np.arange(-12, 16, 2))
     plt.grid(linestyle='-', axis='y', zorder=0)
     #plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
     plt.ylabel('site electricity use $\mathrm{[GWh/a]}$')
@@ -204,7 +204,7 @@ def plot_energy(cases : list):
                bbox_to_anchor=(1.5, 0.75), loc='right')
     #plt.tight_layout()
 
-    save_plot(plt, "energy")
+    save_plot(plt, f"energy")
 
     # Write result to console and file
     # heat pumps ets
