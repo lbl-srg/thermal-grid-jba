@@ -13,7 +13,9 @@ def get_cases():
                 'postProcess': True
             }
             # Combine the dictionaries
-            case.update(common)
+            # Add the common key-value pairs if they don't exist already in 'case'.
+            for key, value in common.items():
+                    case.setdefault(key, value)
             cases.append(case)
 
         # Build list of cases to be simulated
@@ -94,6 +96,7 @@ def get_cases():
             'parameters': {
                 'datDis.heaPumSizFac': 0.8
             },
+            'tolerance'  : '1e-8',
             'label': '$0.8 \, \dot Q_{hea,pum,0}$'
         }
         _add(case, cases)
