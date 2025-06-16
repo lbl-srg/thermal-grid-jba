@@ -61,8 +61,12 @@ model HeatPumpThreeUtilities
     annotation (Dialog(group="Supervisory controller"));
   parameter Modelica.Units.SI.Temperature TChiWatSupSetMax(displayUnit="degC")
      = datHeaPum.TEvaLvgMax
-    "Minimum value of chilled water supply temperature set point"
+    "Maximum value of chilled water supply temperature set point for heat pump (used for heat pump reset)"
     annotation (Dialog(group="Supervisory controller"));
+  parameter Modelica.Units.SI.Temperature THeaWatSupSetMin(displayUnit="degC")
+     = datHeaPum.TConLvgMin
+    "Minimum value of heating water supply temperature set point (used for heat pump reset)";
+
   parameter MediumBui.Temperature TCon_start = MediumBui.T_default
     "Temperature start value on the condenser side"
     annotation(Dialog(tab = "Initialization"));
@@ -76,11 +80,11 @@ model HeatPumpThreeUtilities
     final dpCon_nominal=dpCon_nominal,
     final dpEva_nominal=dpEva_nominal,
     final dat=datHeaPum,
-    THeaWatSupSetMin=303.15,
+    final THeaWatSupSetMin=THeaWatSupSetMin,
     final TChiWatSupSetMax=TChiWatSupSetMax,
     dTOffSetHea=dTOffSetHea,
     dTOffSetCoo=dTOffSetCoo)
-                         "Heat pump" annotation (Dialog(group="Chiller"),
+    "Heat pump" annotation (Dialog(group="Chiller"),
       Placement(transformation(extent={{-10,-16},{10,4}})));
   Buildings.DHC.Networks.BaseClasses.DifferenceEnthalpyFlowRate dHFloHeaWat(
     redeclare final package Medium1 = MediumBui,
