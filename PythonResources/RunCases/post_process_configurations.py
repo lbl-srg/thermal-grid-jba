@@ -344,11 +344,11 @@ def plot_loop_temperatures(cases : list):
         save_plot(plt, f"{case_names[i]}_loopTemperatures")
 
 
-def plotPlant(lis, res, filePrefix, days, time="hours"):
+def plotPlant(lis, res, filePrefix, days, time="hours", fontSize=4, nColLegend=2):
     from datetime import datetime
 
     ori_font_size = plt.rcParams['font.size']
-    plt.rcParams['font.size'] = 4
+    plt.rcParams['font.size'] = fontSize
 
     def get_minMaxIndex(tMin, tMax, t):
         iSta = 0
@@ -382,14 +382,19 @@ def plotPlant(lis, res, filePrefix, days, time="hours"):
         else:
             timeDiv = 3600.
         for i in range(len(lis)):
+            yPlo = np.zeros(len(t))
             for iVar in range(len(lis[i]["vars"])):
                 ptrVar = lis[i]["vars"][iVar]
                 (tAll, yAll) = res.values(ptrVar["var"])
                 t = tAll[iSta:iEnd]
                 y = yAll[iSta:iEnd]
+                if "plotSumOfSeries" in lis[i] and lis[i]["plotSumOfSeries"]:
+                    yPlo = yPlo + y
+                else:
+                    yPlo = y
                 # Check if data series should be skipped to allow for seasonal configuration
                 if not (("skip_if_ySea" in ptrVar) and (ptrVar["skip_if_ySea"] == ySea[iSta])):
-                    axs[k].plot(t/timeDiv, y * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
+                    axs[k].plot(t/timeDiv, yPlo * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
                             linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.2,
                             linestyle=ptrVar["linestyle"] if "linestyle" in ptrVar else "-",
                             marker=ptrVar["marker"] if "marker" in ptrVar else "",
@@ -413,7 +418,7 @@ def plotPlant(lis, res, filePrefix, days, time="hours"):
                 axs[k].set_ylabel(lis[i]["y_label"], multialignment='center')
                 axs[k].legend(bbox_to_anchor=(1.25, 1.0),
                               loc='upper right',
-                              ncol=2)
+                              ncol=nColLegend)
             #axs[i].set_ylim(lis[i]["y_lim"])
 
             k=k+1
