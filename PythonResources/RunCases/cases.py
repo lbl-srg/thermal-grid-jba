@@ -65,15 +65,6 @@ def get_cases():
         _add(case, cases)
 
         case = {
-            'name': "base_TCon_20",
-            'parameters': {
-                'bui.datHeaPum.TConLvgMin': [293.15, 293.15, 293.15, 293.15, 293.15]
-            },
-            'label': '$T_{con,min} = 20^\circ \mathrm{C}$ ($68 \, F$)'
-        }
-        _add(case, cases)
-
-        case = {
             'name': "base_TCon_10",
             'parameters': {
                 'bui.datHeaPum.TConLvgMin': [283.15, 283.15, 283.15, 283.15, 283.15]
