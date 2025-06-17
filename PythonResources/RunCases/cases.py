@@ -149,8 +149,8 @@ def get_cases():
             'name': 'postECM_TMY3',
             'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM',
             'label': 'TMY3 weather'
-         }
-         _add(case, cases)
+        }
+        _add(case, cases)
 
         return cases
 
