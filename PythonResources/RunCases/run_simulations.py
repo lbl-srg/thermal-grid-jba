@@ -4,8 +4,8 @@
 #
 #############################################################
 import os
-BRANCH="issue106_TCon"
-SHOW_DYMOLA_GUI = True
+BRANCH="issue108_TCon15_solver"
+SHOW_DYMOLA_GUI = False
 KEEP_DYMOLA_OPEN = False
 FROM_GIT_HUB = True
 

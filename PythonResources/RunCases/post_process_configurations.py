@@ -344,11 +344,11 @@ def plot_loop_temperatures(cases : list):
         save_plot(plt, f"{case_names[i]}_loopTemperatures")
 
 
-def plotPlant(lis, res, filePrefix, days):
+def plotPlant(lis, res, filePrefix, days, time="hours", fontSize=4, nColLegend=2):
     from datetime import datetime
 
     ori_font_size = plt.rcParams['font.size']
-    plt.rcParams['font.size'] = 4
+    plt.rcParams['font.size'] = fontSize
 
     def get_minMaxIndex(tMin, tMax, t):
         iSta = 0
@@ -377,15 +377,24 @@ def plotPlant(lis, res, filePrefix, days):
         # Take max so that axs is an array.
         fig, axs = plt.subplots(nrows=len(lis), ncols=1, sharex=True)
         k=0
+        if time == "days":
+            timeDiv = 3600*24.
+        else:
+            timeDiv = 3600.
         for i in range(len(lis)):
+            yPlo = np.zeros(len(t))
             for iVar in range(len(lis[i]["vars"])):
                 ptrVar = lis[i]["vars"][iVar]
                 (tAll, yAll) = res.values(ptrVar["var"])
                 t = tAll[iSta:iEnd]
                 y = yAll[iSta:iEnd]
+                if "plotSumOfSeries" in lis[i] and lis[i]["plotSumOfSeries"]:
+                    yPlo = yPlo + y
+                else:
+                    yPlo = y
                 # Check if data series should be skipped to allow for seasonal configuration
                 if not (("skip_if_ySea" in ptrVar) and (ptrVar["skip_if_ySea"] == ySea[iSta])):
-                    axs[k].plot(t/3600., y * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
+                    axs[k].plot(t/timeDiv, yPlo * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
                             linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.2,
                             linestyle=ptrVar["linestyle"] if "linestyle" in ptrVar else "-",
                             marker=ptrVar["marker"] if "marker" in ptrVar else "",
@@ -400,12 +409,16 @@ def plotPlant(lis, res, filePrefix, days):
             if iVar == len(lis[i]["vars"])-1:
                 # Last variable to be plotted
                 if i == len(lis)-1:
-                    axs[k].set_xlabel(f"time [h] ({day['date']})")
+                    if time == "days":
+                        axs[k].set_xlabel(f"time [day]")
+                    else:
+                        axs[k].set_xlabel(f"time [h] ({day['date']})")
+                    
 
                 axs[k].set_ylabel(lis[i]["y_label"], multialignment='center')
                 axs[k].legend(bbox_to_anchor=(1.25, 1.0),
                               loc='upper right',
-                              ncol=2)
+                              ncol=nColLegend)
             #axs[i].set_ylim(lis[i]["y_lim"])
 
             k=k+1
@@ -730,6 +743,139 @@ def dT_hour(time, TLooMin, TLooMax, TLooMinMea, TLooMaxMea):
         dT.append(max(0, dt_min, dt_max))
     dTHou = (np.trapezoid(dT, time)) / 3600
     return dTHou
+
+
+def _getEquidistantPowerSeries(reader, nSamPerHou=12):
+    import numpy as np
+    from buildingspy.io.postprocess import Plotter
+
+    def _getPowerFromEnergy(time, energy):
+        """ Get power from energy. Energy must be equidistant. """
+        lenE=len(energy)
+        dTime = time[1]-time[0]
+        diffTime = (max(time)-min(time))/(lenE-1)
+        if (diffTime - dTime) > 1E-3:
+            raise Exception(f"Time is not equidistant: dTime = {dTime}, diffTime = {diffTime}")
+
+        return (energy[1:lenE]-energy[0:lenE-1])/dTime
+
+    tSup=np.linspace(0, 8760*3600, num=8760*nSamPerHou+1)
+    (t, ETot) = reader.values('ETot.y')
+    (t, EPvBat) = reader.values('EPvBat.y')
+
+    ETotWithOutPV = ETot - EPvBat
+
+    ETotSup      =Plotter.interpolate(tSup, t, ETot)
+    EPvBat       =Plotter.interpolate(tSup, t, EPvBat)
+    ETotWithOutPV=Plotter.interpolate(tSup, t, ETotWithOutPV)
+
+    lenE=len(ETotSup)
+
+    PTotSup          =_getPowerFromEnergy(tSup, ETotSup)
+    PPvBatSup        =_getPowerFromEnergy(tSup, EPvBat)
+    PTotWithOutPVSup =_getPowerFromEnergy(tSup, ETotWithOutPV)
+    tPlot=tSup[0:lenE-1]
+
+    return (tPlot, PTotSup, PPvBatSup, PTotWithOutPVSup)
+
+
+def writeElectricalTimeSeries(reader):
+    '''
+    Write the hourly time series to a csv file for comparison with MILP
+    '''
+    import csv
+    import os
+    import numpy as np
+    (t, PTot, PPvBat, PTotWithOutPV) = _getEquidistantPowerSeries(reader, nSamPerHou=1)
+    header = ["Time [h]",
+              "Imported electricity [MW]",
+              "Power provided by PVs and batteries [MW]",
+              "Total power consumption of all loads [MW]"
+              ]
+    with open(os.path.join("img", "powerUse.csv"), 'w', newline='') as fil:
+        writer = csv.writer(fil)
+        writer.writerow(header)
+
+        for i in range(len(t)):
+            row = [t[i]/3600., np.round(PTot[i]/1E6, 4), np.round(PPvBat[i]/1E6, 4), np.round(PTotWithOutPV[i]/1E6, 4)]
+            writer.writerow(row)
+    return
+
+def plotElectricalTimeSeries(reader):
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gridspec
+
+    (tPlot, PTotSup, PPvBatSup, PTotWithOutPVSup) = _getEquidistantPowerSeries(reader, nSamPerHou=12)
+    # Create plots
+    plt.clf()
+
+    fig = plt.figure(figsize=(10, 6))
+    gs = gridspec.GridSpec(2, 2)
+    axs0 = fig.add_subplot(gs[0, :])
+    axs0.plot(tPlot/3600/24, PTotWithOutPVSup/1E6, label="Total power consumption of all loads (without PV)",
+            linewidth=0.5,
+            color="r",
+            linestyle="-")
+    axs0.plot(tPlot/3600/24, PPvBatSup/1E6, label="Power provided by PVs and batteries",
+            linewidth=0.5,
+            color="g",
+            linestyle="-")
+    axs0.plot(tPlot/3600/24, PTotSup/1E6, label="Imported electricity",
+            linewidth=0.5,
+            color="k",
+            linestyle="-")
+
+    axs1 = fig.add_subplot(gs[1, 0])
+    axs1.plot(tPlot/3600/24, PTotWithOutPVSup/1E6, label="Total power consumption of all loads (without PV)",
+            linewidth=0.5,
+            color="r",
+            linestyle="-")
+    axs1.plot(tPlot/3600/24, PPvBatSup/1E6, label="Power provided by PVs and batteries",
+            linewidth=0.5,
+            color="g",
+            linestyle="-")
+    axs1.plot(tPlot/3600/24, PTotSup/1E6, label="Imported electricity",
+            linewidth=0.5,
+            color="k",
+            linestyle="-")
+
+    axs2 = fig.add_subplot(gs[1, 1])
+    axs2.plot(tPlot/3600/24, PTotWithOutPVSup/1E6, label="Total power consumption of all loads (without PV)",
+            linewidth=0.5,
+            color="r",
+            linestyle="-")
+    axs2.plot(tPlot/3600/24, PPvBatSup/1E6, label="Power provided by PVs and batteries",
+            linewidth=0.5,
+            color="g",
+            linestyle="-")
+    axs2.plot(tPlot/3600/24, PTotSup/1E6, label="Imported electricity",
+            linewidth=0.5,
+            color="k",
+            linestyle="-")
+
+    axs0.set_xlim([0, 365])
+    axs1.set_xlim([50, 65])
+    axs2.set_xlim([205, 220])
+    axs1.set_xticks(np.linspace(50, 65, 16))
+    axs2.set_xticks(np.linspace(205, 220, 16))
+
+    axs0.legend(#bbox_to_anchor=(1.25, 1.0),
+            loc='upper right',
+            ncol=2)
+    ax = [axs0, axs1, axs2]
+    for i in range(len(ax)):    
+            ax[i].set_ylim([-8, 15])
+    #axs.autoscale(True)
+            configure_axes(ax[i])
+    #axs.set_aspect(25)
+
+            ax[i].set_xlabel(f"time [day]")
+
+            ax[i].set_ylabel(f"electricity [MW]", multialignment='center')
+            
+    fig.tight_layout()
+    save_plot(plt, f"powerUse")
+
 
 
 """
