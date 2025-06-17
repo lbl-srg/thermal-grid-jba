@@ -69,7 +69,7 @@ def get_cases():
             'parameters': {
                 'bui.datHeaPum.TConLvgMin': [283.15, 283.15, 283.15, 283.15, 283.15]
             },
-            'label': '$T_{con,min} = 25^\circ \mathrm{C}$ ($77 \, F$)'
+            'label': '$T_{con,min} = 10^\circ \mathrm{C}$ ($50 \, F$)'
         }
         _add(case, cases)
 
@@ -78,7 +78,7 @@ def get_cases():
             'parameters': {
                 'bui.datHeaPum.TConLvgMin': [293.15, 293.15, 293.15, 293.15, 293.15]
             },
-            'label': '$T_{con,min} = 35^\circ \mathrm{C}$ ($95 \, F$)'
+            'label': '$T_{con,min} = 20^\circ \mathrm{C}$ ($68 \, F$)'
         }
         _add(case, cases)
 
