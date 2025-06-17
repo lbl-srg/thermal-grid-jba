@@ -126,6 +126,9 @@ for sea in range(5):
         data_dict[("ETS chiller", "Cooling load", "cooling load")] += \
             abs(integrate_with_condition(results, f'bui[{i}].dHChiWat_flow',
                                          condition = condition))
+        data_dict[("ETS chiller", "Heating load", "space heating load")] += \
+            abs(integrate_with_condition(results, f'bui[{i}].dHHeaWat_flow',
+                                         condition = condition))
         data_dict[("Electricity import", "Pumps - cooling load", "electricity")] += \
             abs(integrate_with_condition(results, f'bui[{i}].bui.disFloCoo.PPum',
                                          condition = condition))
