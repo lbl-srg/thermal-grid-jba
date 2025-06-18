@@ -83,6 +83,15 @@ def get_cases():
         _add(case, cases)
 
         case = {
+            'name': "base_TCon_30",
+            'parameters': {
+                'bui.datHeaPum.TConLvgMin': [303.15, 303.15, 303.15, 303.15, 303.15]
+            },
+            'label': '$T_{con,min} = 30^\circ \mathrm{C}$ ($86 \, F$)'
+        }
+        _add(case, cases)
+
+        case = {
             'name': "base_heaPumSizFac_0_8",
             'parameters': {
                 'datDis.heaPumSizFac': 0.8
@@ -137,8 +146,9 @@ def get_cases():
         # _add(case, cases)
 
         # case = {
-        #     'name': 'post',
-        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM'
+        #     'name': 'postECM_TMY3',
+        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM',
+        #     'label': 'TMY3 weather'
         # }
         # _add(case, cases)
 
