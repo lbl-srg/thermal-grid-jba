@@ -111,8 +111,7 @@ def hide_tick_labels(ax):
     ax.tick_params(axis = 'x',labelbottom='off',bottom='off')
 
 
-
-
+########################################
 def plot_energy(cases : list):
     import os
     import matplotlib.pyplot as plt
@@ -194,14 +193,14 @@ def plot_energy(cases : list):
 
     plt.yticks(np.arange(-12, 16, 2))
     plt.grid(linestyle='-', axis='y', zorder=0)
-    #plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
+
     plt.ylabel('site electricity use $\mathrm{[GWh/a]}$')
     plt.xticks(idx, labels, rotation=90)
     plt.tick_params(axis=u'x', which=u'both',length=0)
 
     plt.legend(tuple(reversed((p0[0], p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0]))), \
                tuple(reversed(('PVs and batteries', 'heat pumps in ETS', 'heat pump in plant', 'pumps in ETS', 'pumps for district loop', 'pumps in  plant', 'fans in plant', 'fans in buildings', 'non-HVAC electricity for buildings'))), \
-               bbox_to_anchor=(1.5, 0.75), loc='right')
+               bbox_to_anchor=(1.55, 0.75), loc='right')
     #plt.tight_layout()
 
     save_plot(plt, f"energy")
@@ -244,6 +243,7 @@ Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \hline"""
 def plot_loop_temperatures(cases : list):
     from buildingspy.io.outputfile import Reader
     import matplotlib.pyplot as plt
+    import copy
 
     results = []
     case_names = []
@@ -274,10 +274,19 @@ def plot_loop_temperatures(cases : list):
         axs[0].plot(t/24./3600., TLooMaxMea-273.15, 'r', label='Maximum loop temperature', linewidth=0.2)
         axs[0].plot(t/24./3600., TLooMinMea-273.15, 'b', label='Minimum loop temperature', linewidth=0.2)
 
-        rect1 = matplotlib.patches.Rectangle((tP[0], 0), 365, TLooMin[0]-273.15, color='mistyrose')
-        axs[0].add_patch(rect1)
-        rect1 = matplotlib.patches.Rectangle((tP[0], TLooMax[0]-273.15), 365, 30, color='mistyrose')
-        axs[0].add_patch(rect1)
+        rect1 = matplotlib.patches.Rectangle((tP[0], -20),
+                                             365, TLooMin[0]-273.15+20, 
+                                             color='mistyrose')
+        rect2 = matplotlib.patches.Rectangle((tP[0], TLooMin[0]-273.15),
+                                             365, (TLooMax[0]-TLooMin[0]),
+                                             color='green', alpha=0.1)
+        rect3 = matplotlib.patches.Rectangle((tP[0], TLooMax[0]-273.15),
+                                             365, 30, 
+                                             color='mistyrose')
+
+        axs[0].add_patch(copy.copy(rect1))
+        axs[0].add_patch(copy.copy(rect2))
+        axs[0].add_patch(copy.copy(rect3))
 
         axs[0].set_ylabel(r'Temperature [$^\circ$C]')
         #axs[0].set_xticks(list(range(25)))
@@ -293,10 +302,10 @@ def plot_loop_temperatures(cases : list):
         axs[1].plot(t/24./3600., TSoiPer-273.15, 'r',   marker=",", label='Spatially averaged temperature perimeter borefield', linewidth=0.75, markevery=30000, markersize=3)
         axs[1].plot(t/24./3600., TSoiCen-273.15, 'b',   marker=">", label='Spatially averaged temperature center borefield', linewidth=0.75, markevery=30000, markersize=3)
 
-        rect1 = matplotlib.patches.Rectangle((tP[0], 0), 365, TLooMin[0]-273.15, color='mistyrose')
-        axs[1].add_patch(rect1)
-        rect1 = matplotlib.patches.Rectangle((tP[0], TLooMax[0]-273.15), 365, 30, color='mistyrose')
-        axs[1].add_patch(rect1)
+
+        axs[1].add_patch(copy.copy(rect1))
+        axs[1].add_patch(copy.copy(rect2))
+        axs[1].add_patch(copy.copy(rect3))
 
         axs[1].set_ylabel(r'Temperature [$^\circ$C]')
         #axs[0].set_xticks(list(range(25)))
@@ -395,7 +404,7 @@ def plotPlant(lis, res, filePrefix, days, time="hours", fontSize=4, nColLegend=2
                 # Check if data series should be skipped to allow for seasonal configuration
                 if not (("skip_if_ySea" in ptrVar) and (ptrVar["skip_if_ySea"] == ySea[iSta])):
                     axs[k].plot(t/timeDiv, yPlo * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
-                            linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.2,
+                            linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.4,
                             linestyle=ptrVar["linestyle"] if "linestyle" in ptrVar else "-",
                             marker=ptrVar["marker"] if "marker" in ptrVar else "",
                             markersize=2,
@@ -471,7 +480,7 @@ def plotOneFigure(lis, res, filePrefix, days):
                 # Check if data series should be skipped to allow for seasonal configuration
                 if not (("skip_if_ySea" in ptrVar) and (ptrVar["skip_if_ySea"] == ySea[iSta])):
                     axs.plot(t/3600./24., y * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
-                            linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.2,
+                            linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.4,
                             linestyle=ptrVar["linestyle"] if "linestyle" in ptrVar else "-",
                             marker=ptrVar["marker"] if "marker" in ptrVar else "",
                             markersize=2,
@@ -876,35 +885,23 @@ def plotElectricalTimeSeries(reader):
     fig.tight_layout()
     save_plot(plt, f"powerUse")
 
-
-
-"""
-Function to compute life cycle and other financial parameters
-@author: remi
-"""
-import pandas as pd
-import os
-import numpy as np
-
-
-
 def calc_finance(If, Iv, C, l, alpha):
     r"""
+
+    Function to compute life cycle and other financial parameters
 
     Parameters
     ----------
     If    : Fixed part of the investment cost
     Iv    : Variable part of the investment cost, cost per unit
     C     : Capacity of the equipment
-    l     : Lifetime if the equipment
-    alpha : percentage of the investment cost associated with operation and maintenance expenses
-
-    Returns
-    -------
-    y : TYPE
-        DESCRIPTION.
+    l     : Lifetime of the equipment
+    alpha : ratio [0...1] of the investment cost associated with operation and maintenance expenses
 
     """
+    import pandas as pd
+    import os
+    import numpy as np
     duration = 20 # of investment, but not life time of equipment
     i = .05 # Interest rate for JBA
     g = .03 # Interest rate for JBA
@@ -937,3 +934,80 @@ def calc_finance(If, Iv, C, l, alpha):
     ALCC = LCC * crf
 
     return [ALCC, LCC, I, OM, RC, SR, crf]
+
+
+def plot_sensitivities(results: list, dic: dict, filename: str):
+    ori_font_size = plt.rcParams['font.size']
+    plt.rcParams['font.size'] = 10
+
+    fig, ax1 = plt.subplots()
+    color = "tab:red"
+    
+    x = np.zeros(len(results))
+    y = np.zeros(len(results))
+
+    for var in dic['vars']:
+        for iRes in range(len(results)):
+            # x-value
+            x[iRes] = results[iRes].max(dic['x']['var'])
+    
+            # y-value
+            y[iRes] = (results[iRes].max(var['var'])) * dic['factor'] + dic['offset']
+        ax1.plot(x, y, "*-", label=var['label'])
+        # Annotate data
+        for i, j in zip(x, y):
+            plt.annotate(f'{np.round(j, 1)} {dic["unit"]}', xy=(i, j), xytext=(5, 5), textcoords='offset points', ha='center')
+
+        ax1.set_ylabel(dic['y_label'])
+        ax1.legend(loc="upper left")
+        ax1.set_ylim(dic['y_lim'])
+
+    # Second axis'
+    ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
+    for var in dic['vars2']:
+        # Base case index
+        iBas = dic['idxBaseCase']
+        for iRes in range(len(results)):
+            # x-value
+            x[iRes] = results[iRes].max(dic['x']['var'])
+            # y-value
+            energyCostDiff = results[iRes].max(var['energyCost']) - \
+                results[iBas].max(var['energyCost'])
+            # unit change
+            unitChange = results[iRes].max(var['unitChange']) - \
+                results[iBas].max(var['unitChange'])
+            
+            #deltaFirstCost = var['costPerUnitChange'] * unitChange
+
+            
+            (ALCC, LCC, I, OM, RC, SR, crf) = calc_finance(0, var['costPerUnitChange'], unitChange, 40, 0.01)
+            y[iRes] = (ALCC + energyCostDiff) * dic['factor2']
+
+        #print(f"x = {x}")
+        #print(f"y = {y}")
+#        print(f"Delta first costs = {var['costPerUnitChange'] * unitChange}")
+
+        ax2.plot(x, y, "*-", color="k", label=var['label'])
+        # Annotate data
+        for i, j in zip(x, y):
+            plt.annotate(f'{np.round(j, 1)} {dic["unit2"]}', xy=(i, j), xytext=(5, 5), textcoords='offset points', ha='center')
+
+        ax2.set_ylabel(dic['y2_label'])
+        ax2.legend(loc="upper right")
+        ax2.set_ylim(dic['y2_lim'])
+
+    ax1.set_label(dic['x']['label'])
+    ax1.set_xlim(dic['x']['x_lim'])
+    configure_axes(ax1)
+    configure_axes(ax2)
+
+        
+
+    fig.tight_layout()
+    save_plot(fig, filename)
+
+    plt.rcParams['font.size'] = ori_font_size
+
+    
+
+
