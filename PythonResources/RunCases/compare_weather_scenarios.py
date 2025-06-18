@@ -7,6 +7,8 @@ Created on Tue Jun 17 11:38:55 2025
 """
 
 import os
+import numpy as np
+import pandas as pd
 from datetime import datetime, timedelta
 from GetVariables import get_vars, index_var_list, integrate_with_condition
 # python file under same folder
@@ -19,6 +21,7 @@ mat_file_cold = os.path.join(CWD, "simulations", "2025-06-09_weatherscenarios", 
 
 J_to_kWh = 1 / 3600 * 1e-3
 J_to_MWh = 1 / 3600 * 1e-6
+J_to_MMBtu = 1 / 1.05505585262e9
 
 #%% construct var list
 _i = '%%i%%'
@@ -28,7 +31,9 @@ var_list = list()
 var_list += ['ETot.y',      # Total ele consumption, J
              'EHeaPum.y']   # Total compressor ele consumption, J
 var_pre_index = [f'bui[{_i}].bui.loa.y[1]', # Building cooling load, W
-                 f'bui[{_i}].bui.loa.y[2]'] # Building sp. heating load, W
+                 f'bui[{_i}].bui.loa.y[2]', # Building sp. heating load, W
+                 f'bui[{_i}].bui.terUniCoo.TLoaODE.TAir', # Room temp for cooling, K
+                 f'bui[{_i}].bui.terUniHea.TLoaODE.TAir'] # Room temp for heating, K
 
 var_list += index_var_list(var_pre_index,
                            _i,
@@ -37,6 +42,7 @@ var_list += index_var_list(var_pre_index,
 #%% get vars
 results_base = get_vars(var_list, mat_file_base, 'dymola')
 results_heat = get_vars(var_list, mat_file_heat, 'dymola')
+results_cold = get_vars(var_list, mat_file_cold, 'dymola')
 
 #%% get time stamps in seconds
 def soy(dt):
@@ -62,61 +68,164 @@ def get_section(df, sec_from, sec_to):
     
     return df_section
 
-def print_comparison(df_base,
-                     df_even,
-                     varname,
-                     integrate : bool,
-                     conversion = 1,
-                     description = None):
-    """ Prints the comparison of a value.
-          if integrate:
-              value = series[-1] - series[0]
-          else:
-              value = trapz(t = [from, to], y)
-        df_base : dataframe of the base scenario
-        df_even : dataframe of the event scenario
-        varname : variable name, also column name in the dataframe
-        integrate : boolean flag
-        conversion : unit conversion factor
-        description : description of the variable
-        
+def write_latex_table(df_base,
+                      df_even,
+                      event : str):
+    """ df_base : baseline
+        df_even : event
+        event : ['heat', 'cold']
     """
     
-    if description is None:
-        description = varname
+    def condition_duration(t, y, condition):
+        """ Duration of time during which y meets the condition.
+        """
+        indices = np.where(condition(y))[0]
+        duration = 0.0
+        for i in range(1, len(indices)):
+            if indices[i] == indices[i-1] + 1:  # Check if the indices are consecutive
+                duration += t[indices[i]] - t[indices[i-1]]
+
+        return duration
     
-    if integrate:
-        v_base = integrate_with_condition(df_base, varname)
-        v_even = integrate_with_condition(df_even, varname)
+    def write_row(description,
+                  v_base,
+                  v_even,
+                  unit_si : str,
+                  factor_si,
+                  to_ip = False,
+                  unit_ip = None,
+                  factor_ip = None):
+        """ Returns one row of the latex table if ip unit not needed,
+              otherwise returns also a second row in ip unit.
+            description : first column,
+            v_base : baseline value in native unit,
+            v_even : event value in native unit,
+            unit_si : display unit string,
+            factor_si : conversion factor to si unit,
+            to_ip : boolean, if true returns second row in ip unit,
+            unit_ip : display unit string for ip,
+            factor_ip : conversion factor for ip.
+        """
+        
+        tab = ""
+        
+        v_base_si = v_base * factor_si
+        v_even_si = v_even * factor_si
+        diff_v_si = v_even_si - v_base_si
+        if abs(v_base_si) < 1e-10:
+            diff_p_str = ""
+        else:
+            diff_p_str = f'{diff_v_si/v_base_si*100:+.1f}\\%'
+        
+        tab += f"{description} & [{unit_si}] & {v_base_si:,.0f} & {v_even_si:,.0f} & \\textit{{{diff_v_si:+,.0f}}} & \\textit{{{diff_p_str}}} \\\\\n"
+        
+        if to_ip:
+            v_base_ip = v_base * factor_ip
+            v_even_ip = v_even * factor_ip
+            diff_v_ip = v_even_ip - v_base_ip
+            
+            tab += f" & [{unit_ip}] & {v_base_ip:,.0f} & {v_even_ip:,.0f} & {diff_v_ip:+,.0f} & \\\\\n"
+            
+        return tab
+    
+    if event == 'heat':
+        event_str = 'Heat wave'
     else:
-        v_base = (df_base[varname].iloc[-1] - df_base[varname].iloc[0])
-        v_even = (df_even[varname].iloc[-1] - df_even[varname].iloc[0])
-    v_base = abs(v_base) * conversion
-    v_even = abs(v_even) * conversion
-    diff_v = v_even - v_base
-    diff_p = diff_v / v_base
-    print(description)
-    print(f"Base case: {v_base:,.0f}")
-    print(f"Event: {v_even:,.0f}")
-    print(f"Diff: {diff_v:,.0f}, {diff_p:.1%}")
+        event_str = 'Cold snap'
+    
+    # header
+    tab = ""
+    tab += "% *remarks*\n\n"
+    tab += "\\begin{tabular}{lrrrrr}\n"
+    tab += "\\toprule\n"
+    tab += f"During the event & & Baseline & {event_str} & & \\\\\n"
+    tab += "\\hline\n"
+    
+    # main body
+    # total electricity use
+    tab += write_row(description = "Total electricity use",
+                     v_base = df_base['ETot.y'].iloc[-1] - df_base['ETot.y'].iloc[0],
+                     v_even = df_even['ETot.y'].iloc[-1] - df_even['ETot.y'].iloc[0],
+                     unit_si = 'MWh',
+                     factor_si = J_to_MWh,
+                     to_ip = False)
+    
+    if event == 'heat':
+        # load
+        cols_coo = [f'bui[{_i}].bui.loa.y[1]' for _i in range(1, nBui+1)]
+        df_base['CooLoa'] = df_base[cols_coo].sum(axis=1)
+        df_even['CooLoa'] = df_even[cols_coo].sum(axis=1)
+        
+        tab += write_row(description = "End-use cooling load",
+                         v_base = abs(integrate_with_condition(df_base, 'CooLoa')),
+                         v_even = abs(integrate_with_condition(df_even, 'CooLoa')),
+                         unit_si = 'MWh',
+                         factor_si = J_to_MWh,
+                         to_ip = True,
+                         unit_ip = 'MMBtu',
+                         factor_ip = J_to_MMBtu)
+        
+        # duration of room temperature violation
+        t_base = condition_duration(np.array(df_base['Time']),
+                                    np.array(df_base['bui[2].bui.terUniCoo.TLoaODE.TAir']),
+                                    lambda y: y > 24.5 + 273.15)
+        t_even = condition_duration(np.array(df_even['Time']),
+                                    np.array(df_even['bui[2].bui.terUniCoo.TLoaODE.TAir']),
+                                    lambda y: y > 24.5 + 273.15)
+        
+        tab += write_row(description = "Total duration of room temperature violation",
+                         v_base = t_base,
+                         v_even = t_even,
+                         unit_si = 'h',
+                         factor_si = 1 / 3600,
+                         to_ip = False)
+    
+    if event == 'cold':
+        cols_hea = [f'bui[{_i}].bui.loa.y[2]' for _i in range(1, nBui+1)]
+        df_base['HeaLoa'] = df_base[cols_hea].sum(axis=1)
+        df_even['HeaLoa'] = df_even[cols_hea].sum(axis=1)
+        
+        tab += write_row(description = "End-use space heating load",
+                         v_base = integrate_with_condition(df_base, 'HeaLoa'),
+                         v_even = integrate_with_condition(df_even, 'HeaLoa'),
+                         unit_si = 'MWh',
+                         factor_si = J_to_MWh,
+                         to_ip = True,
+                         unit_ip = 'MMBtu',
+                         factor_ip = J_to_MMBtu)
+        
+        # duration of room temperature violation
+        t_base = condition_duration(np.array(df_base['Time']),
+                                    np.array(df_base['bui[2].bui.terUniHea.TLoaODE.TAir']),
+                                    lambda y: y < 19.5 + 273.15)
+        t_even = condition_duration(np.array(df_even['Time']),
+                                    np.array(df_even['bui[2].bui.terUniHea.TLoaODE.TAir']),
+                                    lambda y: y < 19.5 + 273.15)
+        
+        tab += write_row(description = "Duration of room temperature violation",
+                         v_base = t_base,
+                         v_even = t_even,
+                         unit_si = 'h',
+                         factor_si = 1 / 3600,
+                         to_ip = False)
+    
+    # footer
+    tab += "\\bottomrule\n"
+    tab += "\\end{tabular}"
+
+    return tab
 
 # heat wave
 df_heat_base = get_section(results_base, sec_heat_from, sec_heat_to)
-df_heat_heat = get_section(results_heat, sec_heat_from, sec_heat_to)
+df_heat_even = get_section(results_heat, sec_heat_from, sec_heat_to)
 
-print_comparison(df_base = df_heat_base,
-                 df_even = df_heat_heat,
-                 varname = 'ETot.y',
-                 integrate = False,
-                 conversion = J_to_MWh,
-                 description = 'Total ele use [MWh]')
+tab_heat = write_latex_table(df_base = df_heat_base,
+                             df_even = df_heat_even,
+                             event = 'heat')
 
-cols_coo = [f'bui[{_i}].bui.loa.y[1]' for _i in range(1, nBui+1)]
-df_heat_base['CooLoa'] = df_heat_base[cols_coo].sum(axis=1)
-df_heat_heat['CooLoa'] = df_heat_heat[cols_coo].sum(axis=1)
-print_comparison(df_base = df_heat_base,
-                 df_even = df_heat_heat,
-                 varname = 'CooLoa',
-                 integrate = True,
-                 conversion = J_to_MWh,
-                 description = 'Total cooling load [MWh]')
+# cold snap
+df_cold_base = get_section(results_base, sec_cold_from, sec_cold_to)
+df_cold_even = get_section(results_cold, sec_cold_from, sec_cold_to)
+tab_cold = write_latex_table(df_base = df_cold_base,
+                             df_even = df_cold_even,
+                             event = 'cold')
