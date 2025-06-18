@@ -24,7 +24,7 @@ def get_cases():
             # Name will be used in output file. Must not contain a period.
             'name': "base",
             # label will be used in plot label
-            'label': 'base'
+            'label': 'base case'
         }
         _add(case, cases)
 
@@ -60,7 +60,7 @@ def get_cases():
             'parameters': {
                 'datDis.dhDisSizFac': 1.2
             },
-            'label': '$1.2 \, h_{dis}$'
+            'label': '$1.2 \, d_{dis}$'
         }
         _add(case, cases)
 
