@@ -480,19 +480,19 @@ model DetailedPlantFiveHubs
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J", displayUnit="Wh"))
-    "Non-HVAC electric use in the ETS"
+    "Non-HVAC electric use in the ETS for plug load, lights etc, PLUS the fan in the AHU (which is also read in from the load profile)"
     annotation (Placement(transformation(extent={{240,230},{260,250}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PEleNonHva(final nin=nBui)
-    "Non-HVAC electric power"
+    "Non-HVAC electric use in the ETS for plug load, lights etc, PLUS the fan in the AHU (which is also read in from the load profile)"
     annotation (Placement(transformation(extent={{180,230},{200,250}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PFanBuiSum(final nin=nBui)
-    "Sum of fan electric power consumption of the building terminal units"
+    "Sum of fan electric power consumption of the building terminal units. This does not include the AHU fan, which is in PEleNonHva"
     annotation (Placement(transformation(extent={{180,270},{200,290}})));
   Modelica.Blocks.Continuous.Integrator EFanBui(
     initType=Modelica.Blocks.Types.Init.InitialState,
     u(final unit="W"),
     y(final unit="J", displayUnit="Wh"))
-    "Building fan electric energy for terminal units"
+    "Building fan electric energy for terminal units. This does not include the AHU fan, which is in EEleNonHvaETS"
     annotation (Placement(transformation(extent={{240,270},{260,290}})));
   Modelica.Blocks.Sources.RealExpression PFanBui[nBui](y=bui.bui.addPFan.y)
     "Fan electric power consumption of each building terminal units"
