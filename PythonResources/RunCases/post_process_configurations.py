@@ -949,7 +949,7 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
     for var in dic['vars']:
         for iRes in range(len(results)):
             # x-value
-            x[iRes] = results[iRes].max(dic['x']['var'])
+            x[iRes] = results[iRes].max(dic['x']['var']) * dic['x']['factor'] + dic['x']['offset']
     
             # y-value
             y[iRes] = (results[iRes].max(var['var'])) * dic['factor'] + dic['offset']
@@ -962,14 +962,12 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
         ax1.legend(loc="upper left")
         ax1.set_ylim(dic['y_lim'])
 
-    # Second axis'
+    # Secondary axis
     ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
     for var in dic['vars2']:
         # Base case index
         iBas = dic['idxBaseCase']
         for iRes in range(len(results)):
-            # x-value
-            x[iRes] = results[iRes].max(dic['x']['var'])
             # y-value
             energyCostDiff = results[iRes].max(var['energyCost']) - \
                 results[iBas].max(var['energyCost'])
