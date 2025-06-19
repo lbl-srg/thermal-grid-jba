@@ -9,6 +9,7 @@ Created on Wed Jun 18 21:40:30 2025
 import os
 import pandas as pd
 import numpy as np
+from GetVariables import integrate_with_condition
 from buildingspy.io.outputfile import Reader
 
 #CWD = os.getcwd()
@@ -62,6 +63,23 @@ def sum_elements_parameter(varPattern):
     
     return y
 
+def construct_df(varNames):
+    """ Construct a pandas datafram with the given variable names.
+          'Time' will be added as well.
+        This is for compatibility with functions from GetVariables.
+    """
+    data = {}
+    (_t, _y) = r.values(varNames[0])
+    data['Time'] = _t
+    
+    for var in varNames:
+        (_t, _y) = r.values(var)
+        data[var] = _y
+    
+    df= pd.DataFrame(data)
+    
+    return df    
+
 def print_row(desc,
               valu,
               conv,
@@ -99,7 +117,8 @@ print_row(desc = 'Capacity of ETS HP (heating)',
 
 # cooling + heating + dhw load sums from load files, kWh.
 # hardcoded here because they are not integrated in the Modelica model.
-# should not change as long as the weather scenario doesn't change
+#   and will need to be integrated and summed from each ets individually.
+# They should not change as long as the weather scenario doesn't change
 val = (16908187.6350861 + 10080563.2344998 + 4748967.95197562)/1000 / (read_last("EHeaPum.y")*J_to_MWh)
 print_row(desc = 'Average COP of ETS HP',
           valu = val,
@@ -115,7 +134,20 @@ print_row(desc = 'Capacity of central HP (cooling)',
           unit = 'MW'
           )
 
-print(f'Average COP of central HP: ** in progress **')
+df_cenHp = construct_df(['cenPla.gen.heaPum.QCon_flow',
+                         'cenPla.gen.heaPum.QEva_flow',
+                         'cenPla.gen.heaPum.P'])
+val = (integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.QCon_flow',
+                                sign = 'positive') + \
+       integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.QEva_flow',
+                                sign = 'positive')) / \
+       integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.P')
+print_row(desc = 'Average COP of central HP',
+          valu = val,
+          conv = 1,
+          form = '.2f',
+          unit = '-'
+          )
 
 print_row(desc = 'BTES capacity',
           valu = read_max_abs("EBorPer.y") + read_max_abs("EBorCen.y"),
