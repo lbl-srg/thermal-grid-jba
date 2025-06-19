@@ -950,9 +950,16 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
         for iRes in range(len(results)):
             # x-value
             x[iRes] = results[iRes].max(dic['x']['var']) * dic['x']['factor'] + dic['x']['offset']
-    
+            
             # y-value
-            y[iRes] = (results[iRes].max(var['var'])) * dic['factor'] + dic['offset']
+            if "operation" in var and var["operation"] == "max":
+                y[iRes] = (results[iRes].max(var['var'])) * dic['factor'] + dic['offset']
+            else:
+                (_, yTmp) = results[iRes].values(var['var'])
+                # Take the last element of the time series
+                y[iRes] = (yTmp[-1]) * dic['factor'] + dic['offset']
+            
+
         ax1.plot(x, y, "*-", label=var['label'])
         # Annotate data
         for i, j in zip(x, y):
@@ -961,7 +968,8 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
         ax1.set_ylabel(dic['y_label'])
         ax1.legend(loc="upper left")
         ax1.set_ylim(dic['y_lim'])
-
+    ax1.set_xlabel(dic['x']['label'])
+    
     # Secondary axis
     ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
     for var in dic['vars2']:
@@ -969,8 +977,12 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
         iBas = dic['idxBaseCase']
         for iRes in range(len(results)):
             # y-value
-            energyCostDiff = results[iRes].max(var['energyCost']) - \
-                results[iBas].max(var['energyCost'])
+
+            (_, yTmpRes) = results[iRes].values(var['energyCost'])
+            (_, yTmpBas) = results[iBas].values(var['energyCost'])
+
+            # Take the difference of the last elements of the time series
+            energyCostDiff = yTmpRes[-1] - yTmpBas[-1]
             # unit change
             unitChange = results[iRes].max(var['unitChange']) - \
                 results[iBas].max(var['unitChange'])
@@ -978,10 +990,11 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
             #deltaFirstCost = var['costPerUnitChange'] * unitChange
 
             
-            (ALCC, LCC, I, OM, RC, SR, crf) = calc_finance(0, var['costPerUnitChange'], unitChange, 40, 0.01)
+            (ALCC, LCC, I, OM, RC, SR, crf) = calc_finance(
+                0, var['costPerUnitChange'], unitChange, var['lifeTime'], var['operationAndMaintenance'])
             y[iRes] = (ALCC + energyCostDiff) * dic['factor2']
 
-        #print(f"x = {x}")
+        print(f"x = {x}")
         #print(f"y = {y}")
 #        print(f"Delta first costs = {var['costPerUnitChange'] * unitChange}")
 
