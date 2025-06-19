@@ -115,6 +115,14 @@ print_row(desc = 'Capacity of ETS HP (heating)',
           unit = 'MW'
           )
 
+val = abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QCoo_flow_nominal"))
+print_row(desc = 'Capacity of ETS HP (cooling)',
+          valu = val,
+          conv = 1e-6,
+          form = ',.1f',
+          unit = 'MW'
+          )
+
 # cooling + heating + dhw load sums from load files, kWh.
 # hardcoded here because they are not integrated in the Modelica model.
 #   and will need to be integrated and summed from each ets individually.
@@ -127,6 +135,13 @@ print_row(desc = 'Average COP of ETS HP',
           unit = '-'
           )
 
+print_row(desc = 'Capacity of central HP (heating)',
+          valu = abs(read_parameter("cenPla.gen.heaPum.QHea_flow_nominal")),
+          conv = 1e-6,
+          form = '.1f',
+          unit = 'MW'
+          )
+
 print_row(desc = 'Capacity of central HP (cooling)',
           valu = abs(read_parameter("cenPla.gen.heaPum.QCoo_flow_nominal")),
           conv = 1e-6,
@@ -136,13 +151,27 @@ print_row(desc = 'Capacity of central HP (cooling)',
 
 df_cenHp = construct_df(['cenPla.gen.heaPum.QCon_flow',
                          'cenPla.gen.heaPum.QEva_flow',
-                         'cenPla.gen.heaPum.P'])
-val = (integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.QCon_flow',
-                                sign = 'positive') + \
-       integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.QEva_flow',
-                                sign = 'positive')) / \
-       integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.P')
-print_row(desc = 'Average COP of central HP',
+                         'cenPla.gen.heaPum.P',
+                         'cenPla.gen.heaPum.hea'])
+
+condition = np.array(df_cenHp['cenPla.gen.heaPum.hea'] > 0.9) # heating mode
+val = integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.QCon_flow',
+                               condition = condition) / \
+      integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.P',
+                               condition = condition)
+print_row(desc = 'Average heating COP of central HP',
+          valu = val,
+          conv = 1,
+          form = '.2f',
+          unit = '-'
+          )
+
+condition = np.array(df_cenHp['cenPla.gen.heaPum.hea'] < 0.1) # cooling mode
+val = integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.QEva_flow',
+                               condition = condition) / \
+      integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.P',
+                               condition = condition)
+print_row(desc = 'Average cooling COP of central HP',
           valu = val,
           conv = 1,
           form = '.2f',
