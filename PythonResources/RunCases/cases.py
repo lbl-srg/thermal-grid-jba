@@ -9,48 +9,104 @@ def get_cases():
                 'number_of_intervals' : 365 * 24,
                 'solver'     : 'cvode',
                 'tolerance'  : '1e-7',
-                'simulate': True
+                'simulate': True,
+                'postProcess': True
             }
             # Combine the dictionaries
-            case.update(common)
+            # Add the common key-value pairs if they don't exist already in 'case'.
+            for key, value in common.items():
+                    case.setdefault(key, value)
             cases.append(case)
 
         # Build list of cases to be simulated
         cases = list()
         case = {
-            'name': "base"
+            # Name will be used in output file. Must not contain a period.
+            'name': "base",
+            # label will be used in plot label
+            'label': 'base case'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_hBor_1.2",
-            'parameters': {
-                'cenPla.borFie.hBor': 91*1.2,
-            }
-        }
-        _add(case, cases)
-
-        case = {
-            'name': "base_hBor_0.8",
+            'name': "base_hBor_0_8",
             'parameters': {
                 'cenPla.borFie.hBor': 91*0.8
-            }
+            },
+            'label': '$0.8 \, h_{bor}$'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_dDis_1.2",
+            'name': "base_hBor_1_2",
             'parameters': {
-                'datDis.dhDisSizFac': 1.2
-            }
+                'cenPla.borFie.hBor': 91*1.2,
+            },
+            'label': '$1.2 \, h_{bor}$'
         }
         _add(case, cases)
 
         case = {
-            'name': "base_dDis_0.8",
+            'name': "base_dDis_0_8",
             'parameters': {
                 'datDis.dhDisSizFac': 0.8
-            }
+            },
+            'label': '$0.8 \, d_{dis}$'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_dDis_1_2",
+            'parameters': {
+                'datDis.dhDisSizFac': 1.2
+            },
+            'label': '$1.2 \, d_{dis}$'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_TCon_10",
+            'parameters': {
+                'bui.datHeaPum.TConLvgMin': [283.15, 283.15, 283.15, 283.15, 283.15]
+            },
+            'label': '$T_{con,min} = 10^\circ \mathrm{C}$ ($50 \, F$)'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_TCon_20",
+            'parameters': {
+                'bui.datHeaPum.TConLvgMin': [293.15, 293.15, 293.15, 293.15, 293.15]
+            },
+            'label': '$T_{con,min} = 20^\circ \mathrm{C}$ ($68 \, F$)'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_TCon_30",
+            'parameters': {
+                'bui.datHeaPum.TConLvgMin': [303.15, 303.15, 303.15, 303.15, 303.15]
+            },
+            'label': '$T_{con,min} = 30^\circ \mathrm{C}$ ($86 \, F$)'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0_8",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.8
+            },
+            'tolerance'  : '1e-8',
+            'label': '$0.8 \, \dot Q_{hea,pum,0}$'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_0_9",
+            'parameters': {
+                'datDis.heaPumSizFac': 0.9
+            },
+            'label': '$0.9 \, \dot Q_{hea,pum,0}$'
         }
         _add(case, cases)
 
@@ -62,35 +118,22 @@ def get_cases():
             'parameters': {
                 'datDis.mPlaHexGly_flow_nominal': 1,
                 'cenPla.TApp': 100
-            }
+            },
+            'label': 'no economizer'
         }
         _add(case, cases)
 
         case = {
             'name': 'heat',
-            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.HeatWave'
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.HeatWave',
+            'label': 'heat wave'
         }
         _add(case, cases)
 
         case = {
             'name': 'cold',
-            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.ColdSnap'
-        }
-        _add(case, cases)
-
-        case = {
-            'name': "base_heaPumSizFac_0.8",
-            'parameters': {
-                'datDis.heaPumSizFac': 0.8
-            }
-        }
-        _add(case, cases)
-
-        case = {
-            'name': "base_heaPumSizFac_0.9",
-            'parameters': {
-                'datDis.heaPumSizFac': 0.9
-            }
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.ColdSnap',
+            'label': 'cold snap'
         }
         _add(case, cases)
 
@@ -103,8 +146,9 @@ def get_cases():
         # _add(case, cases)
 
         # case = {
-        #     'name': 'post',
-        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM'
+        #     'name': 'postECM_TMY3',
+        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM',
+        #     'label': 'TMY3 weather'
         # }
         # _add(case, cases)
 

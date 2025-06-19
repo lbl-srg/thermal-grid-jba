@@ -16,6 +16,14 @@ model HeatPump "Heat pump controller"
     final unit="K",
     displayUnit="degC")
     "Maximum value of chilled water supply temperature set point";
+  parameter Modelica.Units.SI.TemperatureDifference dTOffSetHea(
+    min=0.5,
+    displayUnit="K")
+    "Temperature to be added to the set point in order to be slightly above what the heating load requires";
+  parameter Modelica.Units.SI.TemperatureDifference dTOffSetCoo(
+    max=-0.5,
+    displayUnit="K")
+    "Temperature to be added to the set point in order to be slightly below what the cooling load requires";
 
   Buildings.Controls.OBC.CDL.Interfaces.BooleanInput uHeaSpa
     "True if space heating is required from tank" annotation (Placement(
@@ -57,7 +65,11 @@ model HeatPump "Heat pump controller"
   Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput yPum
     "Primary pump enable signal"
     annotation (Placement(transformation(extent={{280,170},{320,210}}),
-    iconTransformation(extent={{100,40},{140,80}})));
+    iconTransformation(extent={{100,60},{140,100}})));
+  Buildings.Controls.OBC.CDL.Interfaces.BooleanOutput yComOn
+    "Outputs true if the compressor is on" annotation (Placement(transformation(
+          extent={{280,130},{320,170}}), iconTransformation(extent={{100,30},{140,
+            70}})));
   Buildings.Controls.OBC.CDL.Logical.Or heaOrCoo "Heating or cooling requested"
     annotation (Placement(transformation(extent={{-140,180},{-120,200}})));
   Buildings.Controls.OBC.CDL.Reals.PID conValHea(
@@ -70,7 +82,7 @@ model HeatPump "Heat pump controller"
     u_s(final unit="K", displayUnit="degC"),
     u_m(final unit="K", displayUnit="degC"))
     "Condenser three-way valve control"
-    annotation (Placement(transformation(extent={{-30,-60},{-10,-40}})));
+    annotation (Placement(transformation(extent={{40,-60},{60,-40}})));
   Buildings.Controls.OBC.CDL.Reals.PID conValCoo(
     final controllerType=Buildings.Controls.OBC.CDL.Types.SimpleController.P,
     final yMax=1,
@@ -80,10 +92,10 @@ model HeatPump "Heat pump controller"
     final reverseActing=true,
     u_s(final unit="K", displayUnit="degC"),
     u_m(final unit="K", displayUnit="degC"))  "Evaporator three-way valve control"
-    annotation (Placement(transformation(extent={{-30,-120},{-10,-100}})));
-  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yChi
-    "Chiller compressor speed control signal" annotation (Placement(
-        transformation(extent={{280,130},{320,170}}),
+    annotation (Placement(transformation(extent={{40,-120},{60,-100}})));
+  Buildings.Controls.OBC.CDL.Interfaces.RealOutput yCom
+    "Compressor speed control signal"         annotation (Placement(
+        transformation(extent={{278,80},{318,120}}),
         iconTransformation(extent={{100,0},{140,40}})));
   Buildings.DHC.ETS.Combined.Controls.PIDWithEnable conCoo(
     final controllerType=Buildings.Controls.OBC.CDL.Types.SimpleController.P,
@@ -118,7 +130,7 @@ model HeatPump "Heat pump controller"
     raisingSlewRate=1/(15*60),
     fallingSlewRate=-1/30,
     Td=1) "Ramp limiter to avoid sudden load increase from chiller"
-    annotation (Placement(transformation(extent={{240,110},{260,130}})));
+    annotation (Placement(transformation(extent={{240,90},{260,110}})));
 
   Buildings.Controls.OBC.CDL.Logical.Or hea "Heating requested"
     annotation (Placement(transformation(extent={{-180,190},{-160,210}})));
@@ -133,10 +145,10 @@ model HeatPump "Heat pump controller"
     annotation (Placement(transformation(extent={{60,140},{80,160}})));
   Buildings.Controls.OBC.CDL.Reals.Switch swi1
     "Switch to select heating or cooling control signal"
-    annotation (Placement(transformation(extent={{202,110},{222,130}})));
+    annotation (Placement(transformation(extent={{202,90},{222,110}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant zer(final k=0)
     "Outputs zero"
-    annotation (Placement(transformation(extent={{148,80},{168,100}})));
+    annotation (Placement(transformation(extent={{148,60},{168,80}})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant TSupSetDhw(
     y(final unit="K",
       displayUnit="degC"),
@@ -156,22 +168,21 @@ model HeatPump "Heat pump controller"
     u(final unit="K", displayUnit="degC"),
     y(final unit="K", displayUnit="degC"))
     "Offset temperature for 3-way valve control during heating"
-    annotation (Placement(transformation(extent={{-60,-60},{-40,-40}})));
+    annotation (Placement(transformation(extent={{10,-60},{30,-40}})));
   Buildings.Controls.OBC.CDL.Reals.AddParameter offSetCoo(
     p(final unit="K")=+1/kCoo*2,
     u(final unit="K", displayUnit="degC"),
     y(final unit="K", displayUnit="degC"))
     "Offset temperature for 3-way valve control during cooling"
-    annotation (Placement(transformation(extent={{-60,-120},{-40,-100}})));
+    annotation (Placement(transformation(extent={{10,-120},{30,-100}})));
 
-  Buildings.DHC.ETS.Combined.Controls.Reset resTHeaSup(dTOffSet=2,
-                                                       final TWatSupSetMinMax=
+  Buildings.DHC.ETS.Combined.Controls.Reset resTHeaSup(final dTOffSet=
+        dTOffSetHea,                                   final TWatSupSetMinMax=
         THeaWatSupSetMin)
     "Heating water supply temperature reset"
     annotation (Placement(transformation(extent={{-260,70},{-240,90}})));
-  Buildings.DHC.ETS.Combined.Controls.Reset resTCooSup(dTOffSet=-0.5,
-                                                       final TWatSupSetMinMax=
-        TChiWatSupSetMax)
+  Buildings.DHC.ETS.Combined.Controls.Reset resTCooSup(dTOffSet=dTOffSetCoo,
+    final TWatSupSetMinMax=TChiWatSupSetMax)
     "Chilled water supply temperature reset"
     annotation (Placement(transformation(extent={{-260,-20},{-240,0}})));
   Buildings.Controls.OBC.CDL.Reals.Max maxTSup(
@@ -182,7 +193,7 @@ model HeatPump "Heat pump controller"
     annotation (Placement(transformation(extent={{-140,36},{-120,56}})));
   Buildings.Controls.OBC.CDL.Logical.TrueDelay delSta(delayTime=30)
     "Delay start of compressor to ensure pumps have sufficient speed"
-    annotation (Placement(transformation(extent={{148,110},{168,130}})));
+    annotation (Placement(transformation(extent={{148,90},{168,110}})));
   Buildings.Controls.OBC.CDL.Logical.TrueDelay delPumOff(delayTime=30)
     "Delay pump off signal to allow compressor to ramp down"
     annotation (Placement(transformation(extent={{202,180},{222,200}})));
@@ -190,6 +201,7 @@ model HeatPump "Heat pump controller"
     annotation (Placement(transformation(extent={{160,180},{180,200}})));
   Buildings.Controls.OBC.CDL.Logical.Not not2
     annotation (Placement(transformation(extent={{240,180},{260,200}})));
+
 equation
   connect(uCoo,heaOrCoo.u2)
     annotation (Line(points={{-300,120},{-194,120},{-194,182},{-142,182}},
@@ -225,27 +237,23 @@ equation
     annotation (Line(points={{82,150},{90,150}},   color={255,0,255}));
   connect(conHea.y, swi.u1) annotation (Line(points={{-8,150},{0,150},{0,186},{
           88,186},{88,158},{90,158}},          color={0,0,127}));
-  connect(conCoo.y, swi.u3) annotation (Line(points={{-8,100},{72,100},{72,142},
+  connect(conCoo.y, swi.u3) annotation (Line(points={{-8,100},{86,100},{86,142},
           {90,142}},  color={0,0,127}));
-  connect(zer.y, swi1.u3) annotation (Line(points={{170,90},{188,90},{188,112},
-          {200,112}}, color={0,0,127}));
+  connect(zer.y, swi1.u3) annotation (Line(points={{170,70},{188,70},{188,92},{200,
+          92}},       color={0,0,127}));
   connect(swiTSupSetHea.u2, uHeaDhw) annotation (Line(points={{-102,40},{-112,40},
           {-112,160},{-300,160}}, color={255,0,255}));
-  connect(swiTSupSetHea.y, conHea.u_s) annotation (Line(points={{-78,40},{-72,40},
-          {-72,150},{-32,150}},       color={0,0,127}));
-  connect(swiTSupSetHea.y, offSetHea.u) annotation (Line(points={{-78,40},{-72,40},
-          {-72,-50},{-62,-50}},       color={0,0,127}));
   connect(conValHea.u_s, offSetHea.y)
-    annotation (Line(points={{-32,-50},{-38,-50}},   color={0,0,127}));
+    annotation (Line(points={{38,-50},{32,-50}},     color={0,0,127}));
   connect(TConWatLvg, conValHea.u_m) annotation (Line(points={{-300,50},{-196,50},
-          {-196,-80},{-20,-80},{-20,-62}}, color={0,0,127}));
+          {-196,-80},{50,-80},{50,-62}},   color={0,0,127}));
   connect(conValCoo.u_s, offSetCoo.y)
-    annotation (Line(points={{-32,-110},{-38,-110}}, color={0,0,127}));
+    annotation (Line(points={{38,-110},{32,-110}},   color={0,0,127}));
   connect(conValHea.y, yValCon)
-    annotation (Line(points={{-8,-50},{146,-50},{146,0},{300,0}},
+    annotation (Line(points={{62,-50},{146,-50},{146,0},{300,0}},
                                                color={0,0,127}));
   connect(conValCoo.y, yValEva)
-    annotation (Line(points={{-8,-110},{146,-110},{146,-60},{300,-60}},
+    annotation (Line(points={{62,-110},{146,-110},{146,-60},{300,-60}},
                                                    color={0,0,127}));
   connect(resTHeaSup.TWatSupPreSet, THeaWatSupSet) annotation (Line(points={{
           -262,74},{-274,74},{-274,80},{-300,80}}, color={0,0,127}));
@@ -266,20 +274,20 @@ equation
     annotation (Line(points={{-152,52},{-142,52}}, color={0,0,127}));
   connect(resTHeaSup.TWatSupSet, maxTSup.u2) annotation (Line(points={{-238,80},
           {-230,80},{-230,30},{-148,30},{-148,40},{-142,40}}, color={0,0,127}));
-  connect(TEvaWatLvg, conValCoo.u_m) annotation (Line(points={{-300,-50},{-210,
-          -50},{-210,-140},{-20,-140},{-20,-122}}, color={0,0,127}));
-  connect(resTCooSup.TWatSupSet, offSetCoo.u) annotation (Line(points={{-238,
-          -10},{-220,-10},{-220,-110},{-62,-110}}, color={0,0,127}));
+  connect(TEvaWatLvg, conValCoo.u_m) annotation (Line(points={{-300,-50},{-210,-50},
+          {-210,-140},{50,-140},{50,-122}},        color={0,0,127}));
+  connect(resTCooSup.TWatSupSet, offSetCoo.u) annotation (Line(points={{-238,-10},
+          {-220,-10},{-220,-110},{8,-110}},        color={0,0,127}));
   connect(delSta.y, swi1.u2)
-    annotation (Line(points={{170,120},{200,120}}, color={255,0,255}));
-  connect(delSta.u, heaOrCoo.y) annotation (Line(points={{146,120},{140,120},{
-          140,190},{-118,190}}, color={255,0,255}));
-  connect(swi.y, swi1.u1) annotation (Line(points={{114,150},{180,150},{180,128},
-          {200,128}}, color={0,0,127}));
+    annotation (Line(points={{170,100},{200,100}}, color={255,0,255}));
+  connect(delSta.u, heaOrCoo.y) annotation (Line(points={{146,100},{140,100},{140,
+          190},{-118,190}},     color={255,0,255}));
+  connect(swi.y, swi1.u1) annotation (Line(points={{114,150},{180,150},{180,108},
+          {200,108}}, color={0,0,127}));
   connect(swi1.y, ramLimCom.u)
-    annotation (Line(points={{224,120},{238,120}}, color={0,0,127}));
-  connect(ramLimCom.y, yChi) annotation (Line(points={{262,120},{272,120},{272,
-          150},{300,150}}, color={0,0,127}));
+    annotation (Line(points={{224,100},{238,100}}, color={0,0,127}));
+  connect(ramLimCom.y,yCom)  annotation (Line(points={{262,100},{298,100}},
+                           color={0,0,127}));
   connect(heaOrCoo.y, not1.u)
     annotation (Line(points={{-118,190},{158,190}}, color={255,0,255}));
   connect(not1.y, delPumOff.u)
@@ -288,6 +296,12 @@ equation
     annotation (Line(points={{224,190},{238,190}}, color={255,0,255}));
   connect(not2.y, yPum)
     annotation (Line(points={{262,190},{300,190}}, color={255,0,255}));
+  connect(yComOn, delSta.y) annotation (Line(points={{300,150},{184,150},{184,100},
+          {170,100}}, color={255,0,255}));
+  connect(offSetHea.u, swiTSupSetHea.y) annotation (Line(points={{8,-50},{-60,-50},
+          {-60,40},{-78,40}}, color={0,0,127}));
+  connect(swiTSupSetHea.y, conHea.u_s) annotation (Line(points={{-78,40},{-60,40},
+          {-60,150},{-32,150}}, color={0,0,127}));
   annotation (
     Icon(
       coordinateSystem(

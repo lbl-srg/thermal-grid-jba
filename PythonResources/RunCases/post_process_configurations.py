@@ -111,9 +111,8 @@ def hide_tick_labels(ax):
     ax.tick_params(axis = 'x',labelbottom='off',bottom='off')
 
 
-
-
-def plot_energy(results : list, case_names: list):
+########################################
+def plot_energy(cases : list):
     import os
     import matplotlib.pyplot as plt
     import numpy as np
@@ -122,13 +121,24 @@ def plot_energy(results : list, case_names: list):
 
     plt.clf()
 
+    results = []
+    case_names = []
+    labels = []
+    for cas in cases:
+        if cas['postProcess']:
+            results.append(cas['reader'])
+            case_names.append(cas['name'])
+            labels.append(cas['label'])
+
     n = len(results)
     # Conversion from J to kWh/m2
 
     AFlo = results[0].max('datDis.AFlo')
-    conv = 1/3600./1000./AFlo
+    #conv = 1/3600./1000./AFlo
+    conv = 1/3600./1E9
     width = 0.5       # the width of the bars: can also be len(x) sequence
 
+    EPvBat = np.zeros(n)
     EHeaPum = np.zeros(n)
     EComPla = np.zeros(n)
     EPumETS = np.zeros(n)
@@ -144,6 +154,7 @@ def plot_energy(results : list, case_names: list):
     for i in idx:
         res = results[i]
 
+        EPvBat[i]         = res.min('EPvBat.y') * conv
         EHeaPum[i]        = res.max('EHeaPum.y') * conv
         EComPla[i]        = res.max('EComPla.y') * conv
         EPumETS[i]        = res.max('EPumETS.y') * conv
@@ -154,10 +165,11 @@ def plot_energy(results : list, case_names: list):
         EEleNon[i]        = res.max('EEleNonHvaETS.y') * conv
         EAllTot[i]        = res.max('ETot.y') * conv
 
-
     bottom = np.zeros(n)
-    p0 = plt.bar(idx, EHeaPum, width, bottom=bottom, zorder=3)
-    bottom = np.add(bottom, EHeaPum)
+#    pM1 = plt.bar(idx, EPvBat, width, bottom=bottom, zorder=3)
+#    bottom = np.add(bottom, EPvBat)
+    p0 = plt.bar(idx, EHeaPum, width, bottom=EPvBat, zorder=3)
+    bottom = np.add(EPvBat, EHeaPum)
     p1 = plt.bar(idx, EComPla, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EComPla)
     p2 = plt.bar(idx, EPumETS, width, bottom=bottom, zorder=3)
@@ -172,23 +184,26 @@ def plot_energy(results : list, case_names: list):
     bottom = np.add(bottom, EFanBui)
     p7 = plt.bar(idx, EEleNon, width, bottom=bottom, zorder=3)
     bottom = np.add(bottom, EEleNon)
+#    n1 = plt.bar(idx, -EPvBat, width, bottom=EPvBat, zorder=3)
+#    n2 = plt.bar(idx, EPvBat+EAllTot)
 
     print(f"All electricity use = {EAllTot}")
     print(f"Sum of plot = {bottom}")
     np.testing.assert_allclose(EAllTot, bottom, err_msg="Expected energy to be the same.")
 
-    plt.yticks(np.arange(0, 270, 20))
+    plt.yticks(np.arange(-12, 16, 2))
     plt.grid(linestyle='-', axis='y', zorder=0)
-    plt.ylabel('site electricity use $\mathrm{[kWh/(m^2 \cdot a)]}$')
-    plt.xticks(idx, case_names)
+
+    plt.ylabel('site electricity use $\mathrm{[GWh/a]}$')
+    plt.xticks(idx, labels, rotation=90)
     plt.tick_params(axis=u'x', which=u'both',length=0)
 
     plt.legend(tuple(reversed((p0[0], p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0]))), \
-               tuple(reversed(('heat pumps in ETS', 'heat pump in plant', 'pumps in ETS', 'pumps for district loop', 'pumps in  plant', 'fans in plant', 'fans in buildings', 'non-HVAC electricity for buildings'))), \
-               bbox_to_anchor=(1.5, 0.75), loc='right')
+               tuple(reversed(('PVs and batteries', 'heat pumps in ETS', 'heat pump in plant', 'pumps in ETS', 'pumps for district loop', 'pumps in  plant', 'fans in plant', 'fans in buildings', 'non-HVAC electricity for buildings'))), \
+               bbox_to_anchor=(1.55, 0.75), loc='right')
     #plt.tight_layout()
 
-    save_plot(plt, "energy")
+    save_plot(plt, f"energy")
 
     # Write result to console and file
     # heat pumps ets
@@ -199,6 +214,7 @@ def plot_energy(results : list, case_names: list):
     # Energy [GWh/a] Energy [kWh/(m a)] Energy costs [USD/a]  Energy costs [USD/(m2 a)]
     #
     k=0
+    GWH_to_kWh_m2 = 1E9/AFlo/1000
     head=u"""
 \\begin{tabular}{ld{3.2}d{3.2}}
  &  \\multicolumn{1}{l}{Energy} &
@@ -208,12 +224,13 @@ def plot_energy(results : list, case_names: list):
  \\multicolumn{1}{l}{$\mathrm{[kWh/(m2 \, a)]}$} \\\\ \hline"""
 
     vals=f"""
-Heat pumps in ETS   & {EHeaPum[k]*AFlo*1000/1e9:.2f} &  {EHeaPum[k]:.1f} \\\\
-Heat pumps in plant & {EComPla[k]*AFlo*1000/1e9:.2f} &  {EComPla[k]:.1f} \\\\
-Pumps               & {(EPumETS[k]+EPumDis[k]+EPumPla[k])*AFlo*1000/1e9:.2f} &  {(EPumETS[k]+EPumDis[k]+EPumPla[k]):.1f} \\\\
-Fans                & {(EFanDry[k]+EFanBui[k])*AFlo*1000/1e9:.2f} &  {(EFanDry[k]+EFanBui[k]):.1f} \\\\
-Non-HVAC electricity for buildings & {EEleNon[k]*AFlo*1000/1e9:.2f} &  {EEleNon[k]:.1f}  \\\\ \hline
-Total & {EAllTot[k]*AFlo*1000/1e9:.2f} &  {EAllTot[k]:.1f} \\\\ \hline"""
+Heat pumps in ETS   & {EHeaPum[k]:.2f} &  {EHeaPum[k]*GWH_to_kWh_m2:.1f} \\\\
+Heat pumps in plant & {EComPla[k]:.2f} &  {EComPla[k]*GWH_to_kWh_m2:.1f} \\\\
+Pumps               & {(EPumETS[k]+EPumDis[k]+EPumPla[k]):.2f} &  {(EPumETS[k]+EPumDis[k]+EPumPla[k])*GWH_to_kWh_m2:.1f} \\\\
+Fans                & {(EFanDry[k]+EFanBui[k]):.2f} &  {(EFanDry[k]+EFanBui[k])*GWH_to_kWh_m2:.1f} \\\\
+Non-HVAC electricity for buildings & {EEleNon[k]:.2f} &  {EEleNon[k]*GWH_to_kWh_m2:.1f}  \\\\ \hline
+PVs and batteries  & {EPvBat[k]:.2f} &  {EPvBat[k]*GWH_to_kWh_m2:.1f} \\\\
+Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \hline"""
     foot=u"""
     \end{tabular}
     """
@@ -223,9 +240,17 @@ Total & {EAllTot[k]*AFlo*1000/1e9:.2f} &  {EAllTot[k]:.1f} \\\\ \hline"""
         f.write(tab)
 
 
-def plot_loop_temperatures(results : list, case_names: list):
+def plot_loop_temperatures(cases : list):
     from buildingspy.io.outputfile import Reader
     import matplotlib.pyplot as plt
+    import copy
+
+    results = []
+    case_names = []
+    for cas in cases:
+        if cas['postProcess']:
+            results.append(cas['reader'])
+            case_names.append(cas['name'])
 
     nCas = len(case_names)
 
@@ -238,21 +263,30 @@ def plot_loop_temperatures(results : list, case_names: list):
         (tP, TLooMax)     = results[i].values('cenPla.TLooMax')
         (t, TLooMinMea)   = results[i].values('cenPla.TLooMinMea')
         (t, TLooMaxMea)   = results[i].values('cenPla.TLooMaxMea')
+        (t, TDisWatSup)      = results[i].values('TDisWatSup.T')
+        (t, TDisWatRet)      = results[i].values('TDisWatRet.T')
         (t, TSoiPer)      = results[i].values('dTSoiPer.T')
         (t, TSoiCen)      = results[i].values('dTSoiCen.T')
 
-        fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True)
+        fig, axs = plt.subplots(nrows=3, ncols=1, sharex=True)
 
         axs[0].plot(t/24./3600., TDryBul-273.15, 'k', label='Outside air temperature', linewidth=0.1)
-        axs[0].plot(t/24./3600., TLooMinMea-273.15, 'b', label='Minimum loop temperature', linewidth=0.2)
         axs[0].plot(t/24./3600., TLooMaxMea-273.15, 'r', label='Maximum loop temperature', linewidth=0.2)
-        axs[0].plot(t/24./3600., TSoiCen-273.15, 'k', label='Average temperature center borefield', linewidth=0.5)
-        axs[0].plot(t/24./3600., TSoiPer-273.15, 'g', label='Average temperature perimeter borefield', linewidth=0.5)
+        axs[0].plot(t/24./3600., TLooMinMea-273.15, 'b', label='Minimum loop temperature', linewidth=0.2)
 
-        rect1 = matplotlib.patches.Rectangle((tP[0], 0), 365, TLooMin[0]-273.15, color='mistyrose')
-        axs[0].add_patch(rect1)
-        rect1 = matplotlib.patches.Rectangle((tP[0], TLooMax[0]-273.15), 365, 30, color='mistyrose')
-        axs[0].add_patch(rect1)
+        rect1 = matplotlib.patches.Rectangle((tP[0], -20),
+                                             365, TLooMin[0]-273.15+20, 
+                                             color='mistyrose')
+        rect2 = matplotlib.patches.Rectangle((tP[0], TLooMin[0]-273.15),
+                                             365, (TLooMax[0]-TLooMin[0]),
+                                             color='green', alpha=0.1)
+        rect3 = matplotlib.patches.Rectangle((tP[0], TLooMax[0]-273.15),
+                                             365, 30, 
+                                             color='mistyrose')
+
+        axs[0].add_patch(copy.copy(rect1))
+        axs[0].add_patch(copy.copy(rect2))
+        axs[0].add_patch(copy.copy(rect3))
 
         axs[0].set_ylabel(r'Temperature [$^\circ$C]')
         #axs[0].set_xticks(list(range(25)))
@@ -261,6 +295,26 @@ def plot_loop_temperatures(results : list, case_names: list):
         axs[0].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
         #ax.set_aspect(5)
         configure_axes(axs[0])
+
+        # Plant
+#        axs[1].plot(t/24./3600., TDisWatSup-273.15, 'g', label='Supply temperature to district', linewidth=0.1)
+        axs[1].plot(t/24./3600., TDisWatRet-273.15, 'k', label='Return temperature from district loop', linewidth=0.2)
+        axs[1].plot(t/24./3600., TSoiPer-273.15, 'r',   marker=",", label='Spatially averaged temperature perimeter borefield', linewidth=0.75, markevery=30000, markersize=3)
+        axs[1].plot(t/24./3600., TSoiCen-273.15, 'b',   marker=">", label='Spatially averaged temperature center borefield', linewidth=0.75, markevery=30000, markersize=3)
+
+
+        axs[1].add_patch(copy.copy(rect1))
+        axs[1].add_patch(copy.copy(rect2))
+        axs[1].add_patch(copy.copy(rect3))
+
+        axs[1].set_ylabel(r'Temperature [$^\circ$C]')
+        #axs[0].set_xticks(list(range(25)))
+        axs[1].set_xlim([0, 365])
+        axs[1].set_ylim([5, 25])
+        axs[1].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
+        #ax.set_aspect(5)
+        configure_axes(axs[1])
+
 
         # Energy
         (t, EETS)     = results[i].values('ETotEts.y')
@@ -277,32 +331,33 @@ def plot_loop_temperatures(results : list, case_names: list):
         for k in range(len(t)-1):
             EPip[k+1] = EPip[k] + (QPip[k+1]+QPip[k])/2.*(t[k+1]-t[k])
 
-        axs[1].plot(t/24./3600., -EETS/3600./1E9,    'b', label='Energy from ETS heat exchanger', marker=">", linewidth=0.5, markevery=60000, markersize=3)
-        axs[1].plot(t/24./3600., EHexDry/3600./1E9, 'r', label='Energy from central plant economizer', marker=",", linewidth=0.5, markevery=3000, markersize=3)
-        axs[1].plot(t/24./3600., -EBorCen/3600./1E9, 'k-+', label='Energy from center borefield', linewidth=0.2, markevery=60000, markersize=3)
-        axs[1].plot(t/24./3600., -EBorPer/3600./1E9, 'k-*', label='Energy from perimeter borefield', linewidth=0.2, markevery=30000, markersize=3)
-        axs[1].plot(t/24./3600., EPip/3600./1E9,    'k-o', label='Energy from soil into distribution pipe', linewidth=0.2, markevery=50000, markersize=3)
-        axs[1].plot(t/24./3600., EHPCen/3600./1E9,  'g', label='Energy from central heat pump', marker="<", linewidth=0.5, markevery=60000, markersize=3)
+        axs[2].plot(t/24./3600., -EETS/3600./1E9,    'k--+',     label='Energy from ETS heat exchanger', linewidth=0.2, markevery=60000, markersize=3)
+        axs[2].plot(t/24./3600., EHexDry/3600./1E9,  'k-*', label='Energy from central plant economizer', linewidth=0.2, markevery=30000, markersize=3)
+        axs[2].plot(t/24./3600., -EBorPer/3600./1E9, 'r',   marker=",", label='Energy from perimeter borefield', linewidth=0.75, markevery=30000, markersize=3)
+        axs[2].plot(t/24./3600., -EBorCen/3600./1E9, 'b',   marker=">", label='Energy from center borefield', linewidth=0.75, markevery=30000, markersize=3)
+        axs[2].plot(t/24./3600., EPip/3600./1E9,     'g-o',   label='Energy from soil into distribution pipe', linewidth=0.2, markevery=50000, markersize=3)
+        axs[2].plot(t/24./3600., EHPCen/3600./1E9,   'k',   marker="<", label='Energy from central heat pump', linewidth=0.5, markevery=60000, markersize=3)
 
 
-        axs[1].set_xlabel('Time [d]')
-        axs[1].set_ylabel('Energy [GWh/a]')
-        #axs[1].set_xticks(list(range(25)))
-        axs[1].set_xlim([0, 365])
-        axs[1].set_ylim([-12, 12])
-        axs[1].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
-        configure_axes(axs[1])
+        axs[2].set_xlabel('Time [d]')
+        axs[2].set_ylabel('Energy [GWh/a]')
+        #axs[2].set_xticks(list(range(25)))
+        axs[2].set_xlim([0, 365])
+        axs[2].set_ylim([-12, 12])
+        axs[2].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
         plt.tight_layout()
+        configure_axes(axs[2])
+
         #plt.title()
 
         save_plot(plt, f"{case_names[i]}_loopTemperatures")
 
 
-def plotPlant(lis, res, filePrefix, days):
+def plotPlant(lis, res, filePrefix, days, time="hours", fontSize=4, nColLegend=2):
     from datetime import datetime
 
     ori_font_size = plt.rcParams['font.size']
-    plt.rcParams['font.size'] = 4
+    plt.rcParams['font.size'] = fontSize
 
     def get_minMaxIndex(tMin, tMax, t):
         iSta = 0
@@ -331,16 +386,25 @@ def plotPlant(lis, res, filePrefix, days):
         # Take max so that axs is an array.
         fig, axs = plt.subplots(nrows=len(lis), ncols=1, sharex=True)
         k=0
+        if time == "days":
+            timeDiv = 3600*24.
+        else:
+            timeDiv = 3600.
         for i in range(len(lis)):
+            yPlo = np.zeros(len(t))
             for iVar in range(len(lis[i]["vars"])):
                 ptrVar = lis[i]["vars"][iVar]
                 (tAll, yAll) = res.values(ptrVar["var"])
                 t = tAll[iSta:iEnd]
                 y = yAll[iSta:iEnd]
+                if "plotSumOfSeries" in lis[i] and lis[i]["plotSumOfSeries"]:
+                    yPlo = yPlo + y
+                else:
+                    yPlo = y
                 # Check if data series should be skipped to allow for seasonal configuration
                 if not (("skip_if_ySea" in ptrVar) and (ptrVar["skip_if_ySea"] == ySea[iSta])):
-                    axs[k].plot(t/3600., y * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
-                            linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.2,
+                    axs[k].plot(t/timeDiv, yPlo * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
+                            linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.4,
                             linestyle=ptrVar["linestyle"] if "linestyle" in ptrVar else "-",
                             marker=ptrVar["marker"] if "marker" in ptrVar else "",
                             markersize=2,
@@ -354,12 +418,16 @@ def plotPlant(lis, res, filePrefix, days):
             if iVar == len(lis[i]["vars"])-1:
                 # Last variable to be plotted
                 if i == len(lis)-1:
-                    axs[k].set_xlabel(f"time [h] ({day['date']})")
+                    if time == "days":
+                        axs[k].set_xlabel(f"time [day]")
+                    else:
+                        axs[k].set_xlabel(f"time [h] ({day['date']})")
+                    
 
                 axs[k].set_ylabel(lis[i]["y_label"], multialignment='center')
                 axs[k].legend(bbox_to_anchor=(1.25, 1.0),
                               loc='upper right',
-                              ncol=2)
+                              ncol=nColLegend)
             #axs[i].set_ylim(lis[i]["y_lim"])
 
             k=k+1
@@ -412,7 +480,7 @@ def plotOneFigure(lis, res, filePrefix, days):
                 # Check if data series should be skipped to allow for seasonal configuration
                 if not (("skip_if_ySea" in ptrVar) and (ptrVar["skip_if_ySea"] == ySea[iSta])):
                     axs.plot(t/3600./24., y * lis[i]["factor"] + lis[i]["offset"], label=ptrVar["label"],
-                            linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.2,
+                            linewidth=ptrVar["linewidth"] if "linewidth" in ptrVar else 0.4,
                             linestyle=ptrVar["linestyle"] if "linestyle" in ptrVar else "-",
                             marker=ptrVar["marker"] if "marker" in ptrVar else "",
                             markersize=2,
@@ -686,33 +754,154 @@ def dT_hour(time, TLooMin, TLooMax, TLooMinMea, TLooMaxMea):
     return dTHou
 
 
-"""
-Function to compute life cycle and other financial parameters
-@author: remi
-"""
-import pandas as pd
-import os
-import numpy as np
+def _getEquidistantPowerSeries(reader, nSamPerHou=12):
+    import numpy as np
+    from buildingspy.io.postprocess import Plotter
+
+    def _getPowerFromEnergy(time, energy):
+        """ Get power from energy. Energy must be equidistant. """
+        lenE=len(energy)
+        dTime = time[1]-time[0]
+        diffTime = (max(time)-min(time))/(lenE-1)
+        if (diffTime - dTime) > 1E-3:
+            raise Exception(f"Time is not equidistant: dTime = {dTime}, diffTime = {diffTime}")
+
+        return (energy[1:lenE]-energy[0:lenE-1])/dTime
+
+    tSup=np.linspace(0, 8760*3600, num=8760*nSamPerHou+1)
+    (t, ETot) = reader.values('ETot.y')
+    (t, EPvBat) = reader.values('EPvBat.y')
+
+    ETotWithOutPV = ETot - EPvBat
+
+    ETotSup      =Plotter.interpolate(tSup, t, ETot)
+    EPvBat       =Plotter.interpolate(tSup, t, EPvBat)
+    ETotWithOutPV=Plotter.interpolate(tSup, t, ETotWithOutPV)
+
+    lenE=len(ETotSup)
+
+    PTotSup          =_getPowerFromEnergy(tSup, ETotSup)
+    PPvBatSup        =_getPowerFromEnergy(tSup, EPvBat)
+    PTotWithOutPVSup =_getPowerFromEnergy(tSup, ETotWithOutPV)
+    tPlot=tSup[0:lenE-1]
+
+    return (tPlot, PTotSup, PPvBatSup, PTotWithOutPVSup)
 
 
+def writeElectricalTimeSeries(reader):
+    '''
+    Write the hourly time series to a csv file for comparison with MILP
+    '''
+    import csv
+    import os
+    import numpy as np
+    (t, PTot, PPvBat, PTotWithOutPV) = _getEquidistantPowerSeries(reader, nSamPerHou=1)
+    header = ["Time [h]",
+              "Imported electricity [MW]",
+              "Power provided by PVs and batteries [MW]",
+              "Total power consumption of all loads [MW]"
+              ]
+    with open(os.path.join("img", "powerUse.csv"), 'w', newline='') as fil:
+        writer = csv.writer(fil)
+        writer.writerow(header)
+
+        for i in range(len(t)):
+            row = [t[i]/3600., np.round(PTot[i]/1E6, 4), np.round(PPvBat[i]/1E6, 4), np.round(PTotWithOutPV[i]/1E6, 4)]
+            writer.writerow(row)
+    return
+
+def plotElectricalTimeSeries(reader):
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gridspec
+
+    (tPlot, PTotSup, PPvBatSup, PTotWithOutPVSup) = _getEquidistantPowerSeries(reader, nSamPerHou=12)
+    # Create plots
+    plt.clf()
+
+    fig = plt.figure(figsize=(10, 6))
+    gs = gridspec.GridSpec(2, 2)
+    axs0 = fig.add_subplot(gs[0, :])
+    axs0.plot(tPlot/3600/24, PTotWithOutPVSup/1E6, label="Total power consumption of all loads (without PV)",
+            linewidth=0.5,
+            color="r",
+            linestyle="-")
+    axs0.plot(tPlot/3600/24, PPvBatSup/1E6, label="Power provided by PVs and batteries",
+            linewidth=0.5,
+            color="g",
+            linestyle="-")
+    axs0.plot(tPlot/3600/24, PTotSup/1E6, label="Imported electricity",
+            linewidth=0.5,
+            color="k",
+            linestyle="-")
+
+    axs1 = fig.add_subplot(gs[1, 0])
+    axs1.plot(tPlot/3600/24, PTotWithOutPVSup/1E6, label="Total power consumption of all loads (without PV)",
+            linewidth=0.5,
+            color="r",
+            linestyle="-")
+    axs1.plot(tPlot/3600/24, PPvBatSup/1E6, label="Power provided by PVs and batteries",
+            linewidth=0.5,
+            color="g",
+            linestyle="-")
+    axs1.plot(tPlot/3600/24, PTotSup/1E6, label="Imported electricity",
+            linewidth=0.5,
+            color="k",
+            linestyle="-")
+
+    axs2 = fig.add_subplot(gs[1, 1])
+    axs2.plot(tPlot/3600/24, PTotWithOutPVSup/1E6, label="Total power consumption of all loads (without PV)",
+            linewidth=0.5,
+            color="r",
+            linestyle="-")
+    axs2.plot(tPlot/3600/24, PPvBatSup/1E6, label="Power provided by PVs and batteries",
+            linewidth=0.5,
+            color="g",
+            linestyle="-")
+    axs2.plot(tPlot/3600/24, PTotSup/1E6, label="Imported electricity",
+            linewidth=0.5,
+            color="k",
+            linestyle="-")
+
+    axs0.set_xlim([0, 365])
+    axs1.set_xlim([50, 65])
+    axs2.set_xlim([205, 220])
+    axs1.set_xticks(np.linspace(50, 65, 16))
+    axs2.set_xticks(np.linspace(205, 220, 16))
+
+    axs0.legend(#bbox_to_anchor=(1.25, 1.0),
+            loc='upper right',
+            ncol=2)
+    ax = [axs0, axs1, axs2]
+    for i in range(len(ax)):    
+            ax[i].set_ylim([-8, 15])
+    #axs.autoscale(True)
+            configure_axes(ax[i])
+    #axs.set_aspect(25)
+
+            ax[i].set_xlabel(f"time [day]")
+
+            ax[i].set_ylabel(f"electricity [MW]", multialignment='center')
+            
+    fig.tight_layout()
+    save_plot(plt, f"powerUse")
 
 def calc_finance(If, Iv, C, l, alpha):
     r"""
+
+    Function to compute life cycle and other financial parameters
 
     Parameters
     ----------
     If    : Fixed part of the investment cost
     Iv    : Variable part of the investment cost, cost per unit
     C     : Capacity of the equipment
-    l     : Lifetime if the equipment
-    alpha : percentage of the investment cost associated with operation and maintenance expenses
-
-    Returns
-    -------
-    y : TYPE
-        DESCRIPTION.
+    l     : Lifetime of the equipment
+    alpha : ratio [0...1] of the investment cost associated with operation and maintenance expenses
 
     """
+    import pandas as pd
+    import os
+    import numpy as np
     duration = 20 # of investment, but not life time of equipment
     i = .05 # Interest rate for JBA
     g = .03 # Interest rate for JBA
@@ -745,3 +934,78 @@ def calc_finance(If, Iv, C, l, alpha):
     ALCC = LCC * crf
 
     return [ALCC, LCC, I, OM, RC, SR, crf]
+
+
+def plot_sensitivities(results: list, dic: dict, filename: str):
+    ori_font_size = plt.rcParams['font.size']
+    plt.rcParams['font.size'] = 10
+
+    fig, ax1 = plt.subplots()
+    color = "tab:red"
+    
+    x = np.zeros(len(results))
+    y = np.zeros(len(results))
+
+    for var in dic['vars']:
+        for iRes in range(len(results)):
+            # x-value
+            x[iRes] = results[iRes].max(dic['x']['var']) * dic['x']['factor'] + dic['x']['offset']
+    
+            # y-value
+            y[iRes] = (results[iRes].max(var['var'])) * dic['factor'] + dic['offset']
+        ax1.plot(x, y, "*-", label=var['label'])
+        # Annotate data
+        for i, j in zip(x, y):
+            plt.annotate(f'{np.round(j, 1)} {dic["unit"]}', xy=(i, j), xytext=(5, 5), textcoords='offset points', ha='center')
+
+        ax1.set_ylabel(dic['y_label'])
+        ax1.legend(loc="upper left")
+        ax1.set_ylim(dic['y_lim'])
+
+    # Secondary axis
+    ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
+    for var in dic['vars2']:
+        # Base case index
+        iBas = dic['idxBaseCase']
+        for iRes in range(len(results)):
+            # y-value
+            energyCostDiff = results[iRes].max(var['energyCost']) - \
+                results[iBas].max(var['energyCost'])
+            # unit change
+            unitChange = results[iRes].max(var['unitChange']) - \
+                results[iBas].max(var['unitChange'])
+            
+            #deltaFirstCost = var['costPerUnitChange'] * unitChange
+
+            
+            (ALCC, LCC, I, OM, RC, SR, crf) = calc_finance(0, var['costPerUnitChange'], unitChange, 40, 0.01)
+            y[iRes] = (ALCC + energyCostDiff) * dic['factor2']
+
+        #print(f"x = {x}")
+        #print(f"y = {y}")
+#        print(f"Delta first costs = {var['costPerUnitChange'] * unitChange}")
+
+        ax2.plot(x, y, "*-", color="k", label=var['label'])
+        # Annotate data
+        for i, j in zip(x, y):
+            plt.annotate(f'{np.round(j, 1)} {dic["unit2"]}', xy=(i, j), xytext=(5, 5), textcoords='offset points', ha='center')
+
+        ax2.set_ylabel(dic['y2_label'])
+        ax2.legend(loc="upper right")
+        ax2.set_ylim(dic['y2_lim'])
+
+    ax1.set_label(dic['x']['label'])
+    ax1.set_xlim(dic['x']['x_lim'])
+    configure_axes(ax1)
+    configure_axes(ax2)
+
+        
+
+    fig.tight_layout()
+    save_plot(fig, filename)
+
+    plt.rcParams['font.size'] = ori_font_size
+
+    
+
+
