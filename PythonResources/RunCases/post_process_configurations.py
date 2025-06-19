@@ -970,7 +970,7 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
         ax1.set_ylim(dic['y_lim'])
     ax1.set_xlabel(dic['x']['label'])
     
-    # Secondary axis
+    # Secondary axis  
     ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
     for var in dic['vars2']:
         # Base case index
@@ -994,7 +994,7 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
                 0, var['costPerUnitChange'], unitChange, var['lifeTime'], var['operationAndMaintenance'])
             y[iRes] = (ALCC + energyCostDiff) * dic['factor2']
 
-        print(f"x = {x}")
+        #print(f"x = {x}")
         #print(f"y = {y}")
 #        print(f"Delta first costs = {var['costPerUnitChange'] * unitChange}")
 
