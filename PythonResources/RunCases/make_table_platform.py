@@ -105,6 +105,7 @@ print_row(desc = 'Peak electricity import',
 
 print(f'Life-cycle cost: ** in progress **')
 print(f'Life-cycle cost: ** in progress **')
+print(f'Levelized cost of thermal energy: ** in progress **')
 print('')
 
 val = abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QHea_flow_nominal"))
@@ -123,17 +124,41 @@ print_row(desc = 'Capacity of ETS HP (cooling)',
           unit = 'MW'
           )
 
-# cooling + heating + dhw load sums from load files, kWh.
-# hardcoded here because they are not integrated in the Modelica model.
-#   and will need to be integrated and summed from each ets individually.
-# They should not change as long as the weather scenario doesn't change
-val = (16908187.6350861 + 10080563.2344998 + 4748967.95197562)/1000 / (read_last("EHeaPum.y")*J_to_MWh)
-print_row(desc = 'Average COP of ETS HP',
-          valu = val,
-          conv = 1,
-          form = '.2f',
-          unit = '-'
-          )
+# COP of ETS HP
+ets_modes = ['heating only',
+             'cooling only',
+             'simultaneous']
+Q_ets = {mode : 0. for mode in ets_modes}
+P_ets = {mode : 0. for mode in ets_modes}
+
+for i in range(1,6):
+    df_etsHp = construct_df([f'bui[{i}].ets.heaPum.heaPum.QCon_flow',
+                             f'bui[{i}].ets.heaPum.heaPum.QEva_flow',
+                             f'bui[{i}].ets.heaPum.heaPum.P',
+                             f'bui[{i}].ets.heaPum.con.hea.y',
+                             f'bui[{i}].ets.heaPum.con.uCoo'])
+    
+    conditions = dict()
+    conditions['heating'] = np.array(df_etsHp[f'bui[{i}].ets.heaPum.con.hea.y'] > 0.9)
+    conditions['cooling'] = np.array(df_etsHp[f'bui[{i}].ets.heaPum.con.uCoo'] > 0.9)
+    conditions['heating only'] = np.logical_and(conditions['heating'], np.logical_not(conditions['cooling']))
+    conditions['cooling only'] = np.logical_and(np.logical_not(conditions['heating']), conditions['cooling'])
+    conditions['simultaneous'] = np.logical_and(conditions['heating'], conditions['cooling'])
+    
+    for mode in ets_modes:
+        Q_ets[mode] += integrate_with_condition(df_etsHp, f'bui[{i}].ets.heaPum.heaPum.QCon_flow',
+                                                condition = conditions[mode])
+        P_ets[mode] += integrate_with_condition(df_etsHp, f'bui[{i}].ets.heaPum.heaPum.P',
+                                                condition = conditions[mode])
+
+for mode in ets_modes:
+    val = Q_ets[mode] / P_ets[mode]
+    print_row(desc = f'Average COP of ETS HP ({mode})',
+              valu = val,
+              conv = 1,
+              form = '.2f',
+              unit = '-'
+              )
 
 print_row(desc = 'Capacity of central HP (heating)',
           valu = abs(read_parameter("cenPla.gen.heaPum.QHea_flow_nominal")),
@@ -159,7 +184,7 @@ val = integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.QCon_flow',
                                condition = condition) / \
       integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.P',
                                condition = condition)
-print_row(desc = 'Average heating COP of central HP',
+print_row(desc = 'Average COP of central HP (heating)',
           valu = val,
           conv = 1,
           form = '.2f',
@@ -171,7 +196,7 @@ val = integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.QEva_flow',
                                condition = condition) / \
       integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.P',
                                condition = condition)
-print_row(desc = 'Average cooling COP of central HP',
+print_row(desc = 'Average COP of central HP (cooling)',
           valu = val,
           conv = 1,
           form = '.2f',
@@ -185,5 +210,6 @@ print_row(desc = 'BTES capacity',
           unit = 'MWh'
           )
 
-print('PV capacity: N/A')
+print('PV capacity: 8.68 MWp (directly using MILP value)')
+print('Battery capacity: 4.36 MWh (directly using MILP value)')
 
