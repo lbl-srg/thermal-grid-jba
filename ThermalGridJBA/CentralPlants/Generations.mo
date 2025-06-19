@@ -1386,7 +1386,7 @@ equation
           419},{-350,419},{-350,360},{160,360},{160,333},{154,333}}, color={255,
           0,255}));
   annotation (defaultComponentName="gen",
-  Icon(coordinateSystem(preserveAspectRatio=false, extent={{-540,-280},{660,500}}),
+  Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-220},{100,100}}),
                          graphics={
                                 Rectangle(
         extent={{-100,-220},{100,100}},
