@@ -4,7 +4,7 @@
 #
 #############################################################
 import os
-BRANCH="issue110_TCon30"
+BRANCH="issue114_heaPumNewPV"
 SHOW_DYMOLA_GUI = False
 KEEP_DYMOLA_OPEN = False
 FROM_GIT_HUB = True
