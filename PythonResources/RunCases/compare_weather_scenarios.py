@@ -29,7 +29,10 @@ nBui = 5
 
 var_list = list()
 var_list += ['ETot.y',      # Total ele consumption, J
-             'EHeaPum.y']   # Total compressor ele consumption, J
+             'EHeaPum.y',   # ETS compressor ele consumption, J
+             'EComPla.y',   # Plant compressor ele consumption, J
+             'EPumETS.y',   # ETS pump ele consumption, J
+             'EPumPla.y']   # Plant pump ele consumption, J
 var_pre_index = [f'bui[{_i}].bui.loa.y[1]', # Building cooling load, W
                  f'bui[{_i}].bui.loa.y[2]', # Building sp. heating load, W
                  f'bui[{_i}].bui.terUniCoo.TLoaODE.TAir', # Room temp for cooling, K
@@ -76,17 +79,6 @@ def write_latex_table(df_base,
         event : ['heat', 'cold']
     """
     
-    def condition_duration(t, y, condition):
-        """ Duration of time during which y meets the condition.
-        """
-        indices = np.where(condition(y))[0]
-        duration = 0.0
-        for i in range(1, len(indices)):
-            if indices[i] == indices[i-1] + 1:  # Check if the indices are consecutive
-                duration += t[indices[i]] - t[indices[i-1]]
-
-        return duration
-    
     def write_row(description,
                   v_base,
                   v_even,
@@ -124,7 +116,7 @@ def write_latex_table(df_base,
             v_even_ip = v_even * factor_ip
             diff_v_ip = v_even_ip - v_base_ip
             
-            tab += f" & [{unit_ip}] & {v_base_ip:,.0f} & {v_even_ip:,.0f} & {diff_v_ip:+,.0f} & \\\\\n"
+            tab += f" & [{unit_ip}] & {v_base_ip:,.0f} & {v_even_ip:,.0f} & \\textit{{{diff_v_ip:+,.0f}}} & \\\\\n"
             
         return tab
     
@@ -142,13 +134,6 @@ def write_latex_table(df_base,
     tab += "\\hline\n"
     
     # main body
-    # total electricity use
-    tab += write_row(description = "Total electricity use",
-                     v_base = df_base['ETot.y'].iloc[-1] - df_base['ETot.y'].iloc[0],
-                     v_even = df_even['ETot.y'].iloc[-1] - df_even['ETot.y'].iloc[0],
-                     unit_si = 'MWh',
-                     factor_si = J_to_MWh,
-                     to_ip = False)
     
     if event == 'heat':
         # load
@@ -164,23 +149,9 @@ def write_latex_table(df_base,
                          to_ip = True,
                          unit_ip = 'MMBtu',
                          factor_ip = J_to_MMBtu)
-        
-        # duration of room temperature violation
-        t_base = condition_duration(np.array(df_base['Time']),
-                                    np.array(df_base['bui[2].bui.terUniCoo.TLoaODE.TAir']),
-                                    lambda y: y > 24.5 + 273.15)
-        t_even = condition_duration(np.array(df_even['Time']),
-                                    np.array(df_even['bui[2].bui.terUniCoo.TLoaODE.TAir']),
-                                    lambda y: y > 24.5 + 273.15)
-        
-        tab += write_row(description = "Total duration of room temperature violation",
-                         v_base = t_base,
-                         v_even = t_even,
-                         unit_si = 'h',
-                         factor_si = 1 / 3600,
-                         to_ip = False)
     
     if event == 'cold':
+        # load
         cols_hea = [f'bui[{_i}].bui.loa.y[2]' for _i in range(1, nBui+1)]
         df_base['HeaLoa'] = df_base[cols_hea].sum(axis=1)
         df_even['HeaLoa'] = df_even[cols_hea].sum(axis=1)
@@ -193,21 +164,26 @@ def write_latex_table(df_base,
                          to_ip = True,
                          unit_ip = 'MMBtu',
                          factor_ip = J_to_MMBtu)
-        
-        # duration of room temperature violation
-        t_base = condition_duration(np.array(df_base['Time']),
-                                    np.array(df_base['bui[2].bui.terUniHea.TLoaODE.TAir']),
-                                    lambda y: y < 19.5 + 273.15)
-        t_even = condition_duration(np.array(df_even['Time']),
-                                    np.array(df_even['bui[2].bui.terUniHea.TLoaODE.TAir']),
-                                    lambda y: y < 19.5 + 273.15)
-        
-        tab += write_row(description = "Duration of room temperature violation",
-                         v_base = t_base,
-                         v_even = t_even,
-                         unit_si = 'h',
-                         factor_si = 1 / 3600,
-                         to_ip = False)
+    
+    # compressor load
+    tab += write_row(description = "Compressor electricity use",
+                     v_base = df_base['EHeaPum.y'].iloc[-1] - df_base['EHeaPum.y'].iloc[0]
+                            + df_base['EComPla.y'].iloc[-1] - df_base['EComPla.y'].iloc[0],
+                     v_even = df_even['EHeaPum.y'].iloc[-1] - df_even['EHeaPum.y'].iloc[0]
+                            + df_even['EComPla.y'].iloc[-1] - df_even['EComPla.y'].iloc[0],
+                     unit_si = 'MWh',
+                     factor_si = J_to_MWh,
+                     to_ip = False)
+    
+    # pump load
+    tab += write_row(description = "Pump electricity use",
+                     v_base = df_base['EPumETS.y'].iloc[-1] - df_base['EPumETS.y'].iloc[0]
+                            + df_base['EPumPla.y'].iloc[-1] - df_base['EPumPla.y'].iloc[0],
+                     v_even = df_even['EPumETS.y'].iloc[-1] - df_even['EPumETS.y'].iloc[0]
+                            + df_even['EPumPla.y'].iloc[-1] - df_even['EPumPla.y'].iloc[0],
+                     unit_si = 'MWh',
+                     factor_si = J_to_MWh,
+                     to_ip = False)
     
     # footer
     tab += "\\bottomrule\n"
