@@ -125,7 +125,8 @@ print_row(desc = 'Capacity of ETS HP (cooling)',
           )
 
 # COP of ETS HP
-ets_modes = ['heating only',
+ets_modes = ['overall',
+             'heating only',
              'cooling only',
              'simultaneous']
 Q_ets = {mode : 0. for mode in ets_modes}
@@ -141,6 +142,7 @@ for i in range(1,6):
     conditions = dict()
     conditions['heating'] = np.array(df_etsHp[f'bui[{i}].ets.heaPum.con.hea.y'] > 0.9)
     conditions['cooling'] = np.array(df_etsHp[f'bui[{i}].ets.heaPum.con.uCoo'] > 0.9)
+    conditions['overall']      = np.logical_or(conditions['heating'], conditions['cooling'])
     conditions['heating only'] = np.logical_and(conditions['heating'], np.logical_not(conditions['cooling']))
     conditions['cooling only'] = np.logical_and(np.logical_not(conditions['heating']), conditions['cooling'])
     conditions['simultaneous'] = np.logical_and(conditions['heating'], conditions['cooling'])
