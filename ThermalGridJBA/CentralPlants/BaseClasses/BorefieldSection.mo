@@ -31,7 +31,7 @@ model BorefieldSection "Section for a core or an edge of the borefield"
           extent={{100,10},{140,50}})));
 
   Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie(
-    redeclare each final package Medium = Medium,
+    redeclare final package Medium = Medium,
     allowFlowReversal=true,
     show_T=true,
     nSeg=5,
