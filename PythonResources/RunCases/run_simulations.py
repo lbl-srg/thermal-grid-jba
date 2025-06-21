@@ -4,7 +4,7 @@
 #
 #############################################################
 import os
-BRANCH="issue114_heaPumNewPV"
+BRANCH="issue116_modelicaSyntax"
 SHOW_DYMOLA_GUI = False
 KEEP_DYMOLA_OPEN = False
 FROM_GIT_HUB = True
