@@ -89,8 +89,8 @@ model Generations
   parameter Real mHeaPumGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumHea_flow_nominal(unit="W") = cpWat*mHeaPumWat_flow*
-    dTHex_nominal "Nominal heating capacity"
+  parameter Real QHeaPumHea_flow_nominal(unit="W")
+    "Nominal heating capacity"
     annotation (Dialog(group="Heat pump"));
   parameter Real TConHea_nominal(unit="K") = TLooMin + dTHex_nominal
     "Nominal temperature of the heated fluid in heating mode"
@@ -98,8 +98,7 @@ model Generations
   parameter Real TEvaHea_nominal(unit="K")
     "Nominal temperature of evaporator for heat pump design during heating"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumCoo_flow_nominal(unit="W") = -cpWat*mHeaPumWat_flow*
-    dTHex_nominal "Nominal cooling capacity"
+  parameter Real QHeaPumCoo_flow_nominal(unit="W") "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
   parameter Real TConCoo_nominal(unit="K")
     "Nominal temperature of condenser for heat pump design during cooling"
