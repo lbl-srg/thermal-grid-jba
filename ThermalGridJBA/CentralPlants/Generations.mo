@@ -821,12 +821,13 @@ model Generations
     final heaPumRisTim=heaPumRisTim)
     "Heat pump controller"
     annotation (Placement(transformation(extent={{132,312},{152,336}})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFloPla(redeclare each package
-      Medium = MediumW, each allowFlowReversal=false)
+  Buildings.Fluid.Sensors.MassFlowRate senMasFloPla(
+    redeclare package Medium = MediumW,
+    allowFlowReversal=false)
     "Mass flow rate entering plant"
     annotation (Placement(transformation(extent={{-440,-170},{-420,-150}})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFloHeaPum(redeclare each package
-      Medium = MediumW)
+  Buildings.Fluid.Sensors.MassFlowRate senMasFloHeaPum(
+    redeclare package Medium = MediumW)
     "Mass flow rate entering heat pump" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,

@@ -229,7 +229,7 @@ model DetailedPlantFiveHubs
   Buildings.Controls.OBC.CDL.Reals.MultiSum PPumETS(
     nin=nBui,
     u(each unit="W"),
-    y(each unit="W"))
+    y(unit="W"))
     "ETS pump power"
     annotation (Placement(transformation(extent={{120,190},{140,210}})));
   Modelica.Blocks.Continuous.Integrator EPumETS(
@@ -249,8 +249,8 @@ model DetailedPlantFiveHubs
     nin=2,
     u(each unit="J",
      each displayUnit="Wh"),
-    y(each unit="J",
-      each displayUnit="Wh"))
+    y(final unit="J",
+      displayUnit="Wh"))
     "Total pump electric energy"
     annotation (Placement(transformation(extent={{300,120},{320,140}})));
   Buildings.Controls.OBC.CDL.Reals.MultiSum PHeaPump(nin=nBui)
@@ -267,15 +267,14 @@ model DetailedPlantFiveHubs
     nin=8,
     u(each unit="J",
       each displayUnit="Wh"),
-    y(each unit="J",
-      each displayUnit="Wh"))
+    y(unit="J",
+      displayUnit="Wh"))
     "Total electric energy"
     annotation (Placement(transformation(extent={{360,90},{380,110}})));
   Buildings.DHC.Loads.BaseClasses.ConstraintViolation conVio(
     final uMin(final unit="K", displayUnit="degC")=datDis.TLooMin,
     final uMax(final unit="K", displayUnit="degC")=datDis.TLooMax,
     u(each final unit="K", each displayUnit="degC"),
-    y(fixed=false),
     nu=2)
     "Check if loop temperatures are within given range"
     annotation (Placement(transformation(extent={{-220,220},{-200,240}})));
@@ -378,8 +377,8 @@ model DetailedPlantFiveHubs
     nin=7,
     u(each unit="J",
       each displayUnit="Wh"),
-    y(each unit="J",
-      each displayUnit="Wh"))
+    y(unit="J",
+      displayUnit="Wh"))
     "Plant pumps electricity energy"
     annotation (Placement(transformation(extent={{240,60},{260,80}})));
   Buildings.Controls.OBC.CDL.Reals.MultiMax TLooMaxMea(y(unit="K", displayUnit=
