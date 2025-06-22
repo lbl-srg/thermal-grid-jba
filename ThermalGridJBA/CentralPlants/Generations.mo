@@ -4,7 +4,7 @@ model Generations
   package MediumW = Buildings.Media.Water "Water";
   //   package MediumG = Modelica.Media.Incompressible.Examples.Glycol47 "Glycol";
   package MediumA = Buildings.Media.Air "Air";
-  package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.43) "Glycol";
+  package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.45) "Glycol";
   parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
