@@ -38,6 +38,62 @@ def configure_axes(axes):
     axes.grid(color='lightgrey', linewidth=0.25)
     return
 
+def read_case(name: str):
+    # Function to read a case
+    r = {'reader': None, 'error': None}
+    try:
+        print(f"Reading {name}\n")
+        r['reader'] = get_results(name)
+        print(f"Read {name}\n")
+    except Exception as e:
+        r['error'] = f"*** Error reading {name}: {e}"
+    return r
+
+def read_cases(cases, case_names : list):
+    from multiprocessing import Pool
+    import gc
+    # Delete these results that are not requested to reduce memory
+    # which can cause a python kernel error
+
+    for cas in cases:
+        # Check if this case is in the list of cases to be read,
+        # in which case we keep the results.
+        if not any(cas['name'] in ele for ele in case_names):
+            if 'reader' in cas:
+                # Remove the reader to release storage
+                del cas['reader']
+    gc.collect()
+
+    # Read the requested results
+    cases_to_read = []
+    for cas in cases:
+        # Check if this case is in the list of cases to be read.
+        if any(cas['name'] in ele for ele in case_names):
+            # Add case unless the result is already present.
+            if not ('reader' in cas and cas['reader'] is not None):
+                cases_to_read.append(cas['name'])
+
+#    with Pool() as pool:
+#        results = pool.map(read_case, cases_to_read)
+    results = []
+    for nam in cases_to_read:
+        results.append(read_case(nam))
+
+    print(f"Reading {len(cases_to_read)} cases.")
+    # Put the read cases back into the 'cases' argument
+    for k in range(len(cases_to_read)):
+        for i in range(len(cases)):
+            if cases_to_read[k] == cases[i]['name']:
+                if results[k]['error'] is None:
+                    cases[i]['reader'] = results[k]['reader']
+                else:
+                    cases[i]['reader'] = None
+                    cases[i]['postProcess'] = False
+                    print(results[k]['error'])
+    del results
+    gc.collect()
+    return
+
 def get_results(case_name: str):
     """ Get the results for the case with name `case_name`
     """
@@ -112,7 +168,7 @@ def hide_tick_labels(ax):
 
 
 ########################################
-def plot_energy(cases : list):
+def plot_energy(cases : list, filePrefix: str):
     import os
     import matplotlib.pyplot as plt
     import numpy as np
@@ -203,7 +259,7 @@ def plot_energy(cases : list):
                bbox_to_anchor=(1.55, 0.75), loc='right')
     #plt.tight_layout()
 
-    save_plot(plt, f"energy")
+    save_plot(plt, f"{filePrefix}_energy")
 
     # Write result to console and file
     # heat pumps ets
@@ -267,6 +323,7 @@ def plot_loop_temperatures(cases : list):
         (t, TDisWatRet)      = results[i].values('TDisWatRet.T')
         (t, TSoiPer)      = results[i].values('dTSoiPer.T')
         (t, TSoiCen)      = results[i].values('dTSoiCen.T')
+        (t, conVio)       = results[i].values('conVio.y')
 
         fig, axs = plt.subplots(nrows=3, ncols=1, sharex=True)
 
@@ -275,18 +332,20 @@ def plot_loop_temperatures(cases : list):
         axs[0].plot(t/24./3600., TLooMinMea-273.15, 'b', label='Minimum loop temperature', linewidth=0.2)
 
         rect1 = matplotlib.patches.Rectangle((tP[0], -20),
-                                             365, TLooMin[0]-273.15+20, 
+                                             365, TLooMin[0]-273.15+20,
                                              color='mistyrose')
         rect2 = matplotlib.patches.Rectangle((tP[0], TLooMin[0]-273.15),
                                              365, (TLooMax[0]-TLooMin[0]),
                                              color='green', alpha=0.1)
         rect3 = matplotlib.patches.Rectangle((tP[0], TLooMax[0]-273.15),
-                                             365, 30, 
+                                             365, 30,
                                              color='mistyrose')
 
         axs[0].add_patch(copy.copy(rect1))
         axs[0].add_patch(copy.copy(rect2))
         axs[0].add_patch(copy.copy(rect3))
+
+        axs[0].text(400, 10, f"Constraint violation during {max(conVio)*(t[-1]-t[0])/3600.:.1f} hours.")
 
         axs[0].set_ylabel(r'Temperature [$^\circ$C]')
         #axs[0].set_xticks(list(range(25)))
@@ -422,7 +481,7 @@ def plotPlant(lis, res, filePrefix, days, time="hours", fontSize=4, nColLegend=2
                         axs[k].set_xlabel(f"time [day]")
                     else:
                         axs[k].set_xlabel(f"time [h] ({day['date']})")
-                    
+
 
                 axs[k].set_ylabel(lis[i]["y_label"], multialignment='center')
                 axs[k].legend(bbox_to_anchor=(1.25, 1.0),
@@ -872,7 +931,7 @@ def plotElectricalTimeSeries(reader):
             loc='upper right',
             ncol=2)
     ax = [axs0, axs1, axs2]
-    for i in range(len(ax)):    
+    for i in range(len(ax)):
             ax[i].set_ylim([-8, 15])
     #axs.autoscale(True)
             configure_axes(ax[i])
@@ -881,7 +940,7 @@ def plotElectricalTimeSeries(reader):
             ax[i].set_xlabel(f"time [day]")
 
             ax[i].set_ylabel(f"electricity [MW]", multialignment='center')
-            
+
     fig.tight_layout()
     save_plot(plt, f"powerUse")
 
@@ -936,13 +995,20 @@ def calc_finance(If, Iv, C, l, alpha):
     return [ALCC, LCC, I, OM, RC, SR, crf]
 
 
-def plot_sensitivities(results: list, dic: dict, filename: str):
+def plot_sensitivities(cases: list, dic: dict, filename: str):
     ori_font_size = plt.rcParams['font.size']
     plt.rcParams['font.size'] = 10
 
+    results = []
+    case_names = []
+    for cas in cases:
+        if cas['postProcess']:
+            results.append(cas['reader'])
+            case_names.append(cas['name'])
+
+
     fig, ax1 = plt.subplots()
-    color = "tab:red"
-    
+
     x = np.zeros(len(results))
     y = np.zeros(len(results))
 
@@ -950,7 +1016,7 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
         for iRes in range(len(results)):
             # x-value
             x[iRes] = results[iRes].max(dic['x']['var']) * dic['x']['factor'] + dic['x']['offset']
-            
+
             # y-value
             if "operation" in var and var["operation"] == "max":
                 y[iRes] = (results[iRes].max(var['var'])) * dic['factor'] + dic['offset']
@@ -958,7 +1024,7 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
                 (_, yTmp) = results[iRes].values(var['var'])
                 # Take the last element of the time series
                 y[iRes] = (yTmp[-1]) * dic['factor'] + dic['offset']
-            
+
 
         ax1.plot(x, y, "*-", label=var['label'])
         # Annotate data
@@ -969,8 +1035,8 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
         ax1.legend(loc="upper left")
         ax1.set_ylim(dic['y_lim'])
     ax1.set_xlabel(dic['x']['label'])
-    
-    # Secondary axis  
+
+    # Secondary axis
     ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
     for var in dic['vars2']:
         # Base case index
@@ -986,10 +1052,10 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
             # unit change
             unitChange = results[iRes].max(var['unitChange']) - \
                 results[iBas].max(var['unitChange'])
-            
+
             #deltaFirstCost = var['costPerUnitChange'] * unitChange
 
-            
+
             (ALCC, LCC, I, OM, RC, SR, crf) = calc_finance(
                 0, var['costPerUnitChange'], unitChange, var['lifeTime'], var['operationAndMaintenance'])
             y[iRes] = (ALCC + energyCostDiff) * dic['factor2']
@@ -1012,13 +1078,11 @@ def plot_sensitivities(results: list, dic: dict, filename: str):
     configure_axes(ax1)
     configure_axes(ax2)
 
-        
-
     fig.tight_layout()
     save_plot(fig, filename)
 
     plt.rcParams['font.size'] = ori_font_size
 
-    
+
 
 
