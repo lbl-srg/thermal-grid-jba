@@ -44,8 +44,8 @@ The 17 in-scope buildings of the site are grouped at four levels:
 <p>
 The figure below illustrates how the buildings are grouped.
 </p>
-<p align=\"center\">
-<img alt=\"image\" src=\"modelica://ThermalGridJBA/Resources/Images/Networks/building-grouping.png\"/>
+<p align=\"left\">
+<img alt=\"image\" src=\"modelica://ThermalGridJBA/Resources/Images/Networks/hubModelModelica.png\" width=\"600\"/>
 </p>
 </html>"));
 
