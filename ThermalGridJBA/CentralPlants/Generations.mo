@@ -4,7 +4,7 @@ model Generations
   package MediumW = Buildings.Media.Water "Water";
   //   package MediumG = Modelica.Media.Incompressible.Examples.Glycol47 "Glycol";
   package MediumA = Buildings.Media.Air "Air";
-  package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.40) "Glycol";
+  package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.45) "Glycol";
   parameter Real TLooMin(
     unit="K",
     displayUnit="degC")=283.65
@@ -89,8 +89,8 @@ model Generations
   parameter Real mHeaPumGly_flow_nominal(unit="kg/s")
     "Nominal glycol mass flow rate for heat pump"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumHea_flow_nominal(unit="W") = cpWat*mHeaPumWat_flow*
-    dTHex_nominal "Nominal heating capacity"
+  parameter Real QHeaPumHea_flow_nominal(unit="W")
+    "Nominal heating capacity"
     annotation (Dialog(group="Heat pump"));
   parameter Real TConHea_nominal(unit="K") = TLooMin + dTHex_nominal
     "Nominal temperature of the heated fluid in heating mode"
@@ -98,8 +98,7 @@ model Generations
   parameter Real TEvaHea_nominal(unit="K")
     "Nominal temperature of evaporator for heat pump design during heating"
     annotation (Dialog(group="Heat pump"));
-  parameter Real QHeaPumCoo_flow_nominal(unit="W") = -cpWat*mHeaPumWat_flow*
-    dTHex_nominal "Nominal cooling capacity"
+  parameter Real QHeaPumCoo_flow_nominal(unit="W") "Nominal cooling capacity"
     annotation (Dialog(group="Heat pump"));
   parameter Real TConCoo_nominal(unit="K")
     "Nominal temperature of condenser for heat pump design during cooling"
@@ -821,12 +820,13 @@ model Generations
     final heaPumRisTim=heaPumRisTim)
     "Heat pump controller"
     annotation (Placement(transformation(extent={{132,312},{152,336}})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFloPla(redeclare each package
-      Medium = MediumW, each allowFlowReversal=false)
+  Buildings.Fluid.Sensors.MassFlowRate senMasFloPla(
+    redeclare package Medium = MediumW,
+    allowFlowReversal=false)
     "Mass flow rate entering plant"
     annotation (Placement(transformation(extent={{-440,-170},{-420,-150}})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFloHeaPum(redeclare each package
-      Medium = MediumW)
+  Buildings.Fluid.Sensors.MassFlowRate senMasFloHeaPum(
+    redeclare package Medium = MediumW)
     "Mass flow rate entering heat pump" annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,

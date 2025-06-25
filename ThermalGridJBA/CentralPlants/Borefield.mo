@@ -306,8 +306,8 @@ model Borefield "Borefield model"
     "Split total flow to each segment along the long length of the borefield. Factor 2 because the flow is split into two different models."
     annotation (Placement(transformation(extent={{-88,30},{-68,50}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaEdgPer(
-    redeclare each final package Medium = Medium,
-    each allowFlowReversal=false,
+    redeclare final package Medium = Medium,
+    allowFlowReversal=false,
     k=2) "Mass flow rate multiplier at outlet of edge perimeter"
     annotation (Placement(transformation(extent={{40,70},{60,90}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulEntCen(
@@ -317,18 +317,18 @@ model Borefield "Borefield model"
     "Split total flow to each segment along the long length of the borefield. Factor 2 because the flow is split into two different models."
     annotation (Placement(transformation(extent={{-90,-50},{-70,-30}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaCorPer(
-    redeclare each final package Medium = Medium,
-    each allowFlowReversal=false,
+    redeclare final package Medium = Medium,
+    allowFlowReversal=false,
     k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
     annotation (Placement(transformation(extent={{40,40},{60,60}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaEdgCen(
-    redeclare each final package Medium = Medium,
-    each allowFlowReversal=false,
+    redeclare final package Medium = Medium,
+    allowFlowReversal=false,
     k=2) "Mass flow rate multiplier at outlet of edge center"
     annotation (Placement(transformation(extent={{40,-60},{60,-40}})));
   Buildings.Fluid.BaseClasses.MassFlowRateMultiplier masFloMulLeaCorCen(
-    redeclare each final package Medium = Medium,
-    each allowFlowReversal=false,
+    redeclare final package Medium = Medium,
+    allowFlowReversal=false,
     k=nBorSec - 2) "Mass flow rate multiplier at outlet of core perimeter"
     annotation (Placement(transformation(extent={{40,-90},{60,-70}})));
   BaseClasses.DummyBorefield edgDummy(redeclare package Medium = Medium, final
