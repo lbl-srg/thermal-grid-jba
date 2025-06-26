@@ -44,6 +44,10 @@ record HeatPump
 //    20 + 273.15
 //    "Maximum of evaporator water entering temperature"
 //    annotation (Dialog(group="Evaporator"));
+  parameter Modelica.Units.SI.Temperature TConLvgMin(displayUnit="degC") =
+    15 + 273.15
+    "Minimum value for condenser leaving temperature"
+    annotation (Dialog(group="Condenser"));
   parameter Modelica.Units.SI.Temperature TEvaLvgMin(displayUnit="degC") =
     4 + 273.15
     "Minimum value for leaving evaporator temperature"

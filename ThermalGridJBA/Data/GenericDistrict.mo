@@ -2,7 +2,7 @@ within ThermalGridJBA.Data;
 record GenericDistrict "District network design parameters"
   extends Modelica.Icons.Record;
   final package MediumW = Buildings.Media.Water "Water medium";
-  final package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.40) "Glycol medium";
+  final package MediumG = Buildings.Media.Antifreeze.PropyleneGlycolWater(property_T=293.15, X_a=0.45) "Glycol medium";
   constant Real cpWatLiq=Buildings.Utilities.Psychrometrics.Constants.cpWatLiq;
   constant Real cpGly=MediumG.cp_const;
   constant Modelica.Units.SI.Area AFlo = 111997

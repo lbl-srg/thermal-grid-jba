@@ -30,7 +30,7 @@ model IdealHeatingCoolingPlant
     final m_flow_nominal=m_flow_nominal,
     final use_X_wSet=false)
     annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
-  Buildings.DHC.ETS.BaseClasses.Pump_m_flow pum(
+  ThermalGridJBA.BaseClasses.Pump_m_flow pum(
     redeclare final package Medium = Medium,
     final m_flow_nominal=m_flow_nominal,
     final dp_nominal=dp_nominal,
