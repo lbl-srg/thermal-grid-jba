@@ -56,7 +56,8 @@ var_list += ['cenPla.gen.ind.ySea',
              'cenPla.gen.dryCoo.Q1_flow',
              'pumDis.P',
              'PEleNonHva.y',
-             'PFanBuiSum.y'
+             'PFanBuiSum.y',
+             'EPvBat.u'
              ]
 results = get_vars(var_list,
                    mat_file_name,
@@ -67,6 +68,7 @@ results = get_vars(var_list,
 #   `energy carrier` influences colouring in the diagram
 data_dicts = [
     {
+    ("PV and bettery", "Electricity") : 0,
     ("Electricity", "Buildings fans + non HVAC") : 0,
     ("Electricity", "Pump coo") : 0,
     ("Electricity", "Pump hea") : 0,
@@ -103,6 +105,9 @@ for sea in range(5):
     data_dict = data_dicts[sea]
     
     # Electricity node
+    data_dict[("PV and bettery", "Electricity")] = \
+        abs(integrate_with_condition(results, 'EPvBat.u',
+                                     condition = condition))
     data_dict[("Electricity", "Buildings fans + non HVAC")] = \
         abs(integrate_with_condition(results, 'PEleNonHva.y',
                                      condition = condition)) + \
@@ -213,7 +218,7 @@ for sea in range(5):
 
 #%% output to Excel
 seasons = ['Whole year', 'Winter', 'Spring', 'Summer', 'Fall']
-with pd.ExcelWriter('sankey.xlsx', engine='openpyxl') as writer:
+with pd.ExcelWriter('sankey_modelica.xlsx', engine='openpyxl') as writer:
     for season, data_dict in zip(seasons, data_dicts):
         # Convert the dictionary to a DataFrame
         df = pd.DataFrame(list(data_dict.items()), columns=['From-To', 'kWh'])
