@@ -4,7 +4,7 @@
 #
 #############################################################
 import os
-BRANCH="issue117_tmy3"
+BRANCH="main"
 SHOW_DYMOLA_GUI = False
 KEEP_DYMOLA_OPEN = False
 FROM_GIT_HUB = True
