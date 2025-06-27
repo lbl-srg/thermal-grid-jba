@@ -110,6 +110,34 @@ def get_cases():
         }
         _add(case, cases)
 
+        case = {
+            'name': "base_heaPumSizFac_1_1",
+            'parameters': {
+                'datDis.heaPumSizFac': 1.1
+            },
+            'label': '$1.1 \, \dot Q_{hea,pum,0}$'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_1_2",
+            'parameters': {
+                'datDis.heaPumSizFac': 1.2
+            },
+            'label': '$1.2 \, \dot Q_{hea,pum,0}$'
+        }
+        _add(case, cases)
+
+        case = {
+            'name': "base_heaPumSizFac_1_3",
+            'parameters': {
+                'datDis.heaPumSizFac': 1.3
+            },
+            'label': '$1.3 \, \dot Q_{hea,pum,0}$'
+        }
+        _add(case, cases)
+
+
         # Disable plant economizer by setting a small flow rate (as
         # the flow rate is also used to size the dry cooler) and
         # setting the approach that commands the economizer on to 100 K
@@ -145,12 +173,12 @@ def get_cases():
         # }
         # _add(case, cases)
 
-        # case = {
-        #     'name': 'postECM_TMY3',
-        #     'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM',
-        #     'label': 'TMY3 weather'
-        # }
-        # _add(case, cases)
+        case = {
+            'name': 'base_TMY3',
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.PostECM',
+            'label': 'TMY3 weather'
+        }
+        _add(case, cases)
 
         return cases
 

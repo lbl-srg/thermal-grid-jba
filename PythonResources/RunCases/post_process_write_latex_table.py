@@ -20,6 +20,7 @@ def write_latex_capacity_table(r,
         # using water factor & glycol density
     conv_Pa_psi = 1 / 6894.76 # Pa to psi
     conv_m_ft = 3.28084 # m to ft
+    conv_m_in = 39.3701 # m to inch
 
     def read_parameter(varName):
         """ Returns the first value of a series read from mat file.
@@ -112,6 +113,14 @@ def write_latex_capacity_table(r,
                              display_si = "m$^3$",
                              display_ip = "gal")
 
+        # piping
+        tab += write_row(val = read_parameter(f'datDis.lCon[{i}]'),
+                         desc = "Connection pipe length (one way)",
+                         factor_si = 1,
+                         factor_ip = conv_m_ft,
+                         display_si = "m",
+                         display_ip = "ft")
+        
         tab += "\\hline\n"
 
     ## central plant
@@ -185,22 +194,19 @@ def write_latex_capacity_table(r,
     for i in range(1,nBui+2):
         l += read_parameter(f'datDis.lDis[{i}]')
     tab += write_row(val = l,
-                     desc = "District piping",
+                     desc = "District pipe length",
                      factor_si = 1,
                      factor_ip = conv_m_ft,
                      display_si = "m",
                      display_ip = "ft")
-
-    l = 0
-    for i in range(1,nBui+1):
-        l += read_parameter(f'datDis.lCon[{i}]') * 2
-    tab += write_row(val = l,
-                     desc = "Connection piping",
-                     factor_si = 1,
-                     factor_ip = conv_m_ft,
-                     display_si = "m",
-                     display_ip = "ft")
-
+    
+    tab += write_row(val = read_parameter('datDis.dhDisAct'),
+                     desc = "District pipe diameter",
+                     factor_si = 1e3,
+                     factor_ip = conv_m_in,
+                     display_si = "mm",
+                     display_ip = "in")
+    
     # footer
     tab += "\\bottomrule\n"
     tab += "\\end{tabular}"

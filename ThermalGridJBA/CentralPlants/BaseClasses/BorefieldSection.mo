@@ -31,14 +31,14 @@ model BorefieldSection "Section for a core or an edge of the borefield"
           extent={{100,10},{140,50}})));
 
   Buildings.Fluid.Geothermal.ZonedBorefields.TwoUTubes borFie(
-    redeclare each final package Medium = Medium,
-    each allowFlowReversal=true,
+    redeclare final package Medium = Medium,
+    allowFlowReversal=true,
     show_T=true,
     nSeg=5,
-    each energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    each TExt0_start=TSoi_start,
-    each borFieDat=borFieDat,
-    each dT_dz=0) "Borefield"
+    energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+    TExt0_start=TSoi_start,
+    borFieDat=borFieDat,
+    dT_dz=0) "Borefield"
     annotation (Placement(transformation(extent={{-20,-10},{0,10}})));
   Buildings.Fluid.Sources.Boundary_ph sin[2](
     redeclare each package Medium = Medium,
@@ -50,8 +50,9 @@ model BorefieldSection "Section for a core or an edge of the borefield"
     each use_T_in=true,
     each nPorts=1) "Mass flow source"
     annotation (Placement(transformation(extent={{-70,44},{-50,64}})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFloPer(redeclare each package
-      Medium = Medium, each allowFlowReversal=false)
+  Buildings.Fluid.Sensors.MassFlowRate senMasFloPer(
+    redeclare package Medium = Medium,
+    allowFlowReversal=false)
     "Mass flow rate entering borefield"
     annotation (Placement(transformation(extent={{-150,-10},{-130,10}})));
   Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter floGai[2](each k=nDumSec)
@@ -112,8 +113,8 @@ model BorefieldSection "Section for a core or an edge of the borefield"
         rotation=0,
         origin={-170,-60})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFloCen(
-    redeclare each package Medium = Medium,
-    each allowFlowReversal=false)
+    redeclare package Medium = Medium,
+    allowFlowReversal=false)
     "Mass flow rate entering borefield"
     annotation (Placement(transformation(extent={{-150,-70},{-130,-50}})));
   Buildings.Fluid.Sensors.HeatMeter senHeaFloPer(
