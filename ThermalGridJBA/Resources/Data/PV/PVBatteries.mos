@@ -1,7 +1,7 @@
 #1
 double tab1(8760,2)
 # Time in seconds
-# Electricity fed into system from PV and batter this time interval in W.
+# Electricity fed into system from PV and battery in this time interval in W.
 # Negative numbers are electricity produced.
 0,0
 3600,0
