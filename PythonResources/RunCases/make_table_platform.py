@@ -9,15 +9,18 @@ Created on Wed Jun 18 21:40:30 2025
 import os
 import pandas as pd
 import numpy as np
-from GetVariables import integrate_with_condition
+from GetVariables import *
+from def_calc_cost import *
 from buildingspy.io.outputfile import Reader
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-mat_file_name = os.path.join(CWD, "simulations", "2025-06-16", "2025-06-16-11d10-DetailedPlantFiveHubs.mat")
+mat_file_name = os.path.join(CWD, "simulations", "2025-06-25", "2025-06-25-03d5ec91-DetailedPlantFiveHubs.mat")
+
+nBui = 5
 
 #%%
-J_to_MWh = 1 / 3.6e9
+conv_J_kWh = 1 / 3.6e6
 conv_J_MWh = 1 / 3.6e9 # J to MWh
 conv_Wh_Btu = 3.412141633 # Wh to Btu
 conv_MW_MMBH = conv_Wh_Btu * 1e3 # MW to MMBtu/hr
@@ -97,27 +100,6 @@ def print_row(desc,
     print(f'{desc}: {valu*conv:{form}} {unit}')
     
 #%%
-def write_table_economic_requirements():
-    print_row(desc = 'Imported energy',
-              valu = read_last("ETot.y"),
-              conv = J_to_MWh,
-              form = ',.0f',
-              unit = 'MWh'
-              )
-    
-    print_row(desc = 'Peak electricity import',
-              valu = read_max_abs("multiSum.y"),
-              conv = 1e-3,
-              form = '.0f',
-              unit = 'kW'
-              )
-    
-    print('Life-cycle cost: ** in progress **')
-    print('Life-cycle cost: ** in progress **')
-    print('Levelized cost of thermal energy: ** in progress **')
-    print('')
-
-
 def write_table_guiding_values():
     
     def write_row_leading(s : str):
@@ -341,6 +323,158 @@ def write_table_guiding_values():
     
     return tab
     
+def write_table_economic_requirements():
+    print_row(desc = 'Imported energy',
+              valu = read_last("ETot.y"),
+              conv = J_to_MWh,
+              form = ',.0f',
+              unit = 'MWh'
+              )
+    
+    print_row(desc = 'Peak electricity import',
+              valu = read_max_abs("multiSum.y"),
+              conv = 1e-3,
+              form = '.0f',
+              unit = 'kW'
+              )
+    
+    print('Life-cycle cost: ** in progress **')
+    print('Life-cycle cost: ** in progress **')
+    print('Levelized cost of thermal energy: ** in progress **')
+    print('')
+    
+def write_table_modelica_economics():
+    
+    def print_finance(desc,
+                      key,
+                      capa):
+        
+        If = costs[key][0]
+        Iv = costs[key][1]
+        C = capa
+        l = costs[key][2]
+        alpha = costs[key][3]
+        
+        unit = costs[key][4]
+        
+        finance = calc_finance(If, Iv, C, l, alpha)
+        ALCC = finance[0]
+        I = finance[2]
+        
+        print(f'{desc}:')
+        print(' ' *4 + f'capacity = {capa:,.0f} {unit}')
+        print(' ' *4 + f'ALCC = {ALCC:,.0f}, I = {I:,.0f}')
+        
+        return ALCC, I
+    
+    def print_direct(desc, capa, ALCC, I):
+        
+        print(f'{desc}:')
+        print(' '*4 + f'capacity = {capa}')
+        print(' '*4 + f'ALCC = {ALCC}, I = {I}')
+    
+    # [If: fixed cost, Iv: variable cost, l: lifetime, alpha: O&M, unit of capacity]
+    costs = {"battery" : [0, 757, 15, 0.01, 'kWh'],
+             "borefield" : [0, 1.5, 40, 0.005, 'kWh'],
+             "piping" : [0, 1100, 40, 0.01, 'm'],
+             "hp ets" : [19671, 2080, 20, 0.02, 'kW'],
+             "hp plant" : [0, 1631, 20, 0.02, 'kW'],
+             "pump coo" : [46404, 30, 20, 0.02, 'kW'],
+             "pump hea" : [65479, 38, 20, 0.02, 'kW'],
+             "pump dhw" : [6476, 4, 20, 0.02, 'kW'],
+             "dhw storage" : [13800, 33, 20, 0.005, 'kWh']
+             }
 
+    """
+    battery,
+    borefield,
+    dhc network,
+    dhc service line,
+    ele export,
+    ele import,
+    ets hp,
+    plant hp,
+    PV,
+    pumps,
+    water storage
+    """
+    
+    _cp_wat = 4187 # J/kg K
+    _rho_wat = 997 # kg/m3
+    
+    ALCC = 0
+    I = 0
+    
+    print('## capacities read or computed from Modelica results ##')
+    
+    desc = "Borefield"
+    key = "borefield"
+    capa = (read_max_abs("EBorPer.y") + read_max_abs("EBorCen.y")) * conv_J_kWh
+    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    
+    desc = "Network piping"
+    key = "piping"
+    capa = 0
+    for i in range(1,nBui+2):
+        capa += read_parameter(f'datDis.lDis[{i}]')
+    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    
+    for i in range(1, nBui+1):
+        desc = f"ETS {i} heat pump"
+        key = "hp ets"
+        capa = read_parameter(f'bui[{i}].ets.heaPum.heaPum.QHea_flow_nominal') * 1e-3
+        ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+        
+        desc = f"ETS {i} connection piping"
+        key = "piping"
+        capa = read_parameter(f'datDis.lCon[{i}]')
+        ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+        
+        desc = f"ETS {i} CHW pumping station"
+        key = "pump coo"
+        capa = abs(read_parameter(f'bui[{i}].QChiWat_flow_nominal')) * 1e-3
+        ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+        
+        desc = f"ETS {i} HHW pumping station"
+        key = "pump hea"
+        capa = read_parameter(f'bui[{i}].QHeaWat_flow_nominal') * 1e-3
+        ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+        
+        if i != 1:
+            desc = f"ETS {i} DHW pumping station"
+            key = "pump dhw"
+            capa = read_parameter(f'bui[{i}].QHotWat_flow_nominal') * 1e-3
+            ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+            
+            desc = f"ETS {i} DHW storage tank"
+            key = "dhw storage"
+            capa = (_cp_wat * _rho_wat * read_parameter(f'bui[{i}].datDhw.VTan') * \
+                    (read_parameter(f'bui[{i}].datDhw.TDom_nominal') - read_parameter(f'bui[{i}].datDhw.TCol_nominal'))) \
+                   * conv_J_kWh
+            ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    
+    desc = "Central plant heat pump"
+    key = "hp plant"
+    capa = read_parameter("cenPla.gen.heaPum.QHea_flow_nominal") * 1e-3
+    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    
+    desc = "District pumping station"
+    key = "pump hea"
+    capa = read_parameter("cenPla.gen.heaPum.QHea_flow_nominal") * 1e-3
+    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    
+    ## capacities directly taken from MILP
+    
+    desc = "Battery"
+    key = "battery"
+    capa = 4248 # kWh
+    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    
+    desc = "PV"
+    
+    print(f'Total ALCC = {ALCC:,.0f}')
+    print(f'Total Investment = {I:,.0f}')
+    
 #%%
-tab = write_table_guiding_values()
+#tab = write_table_guiding_values()
+write_table_modelica_economics()
