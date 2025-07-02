@@ -78,6 +78,15 @@ model PartialParallel
     "Number of volume segments for tanks"
     annotation (Dialog(group="Buffer Tank"));
 
+  parameter Modelica.Units.SI.TemperatureDifference dTOffSetHea(
+    min=0.5,
+    displayUnit="K") = 1
+    "Temperature to be added to the set point in order to be slightly above what the heating load requires";
+  parameter Modelica.Units.SI.TemperatureDifference dTOffSetCoo(
+    max=-0.5,
+    displayUnit="K") = -1
+    "Temperature to be added to the set point in order to be slightly below what the cooling load requires";
+
   // IO VARIABLES
   Buildings.Controls.OBC.CDL.Interfaces.RealInput THeaWatSupSet(
     final unit="K",
