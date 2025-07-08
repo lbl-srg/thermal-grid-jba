@@ -3,14 +3,7 @@ record FiveHubs "District set up for five clustered hubs using fTMY"
   extends GenericDistrict(
     final nBui=5,
     final filNamInd=
-      if sce == ThermalGridJBA.Types.Scenario.FutureTMY then
-        {
-        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_futu.mos",
-        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_futu.mos",
-        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_futu.mos",
-        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_futu.mos",
-        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_futu.mos"}
-      else if sce == ThermalGridJBA.Types.Scenario.Baseline then
+      if sce == ThermalGridJBA.Types.Scenario.Baseline then
         {
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_base.mos",
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_base.mos",
@@ -31,24 +24,40 @@ record FiveHubs "District set up for five clustered hubs using fTMY"
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_heat.mos",
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_heat.mos",
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_heat.mos"}
-      else
+      else if sce == ThermalGridJBA.Types.Scenario.ColdSnap then
         {
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_cold.mos",
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_cold.mos",
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_cold.mos",
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_cold.mos",
-        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"},
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_cold.mos"}
+      else if sce == ThermalGridJBA.Types.Scenario.CriticalLoad then
+        {
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_crit.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_crit.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_crit.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_crit.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_crit.mos"}
+      else
+        {
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CA_futu.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CB_futu.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CC_futu.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CD_futu.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/CE_futu.mos"},
     final filNamCom=
-      if sce == ThermalGridJBA.Types.Scenario.FutureTMY then
-        "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_futu.mos"
-      else if sce == ThermalGridJBA.Types.Scenario.Baseline then
+      if sce == ThermalGridJBA.Types.Scenario.Baseline then
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_base.mos"
       else if sce == ThermalGridJBA.Types.Scenario.PostECM then
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_post.mos"
       else if sce == ThermalGridJBA.Types.Scenario.HeatWave then
         "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_heat.mos"
+      else if sce == ThermalGridJBA.Types.Scenario.ColdSnap then
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos"
+      else if sce == ThermalGridJBA.Types.Scenario.CriticalLoad then
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_crit.mos"
       else
-        "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_cold.mos",
+        "modelica://ThermalGridJBA/Resources/Data/Consumptions/All_futu.mos",
     final lDis={34,688,347,401,1412,578},
     final lCon={27,226,237,48,31},
     final facTerUniSizHea={1,1.3,1.3,1,1});
@@ -66,5 +75,10 @@ The connection points of the five hubs are at, in sequence:
 Jones Buildings (1500), Malcolm Grow Medical Complex (1058-1060),
 Aerospace Physiology Fac (1045), Presidential Inn (1380),
 and Transient Lodging Facility (1800).
+</p>
+<p>
+The load files are assigned based on
+<code>ThermalGridJBA.Types.Scenario</code>.
+</p>
 </html>"));
 end FiveHubs;
