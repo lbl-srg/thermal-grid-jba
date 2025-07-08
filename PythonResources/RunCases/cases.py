@@ -165,6 +165,13 @@ def get_cases():
         }
         _add(case, cases)
 
+        case = {
+            'name': 'crit',
+            'modifiers': 'datDis.sce = ThermalGridJBA.Types.Scenario.CriticalLoad',
+            'label': 'critical load'
+        }
+        _add(case, cases)
+
         # The commented cases below are for pre-ECM base case and the post-ECM with TMY3.
         # They are supported but not part of the regular batch of runs
         # case = {
