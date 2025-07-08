@@ -14,16 +14,35 @@ import glob
 import os
 from datetime import datetime, timedelta
 
-y = 2025 # dummy year, has no effect
+_y = 2025 # dummy year, has no effect
 CWD = os.getcwd()
 
-#%% Make epw weather file
+weather_eps_from = os.path.realpath(os.path.join(CWD,"../Weather/fTMY_Maryland_Prince_George's_NORESM2_2020_2039.epw"))
+weather_mos_from = os.path.realpath(os.path.join(CWD,"../Weather/fTMY_Maryland_Prince_George's_NORESM2_2020_2039.mos"))
+
+hotday = datetime(_y, 8, 2)
+coldday = datetime(_y, 3, 1)
+
+heat_wave_from = datetime(_y, 7, 27)
+heat_wave_to = datetime(_y, 8, 9)
+
+cold_snap_from = datetime(_y, 2, 23)
+cold_snap_to = datetime(_y, 3, 8)
+
+#%% function definitions
+
+def soy(dt):
+    # Second of year
+    start_of_year = datetime(dt.year, 1, 1)
+    return int((dt - start_of_year).total_seconds())
 
 def make_epw(weather_from,
              weather_to,
              date_to_copy,
              date_to_paste_from,
              date_to_paste_to):
+    """ Generates a new epw data file
+    """
     
     # Dictionary to store reference lines
     lines_to_copy = {}
@@ -51,29 +70,22 @@ def make_epw(weather_from,
                 new_line = line  # If the line does not start with a digit, keep the original line
             outfile.write(new_line)
 
-#%% Make mos weather or load file
-
-def make_mos(load_from,
-                  load_to,
-                  date_to_copy,
-                  date_to_paste_from,
-                  date_to_paste_to,
-                  delimiter,
-                  weather_file_name = ""):
+def make_mos_weather(load_from,
+                     load_to,
+                     date_to_copy,
+                     date_to_paste_from,
+                     date_to_paste_to,
+                     delimiter,
+                     weather_file_name = ""):
     """ Generates a new mos data file
-            `delimiter` : '\t' for a weather file
-                        : ',' for a load file
-            `weather_file_name` will not have effect on a weather file
-                because it will not have the string that is meant to be replaced.
+        `delimiter` : '\t' for a weather file
+                    : ',' for a load file
+        `weather_file_name` marks the weather file that corresponds to
+            the load mos file and will be read in Modelica.
+            It has no effect when generating a weather mos file.
     """
     
-    def soy(dt):
-        # Second of year
-        start_of_year = datetime(dt.year, 1, 1)
-        return int((dt - start_of_year).total_seconds())
-    
-    # Dictionary to store reference lines
-    lines_to_copy = list()
+    lines_to_copy = list() # stores reference lines
     soy_copy_from   = soy(date_to_copy)             # inclusive
     soy_copy_before = soy(date_to_copy) + 24*3600   # exclusive
     with open(load_from, 'r') as file:
@@ -105,16 +117,46 @@ def make_mos(load_from,
                 new_line = line  # If the line does not start with a digit, keep the original line
             outfile.write(new_line)
 
-#%% Main process
-
-weather_eps_from = os.path.realpath(os.path.join(CWD,"../Weather/fTMY_Maryland_Prince_George's_NORESM2_2020_2039.epw"))
-weather_mos_from = os.path.realpath(os.path.join(CWD,"../Weather/fTMY_Maryland_Prince_George's_NORESM2_2020_2039.mos"))
-hotday = datetime(y, 8, 2)
-heat_wave_from = datetime(y, 7, 27)
-heat_wave_to = datetime(y, 8, 9)
-coldday = datetime(y, 3, 1)
-cold_snap_from = datetime(y, 2, 23)
-cold_snap_to = datetime(y, 3, 8)
+def make_mos_critial(load_from,
+                     load_to,
+                     dates,
+                     delimiter = ','):
+    """ Generates a new mos load file.
+        `dates` : A list of datetime dates.
+                  All load values are halved for 7 days starting from
+                      each date in the list.
+    """
+    
+    def get_seconds(idx):
+        
+        sec_from = int(soy(dates[idx]))     # inclusive
+        sec_to = int(sec_from + 7 * 24 * 3600)  # exclusive
+        
+        return sec_from, sec_to
+    
+    dates.sort()
+    idx = 0
+    sec_from, sec_to = get_seconds(idx)
+    with open(load_from, 'r') as infile, open(load_to, 'w') as outfile:
+        for line in infile:
+            if line[0].isdigit(): # skip lines until a digit is found
+                sec, rest = line.split(delimiter,1)
+                iSec = int(float(sec))
+                if iSec >= sec_from and iSec < sec_to:
+                    fields = line.split(delimiter)
+                    new_fields = [fields[0]] # keep the first column
+                    for field in fields[1:]: # multiply all other columns with 50%
+                        new_fields.append(str(float(field) * 0.5))
+                    new_line = delimiter.join(new_fields) + '\n'
+                else:
+                    new_line = line
+                if iSec == sec_to:
+                    idx += 1
+                    if idx < len(dates):
+                        sec_from, sec_to = get_seconds(idx)
+            else:
+                new_line = line
+            outfile.write(new_line)
 
 #%% Make weather files
 
@@ -126,12 +168,12 @@ make_epw(weather_eps_from,
          hotday,
          heat_wave_from,
          heat_wave_to)
-make_mos(weather_mos_from,
-         weather_mos_to,
-         hotday,
-         heat_wave_from,
-         heat_wave_to,
-         '\t')
+make_mos_weather(weather_mos_from,
+                 weather_mos_to,
+                 hotday,
+                 heat_wave_from,
+                 heat_wave_to,
+                 '\t')
 
 # cold snap
 weather_epw_to = os.path.realpath(os.path.join(CWD,"../Weather/USA_MD_Andrews.AFB.fTMY.ColdSnap.epw"))
@@ -141,34 +183,46 @@ make_epw(weather_eps_from,
          coldday,
          cold_snap_from,
          cold_snap_to)
-make_mos(weather_mos_from,
-         weather_mos_to,
-         coldday,
-         cold_snap_from,
-         cold_snap_to,
-         '\t')
+make_mos_weather(weather_mos_from,
+                 weather_mos_to,
+                 coldday,
+                 cold_snap_from,
+                 cold_snap_to,
+                 '\t')
 
-#%% Make load files
+#%% Make load files for extreme weather scenarios
 
 load_from_directory = os.path.realpath(os.path.join(CWD,"Modelica/"))
 load_from_files = glob.glob(os.path.join(load_from_directory, "*_futu.mos"))
 
 for infile in load_from_files:
     outfile = infile.replace("_futu", "_heat")
-    make_mos(infile,
-             outfile,
-             hotday,
-             heat_wave_from,
-             heat_wave_to,
-             ',',
-             "USA_MD_Andrews.AFB.fTMY.HeatWave.mos")
+    make_mos_weather(infile,
+                     outfile,
+                     hotday,
+                     heat_wave_from,
+                     heat_wave_to,
+                     ',',
+                     "USA_MD_Andrews.AFB.fTMY.HeatWave.mos")
 
 for infile in load_from_files:
     outfile = infile.replace("_futu", "_cold")
-    make_mos(infile,
-             outfile,
-             coldday,
-             cold_snap_from,
-             cold_snap_to,
-             ',',
-             "USA_MD_Andrews.AFB.fTMY.ColdSnap.mos")
+    make_mos_weather(infile,
+                     outfile,
+                     coldday,
+                     cold_snap_from,
+                     cold_snap_to,
+                     ',',
+                     "USA_MD_Andrews.AFB.fTMY.ColdSnap.mos")
+    
+#%% Make load files for critical load scenario
+
+load_from_directory = os.path.realpath(os.path.join(CWD,"Modelica/"))
+load_from_files = glob.glob(os.path.join(load_from_directory, "*_futu.mos"))
+
+for infile in load_from_files:
+    outfile = infile.replace("_futu", "_crit")
+    make_mos_critial(infile,
+                     outfile,
+                     [coldday, hotday])
+    
