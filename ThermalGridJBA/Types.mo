@@ -10,7 +10,9 @@ package Types "Package with type definitions"
       HeatWave
         "Post-ECM consumption level and heat wave weather file based on fTMY",
       ColdSnap
-        "Post-ECM consumption level and cold snap weather file based on fTMY")
+        "Post-ECM consumption level and cold snap weather file based on fTMY",
+      CriticalLoad
+        "Post-ECM consumption level reduced to 50% for 7 days following hottest and coldest day")
     "Enumeration to choose the combination of consumption level and weather file"
     annotation (Documentation(info="<html>
 <p>
