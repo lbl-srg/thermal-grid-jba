@@ -242,19 +242,9 @@ def write_table_guiding_values():
     # central HP capacity
     tab += write_row_leading('Central plant heat pump capacity')
     
-    valu_mdlc = abs(read_parameter("cenPla.gen.heaPum.QHea_flow_nominal")) * 1e-6
-    tab += write_row_values(desc = 'heating',
-                            valu_milp = 4.4,
-                            valu_mdlc = valu_mdlc,
-                            format_si = ".1f",
-                            format_ip = ",.0f",
-                            unit_si = "MW",
-                            unit_ip = "MMBtu/hr",
-                            conv = conv_MW_MMBH)
-    
     valu_mdlc = abs(read_parameter("cenPla.gen.heaPum.QCoo_flow_nominal")) * 1e-6
     tab += write_row_values(desc = "cooling",
-                            valu_milp = 8.7,
+                            valu_milp = 10.772,
                             valu_mdlc = valu_mdlc,
                             format_si = ".1f",
                             format_ip = ",.0f",
