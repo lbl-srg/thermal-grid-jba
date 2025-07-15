@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import numpy as np
 from GetVariables import *
-from def_calc_cost import *
+from post_process_configurations import calc_finance
 from buildingspy.io.outputfile import Reader
 
 #CWD = os.getcwd()
