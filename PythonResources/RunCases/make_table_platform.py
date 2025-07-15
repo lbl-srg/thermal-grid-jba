@@ -32,35 +32,42 @@ conv_MW_RT = conv_Wh_Btu / 12000 * 1e6 # MW to refrigeration ton
 
 #%% numbers from MILP results
 # from "TEN + PV + battery" solution
-_milp_ten_capEtsConHea = 6.8 # ETS condenser capacity, space heating, MW
-_milp_ten_capEtsConDhw = 2.0 # ETS condenser capacity, dhw, MW
-_milp_ten_capEtsEvaCoo = 10.1 # ETS evaporator capacity, cooling, MW
+_milp_ten_capEtsConHea = 6.2 # ETS condenser capacity, space heating, MW
+_milp_ten_capEtsConDhw = 2.4 # ETS condenser capacity, dhw, MW
+_milp_ten_capEtsEvaCoo = 11.1 # ETS evaporator capacity, cooling, MW
 
 _milp_ten_copAvgEtsAll = 5.6 # ETS average COP, overall
-_milp_ten_copAvgEtsHea = 4.5 # ETS average COP, heating
-_milp_ten_copAvgEtsCoo = 6.0 # ETS average COP, cooling
+_milp_ten_copAvgEtsHea = 4.8 # ETS average COP, heating
+_milp_ten_copAvgEtsCoo = 7.0 # ETS average COP, cooling
 
 _milp_ten_capPlaHpEva = 10.772 # central plant evaporator capacity, MW
 
 _milp_ten_copPlaHpHea = 4.81 # central plant average COP, heating
-_milp_ten_copPlaHpCoo = 4.67 # central plant average COP, cooling
+_milp_ten_copPlaHpCoo = 4.66 # central plant average COP, cooling
 
 _milp_ten_capBtes = 4750 # BTES capacity, MWh
 
 _milp_ten_eneCos = 1742327.363 # USD/a
-_milp_ten_eneImp = 12.1 # energy import, GWh/a
+_milp_ten_eneImp = 11.997 # energy import, GWh/a
+
+_milp_ten_lcoe = 0.2385 # LCOE, USD/kWh
+
+##################
+# Casper, to potentially be removed
+_milp_ten_ALCC = 1742327.363 # total ALCC, USD/a
+_milp_ten_ALCC_hpPla = 1419756.970 # plant heat pump ALCC, USD/a
+_milp_ten_ALCC_borFie = 321447.722 # borefield ALCC, USD/a
+_milp_ten_capPumDis_eco = 11294 # district pump capacity for economics, equivalent to central HP capacity, kW
+_milp_ten_I = 102019208.9 # total investment, USD
+#################
 
 # from "GAS" solution
-_milp_gas_eneImp = 40.99999 # energy import, GWh/a
+_milp_gas_eneImp = 40.9 # energy import, GWh/a
+_milp_gas_ALCC = 7816186.177 # total ALCC, USD/a
+_milp_gas_I = 39276826.179 # total investment, USD
 
-_milp_gas_ALCC = 7219723 # total ALCC, USD/a
-_milp_gas_ALCC_hpPla = 1419757 # plant heat pump ALCC, USD/a
-_milp_gas_ALCC_borFie = 321448 # borefield ALCC, USD/a
-_milp_gas_capPumDis_eco = 10772 # district pump capacity for economics, equivalent to central HP capacity, kW
+_milp_gas_lcoe = 0.2032 # LCOE, USD/kWh
 
-_milp_gas_I = 102019209 # total investment, USD
-_milp_gas_I_hpPla = 17568322 # plant heat pump investment, USD
-_milp_gas_I_borFie = 7125000 # borefield investment, USD
 
 #%% BuildingsPy reader
 r=Reader(mat_file_name, "dymola")
