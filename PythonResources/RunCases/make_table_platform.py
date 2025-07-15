@@ -457,7 +457,9 @@ def write_table_economic_requirements():
                      mark = r"\checkmark",
                      numb = f"({valu/refv*100:.0f}\\%)")
     
-    tab += r"\reqInvPri & \checkmark & (100\%)* \\"
+    # non-privatised assets
+    footnote = r"\footnote{The MILP and Modelica platforms have the same results because these assets are sized with the same methods with the same inputs.}"
+    tab += r"\reqInvPri & \checkmark & (100\%) " + footnote + r"\\" + '\n'
     
     # Levelised costs
     #   avg ele price:
@@ -535,7 +537,7 @@ def write_table_economic_requirements():
     # energy demands
     print_row(crit = 'energy demands must be matched',
               succ = True)
-    tab += write_row(crit = r"IThe energy demands, which includes space heating, space cooling, domestic hot water and electricity for auxiliary purposes must be matched.",
+    tab += write_row(crit = r"The energy demands, which includes space heating, space cooling, domestic hot water and electricity for auxiliary purposes must be matched.",
                      mark = r"\checkmark")
     
     # footer
