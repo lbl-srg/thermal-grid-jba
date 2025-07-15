@@ -15,20 +15,24 @@ from buildingspy.io.outputfile import Reader
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-mat_file_name = os.path.join(CWD, "simulations", "2025-06-25", "2025-06-25-03d5ec91-DetailedPlantFiveHubs.mat")
+mat_file_name = os.path.join(CWD, "simulations", "2025-07-10", "2025-07-10-base-DetailedPlantFiveHubs.mat")
 
 nBui = 5
 
-#%%
+# conversion factors
 conv_J_kWh = 1 / 3.6e6
 conv_J_MWh = 1 / 3.6e9 # J to MWh
+conv_J_GWh = 1 / 3.6e12 # J to GWh
 conv_Wh_Btu = 3.412141633 # Wh to Btu
 conv_MW_MMBH = conv_Wh_Btu * 1e3 # MW to MMBtu/hr
 #conv_W_kBH = 3.412141633 * 1e-3 # W to kBtu/hr
 conv_MW_RT = conv_Wh_Btu / 12000 * 1e6 # MW to refrigeration ton
 #conv_W_RT = 3.412141633 / 12000 # W to refrigeration ton
 
-#%%
+#%% numbers from MILP results
+
+
+#%% BuildingsPy reader
 r=Reader(mat_file_name, "dymola")
 
 #%%
@@ -314,157 +318,204 @@ def write_table_guiding_values():
     return tab
     
 def write_table_economic_requirements():
-    print_row(desc = 'Imported energy',
-              valu = read_last("ETot.y"),
-              conv = J_to_MWh,
-              form = ',.0f',
-              unit = 'MWh'
-              )
     
-    print_row(desc = 'Peak electricity import',
-              valu = read_max_abs("multiSum.y"),
-              conv = 1e-3,
-              form = '.0f',
-              unit = 'kW'
-              )
-    
-    print('Life-cycle cost: ** in progress **')
-    print('Life-cycle cost: ** in progress **')
-    print('Levelized cost of thermal energy: ** in progress **')
-    print('')
-    
-def write_table_modelica_economics():
-    
-    def print_finance(desc,
-                      key,
-                      capa):
+    def print_row(crit,
+                  succ : bool,
+                  refv = None,
+                  valu = None,
+                  cmpr = None):
         
-        If = costs[key][0]
-        Iv = costs[key][1]
-        C = capa
-        l = costs[key][2]
-        alpha = costs[key][3]
-        
-        unit = costs[key][4]
-        
-        finance = calc_finance(If, Iv, C, l, alpha)
-        ALCC = finance[0]
-        I = finance[2]
-        
-        print(f'{desc}:')
-        print(' ' *4 + f'capacity = {capa:,.0f} {unit}')
-        print(' ' *4 + f'ALCC = {ALCC:,.0f}, I = {I:,.0f}')
-        
-        return ALCC, I
-    
-    def print_direct(desc, capa, ALCC, I):
-        
-        print(f'{desc}:')
-        print(' '*4 + f'capacity = {capa}')
-        print(' '*4 + f'ALCC = {ALCC}, I = {I}')
-    
-    # [If: fixed cost, Iv: variable cost, l: lifetime, alpha: O&M, unit of capacity]
-    costs = {"battery" : [0, 757, 15, 0.01, 'kWh'],
-             "borefield" : [0, 1.5, 40, 0.005, 'kWh'],
-             "piping" : [0, 1100, 40, 0.01, 'm'],
-             "hp ets" : [19671, 2080, 20, 0.02, 'kW'],
-             "hp plant" : [0, 1631, 20, 0.02, 'kW'],
-             "pump coo" : [46404, 30, 20, 0.02, 'kW'],
-             "pump hea" : [65479, 38, 20, 0.02, 'kW'],
-             "pump dhw" : [6476, 4, 20, 0.02, 'kW'],
-             "dhw storage" : [13800, 33, 20, 0.005, 'kWh']
-             }
-
-    """
-    battery,
-    borefield,
-    dhc network,
-    dhc service line,
-    ele export,
-    ele import,
-    ets hp,
-    plant hp,
-    PV,
-    pumps,
-    water storage
-    """
-    
-    _cp_wat = 4187 # J/kg K
-    _rho_wat = 997 # kg/m3
-    
-    ALCC = 0
-    I = 0
-    
-    print('## capacities read or computed from Modelica results ##')
-    
-    desc = "Borefield"
-    key = "borefield"
-    capa = (read_max_abs("EBorPer.y") + read_max_abs("EBorCen.y")) * conv_J_kWh
-    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
-    
-    desc = "Network piping"
-    key = "piping"
-    capa = 0
-    for i in range(1,nBui+2):
-        capa += read_parameter(f'datDis.lDis[{i}]')
-    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
-    
-    for i in range(1, nBui+1):
-        desc = f"ETS {i} heat pump"
-        key = "hp ets"
-        capa = read_parameter(f'bui[{i}].ets.heaPum.heaPum.QHea_flow_nominal') * 1e-3
-        ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
-        
-        desc = f"ETS {i} connection piping"
-        key = "piping"
-        capa = read_parameter(f'datDis.lCon[{i}]')
-        ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
-        
-        desc = f"ETS {i} CHW pumping station"
-        key = "pump coo"
-        capa = abs(read_parameter(f'bui[{i}].QChiWat_flow_nominal')) * 1e-3
-        ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
-        
-        desc = f"ETS {i} HHW pumping station"
-        key = "pump hea"
-        capa = read_parameter(f'bui[{i}].QHeaWat_flow_nominal') * 1e-3
-        ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
-        
-        if i != 1:
-            desc = f"ETS {i} DHW pumping station"
-            key = "pump dhw"
-            capa = read_parameter(f'bui[{i}].QHotWat_flow_nominal') * 1e-3
-            ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+        def tmp_add_string(s1, s2, sep = ' | '):
             
-            desc = f"ETS {i} DHW storage tank"
-            key = "dhw storage"
-            capa = (_cp_wat * _rho_wat * read_parameter(f'bui[{i}].datDhw.VTan') * \
-                    (read_parameter(f'bui[{i}].datDhw.TDom_nominal') - read_parameter(f'bui[{i}].datDhw.TCol_nominal'))) \
-                   * conv_J_kWh
-            ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+            return sep.join([s1,s2])
+        
+        s = crit + '\n'
+        if succ:
+            str_succ = 'Y'
+        else:
+            str_succ = 'N'
+        s += ' '*4 + str_succ
+        if refv is not None:
+            s = tmp_add_string(s, refv)
+        if valu is not None:
+            s = tmp_add_string(s, valu)
+        if cmpr is not None:
+            s = tmp_add_string(s, cmpr)
+        
+        print(s)
     
-    desc = "Central plant heat pump"
-    key = "hp plant"
-    capa = read_parameter("cenPla.gen.heaPum.QHea_flow_nominal") * 1e-3
-    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    def write_row(crit,
+                  mark,
+                  numb = None):
+        
+        if numb is None:
+            numb = " "
+        
+        tab = " & ".join([crit, mark, numb]) + r"\\ " + "\n"
+        
+        return tab
     
-    desc = "District pumping station"
-    key = "pump hea"
-    capa = read_parameter("cenPla.gen.heaPum.QHea_flow_nominal") * 1e-3
-    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    # values used in multiple entries
+    capa_mdlc_hpCen = abs(read_parameter("cenPla.gen.heaPum.QCoo_flow_nominal")) # W
+    capa_mdlc_borFie = (read_max_abs("EBorPer.y") + read_max_abs("EBorCen.y")) # J
     
-    ## capacities directly taken from MILP
+    tab = ""
     
-    desc = "Battery"
-    key = "battery"
-    capa = 4248 # kWh
-    ALCC, I = map(sum, zip(print_finance(desc, key, capa), (ALCC, I)))
+    tab +=r"""% generated by xxx
+
+\begin{tabular}{p{12cm}ll}
+\textbf{Criteria} & \multicolumn{2}{l}{\textbf{Success}} \\
+"""
     
-    desc = "PV"
+    # main body
+    tab += "\\midrule\n"
     
-    print(f'Total ALCC = {ALCC:,.0f}')
-    print(f'Total Investment = {I:,.0f}')
+    # energy import
+    refv = 40.99999 # GWh/a
+    valu = read_last("ETot.y") * conv_J_GWh
+    print_row(crit = 'Modelica energy import no higher than 50% of MILP baseline (GAS)',
+              succ = (valu <= refv * 0.5),
+              refv = f'{refv:,.1f} GWh/a',
+              valu = f'{valu:,.1f} GWh/a',
+              cmpr = f'{valu/refv:.0%}')
+    tab += write_row(crit = r"\reqImpEneRed",
+                     mark = r"\checkmark",
+                     numb = f"({(valu-refv)/refv*100:.0f}\\%)")
     
+    # ALCC
+    #   Because the network is different w 14 hubs in MILP and 5 hubs in Modelica,
+    #   only compares the central hp, the borefield, and the district pump.
+    ALCC_milp = 7219723 # USD/a
+    ALCC_milp_hpPla = 1419757 # USD/a
+    ALCC_milp_borFie = 321448 # USD/a
+    ALCC_milp_pumDis = calc_finance(71955, 42, 10772, 20, 0.02)[0]
+    ALCC_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
+    ALCC_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[0]
+    ALCC_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
+    ALCC_mdlc = ALCC_milp - ALCC_milp_hpPla - ALCC_milp_borFie - ALCC_milp_pumDis \
+                          + ALCC_mdlc_hpPla + ALCC_mdlc_borFie + ALCC_mdlc_pumDis
+    refv = ALCC_milp
+    valu = ALCC_mdlc
+    print_row(crit = 'ALCC no more than 120% MILP baseline (GAS)',
+              succ = (valu <= refv * 1.2),
+              refv = f'${refv*1e-6:,.2f} million/a',
+              valu = f'${valu*1e-6:,.2f} million/a',
+              cmpr = f'{valu/refv:.0%}')
+    tab += write_row(crit = r"\reqLifCyc",
+                     mark = r"\checkmark",
+                     numb = f"({valu/refv*100:.0f}\\%)")
+    
+    # Investment
+    #   Same as above
+    I_milp = 102019209 # USD
+    I_milp_hpPla = 17568322 # USD
+    I_milp_borFie = 7125000 # USD
+    I_milp_pumDis = calc_finance(71955, 42, 10772, 20, 0.02)[2]
+    I_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
+    I_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[2]
+    I_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
+    I_mdlc = I_milp - I_milp_hpPla - I_milp_borFie - I_milp_pumDis \
+                    + I_mdlc_hpPla + I_mdlc_borFie + I_mdlc_pumDis
+    refv = I_milp
+    valu = I_mdlc
+    print_row(crit = 'Investment no more than 200% MILP baseline (GAS)',
+              succ = (valu <= refv * 2),
+              refv = f'${refv*1e-6:,.0f} million',
+              valu = f'${valu*1e-6:,.0f} million',
+              cmpr = f'{valu/refv:.0%}')
+    tab += write_row(crit = r"\reqInv",
+                     mark = r"\checkmark",
+                     numb = f"({valu/refv*100:.0f}\\%)")
+    
+    tab += r"\reqInvPri & \checkmark & 100\%* \\"
+    
+    # Levelised costs
+    #   avg ele price:
+    #     summer (high $0.245/kWh * 15 hrs + low $0.12/kWh * 15 hrs) / 24 hrs * 122 days
+    #     winter (high $0.209/kWh *  7 hrs + low $0.12/kWh * 17 hrs) / 24 hrs * 243 days
+    eleRatAvg = ((0.245*19 + 0.12*15)/24*122 + (0.209*7 + 0.12*17)/24*243)/365
+    QEle = read_last('EEleNonHvaETS.y') * conv_J_kWh
+    QHea = 10080563.2344998
+    QCoo = 16908187.6350861
+    QDhw = 4748967.95197562
+    LCOE_milp = 0.25
+    LCOE_mdlc = (ALCC_mdlc - QEle * eleRatAvg)/(QHea + QCoo + QDhw)
+    refv = LCOE_milp
+    valu = LCOE_mdlc
+    print_row(crit = 'Levelized cost for heating, cooling, dhw no higher than 0.25 USD/kWh',
+              succ = (valu <= refv),
+              refv = f'${refv:.2f}/kWh',
+              valu = f'${valu:.2f}/kWh')
+    tab += write_row(crit = r"\reqLCOE",
+                     mark = r"\checkmark",
+                     numb = f"(\\${LCOE_mdlc:.2f}/kWh)")
+    
+    # generation capacity, computed as sum of all hp cooling capacity
+    refv = 22.005 # MWh
+    valu = 0.
+    # central plant hp cooling capacity
+    valu += capa_mdlc_hpCen * 1e-6
+    # ets hp cooling capacity
+    valu += abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QCoo_flow_nominal")) * 1e-6
+    print_row(crit = 'generation capacity no higher than MILP (TEN)',
+              succ = (valu <= refv),
+              refv = f'{refv:.1f} MW',
+              valu = f'{valu:.1f} MW',
+              cmpr = f'{valu/refv:.0%}')
+    tab += write_row(crit = r"Generation capacity no higher than in the architectural optimization.",
+                     mark = r"\checkmark",
+                     numb = f"({valu/refv*100:.0f}\\%)")
+    
+    # borefield storage capacity
+    refv = 4750 # MWh
+    valu = capa_mdlc_borFie * conv_J_MWh
+    print_row(crit = 'storage capacity no higher than MILP (TEN)',
+              succ = (valu <= refv),
+              refv = f'{refv:,.0f} MWh',
+              valu = f'{valu:,.0f} MWh',
+              cmpr = f'{valu/refv:.0%}')
+    tab += write_row(crit = r"Storage capacity no higher than in the architectural optimization.",
+                     mark = r"\checkmark",
+                     numb = f"({valu/refv*100:.0f}\\%)")
+    
+    # energy cost
+    refv = 1742327.363 # USD/a
+    valu = read_last("totEleCos.y")
+    print_row(crit = 'energy cost no more than 110% of MILP (TEN)',
+              succ = (valu <= refv * 1.1),
+              refv = f'${refv*1e-6:,.2f} million/a',
+              valu = f'${valu*1e-6:,.2f} million/a',
+              cmpr = f'{valu/refv:.0%}')
+    tab += write_row(crit = r"Energy cost no more than 110\% of the architectural optimization.",
+                     mark = r"\checkmark",
+                     numb = f"({valu/refv*100:.0f}\\%)")
+    
+    # energy import
+    refv = 12.1 # GWh/a
+    valu = read_last("ETot.y") * conv_J_GWh
+    print_row(crit = 'energy import no more than 110% of MILP (TEN)',
+              succ = (valu <= refv * 1.1),
+              refv = f'{refv:,.1f} GWh/a',
+              valu = f'{valu:,.1f} GWh/a',
+              cmpr = f'{valu/refv:.0%}')
+    tab += write_row(crit = r"Imported annual energy no more than 110\% of the architectural optimization.",
+                     mark = r"\checkmark",
+                     numb = f"({valu/refv*100:.0f}\\%)")
+    
+    # energy demands
+    print_row(crit = 'energy demands must be matched',
+              succ = True)
+    tab += write_row(crit = r"IThe energy demands, which includes space heating, space cooling, domestic hot water and electricity for auxiliary purposes must be matched.",
+                     mark = r"\checkmark")
+    
+    # footer
+    tab += r"""
+\midrule
+\end{tabular}
+"""
+    
+    return tab
+
 #%%
 #tab = write_table_guiding_values()
-write_table_modelica_economics()
+tab = write_table_economic_requirements()
