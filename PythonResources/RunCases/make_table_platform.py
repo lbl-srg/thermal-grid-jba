@@ -30,7 +30,36 @@ conv_MW_RT = conv_Wh_Btu / 12000 * 1e6 # MW to refrigeration ton
 #conv_W_RT = 3.412141633 / 12000 # W to refrigeration ton
 
 #%% numbers from MILP results
+# from "TEN + PV + battery" solution
+_milp_ten_capEtsConHea = 6.8 # ETS condenser capacity, space heating, MW
+_milp_ten_capEtsConDhw = 2.0 # ETS condenser capacity, dhw, MW
+_milp_ten_capEtsEvaCoo = 10.1 # ETS evaporator capacity, cooling, MW
 
+_milp_ten_copAvgEtsAll = 5.6 # ETS average COP, overall
+_milp_ten_copAvgEtsHea = 4.5 # ETS average COP, heating
+_milp_ten_copAvgEtsCoo = 6.0 # ETS average COP, cooling
+
+_milp_ten_capPlaHpEva = 10.772 # central plant evaporator capacity, MW
+
+_milp_ten_copPlaHpHea = 4.81 # central plant average COP, heating
+_milp_ten_copPlaHpCoo = 4.67 # central plant average COP, cooling
+
+_milp_ten_capBtes = 4750 # BTES capacity, MWh
+
+_milp_ten_eneCos = 1742327.363 # USD/a
+_milp_ten_eneImp = 12.1 # energy import, GWh/a
+
+# from "GAS" solution
+_milp_gas_eneImp = 40.99999 # energy import, GWh/a
+
+_milp_gas_ALCC = 7219723 # total ALCC, USD/a
+_milp_gas_ALCC_hpPla = 1419757 # plant heat pump ALCC, USD/a
+_milp_gas_ALCC_borFie = 321448 # borefield ALCC, USD/a
+_milp_gas_capPumDis_eco = 10772 # district pump capacity for economics, equivalent to central HP capacity, kW
+
+_milp_gas_I = 102019209 # total investment, USD
+_milp_gas_I_hpPla = 17568322 # plant heat pump investment, USD
+_milp_gas_I_borFie = 7125000 # borefield investment, USD
 
 #%% BuildingsPy reader
 r=Reader(mat_file_name, "dymola")
@@ -160,7 +189,7 @@ def write_table_guiding_values():
     
     valu_mdlc = abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QHea_flow_nominal")) * 1e-6
     tab += write_row_values(desc = "condenser (space heating)",
-                            valu_milp = 6.8,
+                            valu_milp = _milp_ten_capEtsConHea,
                             valu_mdlc = valu_mdlc,
                             format_si = ".1f",
                             format_ip = ",.0f",
@@ -170,7 +199,7 @@ def write_table_guiding_values():
     
     valu_mdlc = abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QHea_flow_nominal")) * 1e-6
     tab += write_row_values(desc = "condenser (DHW)",
-                            valu_milp = 2.0,
+                            valu_milp = _milp_ten_capEtsConDhw,
                             valu_mdlc = valu_mdlc,
                             format_si = ".1f",
                             format_ip = ",.0f",
@@ -180,7 +209,7 @@ def write_table_guiding_values():
     
     valu_mdlc = abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QCoo_flow_nominal")) * 1e-6
     tab += write_row_values(desc = "evaporator (cooling)",
-                            valu_milp = 10.1,
+                            valu_milp = _milp_ten_capEtsEvaCoo,
                             valu_mdlc = valu_mdlc,
                             format_si = ".1f",
                             format_ip = ",.0f",
@@ -226,10 +255,10 @@ def write_table_guiding_values():
                  'heating only' : 'heating',
                  'cooling only' : 'cooling ' + footnote + '\n',
                  'simultaneous' : 'simultaneous'}
-    valu_milp_mode = {'overall' : 5.6,
-                     'heating only' : 4.5,
-                     'cooling only' : 6.0,
-                     'simultaneous' : 'N/A'}
+    valu_milp_mode = {'overall' : _milp_ten_copAvgEtsAll,
+                      'heating only' : _milp_ten_copAvgEtsHea,
+                      'cooling only' : _milp_ten_copAvgEtsCoo,
+                      'simultaneous' : 'N/A'}
     for mode in ets_modes:
         valu_mdlc = Q_ets[mode] / P_ets[mode]
         tab += write_row_values(desc = desc_mode[mode],
@@ -248,7 +277,7 @@ def write_table_guiding_values():
     
     valu_mdlc = abs(read_parameter("cenPla.gen.heaPum.QCoo_flow_nominal")) * 1e-6
     tab += write_row_values(desc = "cooling",
-                            valu_milp = 10.772,
+                            valu_milp = _milp_ten_capPlaHpEva,
                             valu_mdlc = valu_mdlc,
                             format_si = ".1f",
                             format_ip = ",.0f",
@@ -272,7 +301,7 @@ def write_table_guiding_values():
                 integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.P',
                                          condition = condition)
     tab += write_row_values(desc = 'heating',
-                            valu_milp = 4.81,
+                            valu_milp = _milp_ten_copPlaHpHea,
                             valu_mdlc = valu_mdlc,
                             format_si = ".1f",
                             format_ip = ".1f",
@@ -286,7 +315,7 @@ def write_table_guiding_values():
                 integrate_with_condition(df_cenHp, 'cenPla.gen.heaPum.P',
                                          condition = condition)
     tab += write_row_values(desc = 'cooling',
-                            valu_milp = 4.67,
+                            valu_milp = _milp_ten_copPlaHpCoo,
                             valu_mdlc = valu_mdlc,
                             format_si = ".1f",
                             format_ip = ".1f",
@@ -300,7 +329,7 @@ def write_table_guiding_values():
     tab += write_row_leading('BTES capacity')
     valu_mdlc = (read_max_abs("EBorPer.y") + read_max_abs("EBorCen.y")) * conv_J_MWh
     tab += write_row_values(desc = ' ',
-                            valu_milp = 4750,
+                            valu_milp = _milp_ten_capBtes,
                             valu_mdlc = valu_mdlc,
                             format_si = ",.0f",
                             format_ip = ",.0f",
@@ -371,7 +400,7 @@ def write_table_economic_requirements():
     tab += "\\midrule\n"
     
     # energy import
-    refv = 40.99999 # GWh/a
+    refv = _milp_gas_eneImp # GWh/a
     valu = read_last("ETot.y") * conv_J_GWh
     print_row(crit = 'Modelica energy import no higher than 50% of MILP baseline (GAS)',
               succ = (valu <= refv * 0.5),
@@ -385,10 +414,10 @@ def write_table_economic_requirements():
     # ALCC
     #   Because the network is different w 14 hubs in MILP and 5 hubs in Modelica,
     #   only compares the central hp, the borefield, and the district pump.
-    ALCC_milp = 7219723 # USD/a
-    ALCC_milp_hpPla = 1419757 # USD/a
-    ALCC_milp_borFie = 321448 # USD/a
-    ALCC_milp_pumDis = calc_finance(71955, 42, 10772, 20, 0.02)[0]
+    ALCC_milp = _milp_gas_ALCC # USD/a
+    ALCC_milp_hpPla = _milp_gas_ALCC_hpPla # USD/a
+    ALCC_milp_borFie = _milp_gas_ALCC_borFie # USD/a
+    ALCC_milp_pumDis = calc_finance(71955, 42, _milp_gas_capPumDis_eco, 20, 0.02)[0]
     ALCC_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
     ALCC_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[0]
     ALCC_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
@@ -407,10 +436,10 @@ def write_table_economic_requirements():
     
     # Investment
     #   Same as above
-    I_milp = 102019209 # USD
-    I_milp_hpPla = 17568322 # USD
-    I_milp_borFie = 7125000 # USD
-    I_milp_pumDis = calc_finance(71955, 42, 10772, 20, 0.02)[2]
+    I_milp = _milp_gas_I # USD
+    I_milp_hpPla = _milp_gas_I_hpPla # USD
+    I_milp_borFie = _milp_gas_I_borFie # USD
+    I_milp_pumDis = calc_finance(71955, 42, _milp_gas_capPumDis_eco, 20, 0.02)[2]
     I_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
     I_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[2]
     I_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
@@ -427,7 +456,7 @@ def write_table_economic_requirements():
                      mark = r"\checkmark",
                      numb = f"({valu/refv*100:.0f}\\%)")
     
-    tab += r"\reqInvPri & \checkmark & 100\%* \\"
+    tab += r"\reqInvPri & \checkmark & (100\%)* \\"
     
     # Levelised costs
     #   avg ele price:
@@ -435,12 +464,12 @@ def write_table_economic_requirements():
     #     winter (high $0.209/kWh *  7 hrs + low $0.12/kWh * 17 hrs) / 24 hrs * 243 days
     eleRatAvg = ((0.245*19 + 0.12*15)/24*122 + (0.209*7 + 0.12*17)/24*243)/365
     QEle = read_last('EEleNonHvaETS.y') * conv_J_kWh
+    # These numbers are from load profiles and are not directly available in mat file (need to be integrated)
     QHea = 10080563.2344998
     QCoo = 16908187.6350861
     QDhw = 4748967.95197562
-    LCOE_milp = 0.25
     LCOE_mdlc = (ALCC_mdlc - QEle * eleRatAvg)/(QHea + QCoo + QDhw)
-    refv = LCOE_milp
+    refv = 0.25
     valu = LCOE_mdlc
     print_row(crit = 'Levelized cost for heating, cooling, dhw no higher than 0.25 USD/kWh',
               succ = (valu <= refv),
@@ -451,7 +480,7 @@ def write_table_economic_requirements():
                      numb = f"(\\${LCOE_mdlc:.2f}/kWh)")
     
     # generation capacity, computed as sum of all hp cooling capacity
-    refv = 22.005 # MWh
+    refv = _milp_ten_capEtsEvaCoo + _milp_ten_capPlaHpEva # MWh
     valu = 0.
     # central plant hp cooling capacity
     valu += capa_mdlc_hpCen * 1e-6
@@ -467,7 +496,7 @@ def write_table_economic_requirements():
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # borefield storage capacity
-    refv = 4750 # MWh
+    refv = _milp_ten_capBtes
     valu = capa_mdlc_borFie * conv_J_MWh
     print_row(crit = 'storage capacity no higher than MILP (TEN)',
               succ = (valu <= refv),
@@ -479,7 +508,7 @@ def write_table_economic_requirements():
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # energy cost
-    refv = 1742327.363 # USD/a
+    refv = _milp_ten_eneCos
     valu = read_last("totEleCos.y")
     print_row(crit = 'energy cost no more than 110% of MILP (TEN)',
               succ = (valu <= refv * 1.1),
@@ -491,7 +520,7 @@ def write_table_economic_requirements():
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # energy import
-    refv = 12.1 # GWh/a
+    refv = _milp_ten_eneImp
     valu = read_last("ETot.y") * conv_J_GWh
     print_row(crit = 'energy import no more than 110% of MILP (TEN)',
               succ = (valu <= refv * 1.1),
@@ -517,5 +546,5 @@ def write_table_economic_requirements():
     return tab
 
 #%%
-#tab = write_table_guiding_values()
-tab = write_table_economic_requirements()
+tab_guiVal = write_table_guiding_values()
+tab_ecoReq = write_table_economic_requirements()
