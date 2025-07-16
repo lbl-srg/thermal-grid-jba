@@ -62,6 +62,7 @@ _milp_ten_I = 102019208.9 # total investment, USD
 #################
 
 # from "GAS" solution
+_milp_gas_eneCos = 4605839.795 # USD/a
 _milp_gas_eneImp = 40.9 # energy import, GWh/a
 _milp_gas_ALCC = 7816186.177 # total ALCC, USD/a
 _milp_gas_I = 39276826.179 # total investment, USD
