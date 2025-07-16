@@ -52,14 +52,14 @@ _milp_ten_eneImp = 11.997 # energy import, GWh/a
 
 _milp_ten_lcoe = 0.2385 # LCOE, USD/kWh
 
-##################
-# Casper, to potentially be removed
-_milp_ten_ALCC = 1742327.363 # total ALCC, USD/a
+#_milp_ten_ALCC = 1742327.363 # total ALCC, USD/a
+_milp_ten_ALCC = 8500000 # number roughly read from Fig 21.
 _milp_ten_ALCC_hpPla = 1419756.970 # plant heat pump ALCC, USD/a
 _milp_ten_ALCC_borFie = 321447.722 # borefield ALCC, USD/a
 _milp_ten_capPumDis_eco = 11294 # district pump capacity for economics, equivalent to central HP capacity, kW
 _milp_ten_I = 102019208.9 # total investment, USD
-#################
+_milp_ten_I_hpPla = 17568322 # plant heat pump investment, USD
+_milp_ten_I_borFie = 7125000 # borefield investment, USD
 
 # from "GAS" solution
 _milp_gas_eneImp = 40.9 # energy import, GWh/a
@@ -382,13 +382,17 @@ def write_table_economic_requirements():
         print(s)
     
     def write_row(crit,
-                  mark,
+                  succ : bool,
                   numb = None):
         
+        if succ:
+            succ = r'\checkmark'
+        else:
+            succ = r'\xmark'
         if numb is None:
             numb = " "
         
-        tab = " & ".join([crit, mark, numb]) + r"\\ " + "\n"
+        tab = " & ".join([crit, succ, numb]) + r"\\ " + "\n"
         
         return tab
     
@@ -410,58 +414,70 @@ def write_table_economic_requirements():
     # energy import
     refv = _milp_gas_eneImp # GWh/a
     valu = read_last("ETot.y") * conv_J_GWh
+    succ = (valu <= refv * 0.5)
     print_row(crit = 'Modelica energy import no higher than 50% of MILP baseline (GAS)',
-              succ = (valu <= refv * 0.5),
+              succ = succ,
               refv = f'{refv:,.1f} GWh/a',
               valu = f'{valu:,.1f} GWh/a',
               cmpr = f'{valu/refv:.0%}')
     tab += write_row(crit = r"\reqImpEneRed",
-                     mark = r"\checkmark",
+                     succ = succ,
                      numb = f"({(valu-refv)/refv*100:.0f}\\%)")
     
     # ALCC
     #   Because the network is different w 14 hubs in MILP and 5 hubs in Modelica,
-    #   only compares the central hp, the borefield, and the district pump.
-    ALCC_milp = _milp_gas_ALCC # USD/a
-    ALCC_milp_hpPla = _milp_gas_ALCC_hpPla # USD/a
-    ALCC_milp_borFie = _milp_gas_ALCC_borFie # USD/a
-    ALCC_milp_pumDis = calc_finance(71955, 42, _milp_gas_capPumDis_eco, 20, 0.02)[0]
+    #   modelica ALCC is computed as MILP TEN ALCC + diff of [plant hp, borefield, district pump]
+    #   Note the comparison is against GAS solution, not TEN.
+    ALCC_milp = _milp_ten_ALCC # USD/a
+    ALCC_milp_hpPla = _milp_ten_ALCC_hpPla # USD/a
+    ALCC_milp_borFie = _milp_ten_ALCC_borFie # USD/a
+    ALCC_milp_pumDis = calc_finance(71955, 42, _milp_ten_capPumDis_eco, 20, 0.02)[0]
     ALCC_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
     ALCC_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[0]
     ALCC_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
     ALCC_mdlc = ALCC_milp - ALCC_milp_hpPla - ALCC_milp_borFie - ALCC_milp_pumDis \
                           + ALCC_mdlc_hpPla + ALCC_mdlc_borFie + ALCC_mdlc_pumDis
-    refv = ALCC_milp
+
+    print('## debug ##')
+    print('ALCC of total system, hp plant, borefield, district pump:')
+    print('TEN solution:')
+    print(' '*4 + f'{ALCC_milp:,.0f}, {ALCC_milp_hpPla:,.0f}, {ALCC_milp_borFie:,.0f}, {ALCC_milp_pumDis:,.0f}')
+    print('Modelica:')
+    print(' '*4 + f'{ALCC_mdlc:,.0f}, {ALCC_mdlc_hpPla:,.0f}, {ALCC_mdlc_borFie:,.0f}, {ALCC_mdlc_pumDis:,.0f}')
+                          
+    refv = _milp_gas_ALCC
     valu = ALCC_mdlc
+    succ = (valu <= refv * 1.2)
     print_row(crit = 'ALCC no more than 120% MILP baseline (GAS)',
-              succ = (valu <= refv * 1.2),
+              succ = succ,
               refv = f'${refv*1e-6:,.2f} million/a',
               valu = f'${valu*1e-6:,.2f} million/a',
               cmpr = f'{valu/refv:.0%}')
     tab += write_row(crit = r"\reqLifCyc",
-                     mark = r"\checkmark",
+                     succ = succ,
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # Investment
     #   Same as above
-    I_milp = _milp_gas_I # USD
-    I_milp_hpPla = _milp_gas_I_hpPla # USD
-    I_milp_borFie = _milp_gas_I_borFie # USD
-    I_milp_pumDis = calc_finance(71955, 42, _milp_gas_capPumDis_eco, 20, 0.02)[2]
+    I_milp = _milp_ten_I # USD
+    I_milp_hpPla = _milp_ten_I_hpPla # USD
+    I_milp_borFie = _milp_ten_I_borFie # USD
+    I_milp_pumDis = calc_finance(71955, 42, _milp_ten_capPumDis_eco, 20, 0.02)[2]
     I_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
     I_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[2]
     I_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
     I_mdlc = I_milp - I_milp_hpPla - I_milp_borFie - I_milp_pumDis \
                     + I_mdlc_hpPla + I_mdlc_borFie + I_mdlc_pumDis
-    refv = I_milp
+    refv = _milp_gas_I
     valu = I_mdlc
+    succ = (valu <= refv * 2)
     print_row(crit = 'Investment no more than 200% MILP baseline (GAS)',
-              succ = (valu <= refv * 2),
+              succ = succ,
               refv = f'${refv*1e-6:,.0f} million',
               valu = f'${valu*1e-6:,.0f} million',
               cmpr = f'{valu/refv:.0%}')
     tab += write_row(crit = r"\reqInv",
-                     mark = r"\checkmark",
+                     succ = succ,
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # non-privatised assets
@@ -481,12 +497,13 @@ def write_table_economic_requirements():
     LCOE_mdlc = (ALCC_mdlc - QEle * eleRatAvg)/(QHea + QCoo + QDhw)
     refv = 0.25
     valu = LCOE_mdlc
+    succ = (valu <= refv)
     print_row(crit = 'Levelized cost for heating, cooling, dhw no higher than 0.25 USD/kWh',
-              succ = (valu <= refv),
+              succ = succ,
               refv = f'${refv:.2f}/kWh',
               valu = f'${valu:.2f}/kWh')
     tab += write_row(crit = r"\reqLCOE",
-                     mark = r"\checkmark",
+                     succ = succ,
                      numb = f"(\\${LCOE_mdlc:.2f}/kWh)")
     
     # generation capacity, computed as sum of all hp cooling capacity
@@ -496,56 +513,60 @@ def write_table_economic_requirements():
     valu += capa_mdlc_hpCen * 1e-6
     # ets hp cooling capacity
     valu += abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QCoo_flow_nominal")) * 1e-6
+    succ = (valu <= refv)
     print_row(crit = 'generation capacity no higher than MILP (TEN)',
-              succ = (valu <= refv),
+              succ = succ,
               refv = f'{refv:.1f} MW',
               valu = f'{valu:.1f} MW',
               cmpr = f'{valu/refv:.0%}')
     tab += write_row(crit = r"Generation capacity no higher than in the architectural optimization.",
-                     mark = r"\checkmark",
+                     succ = succ,
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # borefield storage capacity
     refv = _milp_ten_capBtes
     valu = capa_mdlc_borFie * conv_J_MWh
+    succ = (valu <= refv)
     print_row(crit = 'storage capacity no higher than MILP (TEN)',
-              succ = (valu <= refv),
+              succ = succ,
               refv = f'{refv:,.0f} MWh',
               valu = f'{valu:,.0f} MWh',
               cmpr = f'{valu/refv:.0%}')
     tab += write_row(crit = r"Storage capacity no higher than in the architectural optimization.",
-                     mark = r"\checkmark",
+                     succ = succ,
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # energy cost
     refv = _milp_ten_eneCos
     valu = read_last("totEleCos.y")
+    succ = (valu <= refv * 1.1)
     print_row(crit = 'energy cost no more than 110% of MILP (TEN)',
-              succ = (valu <= refv * 1.1),
+              succ = succ,
               refv = f'${refv*1e-6:,.2f} million/a',
               valu = f'${valu*1e-6:,.2f} million/a',
               cmpr = f'{valu/refv:.0%}')
     tab += write_row(crit = r"Energy cost no more than 110\% of the architectural optimization.",
-                     mark = r"\checkmark",
+                     succ = succ,
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # energy import
     refv = _milp_ten_eneImp
     valu = read_last("ETot.y") * conv_J_GWh
+    succ = (valu <= refv * 1.1)
     print_row(crit = 'energy import no more than 110% of MILP (TEN)',
-              succ = (valu <= refv * 1.1),
+              succ = succ,
               refv = f'{refv:,.1f} GWh/a',
               valu = f'{valu:,.1f} GWh/a',
               cmpr = f'{valu/refv:.0%}')
     tab += write_row(crit = r"Imported annual energy no more than 110\% of the architectural optimization.",
-                     mark = r"\checkmark",
+                     succ = succ,
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # energy demands
     print_row(crit = 'energy demands must be matched',
               succ = True)
     tab += write_row(crit = r"The energy demands, which includes space heating, space cooling, domestic hot water and electricity for auxiliary purposes must be matched.",
-                     mark = r"\checkmark")
+                     succ = True)
     
     # footer
     tab += r"""
