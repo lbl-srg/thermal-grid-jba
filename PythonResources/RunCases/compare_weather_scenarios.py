@@ -291,7 +291,7 @@ def write_latex_table_weather(event : str):
                      unit_si = 'MWh',
                      factor_si = J_to_MWh,
                      to_ip = True,
-                     unit_ip = 'MMBtu',
+                     unit_ip = 'MMBTU',
                      factor_ip = J_to_MMBtu)
     
     # ets
