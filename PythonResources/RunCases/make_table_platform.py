@@ -601,15 +601,8 @@ def compute_modelica_economics():
     ALCC_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
     ALCC_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[0]
     ALCC_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
-    ALCC_mdlc = ALCC_milp - ALCC_milp_hpPla - ALCC_milp_borFie - ALCC_milp_pumDis \
-                          + ALCC_mdlc_hpPla + ALCC_mdlc_borFie + ALCC_mdlc_pumDis
-
-    print('## debug ##')
-    print('ALCC of total system, hp plant, borefield, district pump:')
-    print('TEN solution:')
-    print(' '*4 + f'{ALCC_milp:,.0f}, {ALCC_milp_hpPla:,.0f}, {ALCC_milp_borFie:,.0f}, {ALCC_milp_pumDis:,.0f}')
-    print('Modelica:')
-    print(' '*4 + f'{ALCC_mdlc:,.0f}, {ALCC_mdlc_hpPla:,.0f}, {ALCC_mdlc_borFie:,.0f}, {ALCC_mdlc_pumDis:,.0f}')
+    ALCC_mdlc = ALCC_milp - ALCC_milp_hpPla - ALCC_milp_borFie - ALCC_milp_pumDis - _milp_ten_eneCos \
+                          + ALCC_mdlc_hpPla + ALCC_mdlc_borFie + ALCC_mdlc_pumDis + read_last("totEleCos.y")
     
     # Investment
     I_milp = _milp_ten_I # USD
