@@ -87,7 +87,7 @@ def write_latex_capacity_table(r,
                          factor_si = 1e-3,
                          factor_ip = conv_W_kBH,
                          display_si = "kW",
-                         display_ip = "kBtu/hr")
+                         display_ip = "kBTU/h")
 
         tab += write_row(val = abs(read_parameter(f'bui[{i}].ets.heaPum.heaPum.QCoo_flow_nominal')),
                          desc = "Heat recovery heat pump - cooling",
@@ -102,7 +102,7 @@ def write_latex_capacity_table(r,
                          factor_si = 1e-3,
                          factor_ip = conv_W_kBH,
                          display_si = "kW",
-                         display_ip = "kBtu/hr")
+                         display_ip = "kBTU/h")
 
         # dhw
         if i != 1: # Bui[1] doesn't have dhw.
@@ -131,7 +131,7 @@ def write_latex_capacity_table(r,
                      factor_si = 1e-3,
                      factor_ip = conv_W_kBH,
                      display_si = "kW",
-                     display_ip = "kBtu/hr")
+                     display_ip = "kBTU/h")
 
     tab += write_row(val = abs(read_parameter('cenPla.gen.heaPum.QCoo_flow_nominal')),
                      desc = "Heat pump - cooling",
@@ -161,14 +161,14 @@ def write_latex_capacity_table(r,
                      factor_si = conv_J_MWh,
                      factor_ip = conv_J_MMBtu,
                      display_si = "MWh",
-                     display_ip = "MMBtu")
+                     display_ip = "MMBTU")
 
     tab += write_row(val = read_max_abs('EBorCen.y'),
                      desc = "Borefield center zone",
                      factor_si = conv_J_MWh,
                      factor_ip = conv_J_MMBtu,
                      display_si = "MWh",
-                     display_ip = "MMBtu")
+                     display_ip = "MMBTU")
 
     tab += "\\hline\n"
 

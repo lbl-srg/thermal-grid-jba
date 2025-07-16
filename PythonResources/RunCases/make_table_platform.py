@@ -202,7 +202,7 @@ def write_table_guiding_values():
                             format_si = ".1f",
                             format_ip = ",.0f",
                             unit_si = "MW",
-                            unit_ip = "MMBtu/hr",
+                            unit_ip = "MMBTU/h",
                             conv = conv_MW_MMBH)
     
     valu_mdlc = abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QHea_flow_nominal")) * 1e-6
@@ -212,7 +212,7 @@ def write_table_guiding_values():
                             format_si = ".1f",
                             format_ip = ",.0f",
                             unit_si = "MW",
-                            unit_ip = "MMBtu/hr",
+                            unit_ip = "MMBTU/h",
                             conv = conv_MW_MMBH)
     
     valu_mdlc = abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QCoo_flow_nominal")) * 1e-6
@@ -342,7 +342,7 @@ def write_table_guiding_values():
                             format_si = ",.0f",
                             format_ip = ",.0f",
                             unit_si = "MWh",
-                            unit_ip = "MMBtu",
+                            unit_ip = "MMBTU",
                             conv = conv_Wh_Btu)
     
     # print('PV capacity: 8.68 MWp (directly using MILP value)')
