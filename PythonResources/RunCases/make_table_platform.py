@@ -52,7 +52,7 @@ _milp_ten_eneImp = 11.997 # energy import, GWh/a
 
 _milp_ten_lcoe = 0.2385 # LCOE, USD/kWh
 
-#_milp_ten_ALCC = 1742327.363 # total ALCC, USD/a
+#_milp_ten_ALCC = 1742327.363 # total ALCC, USD/a - seems incorrect
 _milp_ten_ALCC = 8500000 # number roughly read from Fig 21.
 _milp_ten_ALCC_hpPla = 1419756.970 # plant heat pump ALCC, USD/a
 _milp_ten_ALCC_borFie = 321447.722 # borefield ALCC, USD/a
@@ -62,6 +62,7 @@ _milp_ten_I_hpPla = 17568322 # plant heat pump investment, USD
 _milp_ten_I_borFie = 7125000 # borefield investment, USD
 
 # from "GAS" solution
+_milp_gas_eneCos = -9999999 # placeholder USD/a
 _milp_gas_eneImp = 40.9 # energy import, GWh/a
 _milp_gas_ALCC = 7816186.177 # total ALCC, USD/a
 _milp_gas_I = 39276826.179 # total investment, USD
@@ -539,7 +540,7 @@ def write_table_economic_comparison():
     tab += f"% {remarks}\n\n"
     tab +=r"""
 \begin{tabular}{lrlll}
- & & Baseline & Optimized & Modelica \\
+ & & MILP baseline & MILP optimized & Modelica \\
 """
     
     # main body
@@ -549,13 +550,19 @@ def write_table_economic_comparison():
     v_gas = _milp_gas_eneImp
     v_ten = _milp_ten_eneImp
     v_mod = read_last("ETot.y") * conv_J_GWh
-    tab += f"Imported energy & [GWh/a] & {v_gas:.1f} & {v_ten:.1f} & {v_mod:.1f} \\\\\n"
+    tab += f"Imported energy & [GWh/a] & {v_gas:.3g} & {v_ten:.3g} & {v_mod:.3g} \\\\\n"
+    
+    # energy cost
+    v_gas = _milp_gas_eneCos * 1e-6
+    v_ten = _milp_ten_eneCos * 1e-6
+    v_mod = read_last("totEleCos.y") * 1e-6
+    tab += f"Imported energy cost & [million \\$/a] & {v_gas:.3g} & {v_ten:.3g} & {v_mod:.3g} \\\\\n"
     
     # annualised life cycle cost
     v_gas = _milp_gas_ALCC * 1e-6
     v_ten = _milp_ten_ALCC * 1e-6
     v_mod = ALCC_mdlc * 1e-6
-    tab += f"Annualized life-cycle cost & [million \\$/a] & {v_gas:.1f} & {v_ten:.1f} & {v_mod:.1f} \\\\\n"
+    tab += f"Annualized life-cycle cost & [million \\$/a] & {v_gas:.3g} & {v_ten:.3g} & {v_mod:.3g} \\\\\n"
     
     # total investment
     v_gas = _milp_gas_I * 1e-6
