@@ -54,7 +54,7 @@ _milp_ten_lcoe = 0.2385 # LCOE, USD/kWh
 
 ##################
 # Casper, to potentially be removed
-_milp_ten_ALCC = 1742327.363 # total ALCC, USD/a
+_milp_ten_ALCC = 8936345.735 # total ALCC, USD/a
 _milp_ten_ALCC_hpPla = 1419756.970 # plant heat pump ALCC, USD/a
 _milp_ten_ALCC_borFie = 321447.722 # borefield ALCC, USD/a
 _milp_ten_capPumDis_eco = 11294 # district pump capacity for economics, equivalent to central HP capacity, kW
