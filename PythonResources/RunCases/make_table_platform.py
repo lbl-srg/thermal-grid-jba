@@ -396,10 +396,6 @@ def write_table_economic_requirements():
         
         return tab
     
-    # values used in multiple entries
-    capa_mdlc_hpCen = abs(read_parameter("cenPla.gen.heaPum.QCoo_flow_nominal")) # W
-    capa_mdlc_borFie = (read_max_abs("EBorPer.y") + read_max_abs("EBorCen.y")) # J
-    
     tab = ""
     
     tab += f"% {remarks}\n\n"
@@ -424,27 +420,7 @@ def write_table_economic_requirements():
                      succ = succ,
                      numb = f"({(valu-refv)/refv*100:.0f}\\%)")
     
-    # ALCC
-    #   Because the network is different w 14 hubs in MILP and 5 hubs in Modelica,
-    #   modelica ALCC is computed as MILP TEN ALCC + diff of [plant hp, borefield, district pump]
-    #   Note the comparison is against GAS solution, not TEN.
-    ALCC_milp = _milp_ten_ALCC # USD/a
-    ALCC_milp_hpPla = _milp_ten_ALCC_hpPla # USD/a
-    ALCC_milp_borFie = _milp_ten_ALCC_borFie # USD/a
-    ALCC_milp_pumDis = calc_finance(71955, 42, _milp_ten_capPumDis_eco, 20, 0.02)[0]
-    ALCC_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
-    ALCC_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[0]
-    ALCC_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
-    ALCC_mdlc = ALCC_milp - ALCC_milp_hpPla - ALCC_milp_borFie - ALCC_milp_pumDis \
-                          + ALCC_mdlc_hpPla + ALCC_mdlc_borFie + ALCC_mdlc_pumDis
-
-    print('## debug ##')
-    print('ALCC of total system, hp plant, borefield, district pump:')
-    print('TEN solution:')
-    print(' '*4 + f'{ALCC_milp:,.0f}, {ALCC_milp_hpPla:,.0f}, {ALCC_milp_borFie:,.0f}, {ALCC_milp_pumDis:,.0f}')
-    print('Modelica:')
-    print(' '*4 + f'{ALCC_mdlc:,.0f}, {ALCC_mdlc_hpPla:,.0f}, {ALCC_mdlc_borFie:,.0f}, {ALCC_mdlc_pumDis:,.0f}')
-                          
+    # ALCC                
     refv = _milp_gas_ALCC
     valu = ALCC_mdlc
     succ = (valu <= refv * 1.2)
@@ -457,17 +433,7 @@ def write_table_economic_requirements():
                      succ = succ,
                      numb = f"({valu/refv*100:.0f}\\%)")
     
-    # Investment
-    #   Same as above
-    I_milp = _milp_ten_I # USD
-    I_milp_hpPla = _milp_ten_I_hpPla # USD
-    I_milp_borFie = _milp_ten_I_borFie # USD
-    I_milp_pumDis = calc_finance(71955, 42, _milp_ten_capPumDis_eco, 20, 0.02)[2]
-    I_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
-    I_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[2]
-    I_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
-    I_mdlc = I_milp - I_milp_hpPla - I_milp_borFie - I_milp_pumDis \
-                    + I_mdlc_hpPla + I_mdlc_borFie + I_mdlc_pumDis
+    # Investment    
     refv = _milp_gas_I
     valu = I_mdlc
     succ = (valu <= refv * 2)
@@ -485,16 +451,6 @@ def write_table_economic_requirements():
     tab += r"\reqInvPri & \checkmark & (100\%) " + footnote + r"\\" + '\n'
     
     # Levelised costs
-    #   avg ele price:
-    #     summer (high $0.245/kWh * 15 hrs + low $0.12/kWh * 15 hrs) / 24 hrs * 122 days
-    #     winter (high $0.209/kWh *  7 hrs + low $0.12/kWh * 17 hrs) / 24 hrs * 243 days
-    eleRatAvg = ((0.245*19 + 0.12*15)/24*122 + (0.209*7 + 0.12*17)/24*243)/365
-    QEle = read_last('EEleNonHvaETS.y') * conv_J_kWh
-    # These numbers are from load profiles and are not directly available in mat file (need to be integrated)
-    QHea = 10080563.2344998
-    QCoo = 16908187.6350861
-    QDhw = 4748967.95197562
-    LCOE_mdlc = (ALCC_mdlc - QEle * eleRatAvg)/(QHea + QCoo + QDhw)
     refv = 0.25
     valu = LCOE_mdlc
     succ = (valu <= refv)
@@ -504,13 +460,13 @@ def write_table_economic_requirements():
               valu = f'${valu:.2f}/kWh')
     tab += write_row(crit = r"\reqLCOE",
                      succ = succ,
-                     numb = f"(\\${LCOE_mdlc:.2f}/kWh)")
+                     numb = f"(\\${LCOE_mdlc:.3f}/kWh)")
     
     # generation capacity, computed as sum of all hp cooling capacity
     refv = _milp_ten_capEtsEvaCoo + _milp_ten_capPlaHpEva # MWh
     valu = 0.
     # central plant hp cooling capacity
-    valu += capa_mdlc_hpCen * 1e-6
+    valu += abs(read_parameter("cenPla.gen.heaPum.QCoo_flow_nominal")) * 1e-6
     # ets hp cooling capacity
     valu += abs(sum_elements_parameter("bui\[.\].ets.heaPum.heaPum.QCoo_flow_nominal")) * 1e-6
     succ = (valu <= refv)
@@ -525,7 +481,7 @@ def write_table_economic_requirements():
     
     # borefield storage capacity
     refv = _milp_ten_capBtes
-    valu = capa_mdlc_borFie * conv_J_MWh
+    valu = (read_max_abs("EBorPer.y") + read_max_abs("EBorCen.y")) * conv_J_MWh
     succ = (valu <= refv)
     print_row(crit = 'storage capacity no higher than MILP (TEN)',
               succ = succ,
@@ -576,6 +532,107 @@ def write_table_economic_requirements():
     
     return tab
 
-#%%
+def write_table_economic_comparison():
+    
+    tab = ""
+    
+    tab += f"% {remarks}\n\n"
+    tab +=r"""
+\begin{tabular}{lrlll}
+ & & Baseline & Optimized & Modelica \\
+"""
+    
+    # main body
+    tab += "\\midrule\n"
+    
+    # energy import
+    v_gas = _milp_gas_eneImp
+    v_ten = _milp_ten_eneImp
+    v_mod = read_last("ETot.y") * conv_J_GWh
+    tab += f"Imported energy & [GWh/a] & {v_gas:.1f} & {v_ten:.1f} & {v_mod:.1f} \\\\\n"
+    
+    # annualised life cycle cost
+    v_gas = _milp_gas_ALCC * 1e-6
+    v_ten = _milp_ten_ALCC * 1e-6
+    v_mod = ALCC_mdlc * 1e-6
+    tab += f"Annualized life-cycle cost & [million \\$/a] & {v_gas:.1f} & {v_ten:.1f} & {v_mod:.1f} \\\\\n"
+    
+    # total investment
+    v_gas = _milp_gas_I * 1e-6
+    v_ten = _milp_ten_I * 1e-6
+    v_mod = I_mdlc * 1e-6
+    tab += f"Total investment & [million \\$/a] & {v_gas:.3g} & {v_ten:.3g} & {v_mod:.3g} \\\\\n"
+    
+    # levelised cost of thermal energy
+    v_gas = _milp_gas_lcoe
+    v_ten = _milp_ten_lcoe
+    v_mod = LCOE_mdlc
+    tab += f"Levelized cost of thermal energy & [\\$/kWh] & {v_gas:.3g} & {v_ten:.3g} & {v_mod:.3g} \\\\\n"
+    
+    # footer
+    tab += r"""
+\midrule
+\end{tabular}
+"""
+    
+    return tab
+
+#%% economics from modelica results
+def compute_modelica_economics():
+    
+    #   Because the network is different w 14 hubs in MILP and 5 hubs in Modelica,
+    #   modelica ALCC is computed as MILP TEN ALCC + diff of [plant hp, borefield, district pump]
+    #   Note the comparison is against GAS solution, not TEN.
+    
+    capa_mdlc_hpCen = abs(read_parameter("cenPla.gen.heaPum.QCoo_flow_nominal")) # W
+    capa_mdlc_borFie = (read_max_abs("EBorPer.y") + read_max_abs("EBorCen.y")) # J
+    
+    # ALCC
+    ALCC_milp = _milp_ten_ALCC # USD/a
+    ALCC_milp_hpPla = _milp_ten_ALCC_hpPla # USD/a
+    ALCC_milp_borFie = _milp_ten_ALCC_borFie # USD/a
+    ALCC_milp_pumDis = calc_finance(71955, 42, _milp_ten_capPumDis_eco, 20, 0.02)[0]
+    ALCC_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
+    ALCC_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[0]
+    ALCC_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[0]
+    ALCC_mdlc = ALCC_milp - ALCC_milp_hpPla - ALCC_milp_borFie - ALCC_milp_pumDis \
+                          + ALCC_mdlc_hpPla + ALCC_mdlc_borFie + ALCC_mdlc_pumDis
+
+    print('## debug ##')
+    print('ALCC of total system, hp plant, borefield, district pump:')
+    print('TEN solution:')
+    print(' '*4 + f'{ALCC_milp:,.0f}, {ALCC_milp_hpPla:,.0f}, {ALCC_milp_borFie:,.0f}, {ALCC_milp_pumDis:,.0f}')
+    print('Modelica:')
+    print(' '*4 + f'{ALCC_mdlc:,.0f}, {ALCC_mdlc_hpPla:,.0f}, {ALCC_mdlc_borFie:,.0f}, {ALCC_mdlc_pumDis:,.0f}')
+    
+    # Investment
+    I_milp = _milp_ten_I # USD
+    I_milp_hpPla = _milp_ten_I_hpPla # USD
+    I_milp_borFie = _milp_ten_I_borFie # USD
+    I_milp_pumDis = calc_finance(71955, 42, _milp_ten_capPumDis_eco, 20, 0.02)[2]
+    I_mdlc_hpPla = calc_finance(0, 1631, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
+    I_mdlc_borFie = calc_finance(0, 1.5, capa_mdlc_borFie*conv_J_kWh, 40, 0.005)[2]
+    I_mdlc_pumDis = calc_finance(71955, 42, capa_mdlc_hpCen*1e-3, 20, 0.02)[2]
+    I_mdlc = I_milp - I_milp_hpPla - I_milp_borFie - I_milp_pumDis \
+                    + I_mdlc_hpPla + I_mdlc_borFie + I_mdlc_pumDis
+    
+    # Levelised energy cost
+    #   avg ele price:
+    #     summer (high $0.245/kWh * 15 hrs + low $0.12/kWh * 15 hrs) / 24 hrs * 122 days
+    #     winter (high $0.209/kWh *  7 hrs + low $0.12/kWh * 17 hrs) / 24 hrs * 243 days
+    eleRatAvg = ((0.245*19 + 0.12*15)/24*122 + (0.209*7 + 0.12*17)/24*243)/365
+    QEle = read_last('EEleNonHvaETS.y') * conv_J_kWh
+    # These numbers are from load profiles and are not directly available in mat file (need to be integrated)
+    QHea = 10080563.2344998
+    QCoo = 16908187.6350861
+    QDhw = 4748967.95197562
+    LCOE_mdlc = (ALCC_mdlc - QEle * eleRatAvg)/(QHea + QCoo + QDhw)
+    
+    return ALCC_mdlc, I_mdlc, LCOE_mdlc
+
+ALCC_mdlc, I_mdlc, LCOE_mdlc = compute_modelica_economics()
+
+#%% write tables
 tab_guiVal = write_table_guiding_values()
 tab_ecoReq = write_table_economic_requirements()
+tab_ecoCom = write_table_economic_comparison()
