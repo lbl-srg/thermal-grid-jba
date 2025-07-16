@@ -52,8 +52,7 @@ _milp_ten_eneImp = 11.997 # energy import, GWh/a
 
 _milp_ten_lcoe = 0.2385 # LCOE, USD/kWh
 
-#_milp_ten_ALCC = 1742327.363 # total ALCC, USD/a - seems incorrect
-_milp_ten_ALCC = 8500000 # number roughly read from Fig 21.
+_milp_ten_ALCC = 8936345.735 # total ALCC, USD/a
 _milp_ten_ALCC_hpPla = 1419756.970 # plant heat pump ALCC, USD/a
 _milp_ten_ALCC_borFie = 321447.722 # borefield ALCC, USD/a
 _milp_ten_capPumDis_eco = 11294 # district pump capacity for economics, equivalent to central HP capacity, kW
@@ -62,7 +61,7 @@ _milp_ten_I_hpPla = 17568322 # plant heat pump investment, USD
 _milp_ten_I_borFie = 7125000 # borefield investment, USD
 
 # from "GAS" solution
-_milp_gas_eneCos = -9999999 # placeholder USD/a
+_milp_gas_eneCos = 4605839.795 # USD/a
 _milp_gas_eneImp = 40.9 # energy import, GWh/a
 _milp_gas_ALCC = 7816186.177 # total ALCC, USD/a
 _milp_gas_I = 39276826.179 # total investment, USD
