@@ -132,7 +132,7 @@ def runBuildings(listBui,
             if stag == 'post':
                 setPrimaryY(ax1,'Hourly Use\n(kWh/h)')
             if stag == 'futu':
-                setSecondY(ax1,'(kBtu/hr)')
+                setSecondY(ax1,'(kBTU/h)')
             ax1.grid()
             ax1.axhline(color = 'k', linewidth = linewidth*0.8)
               
@@ -155,7 +155,7 @@ def runBuildings(listBui,
             if stag == 'post':
                 setPrimaryY(ax2,'Monthly Peak\n(kW)')
             elif stag == 'futu':
-                setSecondY(ax2,'(kBtu/hr)')
+                setSecondY(ax2,'(kBTU/h)')
             ax2.grid()
             ax2.axhline(color = 'k', linewidth = linewidth*0.8)
             
@@ -175,7 +175,7 @@ def runBuildings(listBui,
             if stag == 'post':
                 setPrimaryY(ax3,'Cumulative Use\n(MWh)')
             elif stag == 'futu':
-                setSecondY(ax3,'(MMBtu)')
+                setSecondY(ax3,'(MMBTU)')
             
             # Format the x-axis
             ax3.xaxis.set_major_locator(mdates.MonthLocator())
@@ -363,7 +363,7 @@ if saveTables:
         if util == 'dhw' and not hasDhw:
             continue
         dfPea = pd.DataFrame(columns = ['[kW]', 'Annual'] + calendar.month_name[1:13])
-        dfTot = pd.DataFrame(columns = ['[MWh]', 'Annual'] + calendar.month_name[1:13])
+        dfTot = pd.DataFrame(columns = ['[kWh]', 'Annual'] + calendar.month_name[1:13])
         for rowname in monthly.coords['buil'].values:
             _row_mon = monthly.peak.sel(stag=stag,util=util,buil=rowname).values.tolist()
             dfPea.loc[len(dfPea.index) + 1] = [rowname, np.max(_row_mon)] + _row_mon
