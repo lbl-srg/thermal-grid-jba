@@ -180,6 +180,7 @@ def plot_energy(cases : list, filePrefix: str):
     results = []
     case_names = []
     labels = []
+
     for cas in cases:
         if cas['postProcess']:
             results.append(cas['reader'])
@@ -292,7 +293,7 @@ Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \hline"""
     """
     print(vals)
     tab=head + vals + foot
-    with open(os.path.join("img", "energyUseMod.tex"), 'w') as f:
+    with open(os.path.join("img", f"{case_names[k]}_energyUseMod.tex"), 'w') as f:
         f.write(tab)
 
 
@@ -1082,7 +1083,3 @@ def plot_sensitivities(cases: list, dic: dict, filename: str):
     save_plot(fig, filename)
 
     plt.rcParams['font.size'] = ori_font_size
-
-
-
-
