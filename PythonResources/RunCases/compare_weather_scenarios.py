@@ -182,7 +182,7 @@ def write_row(description,
         diff_p_str = ""
     else:
         _diff_p = _diff_v_si/v_base_si*100
-        diff_p_str = f'{_diff_p:+.3g}\\%'
+        diff_p_str = f'{_diff_p:+.0f}\\%'
     
     tab += f"{description} & [{unit_si}] & {v_base_si:{format_si}} & {v_even_si:{format_si}} & \\textit{{{diff_v_si}}} & \\textit{{{diff_p_str}}} \\\\\n"
     
@@ -262,19 +262,21 @@ def write_latex_table_weather(event : str):
         COP[model][sce] = QCon[model][sce] / PEle[model][sce]
         
     if event == 'heat':
-        event_str = 'Heat wave'
+        event_str = 'Heat~wave'
     else:
-        event_str = 'Cold snap'
+        event_str = 'Cold~snap'
     
     # header
     tab = ""
     tab += f"% {remarks}\n\n"
-    tab += "\\begin{tabular}{lrrrrr}\n"
-    tab += "\\toprule\n"
+    tab += r"""
+\begin{tabular}{lp{2.5cm}D{.}{.}{3.6}D{.}{.}{3.2}rr}
+\toprule
+"""
     tab += f" & & Baseline & {event_str} & & \\\\\n"
-    tab += "\\hline\n"
     
     # main body
+    tab += "\\midrule\n"
     
     # end-use heating or cooling load
     if event == 'heat':
@@ -317,7 +319,7 @@ def write_latex_table_weather(event : str):
                      skip_compare = True)
     
     # awhp# ets
-    tab += "AWHP system & & & & & \\\\\n"
+    tab += "AW HP system & & & & & \\\\\n"
     model = 'awhp'
     
     # awhp compressor load
@@ -366,10 +368,10 @@ def write_latex_table_critical():
     tab += f"% {remarks}\n\n"
     tab += "\\begin{tabular}{lrrrrr}\n"
     tab += "\\toprule\n"
-    tab += " & & TEN & AW HP &  & \\\\\n"
-    tab += "\\hline\n"
+    tab += " & & TEN System & AW HP System &  & \\\\\n"
     
     # main body
+    tab += "\\midrule\n"
     
     # power outage after each event
     tab += "Required backup power & & & & & \\\\\n"
