@@ -538,8 +538,10 @@ def write_table_economic_comparison():
     
     tab += f"% {remarks}\n\n"
     tab +=r"""
-\begin{tabular}{lrlll}
- & & MILP baseline & MILP optimized & Modelica \\
+\begin{tabular}{llD{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}}
+& & \multicolumn{1}{l}{MILP} & \multicolumn{1}{l}{MILP} & \multicolumn{1}{l}{Modelica} \\
+\
+& & \multicolumn{1}{l}{\textbf{Gas}} & \multicolumn{1}{l}{\textbf{TEN+PV+Battery}} & \\
 """
     
     # main body
@@ -567,7 +569,7 @@ def write_table_economic_comparison():
     v_gas = _milp_gas_I * 1e-6
     v_ten = _milp_ten_I * 1e-6
     v_mod = I_mdlc * 1e-6
-    tab += f"Total investment & [million \\$/a] & {v_gas:.3g} & {v_ten:.3g} & {v_mod:.3g} \\\\\n"
+    tab += f"Investment & [million \\$/a] & {v_gas:.3g} & {v_ten:.3g} & {v_mod:.3g} \\\\\n"
     
     # levelised cost of thermal energy
     v_gas = _milp_gas_lcoe
