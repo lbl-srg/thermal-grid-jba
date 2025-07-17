@@ -199,6 +199,54 @@ def write_row(description,
         
     return tab
 
+def get_diff(series):
+    """ Returns (y[-1] - y[0]) of a pandas series y.
+    """
+    
+    return series.iloc[-1] - series.iloc[0]
+
+def compute_thermal_power_ten(df):
+    """ TEN system power needed to thermal load
+          = total power - terminal fans - non hvac - PV generation
+    """
+    
+    #   crit power = total electricity use - terminal fans - non hvac
+    PEle = get_diff(df['ETot.y']) - \
+           get_diff(df['EFanBui.y']) - \
+           get_diff(df['EEleNonHvaETS.y']) - \
+           get_diff(df['EPvBat.y'])
+             
+    return PEle
+
+def compute_thermal_power_awhp(df):
+    """ AW HP system power needed to thermal load
+          = compressor + pump + fan (estimated with affinity law & eta = 0.7)
+        Both AWHP and side-stream HRC included.
+    """
+    
+    PEle = 0
+    dp_nominal = df['pla.hp.dat.dpSouHeaHp_nominal'].iloc[0]
+    m_flow_nominal = df['pla.hp.mSouHeaHp_flow_nominal'].iloc[0]
+    V_flow_nominal = m_flow_nominal / df['pla.rhoSou_default'].iloc[0]
+    PFan_nominal = dp_nominal * V_flow_nominal / 0.7
+    # each awhp
+    for i in range(1, nHp+1):
+        # compressor
+        PEle += integrate_with_condition(df, f'pla.hp.hp[{i}].hp.P')
+        # pumps
+        PEle += integrate_with_condition(df, f'pla.pumPri.pumHeaWat.pum[{i}].P')
+        PEle += integrate_with_condition(df, f'pla.pumChiWatSec.pum[{i}].P')
+        PEle += integrate_with_condition(df, f'pla.pumHeaWatSec.pum[{i}].P')
+        # fan, assuming P ~ flow^3
+        df[f'PFan[{i}]'] = PFan_nominal * (df[f'pla.hp.hp[{i}].floSou.m_flow'] / m_flow_nominal)**3
+        PEle += integrate_with_condition(df, f'PFan[{i}]')
+    # side stream hrc
+    PEle += integrate_with_condition(df, 'pla.hrc.hrc.chi.P')
+    PEle += integrate_with_condition(df, 'pla.hrc.pumChiWat.pum.P')
+    PEle += integrate_with_condition(df, 'pla.hrc.pumHeaWat.pum.P')
+    
+    return PEle
+
 def write_latex_table_weather(event : str):
     """ event : ['heat', 'cold']
     """
@@ -263,8 +311,10 @@ def write_latex_table_weather(event : str):
         
     if event == 'heat':
         event_str = 'Heat~wave'
+        cop_str = 'Average cooling COP'
     else:
         event_str = 'Cold~snap'
+        cop_str = 'Average heating COP'
     
     # header
     tab = ""
@@ -300,39 +350,37 @@ def write_latex_table_weather(event : str):
     tab += "TEN system & & & & & \\\\\n"
     model = 'ets'
     
-    # ets compressor load
-    tab += write_row(description = r"\hspace{0.5cm}" + "System-wide compressor load",
-                     v_base = PEle[model]['base'],
-                     v_even = PEle[model][event],
+    # ten power consumed
+    tab += write_row(description = r"\hspace{0.5cm}" + "Electric power consumed",
+                     v_base = compute_thermal_power_ten(dfs[model]['base']),
+                     v_even = compute_thermal_power_ten(dfs[model][event]),
                      unit_si = 'MWh',
                      factor_si = J_to_MWh,
                      to_ip = False)
     
     # ets COP
-    
-    tab += write_row(description = r"\hspace{0.5cm}" + "Average COP",
+    tab += write_row(description = r"\hspace{0.5cm}" + cop_str,
                      v_base = COP[model]['base'],
                      v_even = COP[model][event],
                      unit_si = '-',
                      factor_si = 1.,
                      format_si = '.2f',
                      skip_compare = True)
-    
+    "Average COP"
     # awhp# ets
     tab += "AW HP system & & & & & \\\\\n"
     model = 'awhp'
     
-    # awhp compressor load
-    
-    tab += write_row(description = r"\hspace{0.5cm}" + "System-wide compressor load",
-                     v_base = PEle[model]['base'],
-                     v_even = PEle[model][event],
+    # awhp power consumed
+    tab += write_row(description = r"\hspace{0.5cm}" + "Electric power consumed",
+                     v_base = compute_thermal_power_awhp(dfs[model]['base']),
+                     v_even = compute_thermal_power_awhp(dfs[model][event]),
                      unit_si = 'MWh',
                      factor_si = J_to_MWh,
                      to_ip = False)
     
     # awhp COP
-    tab += write_row(description = r"\hspace{0.5cm}" + "Average COP",
+    tab += write_row(description = r"\hspace{0.5cm}" + cop_str,
                      v_base = COP[model]['base'],
                      v_even = COP[model][event],
                      unit_si = '-',
@@ -347,12 +395,6 @@ def write_latex_table_weather(event : str):
     return tab
 
 def write_latex_table_critical():
-    
-    def get_diff(series):
-        """ Returns (y[-1] - y[0]) of a pandas series y.
-        """
-        
-        return series.iloc[-1] - series.iloc[0]
     
     scenarios = ['crit_cold', 'crit_heat']
     
@@ -375,40 +417,12 @@ def write_latex_table_critical():
     
     # power outage after each event
     tab += "Required backup power & & & & & \\\\\n"
-    desc = {'crit_cold' : r"\hspace{0.5cm}" + "After cold snap",
-            'crit_heat' : r"\hspace{0.5cm}" + "After heat wave"
+    desc = {'crit_cold' : r"\hspace{0.5cm}" + "After the coldest day",
+            'crit_heat' : r"\hspace{0.5cm}" + "After the hottest day"
             }
     for sce in scenarios:
-        # ten system
-        #   crit power = total electricity use - terminal fans - non hvac
-        v_base = get_diff(dfs['ets'][sce]['ETot.y']) - \
-                 get_diff(dfs['ets'][sce]['EFanBui.y']) - \
-                 get_diff(dfs['ets'][sce]['EEleNonHvaETS.y']) - \
-                 get_diff(dfs['ets'][sce]['EPvBat.y'])
-        # awhp system
-        #   crit power = compressor + pumps + fans
-        #   assuming fan eat = 0.7
-        PEle = 0
-        dp_nominal = dfs['awhp'][sce]['pla.hp.dat.dpSouHeaHp_nominal'].iloc[0]
-        m_flow_nominal = dfs['awhp'][sce]['pla.hp.mSouHeaHp_flow_nominal'].iloc[0]
-        V_flow_nominal = m_flow_nominal / dfs['awhp'][sce]['pla.rhoSou_default'].iloc[0]
-        PFan_nominal = dp_nominal * V_flow_nominal / 0.7
-        # each awhp
-        for i in range(1, nHp+1):
-            # compressor
-            PEle += integrate_with_condition(dfs['awhp'][sce], f'pla.hp.hp[{i}].hp.P')
-            # pumps
-            PEle += integrate_with_condition(dfs['awhp'][sce], f'pla.pumPri.pumHeaWat.pum[{i}].P')
-            PEle += integrate_with_condition(dfs['awhp'][sce], f'pla.pumChiWatSec.pum[{i}].P')
-            PEle += integrate_with_condition(dfs['awhp'][sce], f'pla.pumHeaWatSec.pum[{i}].P')
-            # fan, assuming P ~ flow^3
-            dfs['awhp'][sce][f'PFan[{i}]'] = PFan_nominal * (dfs['awhp'][sce][f'pla.hp.hp[{i}].floSou.m_flow'] / m_flow_nominal)**3
-            PEle += integrate_with_condition(dfs['awhp'][sce], f'PFan[{i}]')
-        # side stream hrc
-        PEle += integrate_with_condition(dfs['awhp'][sce], 'pla.hrc.hrc.chi.P')
-        PEle += integrate_with_condition(dfs['awhp'][sce], 'pla.hrc.pumChiWat.pum.P')
-        PEle += integrate_with_condition(dfs['awhp'][sce], 'pla.hrc.pumHeaWat.pum.P')
-        v_even = PEle
+        v_base = compute_thermal_power_ten(dfs['ets'][sce])
+        v_even = compute_thermal_power_awhp(dfs['awhp'][sce])
         tab += write_row(description = desc[sce],
                          v_base = v_base,
                          v_even = v_even,
