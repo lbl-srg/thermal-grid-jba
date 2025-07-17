@@ -447,7 +447,7 @@ def write_table_economic_requirements():
                      numb = f"({valu/refv*100:.0f}\\%)")
     
     # non-privatised assets
-    footnote = r"\footnote{The MILP and Modelica platforms have the same results because these assets are sized with the same methods with the same inputs.}"
+    footnote = r"\tablefootnote{The two platforms have the same investment cost for these assets. See explanation in \cref{sec:economic-performance}.}"
     tab += r"\reqInvPri & \checkmark & (100\%) " + footnote + r"\\" + '\n'
     
     # Levelised costs
