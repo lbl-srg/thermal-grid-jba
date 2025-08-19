@@ -4,7 +4,7 @@ This repository contains the models and the post-processing scripts that were us
 
 The repository is organized as follows:
 
-- xxx: Directory with input files for the techno-economic optimization (MILP optimization). See xxx for instructions.
+- `MILPResources`: Directory with input files for the techno-economic optimization (MILP optimization). See [README.md](https://github.com/lbl-srg/thermal-grid-jba/blob/main/MILPResources/README.md) for instructions.
 - `PythonResources/RunCases`: Directory with scripts used for the energy and control system design and verification. These scripts automate the Modelica simulations and post-processing. See its [README.md](https://github.com/lbl-srg/thermal-grid-jba/blob/main/PythonResources/RunCases/README.md) file for instructions.
 - `ThermalGridJBA`: Directory with Modelica models. See the above [README.md](https://github.com/lbl-srg/thermal-grid-jba/blob/main/PythonResources/RunCases/README.md) for how to run the models.
    The main system model is [ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs](https://github.com/lbl-srg/thermal-grid-jba/blob/main/ThermalGridJBA/Networks/Validation/DetailedPlantFiveHubs.mo)
