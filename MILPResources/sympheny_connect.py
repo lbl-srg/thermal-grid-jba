@@ -8,12 +8,7 @@ Step by step script:
     1- Delete + Create a new scenario based on "single_hub"
     2- Populate the scenario with the different hubs
     3- Add the energy demands (based on xlsx files) for Cooling + Space heating + Domestic hot water + Electricity
-    4- Add on-site resources (extend the existing ones to all the hubs)
-    5- Add the supply technologies (extend the existing one to all the hubs)
-Improvements:
-    2- Hubs : import geospatial data
-    5- Imports and exports : dynamic price, how to send a file?
-    
+    4- Add the supply technologies (extend the existing one to all the hubs)    
 """
 
 import json
