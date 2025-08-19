@@ -4,29 +4,23 @@
 Created on Fri Apr 11 11:50:10 2025
 
 @author: casper
+
+Code not cleaned yet.
 """
 
 import os
-#import glob
 import pandas as pd
 import numpy as np
-#from buildingspy.io.outputfile import Reader
 
-# Dymola-python interface: see Dymola user manual 12.3
-from dymola.dymola_interface import DymolaInterface
-# Install this with
-#    <...>/Dymola-2025x-x86_64/Modelica/Library/python_interface/dymola-2024.1-py3-none-any.whl
-dymola = DymolaInterface("/usr/local/bin/dymola")
-# Replace the argument with the location of your Dymola excecutable.
-
-from GetVariables import get_vars # python file under same folder
+from GetVariables import get_vars, index_var_list, integrate_with_condition
+# python file under same folder
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-mat_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.mat")
-csv_file_name = os.path.join(CWD, "simulations", "2025-05-05-simulations", "detailed_plant_five_hubs_futu", "DetailedPlantFiveHubs.csv")
+result_folder = os.path.join(CWD, "simulations", "base")
+mat_file_name = os.path.join(result_folder, "DetailedPlantFiveHubs.mat")
 
-PRINT_RESULTS = False
+PRINT_RESULTS = True
 WRITE_TO_XLSX = True
 PATH_XLSX = os.path.join(CWD, "cop_for_milp.xlsx")
 nBui = 5
@@ -34,17 +28,22 @@ nBui = 5
 # remarks to be written to the output file
 WRITE_REMARKS = True
 
-def get_commit_hash():
-    import git
-    repo = git.Repo(search_parent_directories=True)
-    sha = repo.head.object.hexsha
-    return sha
+def find_commit(fn):
+    """ Returns the text after "version=" in the text file `fn`.
+    """
+    try:
+        with open(fn, 'r') as file:
+            for line in file:
+                if line.startswith("commit="):
+                    return line.split("commit=", 1)[1].strip()
+    except Exception:
+        return "unspecified"
+    return "unspecified"
 
 if WRITE_REMARKS:
     remarks = pd.DataFrame(np.array([['Model', 'ThermalGridJBA.Networks.Validation.DetailedPlantFiveHubs'],
                                      ['Weather scenario', 'fTMY'],
-                                     ['Result file at commit', '343b6a5a47399dbee9441f1aaf96fb83d38b8aa6'],
-                                     ['This file generated at commit', get_commit_hash()]]))
+                                     ['Result file at commit', find_commit(os.path.join(result_folder,'version.txt'))]]))
 
 def safe_cop(QCon, PChi):
     """ Returns nan if PChi == 0.
@@ -59,20 +58,6 @@ def safe_cop(QCon, PChi):
     return COP
 
 #%% Generate variable list
-def generate_indexed_var_list(pre_index, holder, i):
-    """ Replaces the `holder` string in `pre_index` with index `i`.
-        Both `pre_index` and `i` can be either a single value or a list.
-    """
-
-    _pre_index = [pre_index] if isinstance(pre_index, str) else pre_index
-    _i = [i] if isinstance(i, int) else i
-
-    var_list = list()
-    for pre, ind in [(pre, ind) for pre in _pre_index for ind in _i]:
-        var_list.append(pre.replace(holder,str(ind)))
-
-    return var_list
-
 index_holder = r'%%i%%' # placeholder string to be replaced with index
 
 # keys are the var names to be read from the result file
@@ -91,13 +76,22 @@ var_dict_pre_index = {
 
 var_list_pre_index = list(var_dict_pre_index.keys())
 
-var_list = generate_indexed_var_list(var_list_pre_index, index_holder, range(1,nBui+1))
+var_list = index_var_list(var_list_pre_index, index_holder, range(1,nBui+1))
+
+var_list_plant = [
+    'cenPla.gen.heaPum.COP',
+    'cenPla.gen.heaPum.P',
+    'cenPla.gen.heaPum.QCon_flow',
+    'cenPla.gen.heaPum.QEva_flow',
+    'cenPla.gen.heaPum.hea'
+    ]
+
+var_list += var_list_plant
 
 #%% Read mat file
 result_full = get_vars(var_list,
                        mat_file_name,
-                       'dymola',
-                       csv_file_name)
+                       'dymola')
 
 # Convert the timestamp to datetime format
 result_full['datetime'] = pd.to_datetime(result_full['Time'], unit='s', origin='2025-01-01')
@@ -108,6 +102,8 @@ if WRITE_TO_XLSX:
     w = pd.ExcelWriter(PATH_XLSX, engine='xlsxwriter')
 
 month_order = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+#%% Computation for building ETS
 all_sums = {}
 for i in range(1,nBui+1):
 #for i in [1]:
@@ -115,17 +111,15 @@ for i in range(1,nBui+1):
     var_list_bui = ['Time', 'datetime'] # initialise
 
     # indexed var names for this building
-    var_list_bui += generate_indexed_var_list(var_list_pre_index, index_holder, i)
-    result_bui = result_full[var_list_bui]
-
+    var_list_bui += index_var_list(var_list_pre_index, index_holder, i)
+    result_bui = result_full[var_list_bui].copy()
+    
     # dict for renaming pd columns
     var_dict_indexed = {key.replace(index_holder, str(i)): value for key, value in var_dict_pre_index.items()}
     result_bui = result_bui.rename(columns=var_dict_indexed)
 
     # Filter
-    result_bui = result_bui[result_bui['COP'] > 0.01] # only when chiller on
     result_bui = result_bui[result_bui['COP'] < 15.0] # remove transient at initialisation
-    result_bui = result_bui[np.isclose(result_bui['Time'] % 3600, 0)] # only keep hourly sampled values
     result_bui = result_bui.iloc[:-1] # drop the last point which would be categorised to the next year
 
     # Section the data to each calendar month
@@ -145,9 +139,19 @@ for i in range(1,nBui+1):
 
     cop_mon_results = []
     for (month, mode), group in grouped:
-        QCon_sum = group['QCon'].sum()
-        PChi_sum = group['PChi'].sum()
-
+        
+        if mode == 'other':
+            continue
+        
+        condition = np.array(np.logical_and(result_bui['month'] == month,
+                                            result_bui['mode'] == mode))
+        QCon_sum = integrate_with_condition(result_bui, 'QCon',
+                                            sign = None,
+                                            condition = condition)
+        PChi_sum = integrate_with_condition(result_bui, 'PChi',
+                                            sign = None,
+                                            condition = condition)
+        
         if (month, mode) not in all_sums:
             all_sums[(month, mode)] = {'QCon': 0, 'PChi': 0}
         all_sums[(month, mode)]['QCon'] += QCon_sum
@@ -253,12 +257,91 @@ cop_all_df_pivot = cop_all_df.pivot_table(
     aggfunc='first'
 ).swaplevel(axis=1).sort_index(axis=1)
 
+#%% Computation for central plant
+var_list_plant_results = ['Time', 'datetime'] + var_list_plant
+result_pla = result_full[var_list_plant_results].copy()
+
+# Filter
+result_pla = result_pla.iloc[:-2] # drop the last point which would be categorised to the next year
+
+# Section the data to each calendar month
+result_pla['month'] = result_pla['datetime'].dt.to_period('M')
+
+# Filter data based on operational modes
+conditions = [
+    result_pla['cenPla.gen.heaPum.hea'] == 1,
+    result_pla['cenPla.gen.heaPum.hea'] == 0
+              ]
+modes = ['heating', 'cooling']
+result_pla['mode'] = np.select(conditions, modes, default='other')
+
+# Monthly
+grouped = result_pla.groupby(['month', 'mode'])
+
+cop_mon_results_plant = []
+all_sums_plant = {}
+for (month, mode), group in grouped:
+    if mode == 'other':
+        continue
+    
+    condition = np.array(np.logical_and(result_pla['month'] == month,
+                                        result_pla['mode'] == mode))
+    
+    if mode == 'heating':
+        QCon_sum = integrate_with_condition(result_pla, 'cenPla.gen.heaPum.QCon_flow',
+                                            sign = None,
+                                            condition = condition)
+    else:
+        QCon_sum = integrate_with_condition(result_pla, 'cenPla.gen.heaPum.QEva_flow',
+                                            sign = None,
+                                            condition = condition)
+    PChi_sum = integrate_with_condition(result_pla, 'cenPla.gen.heaPum.P',
+                                        sign = None,
+                                        condition = condition)
+    
+    # print(f"# debug # (month, mode) = ({month}, {mode}):")
+    # print(f"    month match count = {np.sum(result_pla['month'] == month)}")
+    # print(f"    mode match count  = {np.sum(result_pla['mode'] == mode)}")
+    # print(f"    condition == True count = {np.sum(condition)}")
+    # print(f"    QCon = {QCon_sum}")
+    # print(f"    PChi = {PChi_sum}")
+    
+    if (month, mode) not in all_sums_plant:
+        all_sums_plant[(month, mode)] = {'QCon': 0, 'PChi': 0}
+    all_sums_plant[(month, mode)]['QCon'] += QCon_sum
+    all_sums_plant[(month, mode)]['PChi'] += PChi_sum
+    
+    COP_mon = safe_cop(QCon_sum,PChi_sum)
+    
+    cop_mon_results_plant.append((month, mode, COP_mon))
+    
+    column_names = ['COP_h']
+    
+    cop_mon_df_plant = pd.DataFrame(cop_mon_results_plant, columns=['month', 'mode'] + column_names)
+    
+    # Convert the 'month' column to abbreviated month names and order it
+    cop_mon_df_plant['month'] = cop_mon_df_plant['month'].dt.strftime('%b')
+    cop_mon_df_plant['month'] = pd.Categorical(cop_mon_df_plant['month'], categories=month_order, ordered=True)
+    
+    # Pivot the DataFrame
+    cop_mon_df_pivot_plant = cop_mon_df_plant.pivot_table(
+        index='month',
+        columns='mode',
+        values=column_names,
+        aggfunc='first'
+    ).swaplevel(axis=1).sort_index(axis=1)
+
+#%% print results
 if PRINT_RESULTS:
     print("COP across all buildings:")
     print(cop_all_df_pivot)
+    
+    print("COP of plant")
+    print(cop_mon_df_pivot_plant)
 
 if WRITE_TO_XLSX:
     cop_all_df_pivot.to_excel(w, sheet_name='All buildings', index=True)
+    cop_mon_df_pivot_plant.to_excel(w, sheet_name='Plant', index=True)
     if WRITE_REMARKS:
         remarks.to_excel(w, sheet_name="remarks", index=False)
     w.close()
