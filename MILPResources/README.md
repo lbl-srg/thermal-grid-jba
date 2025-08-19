@@ -10,6 +10,7 @@ The script `sympheny_connect.py` connects to the MILP platform, duplicates and p
 - The hourly cost of electricity (`electricity_price.xlsx`)
 
 The PV production (`pv_unit.xlsx`) is manually uploaded to the MILP platform.
+The file `additional_inputs.xlsx` provides the individual capacities of the domestic hot water tanks and the lengths of the distance between the different hubs.
 
 ## Running optimization on the MILP platform
 
