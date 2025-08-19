@@ -12,8 +12,8 @@ createPlot(id=3, position={125, 75, 795, 450}, y={"bui.ets.tanChiWat.port_genBot
 createPlot(id=3, position={125, 75, 795, 450}, y={"bui.ets.tanChiWat.TTop", "bui.ets.tanChiWat.TBot"}, range={7750000.0, 8650000.0, 5.0, 20.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"degC", "degC"});
 createPlot(id=4, position={96, 110, 792, 439}, y={"bui.ets.tanHeaWat.port_genTop.m_flow", "bui.ets.tanHeaWat.port_loaTop.m_flow"}, range={7700000.0, 8700000.0, -20.0, 100.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"kg/s", "kg/s"});
 createPlot(id=4, position={96, 110, 792, 439}, y={"bui.ets.tanHeaWat.TTop", "bui.ets.tanHeaWat.TBot"}, range={7750000.0, 8650000.0, 35.0, 60.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"degC", "degC"});
-createPlot(id=5, position={50, 149, 793, 569}, y={"bui.ets.dhw.domHotWatTan.TTanTop.T", "bui.ets.dhw.domHotWatTan.TTanBot.T", 
-"bui.ets.dhw.domHotWatTan.TDomSet"}, range={7750000.0, 8650000.0, 35.0, 55.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="s", displayUnits={"degC", "degC", "degC"});
-createPlot(id=5, position={50, 149, 793, 569}, y={"bui.ets.dhw.domHotWatTan.junTop.port_2.m_flow", "bui.ets.dhw.domHotWatTan.junTop.port_1.m_flow"}, range={7750000.0, 8650000.0, -50.0, 100.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"kg/s", "kg/s"});
+createPlot(id=5, position={50, 149, 793, 569}, y={"bui.ets.tanDhw.domHotWatTan.TTanTop.T", "bui.ets.tanDhw.domHotWatTan.TTanBot.T", 
+"bui.ets.tanDhw.THotWatSupSet"}, range={7750000.0, 8650000.0, 35.0, 55.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="s", displayUnits={"degC", "degC", "degC"});
+createPlot(id=5, position={50, 149, 793, 569}, y={"bui.ets.tanDhw.domHotWatTan.junTop.port_2.m_flow", "bui.ets.tanDhw.domHotWatTan.junTop.port_1.m_flow"}, range={7750000.0, 8650000.0, -50.0, 100.0}, grid=true, subPlot=102, colors={{28,108,200}, {238,46,47}}, timeUnit="s", displayUnits={"kg/s", "kg/s"});
 createPlot(id=5, position={50, 149, 793, 569}, y={"bui.ets.valMixHea.y_actual"}, range={7750000.0, 8650000.0, -0.5, 1.5}, grid=true, subPlot=103, colors={{28,108,200}}, timeUnit="s");
 

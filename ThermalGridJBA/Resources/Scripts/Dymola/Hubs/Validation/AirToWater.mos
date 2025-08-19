@@ -1,0 +1,9 @@
+removePlots(true);
+
+simulateModel("ThermalGridJBA.Hubs.Validation.AirToWater", tolerance=1e-6, startTime=17884800, stopTime=19094400, outputInterval=3600, method="CVode", resultFile="AirToWater");
+createPlot(id=10, position={0, 4, 987, 601}, y={"gaiCoo.u", "gaiHea.u"}, range={17800000.0, 19100000.0, -20000000.0, 10000000.0}, grid=true, subPlot=101, colors={{28,108,200}, {238,46,47}}, timeUnit="s");
+createPlot(id=10, position={0, 4, 987, 601}, y={"pla.hp.hp[1].hp.uMod", "pla.hp.hp[2].hp.uMod", "pla.hp.hp[3].hp.uMod"}, range={17800000.0, 19100000.0, -2.0, 2.0}, grid=true, subPlot=102, colors={{28,108,200}, {28,108,200}, {28,108,200}}, timeUnit="s");
+createPlot(id=10, position={0, 4, 987, 601}, y={"pla.hp.hp[1].hp.QLoa_flow", "pla.hp.hp[2].hp.QLoa_flow", "pla.hp.hp[3].hp.QLoa_flow"}, range={17800000.0, 19100000.0, -20000000.0, 20000000.0}, grid=true, subPlot=103, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="s", displayUnits={"W", "W", "W"});
+createPlot(id=10, position={0, 4, 987, 601}, y={"pla.hp.hp[1].hp.QSou_flow", "pla.hp.hp[2].hp.QSou_flow", "pla.hp.hp[3].hp.QSou_flow"}, range={17800000.0, 19100000.0, -20000000.0, 20000000.0}, grid=true, subPlot=104, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="s", displayUnits={"W", "W", "W"});
+createPlot(id=10, position={0, 4, 987, 601}, y={"pla.hp.hp[1].hp.P", "pla.hp.hp[2].hp.P", "pla.hp.hp[3].hp.P"}, range={17800000.0, 19100000.0, -5000000.0, 10000000.0}, grid=true, subPlot=105, colors={{28,108,200}, {238,46,47}, {0,140,72}}, timeUnit="s", displayUnits={"W", "W", "W"});
+

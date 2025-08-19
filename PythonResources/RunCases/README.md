@@ -11,9 +11,9 @@ nohub ./run_simulationsAndPostprocess.sh &
 The `export MODELICAPATH` command sets the path to the Modelica libraries
 and sets it to a directory that contains the libraries
 
-- Buildings, version 12.1.0
-- Modelica_Requirements, version 0.7
-- Buildings_Requirements.
+- [Buildings](https://simulationresearch.lbl.gov/modelica), version 12.1.0
+- [Modelica_Requirements](https://github.com/modelica-3rdparty/Modelica_Requirements), version 0.7
+- [Buildings_Requirements](https://github.com/lbl-srg/modelica-buildings-requirements), commit [57eca51](https://github.com/lbl-srg/modelica-buildings-requirements/commit/57eca5186599c82c04a22e431e3b5dacb2cff933).
 
 Also used is Modelica 4.0 which is distributed with Dymola 2025x.
 
@@ -31,7 +31,7 @@ which cases are run is determined in the file `cases.py`.
 ## Post Processing
 
 The ipython notebooks (files `*.ipynb`)
-write all figures to the directory img as pdf and png files.
+write all figures to the directory `img` as pdf and png files.
 They also write LaTeX snippets for the project report.
 
 Ubuntu, the following version of matplotlib was used
