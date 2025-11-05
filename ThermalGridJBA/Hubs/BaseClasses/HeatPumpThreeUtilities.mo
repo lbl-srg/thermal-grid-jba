@@ -18,7 +18,9 @@ model HeatPumpThreeUtilities
     tanChiWat(final T_start=TEva_start),
     valIsoCon(linearized=true),
     valIsoEva(linearized=true),
-    hex(val2(linearized={true,true})));
+    hex(val2(linearized={true,true})),
+    nPorts_aChiWat=1,
+    nPorts_bChiWat=1);
 
   parameter ThermalGridJBA.Data.HeatPump datHeaPum "Heat pump performance data"
     annotation (
@@ -110,8 +112,8 @@ model HeatPumpThreeUtilities
     final m_flow_nominal=colChiWat.mDis_flow_nominal)
     "Variation of enthalpy flow rate"
     annotation (Placement(transformation(extent={{-10,10},{10,-10}},
-        rotation=90,
-        origin={258,130})));
+        rotation=0,
+        origin={224,110})));
   Buildings.Controls.OBC.CDL.Reals.Sources.Constant zerPHea(
     final k=0)
     "Zero power"
@@ -310,8 +312,8 @@ model HeatPumpThreeUtilities
     final m_flow_nominal=datHeaPum.mEva_flow_nominal)
     "Supply temperature for space cooling" annotation (Placement(transformation(
         extent={{10,-10},{-10,10}},
-        rotation=0,
-        origin={170,190})));
+        rotation=270,
+        origin={260,180})));
   Buildings.Fluid.Actuators.Valves.ThreeWayEqualPercentageLinear valTHeaSup(
     redeclare package Medium = MediumBui,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
@@ -355,9 +357,9 @@ model HeatPumpThreeUtilities
     dpValve_nominal=3000)
     "Three way valve for cooling supply temperature control" annotation (
       Placement(transformation(
-        extent={{10,10},{-10,-10}},
+        extent={{10,-10},{-10,10}},
         rotation=270,
-        origin={220,170})));
+        origin={260,152})));
   Buildings.Fluid.FixedResistances.Junction junCooWatRet(
     redeclare final package Medium = MediumBui,
     final dp_nominal={0,0,0},
@@ -365,15 +367,15 @@ model HeatPumpThreeUtilities
     final tau=1,
     final m_flow_nominal=datHeaPum.mEva_flow_nominal*{1,-1,-1})
     "Junction at cooling water return" annotation (Placement(transformation(
-        extent={{10,10},{-10,-10}},
+        extent={{10,-10},{-10,10}},
         rotation=90,
-        origin={264,170})));
+        origin={220,152})));
 equation
   connect(dHFloHeaWat.dH_flow, dHHeaWat_flow) annotation (Line(points={{-271,
           182},{-271,206},{290,206},{290,160},{320,160}},
                                  color={0,0,127}));
-  connect(dHFloChiWat.dH_flow, dHChiWat_flow) annotation (Line(points={{261,142},
-          {261,148},{292,148},{292,120},{320,120}}, color={0,0,127}));
+  connect(dHFloChiWat.dH_flow, dHChiWat_flow) annotation (Line(points={{236,107},
+          {236,108},{280,108},{280,120},{320,120}}, color={0,0,127}));
   connect(totPHea.u[1], zerPHea.y)
     annotation (Line(points={{258,60},{232,60}}, color={0,0,127}));
   connect(heaPum.port_bChiWat, colChiWat.ports_aCon[2]) annotation (Line(points
@@ -428,9 +430,9 @@ equation
   connect(conDivValChi.y, valDivEva.y)
     annotation (Line(points={{122,80},{138,80}}, color={0,0,127}));
   connect(tanChiWat.port_loaTop, dHFloChiWat.port_b2) annotation (Line(points={{200,116},
-          {252,116},{252,120}},           color={0,127,255}));
+          {214,116}},                     color={0,127,255}));
   connect(tanChiWat.port_loaBot, dHFloChiWat.port_a1) annotation (Line(points={{200,104},
-          {264,104},{264,120}},           color={0,127,255}));
+          {214,104}},                     color={0,127,255}));
   connect(colChiWat.port_aDisSup, valDivEva.port_2) annotation (Line(points={{140,-50},
           {150,-50},{150,70}},          color={0,127,255}));
   connect(valDivEva.port_1, tanChiWat.port_genTop) annotation (Line(points={{150,90},
@@ -519,9 +521,6 @@ equation
   connect(senTSpaHeaSup.port_b, ports_bHeaWat[1])
     annotation (Line(points={{-178,256},{62,256},{62,260},{300,260}},
                                                    color={0,127,255}));
-  connect(senTSpaCooSup.port_b, ports_aChiWat[1])
-    annotation (Line(points={{160,190},{-20,190},{-20,200},{-300,200}},
-                                                    color={0,127,255}));
   connect(dHFloHeaWat.port_b1, valTHeaSup.port_1) annotation (Line(points={{
           -268,180},{-268,192},{-250,192},{-250,210}}, color={0,127,255}));
   connect(valTHeaSup.port_2, senTSpaHeaSup.port_a) annotation (Line(points={{
@@ -537,26 +536,29 @@ equation
     annotation (Line(points={{-280,210},{-280,180}}, color={0,127,255}));
   connect(junHeaWatRet.port_1, ports_aHeaWat[1]) annotation (Line(points={{-280,
           230},{-280,260},{-300,260}}, color={0,127,255}));
-  connect(dHFloChiWat.port_a2, valTCooSup.port_1) annotation (Line(points={{252,
-          140},{252,150},{220,150},{220,160}}, color={0,127,255}));
-  connect(valTCooSup.port_2, senTSpaCooSup.port_a) annotation (Line(points={{
-          220,180},{220,190},{180,190}}, color={0,127,255}));
-  connect(dHFloChiWat.port_b1, junCooWatRet.port_2)
-    annotation (Line(points={{264,140},{264,160}}, color={0,127,255}));
-  connect(junCooWatRet.port_1, ports_bChiWat[1]) annotation (Line(points={{264,
-          180},{264,200},{300,200}}, color={0,127,255}));
+  connect(valTCooSup.port_2, senTSpaCooSup.port_a) annotation (Line(points={{260,162},
+          {260,170}},                    color={0,127,255}));
   connect(senTSpaCooSup.T, conPIDTCooWatSup.u_m)
-    annotation (Line(points={{170,201},{170,228}}, color={0,0,127}));
+    annotation (Line(points={{271,180},{278,180},{278,222},{170,222},{170,228}},
+                                                   color={0,0,127}));
   connect(conPIDTCooWatSup.y, valTCooSup.y) annotation (Line(points={{182,240},
-          {190,240},{190,170},{208,170}}, color={0,0,127}));
+          {280,240},{280,152},{272,152}}, color={0,0,127}));
   connect(valTCooSup.port_3, junCooWatRet.port_3)
-    annotation (Line(points={{230,170},{254,170}}, color={0,127,255}));
-  connect(conPIDTCooWatSup.u_s, TChiWatSupSet) annotation (Line(points={{158,
-          240},{66,240},{66,210},{-26,210},{-26,-24},{-240,-24},{-240,-60},{
-          -320,-60}}, color={0,0,127}));
+    annotation (Line(points={{250,152},{230,152}}, color={0,127,255}));
+  connect(conPIDTCooWatSup.u_s, TChiWatSupSet) annotation (Line(points={{158,240},
+          {150,240},{150,210},{-26,210},{-26,-24},{-240,-24},{-240,-60},{-320,
+          -60}},      color={0,0,127}));
   connect(conPIDTHeaWatSup.u_s, THeaWatSupSet) annotation (Line(points={{-258,274},
           {-288,274},{-288,-20},{-300,-20},{-300,-20},{-320,-20}},      color={
           0,0,127}));
+  connect(junCooWatRet.port_1, ports_aChiWat[1]) annotation (Line(points={{220,
+          162},{220,200},{-300,200}}, color={0,127,255}));
+  connect(senTSpaCooSup.port_b, ports_bChiWat[1]) annotation (Line(points={{260,
+          190},{260,200},{300,200}}, color={0,127,255}));
+  connect(dHFloChiWat.port_b1, valTCooSup.port_1) annotation (Line(points={{234,
+          104},{260,104},{260,142}}, color={0,127,255}));
+  connect(dHFloChiWat.port_a2, junCooWatRet.port_2) annotation (Line(points={{
+          234,116},{250,116},{250,130},{220,130},{220,142}}, color={0,127,255}));
   annotation (Icon(graphics={
         Rectangle(
           extent={{12,-40},{40,-12}},
