@@ -18,7 +18,8 @@ from GetVariables import *
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))
-mat_file_name = os.path.join(CWD, "simulations", "2025-07-10_base-crit", "2025-07-10-base-DetailedPlantFiveHubs.mat")
+#mw: mat_file_name = os.path.join(CWD, "simulations", "2025-07-10_base-crit", "2025-07-10-base-DetailedPlantFiveHubs.mat")
+mat_file_name = os.path.join(CWD, "simulations", "base", "DetailedPlantFiveHubs.mat")
 
 nBui = 5 # Ensure this is consistent with the mat file
 _i = r'%%i%%' # placeholder string to be replaced with index

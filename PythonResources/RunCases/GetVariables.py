@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 from typing import Literal, get_args
-from scipy.integrate import trapz
+from scipy.integrate import trapezoid as trapz
 
 #CWD = os.getcwd()
 CWD = os.path.dirname(os.path.abspath(__file__))

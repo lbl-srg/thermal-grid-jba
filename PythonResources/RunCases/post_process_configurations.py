@@ -277,19 +277,19 @@ def plot_energy(cases : list, filePrefix: str):
  &  \\multicolumn{1}{l}{Energy} &
  \\multicolumn{1}{l}{Specific energy} \\\\
  &
- \\multicolumn{1}{l}{$\mathrm{[GWh/a]}$} &
- \\multicolumn{1}{l}{$\mathrm{[kWh/(m2 \, a)]}$} \\\\ \hline"""
+ \\multicolumn{1}{l}{$\\mathrm{[GWh/a]}$} &
+ \\multicolumn{1}{l}{$\\mathrm{[kWh/(m2 \\, a)]}$} \\\\ \\hline"""
 
     vals=f"""
 Heat pumps in ETS   & {EHeaPum[k]:.2f} &  {EHeaPum[k]*GWH_to_kWh_m2:.1f} \\\\
 Heat pumps in plant & {EComPla[k]:.2f} &  {EComPla[k]*GWH_to_kWh_m2:.1f} \\\\
 Pumps               & {(EPumETS[k]+EPumDis[k]+EPumPla[k]):.2f} &  {(EPumETS[k]+EPumDis[k]+EPumPla[k])*GWH_to_kWh_m2:.1f} \\\\
 Fans                & {(EFanDry[k]+EFanBui[k]):.2f} &  {(EFanDry[k]+EFanBui[k])*GWH_to_kWh_m2:.1f} \\\\
-Non-HVAC electricity for buildings & {EEleNon[k]:.2f} &  {EEleNon[k]*GWH_to_kWh_m2:.1f}  \\\\ \hline
+Non-HVAC electricity for buildings & {EEleNon[k]:.2f} &  {EEleNon[k]*GWH_to_kWh_m2:.1f}  \\\\ \\hline
 PVs and batteries  & {EPvBat[k]:.2f} &  {EPvBat[k]*GWH_to_kWh_m2:.1f} \\\\
-Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \hline"""
+Total & {EAllTot[k]:.2f} &  {EAllTot[k]*GWH_to_kWh_m2:.1f} \\\\ \\hline"""
     foot=u"""
-    \end{tabular}
+    \\end{tabular}
     """
     print(vals)
     tab=head + vals + foot
