@@ -22,21 +22,23 @@ The file `run_simulationsAndPostprocess.sh` runs all simulations and
 (some) of the post-proceesing.
 Note that not all post-processing is run as we skip some simulations that
 were done for equipment sizing.
+The post-processing writes all figures to the directory `img` as pdf and png files.
+It also also writes LaTeX snippets for the project report.
 
 Which version of the repository is used is determined at the
 to of the file `run_simulations.py`, and
 which cases are run is determined in the file `cases.py`.
+The results of the simulations will be stored in `simulations`,
+with a directory for each case. For example,
+`simulations/base` will contain the results of the base case.
+These results are not version controlled as they full output files are too large.
+
+To install a Python virtual environment, use the file `requirements.txt`.
 
 
 ## Post Processing
 
-The ipython notebooks (files `*.ipynb`)
-write all figures to the directory `img` as pdf and png files.
-They also write LaTeX snippets for the project report.
-
-Ubuntu, the following version of matplotlib was used
-```
-pip freeze | grep matplotlib
-matplotlib==3.5.1
-```
-Some older versions return an error because they do not support some plot configurations.
+The file `make_table_platform.py` creates LaTeX tables that compares various results for inclusion in the project report, and
+`extract_values_for_sankey.py` creates a Excel file that has been used
+to create manually the Sankey diagrams.
+(These files are not called by `run_simulationsAndPostprocess.sh`, but for future updates, they should be added to that file.)
