@@ -346,7 +346,7 @@ def plot_loop_temperatures(cases : list):
         axs[0].add_patch(copy.copy(rect2))
         axs[0].add_patch(copy.copy(rect3))
 
-        axs[0].text(400, 10, f"Constraint violation during {max(conVio)*(t[-1]-t[0])/3600.:.1f} hours.")
+        axs[0].text(400, 10, f"Constraint violation during {conVio[-1]*(t[-1]-t[0])/3600.:.1f} hours.")
 
         axs[0].set_ylabel(r'Temperature [$^\circ$C]')
         #axs[0].set_xticks(list(range(25)))

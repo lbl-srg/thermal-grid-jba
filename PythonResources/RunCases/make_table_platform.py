@@ -405,7 +405,7 @@ def write_table_economic_requirements():
 """
     
     # main body
-    tab += "\\midrule\n"
+    tab += "\\hline\n"
     
     # energy import
     refv = _milp_gas_eneImp # GWh/a
@@ -526,7 +526,7 @@ def write_table_economic_requirements():
     
     # footer
     tab += r"""
-\midrule
+\hline
 \end{tabular}
 """
     
@@ -546,7 +546,7 @@ def write_table_economic_comparison():
 """
     
     # main body
-    tab += "\\midrule\n"
+    tab += "\\hline\n"
     
     # energy import
     v_gas = _milp_gas_eneImp
@@ -600,7 +600,7 @@ def write_table_economic_comparison():
     
     # footer
     tab += r"""
-\midrule
+\hline
 \end{tabular}
 """
     tab += r"""}"""
@@ -662,8 +662,8 @@ tab_ecoCom = write_table_economic_comparison()
 
 # Below output added by mwetter, 2025-12-13
 f1 = os.path.join("img", "guidingValues.tex")
-f2 = "tab_economic-requirements-modelica.tex"
-f3 = "tab_economic-comparison.tex"
+f2 = os.path.join("img", "tab_economic-requirements-modelica.tex")
+f3 = os.path.join("img", "tab_economic-comparison.tex")
 with open(f1, "w") as f:
     f.write(tab_guiVal)
 with open(f2, "w") as f:
