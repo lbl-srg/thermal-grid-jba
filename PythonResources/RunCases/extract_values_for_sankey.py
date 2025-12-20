@@ -32,8 +32,11 @@ var_list_pre_index = [
     f'bui[{_i}].ets.PCoo',
     f'bui[{_i}].dHChiWat_flow',
     f'bui[{_i}].dHHeaWat_flow',
-    f'bui[{_i}].bui.disFloHea.PPum',
-    f'bui[{_i}].bui.disFloCoo.PPum',
+    f'bui[{_i}].ets.PPum',
+##--    f'bui[{_i}].bui.disFloHea.PPum',
+##--    f'bui[{_i}].bui.disFloCoo.PPum',
+##--    f'bui[{_i}].bui.terUniHea.PFan',
+##--    f'bui[{_i}].bui.terUniCoo.PFan',
     f'QEtsHex_flow.u[{_i}]']
 var_list += index_var_list(var_list_pre_index,
                            _i,
@@ -57,12 +60,22 @@ var_list += ['cenPla.gen.ind.ySea',
              'cenPla.QBorCen_flow',
              'cenPla.gen.fanDryCoo.P',
              'cenPla.gen.pumDryCoo.P',
+             'cenPla.gen.pumBorFiePer.P',
+             'cenPla.gen.pumBorFieCen.P',
+             'cenPla.gen.pumCenPlaPri.P',
+             'cenPla.gen.pumCenPlaSec.P',
+             'cenPla.gen.pumHexGly.P',
+             'cenPla.gen.pumHeaPumWat.P',
+             'cenPla.gen.pumHeaPumGly.P',
+             'cenPla.gen.pumDryCoo.P',
              'cenPla.gen.dryCoo.Q1_flow',
              'pumDis.P',
+             'PPumETS.y',
              'PEleNonHva.y',
              'PFanBuiSum.y',
              'EPvBat.u'
              ]
+
 results = get_vars(var_list,
                    mat_file_name,
                    'dymola')
@@ -73,14 +86,15 @@ results = get_vars(var_list,
 data_dicts = [
     {
     ("PV and bettery", "Electricity") : 0,
-    ("Electricity", "Buildings fans + non HVAC") : 0,
-    ("Electricity", "Pump coo") : 0,
-    ("Electricity", "Pump hea") : 0,
-    ("Electricity", "Pump DHW") : 0,
-    ("Electricity", "ETS") : 0,
-    ("Electricity", "Central plant chiller") : 0,
-    ("Electricity", "Dry cooler") : 0,
+    ("Electricity", "Building Load") : 0,
+    ("Electricity", "Pumps ETS and buildings") : 0,
+    ("Electricity", "Pump DHW (this is also in 'Pump in ETS and buildings')") : 0,
+    ("Electricity", "ETS HP compressor") : 0,
+    ("Electricity", "Dry cooler fan") : 0,
     ("Electricity", "Pump district") : 0,
+    ("Electricity", "Central plant chiller compressor") : 0,
+    ("Electricity", "Central plant both borefield pumps") : 0,
+    ("Electricity", "Central plant all water & glycol pumps, except borefield") : 0,
     ("Heat ambient", "Dry cooler") : 0,
     ("TEN", "Central plant chiller") : 0,
     ("Dry cooler", "Heat ambient") : 0,
@@ -88,14 +102,14 @@ data_dicts = [
     ("Economiser", "TEN") : 0,
     ("Borefield", "TEN") : 0,
     ("Ground", "TEN") : 0,
-    ("ETS", "Pump district") : 0,
+    ("ETS", "Pump district (heat flow)") : 0,
     ("TEN", "Economiser") : 0,
     ("TEN", "Borefield") : 0,
     ("TEN", "Ground") : 0,
-    ("Pump district", "ETS") : 0,
-    ("Pump coo", "ETS") : 0,
-    ("ETS", "Pump hea") : 0,
-    ("ETS", "DHW") : 0
+    ("Pump district", "ETS (heat flow)") : 0,
+    ("Pump coo (heat flow)", "ETS") : 0,
+    ("ETS", "Pump hea (heat flow)") : 0,
+    ("ETS", "DHW (heat flow)") : 0
         }
     for _ in range(5)]
 
@@ -105,45 +119,63 @@ for sea in range(5):
         condition = None
     else:
         condition = np.array(results['cenPla.gen.ind.ySea'] == sea)
-    
+
     data_dict = data_dicts[sea]
-    
+
     # Electricity node
     data_dict[("PV and bettery", "Electricity")] = \
         abs(integrate_with_condition(results, 'EPvBat.u',
                                      condition = condition))
-    data_dict[("Electricity", "Buildings fans + non HVAC")] = \
+    data_dict[("Electricity", "Building Load")] = \
         abs(integrate_with_condition(results, 'PEleNonHva.y',
                                      condition = condition)) + \
         abs(integrate_with_condition(results, 'PFanBuiSum.y',
                                      condition = condition))
-    data_dict[("Electricity", "Central plant chiller")] = \
+    data_dict[("Electricity", "Pumps ETS and buildings")] += \
+        abs(integrate_with_condition(results, 'PPumETS.y',
+                                        condition = condition))
+
+    data_dict[("Electricity", "Central plant chiller compressor")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.heaPum.P',
                                      condition = condition))
-    data_dict[("Electricity", "Dry cooler")] = \
+    data_dict[("Electricity", "Dry cooler fan")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.fanDryCoo.P',
+                                     condition = condition))
+    data_dict[("Electricity", "Central plant both borefield pumps")] = \
+        abs(integrate_with_condition(results, 'cenPla.gen.pumBorFiePer.P',
+                                     condition = condition)) + \
+        abs(integrate_with_condition(results, 'cenPla.gen.pumBorFieCen.P',
+                                     condition = condition))
+    data_dict[("Electricity", "Central plant all water & glycol pumps, except borefield")] = \
+        abs(integrate_with_condition(results, 'cenPla.gen.pumCenPlaPri.P',
+                                     condition = condition)) + \
+        abs(integrate_with_condition(results, 'cenPla.gen.pumCenPlaSec.P',
+                                     condition = condition)) + \
+        abs(integrate_with_condition(results, 'cenPla.gen.pumHexGly.P',
+                                     condition = condition)) + \
+        abs(integrate_with_condition(results, 'cenPla.gen.pumHeaPumWat.P',
+                                     condition = condition)) + \
+        abs(integrate_with_condition(results, 'cenPla.gen.pumHeaPumGly.P',
                                      condition = condition)) + \
         abs(integrate_with_condition(results, 'cenPla.gen.pumDryCoo.P',
                                      condition = condition))
+
+
+
     data_dict[("Electricity", "Pump district")] = \
         abs(integrate_with_condition(results, 'pumDis.P',
                                      condition = condition))
     # each building
     for i in range(1,nBui+1):
-        data_dict[("Electricity", "ETS")] += \
+        data_dict[("Electricity", "ETS HP compressor")] += \
             abs(integrate_with_condition(results, f'bui[{i}].ets.PCoo',
                                          condition = condition))
-        data_dict[("Electricity", "Pump coo")] += \
-            abs(integrate_with_condition(results, f'bui[{i}].bui.disFloCoo.PPum',
-                                         condition = condition))
-        data_dict[("Electricity", "Pump hea")] += \
-            abs(integrate_with_condition(results, f'bui[{i}].bui.disFloHea.PPum',
-                                         condition = condition))
+
         if i != 1: # bui[1] doesn't have dhw
-            data_dict[("Electricity", "Pump DHW")] += \
+            data_dict[("Electricity", "Pump DHW (this is also in 'Pump in ETS and buildings')")] += \
                 abs(integrate_with_condition(results, f'bui[{i}].ets.tanDhw.PEle',
                                              condition = condition))
-    
+
     # Central plant node, previously computed links excluded
     data_dict[("Heat ambient", "Dry cooler")] = \
         abs(integrate_with_condition(results, 'cenPla.gen.dryCoo.Q1_flow',
@@ -197,11 +229,11 @@ for sea in range(5):
                                           condition = condition))
     # each building
     for i in range(1,nBui+1):
-        data_dict[("Pump district", "ETS")] += \
+        data_dict[("Pump district", "ETS (heat flow)")] += \
             abs(integrate_with_condition(results, f'QEtsHex_flow.u[{i}]',
                                           sign = 'positive',
                                           condition = condition))
-        data_dict[("ETS", "Pump district")] += \
+        data_dict[("ETS", "Pump district (heat flow)")] += \
             abs(integrate_with_condition(results, f'QEtsHex_flow.u[{i}]',
                                           sign = 'negative',
                                           condition = condition))
@@ -209,14 +241,14 @@ for sea in range(5):
     # ETS node, previously computed links excluded
     # each building
     for i in range(1,nBui+1):
-        data_dict[("Pump coo", "ETS")] += \
+        data_dict[("Pump coo (heat flow)", "ETS")] += \
             abs(integrate_with_condition(results, f'bui[{i}].dHChiWat_flow',
                                           condition = condition))
-        data_dict[("ETS", "Pump hea")] += \
+        data_dict[("ETS", "Pump hea (heat flow)")] += \
             abs(integrate_with_condition(results, f'bui[{i}].dHHeaWat_flow',
                                           condition = condition))
         if i != 1: # bui[1] doesn't have dhw
-            data_dict[("ETS", "DHW")] += \
+            data_dict[("ETS", "DHW (heat flow)")] += \
                 abs(integrate_with_condition(results, f'bui[{i}].dHHotWat_flow',
                                               condition = condition))
 
@@ -229,5 +261,5 @@ with pd.ExcelWriter('sankey_modelica.xlsx', engine='openpyxl') as writer:
         df[['From', 'To']] = pd.DataFrame(df['From-To'].tolist(), index=df.index)
         df['kWh'] = df['kWh'] * J_to_kWh
         df = df[['From', 'To', 'kWh']]
-        
+
         df.to_excel(writer, sheet_name=season, index=False)
